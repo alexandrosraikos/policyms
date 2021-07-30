@@ -23,6 +23,8 @@ function registration_form_html()
      * 
      * TODO@elefkour: Δημιουργία function με το HTML registration form.
      * Βάλε ως κύριο id=policycloud-registration για το HTML <form>.
+     * Βλέπε το documentation (https://documenter.getpostman.com/view/16776360/TzsZs8kn#17a87988-323b-4209-b93c-ea3854616ab3)
+     * "Register a User" για τα πεδία που χρειάζονται.
      */
 }
 
