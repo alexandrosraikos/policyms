@@ -29,5 +29,5 @@
    * practising this, we should strive to set a better example in our own work.
    */
 
-  // TODO@alexandrosraikos: Δημιουργία capture script για τη φόρμα με το id = policycloud-registration.
+  // TODO@alexandrosraikos [P1]: Δημιουργία capture script για τη φόρμα με το id = policycloud-registration.
 })(jQuery);

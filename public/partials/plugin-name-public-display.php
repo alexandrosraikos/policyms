@@ -14,3 +14,16 @@
 ?>
 
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->
+
+<?php
+
+function registration_form_html()
+{
+    /**
+     * 
+     * TODO@elefkour: Δημιουργία function με το HTML registration form.
+     * Βάλε ως κύριο id=policycloud-registration για το HTML <form>.
+     */
+}
+
+?>

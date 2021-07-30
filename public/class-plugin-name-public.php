@@ -106,13 +106,13 @@ class Plugin_Name_Public
 
 		/**
 		 * 
-		 * TODO@elefkour: Δημιουργία shortcode function με το HTML registration form.
-		 * Βάλε ως κύριο id=policycloud-registration για το HTML <form>.
+		 * TODO@alexandrosraikos [P1]: Δημιουργία wp_localize_script με nonce.
 		 */
 
-		/**
+		 /**
 		 * 
-		 * TODO@alexandrosraikos: Δημιουργία wp_localize_script με το nonce.
+		 * TODO@elefkour [P1]: Δημιουργία shortcode για  τη 'registration_form_html'.
+		 * (βλέπε TODO στο public/partials/plugin-name-public-display.php)
 		 */
 	}
 }
