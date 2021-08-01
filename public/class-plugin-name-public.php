@@ -114,5 +114,6 @@ class Plugin_Name_Public
 		 * TODO@elefkour [P1]: Δημιουργία shortcode για  τη 'registration_form_html'.
 		 * (βλέπε TODO στο public/partials/plugin-name-public-display.php)
 		 */
+		add_shortcode("wpbiskoto-registration","registration_form_html");
 	}
 }
