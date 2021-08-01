@@ -101,19 +101,15 @@ class Plugin_Name_Public
 		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/plugin-name-public.js', array('jquery'), $this->version, false);
 	}
 
-	public function register_shortcodes()
+	public static function registration_shortcode()
 	{
-
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/partials/plugin-name-public-display.php';
+		
 		/**
 		 * 
 		 * TODO@alexandrosraikos [P1]: Δημιουργία wp_localize_script με nonce.
 		 */
-
-		 /**
-		 * 
-		 * TODO@elefkour [P1]: Δημιουργία shortcode για  τη 'registration_form_html'.
-		 * (βλέπε TODO στο public/partials/plugin-name-public-display.php)
-		 */
-		add_shortcode("wpbiskoto-registration","registration_form_html");
+		
+		return registration_form_html();
 	}
 }
