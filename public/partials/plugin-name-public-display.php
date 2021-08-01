@@ -40,36 +40,31 @@ function registration_form_html()
             <article class="card-body mx-auto" style="max-width: 400px;">
                 <h4 class="card-title mt-3 text-center">Create Account</h4>
                 <p class="text-center">Get started with your free account</p>
-                <p>
-                    <a href="" class="btn btn-block btn-twitter"> <i class="fab fa-twitter"></i> Login via Twitter</a>
-                    <a href="" class="btn btn-block btn-facebook"> <i class="fab fa-facebook-f"></i> Login via facebook</a>
-                </p>
-
-                <form id="policycloud-registration" action="" method"post">
+                <form id="policycloud-registration" action="">
                     <div class="form-row">
                         <div class="form-group input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"> <i class="fa fa-user"></i> </span>
                             </div>
-                            <input name="username" class="form-control" placeholder="username" id="username" type="text">
+                            <input required name="username" class="form-control" placeholder="username" id="username" type="text">
                         </div> <!-- form-group// -->
                         <div class="form-group input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"> <i class="fa fa-user"></i> </span>
                             </div>
-                            <input name="name" class="form-control" placeholder="name" id="name" type="text">
+                            <input required name="name" class="form-control" placeholder="name" id="name" type="text">
                         </div> <!-- form-group// -->
                         <div class="form-group input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"> <i class="fa fa-user"></i> </span>
                             </div>
-                            <input name="surname" class="form-control" placeholder="surname" type="text">
+                            <input required name="surname" class="form-control" placeholder="surname" type="text">
                         </div> <!-- form-group// -->
                         <div class="form-group input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"> <i class="fa fa-envelope"></i> </span>
                             </div>
-                            <input name="email" class="form-control" placeholder="Email address" type="email">
+                            <input required name="email" class="form-control" placeholder="Email address" type="email">
                         </div> <!-- form-group// -->
                     </div>
                     <div class="form-row">
@@ -78,20 +73,20 @@ function registration_form_html()
                                 <span class="input-group-text"> <i class="fa fa-phone"></i> </span>
                             </div>
 
-                            <input name="phone" class="form-control" placeholder="phone" type="text">
+                            <input required name="phone" class="form-control" placeholder="phone" type="text">
                         </div> <!-- form-group// -->
                         <div class="form-group input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"> <i class="fa fa-building"></i> </span>
                             </div>
 
-                            <input name="organization" class="form-control" placeholder="organization" type="text">
+                            <input required name="organization" class="form-control" placeholder="organization" type="text">
                         </div> <!-- form-group// -->
                         <div class="form-group input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"> <i class="fa fa-building"></i> </span>
                             </div>
-                            <select class="form-control">
+                            <select required name="title" class="form-control">
                                 <option selected="">Title</option>
                                 <option>Mr</option>
                                 <option>Mrs</option>
@@ -103,7 +98,7 @@ function registration_form_html()
                             <div class="input-group-prepend">
                                 <span class="input-group-text"> <i class="fas fa-genderless"></i> </span>
                             </div>
-                            <select class="form-control">
+                            <select required name="gender" class="form-control">
                                 <option selected="">Gender</option>
                                 <option>Male</option>
                                 <option>Female</option>
@@ -113,13 +108,13 @@ function registration_form_html()
                             <div class="input-group-prepend">
                                 <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
                             </div>
-                            <input class="form-control" placeholder="Create password" type="password">
+                            <input required name="password" class="form-control" placeholder="Create password" type="password">
                         </div> <!-- form-group// -->
                         <div class="form-group input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
                             </div>
-                            <input class="form-control" placeholder="Repeat password" type="password">
+                            <input required class="form-control" placeholder="Repeat password" type="password">
                         </div> <!-- form-group// -->
                         <div class="form-group">
 
