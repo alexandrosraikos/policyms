@@ -99,17 +99,24 @@ class Plugin_Name_Public
 		 */
 
 		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/plugin-name-public.js', array('jquery'), $this->version, false);
+
+		wp_register_script("wpbiskoto-registration", plugin_dir_url(__FILE__) . 'js/plugin-name-public-registration.js', array('jquery'), $this->version, false);
 	}
 
 	public static function registration_shortcode()
 	{
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/partials/plugin-name-public-display.php';
-		
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/plugin-name-public-display.php';
+
 		/**
 		 * 
 		 * TODO@alexandrosraikos [P1]: Δημιουργία wp_localize_script με nonce.
 		 */
-		
+		wp_enqueue_script("wpbiskoto-registration");
+		wp_localize_script('wpbiskoto-registration', 'ajax_prop', array(
+			'ajax_url' => admin_url('admin-ajax.php'),
+			'nonce' => wp_create_nonce('ajax_registration'),
+		));
+
 		return registration_form_html();
 	}
 }
