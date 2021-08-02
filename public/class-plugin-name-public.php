@@ -107,10 +107,6 @@ class Plugin_Name_Public
 	{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/plugin-name-public-display.php';
 
-		/**
-		 * 
-		 * TODO@alexandrosraikos [P1]: Δημιουργία wp_localize_script με nonce.
-		 */
 		wp_enqueue_script("wpbiskoto-registration");
 		wp_localize_script('wpbiskoto-registration', 'ajax_prop', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
@@ -118,5 +114,52 @@ class Plugin_Name_Public
 		));
 
 		return registration_form_html();
+	}
+
+	private static function user_registration($information)
+	{
+
+		/**
+		 * TODO @elefkour : Επαλήθευση πληροφοριών.
+		 * - Να μην υπάρχουν κενές τιμές.
+		 * - Έλεγχος έγκυρης διεύθυνσης email.
+		 * ----
+		 * Αλλιώς βγάζει σφάλμα η συνάρτηση:
+		 * throw new Exception("μήνυμα");
+		 */
+
+		/**
+		 * TODO @elefkour : Αποστολή με HTTP POST στο Marketplace API.
+		 * Προβολή στοιχείων χρήστη εδώ:
+		 * https://documenter.getpostman.com/view/16776360/TzsZs8kn#17a87988-323b-4209-b93c-ea3854616ab3
+		 * - Σε περίπτωση API error, τότε:
+		 * throw new Exception(<<βάλε το μήνυμα API error εδώ>>);
+		 * - Σε περίπτωση επιτυχίας, τότε:
+		 * Βάλτο στο $response.
+		 */
+
+		/**
+		 * TODO @alexandrosraikos : Αποθήκευση κρυπτογραφημένου JWT.
+		 */
+	}
+
+	public function user_registration_handler()
+	{
+
+		// Verify WordPress generated nonce.
+		if (!wp_verify_nonce($_POST['nonce'], 'ajax_registration')) {
+			die("Unverified request to register user.");
+		}
+
+		// Attempt to send shipment using POST data.
+		try {
+			Plugin_Name_Public::user_registration($_POST);
+		} catch (Exception $e) {
+			// Return error.
+			echo $e->getMessage();
+		}
+
+		// Return success.
+		die();
 	}
 }

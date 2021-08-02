@@ -24,6 +24,9 @@
 
         // Handle response.
         complete: function (response) {
+          /*
+          TODO@alexandrosraikos: Χειρισμός σφαλμάτων εγγραφής.
+          */
           // if (response.responseText.includes("error")) {
           //   var url = new URL(window.location.href);
           //   var params = url.searchParams;

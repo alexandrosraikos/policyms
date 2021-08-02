@@ -173,8 +173,11 @@ class Plugin_Name {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
-		// Στην 'register_shortcodes' καλούνται όλα τα shortcodes που χρειάζονται.
+		// Προσθήκη shortcode και script για την εγγραφή.
 		add_shortcode('wpbiskoto-registration','Plugin_Name_Public::registration_shortcode');
+
+		// Προσθήκη AJAX endpoint για την εγγραφή.
+		$this->loader->add_action('wp_ajax_registration', $plugin_public, 'user_registration_handler');
 	}
 
 	/**
