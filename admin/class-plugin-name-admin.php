@@ -20,7 +20,8 @@
  * @subpackage Plugin_Name/admin
  * @author     Your Name <email@example.com>
  */
-class Plugin_Name_Admin {
+class Plugin_Name_Admin
+{
 
 	/**
 	 * The ID of this plugin.
@@ -47,11 +48,11 @@ class Plugin_Name_Admin {
 	 * @param      string    $plugin_name       The name of this plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct($plugin_name, $version)
+	{
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-
 	}
 
 	/**
@@ -59,7 +60,8 @@ class Plugin_Name_Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles() {
+	public function enqueue_styles()
+	{
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -73,8 +75,7 @@ class Plugin_Name_Admin {
 		 * class.
 		 */
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/plugin-name-admin.css', array(), $this->version, 'all' );
-
+		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/plugin-name-admin.css', array(), $this->version, 'all');
 	}
 
 	/**
@@ -82,7 +83,8 @@ class Plugin_Name_Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_scripts() {
+	public function enqueue_scripts()
+	{
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -96,8 +98,58 @@ class Plugin_Name_Admin {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/plugin-name-admin.js', array( 'jquery' ), $this->version, false );
-
+		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/plugin-name-admin.js', array('jquery'), $this->version, false);
 	}
 
+	function policycloud_marketplace_validate_plugin_settings( $input ) {
+		$output['jwt_key']      = sanitize_text_field( $input['jwt_key'] );
+		$output['marketplace_host'] = sanitize_text_field( $input['marketplace_host']);
+		return $output;
+	}
+
+	function register_settings() {
+		
+		register_setting(
+		  'policycloud_marketplace_plugin_settings',
+		  'policycloud_marketplace_plugin_settings',
+		  'policycloud_marketplace_validate_plugin_settings'
+		);
+
+		add_settings_section(
+		  'section_one',
+		  'Access Credentials',
+		  'policycloud_marketplace_plugin_section_one',
+		  'policycloud_marketplace_plugin'
+		);
+
+		add_settings_field(
+		  'marketplace_host',
+		  'Marketplace Host',
+		  'policycloud_marketplace_plugin_host',
+		  'policycloud_marketplace_plugin',
+		  'section_one'
+		);
+
+		add_settings_field(
+		  'jwt_key',
+		  'Marketplace Key',
+		  'policycloud_marketplace_plugin_jwt_key',
+		  'policycloud_marketplace_plugin',
+		  'section_one'
+		);
+
+	  }
+	  
+	public function add_settings_page()
+	{
+		require_once plugin_dir_path(dirname(__FILE__)) . 'admin/partials/plugin-name-admin-display.php';
+
+		add_options_page(
+			'PolicyCloud Marketplace Settings',
+			'PolicyCloud Marketplace',
+			'manage_options',
+			'policycloud-marketplace-plugin',
+			'render_settings_page'
+		);
+	}
 }
