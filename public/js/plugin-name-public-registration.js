@@ -3,7 +3,7 @@
   $(document).ready(() => {
     $("#policycloud-registration").submit((e) => {
       e.preventDefault();
-
+      $(".submit-registration").addClass("loading");
       // Perform AJAX request.
       $.ajax({
         url: ajax_prop.ajax_url,
@@ -13,6 +13,7 @@
           nonce: ajax_prop.nonce,
           username: $("input[name=username]").val(),
           password: $("input[name=password]").val(),
+          password_confirm: $("input[name=password-confirm]").val(),
           email: $("input[name=email]").val(),
           name: $("input[name=name]").val(),
           surname: $("input[name=surname]").val(),
@@ -24,18 +25,22 @@
 
         // Handle response.
         complete: function (response) {
-          /*
-          TODO@alexandrosraikos: Χειρισμός σφαλμάτων εγγραφής.
-          */
-          // if (response.responseText.includes("error")) {
-          //   var url = new URL(window.location.href);
-          //   var params = url.searchParams;
-          //   params.set("error", response.responseText);
-          //   url.search = params.toString();
-          //   window.location.href = url.toString();
-          // } else {
-          //   window.location.reload();
-          // }
+          var response_data = JSON.parse(response.responseText);
+          if (response_data != null) {
+            if (response_data.status === "failure") {
+              $(".registration-error").html(response_data.data);
+            } else if (response_data.status === "success") {
+              // Set 30 day cookie.
+              let date = new Date();
+              date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
+              const expires = "expires=" + date.toUTCString();
+              document.cookie =
+                "ppmapi-token=" + response_data.data + "; " + expires;
+            }
+          } else {
+            $(".registration-error").html("There was an internal error.");
+          }
+          $(".submit-registration").removeClass("loading");
         },
         dataType: "json",
       });

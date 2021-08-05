@@ -103,6 +103,12 @@ class Plugin_Name_Public
 		wp_register_script("wpbiskoto-registration", plugin_dir_url(__FILE__) . 'js/plugin-name-public-registration.js', array('jquery'), $this->version, false);
 	}
 
+
+	/**
+	 * Register the shortcode for user registration.
+	 *
+	 * @since    1.0.0
+	 */
 	public static function registration_shortcode()
 	{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/plugin-name-public-display.php';
@@ -116,85 +122,100 @@ class Plugin_Name_Public
 		return registration_form_html();
 	}
 
-	private static function user_registration($information)
+
+	/**
+	 * Enact user registration using the Marketplace API.
+	 *
+	 * @since    1.0.0
+	 */
+	private static function user_registration($data)
 	{
 
-		/**
-		 * TODO @elefkour : Επαλήθευση πληροφοριών.
-		 * - Να μην υπάρχουν κενές τιμές.
-		 * - Έλεγχος έγκυρης διεύθυνσης email.
-		 * ----
-		 * Αλλιώς βγάζει σφάλμα η συνάρτηση:
-		 * throw new Exception("μήνυμα");
-		 */
-		//to evala se afth th metavlhth epeidh eixa kanei etsi sthn arxh tous elenxous.
-	
-		$data = $information;
-
-		if (empty($data['username']) ||
+		// Information validation.
+		if (
+			empty($data['username']) ||
 			empty($data['password']) ||
 			empty($data['email']) ||
 			empty($data['name']) ||
 			empty($data['surname']) ||
 			empty($data['title']) ||
-			empty($data['gender'])||
+			empty($data['gender']) ||
 			empty($data['organization']) ||
-			empty($data['phone'])) {
-			
+			empty($data['phone'])
+		) {
+
 			throw new Exception('Please fill all required fields!');
 		}
-		if(!filter_var($data["email"], FILTER_VALIDATE_EMAIL)){
+
+		// if (!marketplace_username_exists($data['information'])) {
+		// 	// TODO @elefkour: curl για valid username (ξεχωριστό function).
+		// 	throw new Exception("Username already exists.");
+		// }
+
+		if (!filter_var($data["email"], FILTER_VALIDATE_EMAIL)) {
 			throw new Exception("Please enter a valid email");
 		}
-		//afto to evala mh to xreiastoume kapoia stigmh gia antistoixia kwdikwn
+		
 		if ($data['password'] !== $data['password_confirm']) {
-		   throw new Exception('Password and Confirm password should match!');   
-		   
+			throw new Exception('Password and Confirm password should match!');
 		}
 		$uppercase = preg_match('@[A-Z]@', $data['password']);
-$lowercase = preg_match('@[a-z]@', $data['password']);
-$number    = preg_match('@[0-9]@', $data['password']);
-$specialChars = preg_match('@[^\w]@', $data['password']);
-//se periptwsh pou theloume na kanoume to xrhsth na valei isxuro kwdiko
-if(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($data['password']) < 8) {
-    throw new Exception('Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character.');
-}
+		$lowercase = preg_match('@[a-z]@', $data['password']);
+		$number    = preg_match('@[0-9]@', $data['password']);
+		$specialChars = preg_match('@[^\w]@', $data['password']);
 		
-		/**
-		 * TODO @elefkour : Αποστολή με HTTP POST στο Marketplace API.
-		 * Προβολή στοιχείων χρήστη εδώ:
-		 * https://documenter.getpostman.com/view/16776360/TzsZs8kn#17a87988-323b-4209-b93c-ea3854616ab3
-		 * - Σε περίπτωση API error, τότε:
-		 * throw new Exception(<<βάλε το μήνυμα API error εδώ>>);
-		 * - Σε περίπτωση επιτυχίας, τότε:
-		 * Βάλτο στο $response.
-		 */
-		$curl = curl_init();
-		
-		curl_setopt_array($curl, array(
-		  CURLOPT_URL => 'https://iristest.ddns.net:4444/registration/users',
-		  CURLOPT_RETURNTRANSFER => true,
-		  CURLOPT_ENCODING => '',
-		  CURLOPT_MAXREDIRS => 10,
-		  CURLOPT_TIMEOUT => 0,
-		  CURLOPT_FOLLOWLOCATION => true,
-		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-		  CURLOPT_CUSTOMREQUEST => 'POST',
-		  CURLOPT_POSTFIELDS =>'{"password": "'.$data['password'].'", "username": "'.$data['username'].'", "name": "'.$data['name'].'", "surname": "'.$data['surname'].'", "title": "'.$data['title'].'", "gender": "'.$data['gender'].'", "organization": "'.$data['organization'].'", "email": "'.$data['email'].'", "phone": "'.$data['phone'].'"}',
-		  CURLOPT_HTTPHEADER => array('Content-Type: application/json')
-		));
-		
-		$response = json_decode(curl_exec($curl),true);
-		curl_close($curl);
-		if ($response['_status'] == "successful")
-			return array($response["token"], 1);
-		else return array($response["message"], 0, $response);
+		if (!$uppercase || !$lowercase || !$number || !$specialChars || strlen($data['password']) < 8) {
+			throw new Exception('Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character.');
+		}
 
-		/**
-		 * TODO @alexandrosraikos : Αποθήκευση κρυπτογραφημένου JWT.
-		 */
+		// Contact Marketplace registration API.
+		$curl = curl_init();
+
+		$options = get_option('policycloud_marketplace_plugin_settings');
+
+		curl_setopt_array($curl, array(
+			CURLOPT_URL => 'https://'.$options['marketplace_host'].'/registration/users',
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_ENCODING => '',
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_TIMEOUT => 0,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST => 'POST',
+			CURLOPT_POSTFIELDS => '{"password": "' . $data['password'] . '", "username": "' . $data['username'] . '", "name": "' . $data['name'] . '", "surname": "' . $data['surname'] . '", "title": "' . $data['title'] . '", "gender": "' . $data['gender'] . '", "organization": "' . $data['organization'] . '", "email": "' . $data['email'] . '", "phone": "' . $data['phone'] . '"}',
+			CURLOPT_HTTPHEADER => array('Content-Type: application/json')
+		));
+
+		$response = json_decode(curl_exec($curl), true);
+		curl_close($curl);
+
+		// Return encypted token.
+		if ($response['_status'] == 'successful') {
+
+			try {
+
+				// Αποκωδικοποίηση και επιστροφή κρυπτογραφημένου token.
+				$options = get_option('policycloud_marketplace_plugin_settings');
+
+				$data = JWT::decode($response['token'], $options['jwt_key'], array('HS256'));
+
+				return openssl_encrypt(json_encode($data), "AES-128-ECB", $options['jwt_key']);
+			} catch (Exception $e) {
+				throw new Exception($e->getMessage());
+			}
+		} elseif ($response['_status'] == 'unsuccessful') {
+
+			// Επιστροφή σφάλματος.
+			throw new Exception($response['message']);
+		}
 	}
 
+
+	/**
+	 * Handle user registration AJAX requests.
+	 *
+	 * @since    1.0.0
+	 */
 	public function user_registration_handler()
 	{
 
@@ -203,13 +224,22 @@ if(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($data['pas
 			die("Unverified request to register user.");
 		}
 
+		$response = array();
+
 		// Attempt to send shipment using POST data.
 		try {
-			Plugin_Name_Public::user_registration($_POST);
+			$response = array(
+				'status' => 'success',
+				'data' => Plugin_Name_Public::user_registration($_POST)
+			);
 		} catch (Exception $e) {
-			// Return error.
-			echo $e->getMessage();
+			$response = array(
+				'status' => 'failure',
+				'data' => $e->getMessage()
+			);
 		}
+
+		echo json_encode($response);
 
 		// Return success.
 		die();
