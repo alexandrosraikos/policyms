@@ -130,7 +130,34 @@ class Plugin_Name_Public
 	 */
 	private static function user_registration($data)
 	{
-
+		function marketplace_username_exists($username) {
+		
+			$options = get_option('policycloud_marketplace_plugin_settings');
+			$curl = curl_init();
+	
+			curl_setopt_array($curl, array(
+			  CURLOPT_URL => 'https://'.$options['marketplace_host'].'/username/availability',
+			  CURLOPT_RETURNTRANSFER => true,
+			  CURLOPT_ENCODING => '',
+			  CURLOPT_MAXREDIRS => 10,
+			  CURLOPT_TIMEOUT => 0,
+			  CURLOPT_FOLLOWLOCATION => true,
+			  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			  CURLOPT_CUSTOMREQUEST => 'GET',
+			  CURLOPT_HTTPHEADER => array(
+				'username: "'. $username .'"'
+			  ),
+			));
+			$isexist=false;
+			$response = curl_exec($curl);
+			if ($response['_status'] == 'successful') {
+	$isexist=true;
+			}
+			curl_close($curl);
+			//echo $response;
+			echo $isexist;
+	
+		}
 		// Information validation.
 		if (
 			empty($data['username']) ||
@@ -162,7 +189,14 @@ class Plugin_Name_Public
 		if (!$uppercase || !$lowercase || !$number || !$specialChars || strlen($data['password']) < 8) {
 			throw new Exception('Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character.');
 		}
-
+		if (!marketplace_username_exists($data['username'])) {
+			// 	// TODO @elefkour: curl για valid username (ξεχωριστό function).
+				throw new Exception("Username already exists.");
+			// }
+			 }
+			if ($data['username']<=2){
+				throw new Exception("Username must be at least 2 chars");
+			}
 		// Contact Marketplace registration API.
 		$curl = curl_init();
 
