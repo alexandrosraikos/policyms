@@ -134,4 +134,6 @@ function registration_form_html()
 <?php
 }
 
+// TODO@alexandrosraikos: Προσθήκη log in ως διπλότυπο registration.
+
 ?>

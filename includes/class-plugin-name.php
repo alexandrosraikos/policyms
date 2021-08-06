@@ -181,6 +181,8 @@ class Plugin_Name {
 
 		// Προσθήκη AJAX endpoint για την εγγραφή.
 		$this->loader->add_action('wp_ajax_registration', $plugin_public, 'user_registration_handler');
+
+		// TODO@alexandrosraikos: Προσθήκη log in ως διπλότυπο registration.
 	}
 
 	/**

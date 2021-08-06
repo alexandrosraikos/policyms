@@ -147,11 +147,6 @@ class Plugin_Name_Public
 			throw new Exception('Please fill all required fields!');
 		}
 
-		// if (!marketplace_username_exists($data['information'])) {
-		// 	// TODO @elefkour: curl για valid username (ξεχωριστό function).
-		// 	throw new Exception("Username already exists.");
-		// }
-
 		if (!filter_var($data["email"], FILTER_VALIDATE_EMAIL)) {
 			throw new Exception("Please enter a valid email");
 		}
@@ -245,3 +240,5 @@ class Plugin_Name_Public
 		die();
 	}
 }
+
+ // TODO@alexandrosraikos: Προσθήκη log in ως διπλότυπο registration.
