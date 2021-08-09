@@ -19,13 +19,6 @@
 
 function registration_form_html()
 {
-    /**
-     * 
-     * TODO@elefkour: Δημιουργία function με το HTML registration form.
-     * Βάλε ως κύριο id=policycloud-registration για το HTML <form>.
-     * Βλέπε το documentation (https://documenter.getpostman.com/view/16776360/TzsZs8kn#17a87988-323b-4209-b93c-ea3854616ab3)
-     * "Register a User" για τα πεδία που χρειάζονται.
-     */
 ?>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
@@ -134,6 +127,53 @@ function registration_form_html()
 <?php
 }
 
-// TODO@alexandrosraikos: Προσθήκη log in ως διπλότυπο registration.
+
+function login_form_html()
+{
+
+?>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!------ Include the above in your HEAD tag ---------->
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
+
+    <!------ Include the above in your HEAD tag ---------->
+    <div class="container">
+        <div class="card bg-light">
+            <article class="card-body mx-auto" style="max-width: 400px;">
+                <h4 class="card-title mt-3 text-center">Log In</h4>
+                <form id="policycloud-login" action="">
+                    <div class="form-row">
+                        <div class="form-group input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"> <i class="fa fa-user"></i> </span>
+                            </div>
+                            <input required name="username" class="form-control" placeholder="Username" id="username" type="text">
+                        </div> 
+                        <div class="form-group input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+                            </div>
+                            <input required name="password" class="form-control" placeholder="Password" type="password">
+                        </div>
+
+                            <button type="submit" class="btn btn-primary btn-block submit-login"> Log In </button>
+                        </div> <!-- form-group// -->
+                        <div class="login-error">
+                    <p class="text-center"><a href="">Forgot password</a> </p>
+
+                        </div>
+                    </div>
+                </form>
+            </article>
+        </div> <!-- card.// -->
+
+    </div>
+
+<?php
+}
+
 
 ?>
