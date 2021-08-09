@@ -158,12 +158,12 @@ function login_form_html()
                             </div>
                             <input required name="password" class="form-control" placeholder="Password" type="password">
                         </div>
-
                             <button type="submit" class="btn btn-primary btn-block submit-login"> Log In </button>
                         </div> <!-- form-group// -->
                         <div class="login-error">
-                    <p class="text-center"><a href="">Forgot password</a> </p>
-
+                        <p class="text-center">
+                            <a href="">Forgot password</a> 
+                        </p>
                         </div>
                     </div>
                 </form>

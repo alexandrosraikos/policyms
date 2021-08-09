@@ -189,6 +189,9 @@ class Plugin_Name {
 
 		// Προσθήκη AJAX endpoint για την είσοδο.
 		$this->loader->add_action('wp_ajax_login', $plugin_public, 'user_login_handler');
+
+		// Προσθήκη υποθετικού ελέγχου σύνδεσης στο μενού.
+		$this->loader->add_filter('wp_nav_menu_items', 'add_conditional_access_menu_item', 10, 2);
 	}
 
 	/**

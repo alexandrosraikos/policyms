@@ -107,118 +107,18 @@ class Plugin_Name_Public
 		wp_register_script("wpbiskoto-registration", plugin_dir_url(__FILE__) . 'js/plugin-name-public-registration.js', array('jquery'), $this->version, false);
 
 		wp_register_script("wpbiskoto-login", plugin_dir_url(__FILE__) . 'js/plugin-name-public-login.js', array('jquery'), $this->version, false);
+
+		wp_enqueue_script("wpbiskoto-logout", plugin_dir_url(__FILE__) . 'js/plugin-name-public-logout.js', array('jquery'), $this->version, false);
 	}
 
 	/**
-	 * Register the shortcode for user registration.
-	 *
-	 * @since    1.0.0
+	 * 
+	 * -----------
+	 * 
+	 * REGISTRATION
+	 * 
+	 * -----------
 	 */
-	public static function login_shortcode()
-	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/plugin-name-public-display.php';
-
-		wp_enqueue_script('wpbiskoto-login');
-		wp_localize_script('wpbiskoto-login', 'ajax_prop', array(
-			'ajax_url' => admin_url('admin-ajax.php'),
-			'nonce' => wp_create_nonce('ajax_login'),
-		));
-
-		return login_form_html();
-	}
-
-	/**
-	 * Enact user registration using the Marketplace API.
-	 *
-	 * @since    1.0.0
-	 */
-	private static function user_login($data)
-	{
-		// Information validation.
-		if (
-			empty($data['username']) ||
-			empty($data['password'])
-		) {
-			throw new Exception('Please fill all required fields!');
-		}
-
-		// Contact Marketplace login API endpoint.
-		$curl = curl_init();
-
-		$options = get_option('policycloud_marketplace_plugin_settings');
-
-		curl_setopt_array($curl, array(
-			CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/authorization/users',
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_ENCODING => '',
-			CURLOPT_MAXREDIRS => 10,
-			CURLOPT_TIMEOUT => 0,
-			CURLOPT_FOLLOWLOCATION => true,
-			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-			CURLOPT_CUSTOMREQUEST => 'POST',
-			CURLOPT_POSTFIELDS => '{"password": "' . $data['password'] . '", "username": "' . $data['username'] . '"}',
-			CURLOPT_HTTPHEADER => array('Content-Type: application/json')
-		));
-
-		$response = json_decode(curl_exec($curl), true);
-		curl_close($curl);
-		// Return encypted token.
-		if (!isset($response)) {			
-			throw new Exception("Unable to reach the Marketplace server.");
-		}
-		elseif ($response['_status'] == 'successful') {
-
-			try {
-
-				// Αποκωδικοποίηση και επιστροφή κρυπτογραφημένου token.
-				$options = get_option('policycloud_marketplace_plugin_settings');
-
-				$data = JWT::decode($response['token'], $options['jwt_key'], array('HS256'));
-
-				return openssl_encrypt(json_encode($data), "AES-128-ECB", $options['jwt_key']);
-			} catch (Exception $e) {
-				throw new Exception($e->getMessage());
-			}
-		} elseif ($response['_status'] == 'unsuccessful') {
-
-			// Επιστροφή σφάλματος.
-			throw new Exception($response['message']);
-		}
-	}
-
-	/**
-	 * Handle user login AJAX requests.
-	 *
-	 * @since    1.0.0
-	 */
-	public function user_login_handler()
-	{
-
-		// Verify WordPress generated nonce.
-		if (!wp_verify_nonce($_POST['nonce'], 'ajax_login')) {
-			die("Unverified request to register user.");
-		}
-
-		$response = array();
-
-		// Attempt to send shipment using POST data.
-		try {
-			$response = array(
-				'status' => 'success',
-				'data' => Plugin_Name_Public::user_login($_POST)
-			);
-		} catch (Exception $e) {
-			$response = array(
-				'status' => 'failure',
-				'data' => $e->getMessage()
-			);
-		}
-
-		echo json_encode($response);
-
-		// Return success.
-		die();
-	}
 
 
 	/**
@@ -392,6 +292,153 @@ class Plugin_Name_Public
 		// Return success.
 		die();
 	}
-}
 
- // TODO@alexandrosraikos: Προσθήκη log in ως διπλότυπο registration.
+
+	/**
+	 * 
+	 * -----------
+	 * 
+	 * LOGIN
+	 * 
+	 * -----------
+	 */
+	
+	/**
+	 * Register the shortcode for user login.
+	 *
+	 * @since    1.0.0
+	 */
+	public static function login_shortcode()
+	{
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/plugin-name-public-display.php';
+
+		wp_enqueue_script('wpbiskoto-login');
+		wp_localize_script('wpbiskoto-login', 'ajax_prop', array(
+			'ajax_url' => admin_url('admin-ajax.php'),
+			'nonce' => wp_create_nonce('ajax_login'),
+		));
+
+		return login_form_html();
+	}
+
+	/**
+	 * Enact user registration using the Marketplace API.
+	 *
+	 * @since    1.0.0
+	 */
+	private static function user_login($data)
+	{
+		// Information validation.
+		if (
+			empty($data['username']) ||
+			empty($data['password'])
+		) {
+			throw new Exception('Please fill all required fields!');
+		}
+
+		// Contact Marketplace login API endpoint.
+		$curl = curl_init();
+
+		$options = get_option('policycloud_marketplace_plugin_settings');
+
+		curl_setopt_array($curl, array(
+			CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/authorization/users',
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_ENCODING => '',
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_TIMEOUT => 0,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST => 'POST',
+			CURLOPT_POSTFIELDS => '{"password": "' . $data['password'] . '", "username": "' . $data['username'] . '"}',
+			CURLOPT_HTTPHEADER => array('Content-Type: application/json')
+		));
+
+		$response = json_decode(curl_exec($curl), true);
+		curl_close($curl);
+		// Return encypted token.
+		if (!isset($response)) {			
+			throw new Exception("Unable to reach the Marketplace server.");
+		}
+		elseif ($response['_status'] == 'successful') {
+
+			try {
+
+				// Αποκωδικοποίηση και επιστροφή κρυπτογραφημένου token.
+				$options = get_option('policycloud_marketplace_plugin_settings');
+
+				$data = JWT::decode($response['token'], $options['jwt_key'], array('HS256'));
+
+				return openssl_encrypt(json_encode($data), "AES-128-ECB", $options['jwt_key']);
+			} catch (Exception $e) {
+				throw new Exception($e->getMessage());
+			}
+		} elseif ($response['_status'] == 'unsuccessful') {
+
+			// Επιστροφή σφάλματος.
+			throw new Exception($response['message']);
+		}
+	}
+
+	/**
+	 * Handle user login AJAX requests.
+	 *
+	 * @since    1.0.0
+	 */
+	public function user_login_handler()
+	{
+
+		// Verify WordPress generated nonce.
+		if (!wp_verify_nonce($_POST['nonce'], 'ajax_login')) {
+			die("Unverified request to register user.");
+		}
+
+		$response = array();
+
+		// Attempt to send shipment using POST data.
+		try {
+			$response = array(
+				'status' => 'success',
+				'data' => Plugin_Name_Public::user_login($_POST)
+			);
+		} catch (Exception $e) {
+			$response = array(
+				'status' => 'failure',
+				'data' => $e->getMessage()
+			);
+		}
+
+		echo json_encode($response);
+
+		// Return success.
+		die();
+	}
+
+	/**
+	 * 
+	 * ----------
+	 * 
+	 * MENU ITEM
+	 * 
+	 * ----------
+	 * 
+	 */
+
+	 function add_conditional_access_menu_item($items, $args) {
+
+		// TODO @elefkour: Προσθήκη υποθετικού στοιχείου.
+		// https://developer.wordpress.org/reference/hooks/wp_nav_menu_items/
+
+		$link = "";
+		if (mesa) {
+			$link = "logout";
+		}
+		else {
+			$link = "login";
+		}
+		
+		$items .= '<li>'.$link.'</li>';
+		return $items;
+	 }
+
+}

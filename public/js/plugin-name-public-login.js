@@ -4,6 +4,7 @@
     $("#policycloud-login").submit((e) => {
       e.preventDefault();
       $(".submit-login").addClass("loading");
+
       // Perform AJAX request.
       $.ajax({
         url: ajax_prop.ajax_url,
