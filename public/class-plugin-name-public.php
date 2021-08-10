@@ -424,21 +424,19 @@ class Plugin_Name_Public
 	 * 
 	 */
 
-	 function add_conditional_access_menu_item($items, $args) {
-
-		// TODO @elefkour: Προσθήκη υποθετικού στοιχείου.
-		// https://developer.wordpress.org/reference/hooks/wp_nav_menu_items/
-
-		$link = "";
-		if (mesa) {
-			$link = "logout";
+	 public static function add_conditional_access_menu_item($items, $args) {
+		if ($args->theme_location == 'primary') {
+			if (isset($_COOKIE["ppmapi-token"])) {			
+				$link = '<a class="policycloud-logout">Log out</a>';
+			}
+			else {
+				$link = '<a href="/login">Log In</a>';
+			}
+			return $items.'<li class="menu-item policycloud-access-button">'.$link.'</li>';
 		}
 		else {
-			$link = "login";
+			return $items;
 		}
-		
-		$items .= '<li>'.$link.'</li>';
-		return $items;
 	 }
 
 }
