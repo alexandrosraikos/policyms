@@ -29,6 +29,7 @@
               const expires = "expires=" + date.toUTCString();
               document.cookie =
                 "ppmapi-token=" + response_data.data + "; " + expires;
+              window.location.href = "/";
             }
           } else {
             $(".login-error").html("There was an internal error.");

@@ -168,13 +168,15 @@ class Plugin_Name_Public
 			));
 			$isexist = false;
 			$response = curl_exec($curl);
+			$response = json_decode($response, true);
 			if ($response['_status'] == 'successful') {
 				$isexist = true;
 			}
 			curl_close($curl);
 			//echo $response;
-			echo $isexist;
+			return $isexist;
 		}
+
 		// Information validation.
 		if (
 			empty($data['username']) ||
@@ -217,7 +219,22 @@ class Plugin_Name_Public
 		$curl = curl_init();
 
 		$options = get_option('policycloud_marketplace_plugin_settings');
-
+		error_log(json_encode($data));
+		$registration_data = array(
+			'username' => $data['username'],
+			'account' => array(
+				'password' => $data['password']
+			),
+			'info' => array(
+				'name' => $data['name'],
+				'surname' => $data['surname'],
+				'title' => $data['title'],
+				'gender' => $data['gender'],
+				'organization' => $data['organization'],
+				'phone' => $data['phone'] ?? '',
+				'email' => $data['email']
+			)
+		);
 		curl_setopt_array($curl, array(
 			CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/registration/users',
 			CURLOPT_RETURNTRANSFER => true,
@@ -227,13 +244,13 @@ class Plugin_Name_Public
 			CURLOPT_FOLLOWLOCATION => true,
 			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 			CURLOPT_CUSTOMREQUEST => 'POST',
-			CURLOPT_POSTFIELDS => '{"password": "' . $data['password'] . '", "username": "' . $data['username'] . '", "name": "' . $data['name'] . '", "surname": "' . $data['surname'] . '", "title": "' . $data['title'] . '", "gender": "' . $data['gender'] . '", "organization": "' . $data['organization'] . '", "email": "' . $data['email'] . '", "phone": "' . $data['phone'] . '"}',
+			CURLOPT_POSTFIELDS => json_encode($registration_data),
 			CURLOPT_HTTPHEADER => array('Content-Type: application/json')
 		));
 
 		$response = json_decode(curl_exec($curl), true);
 		curl_close($curl);
-
+		error_log(json_encode($response));
 		// Return encypted token.
 		if (!isset($response)){
 			throw new Exception("Unable to reach the Marketplace server.");
@@ -245,6 +262,7 @@ class Plugin_Name_Public
 				// Αποκωδικοποίηση και επιστροφή κρυπτογραφημένου token.
 				$options = get_option('policycloud_marketplace_plugin_settings');
 
+				error_log($options['jwt_key']);
 				$data = JWT::decode($response['token'], $options['jwt_key'], array('HS256'));
 
 				return openssl_encrypt(json_encode($data), "AES-128-ECB", $options['jwt_key']);
@@ -366,7 +384,7 @@ class Plugin_Name_Public
 
 				// Αποκωδικοποίηση και επιστροφή κρυπτογραφημένου token.
 				$options = get_option('policycloud_marketplace_plugin_settings');
-
+				error_log($options['jwt_key']);
 				$data = JWT::decode($response['token'], $options['jwt_key'], array('HS256'));
 
 				return openssl_encrypt(json_encode($data), "AES-128-ECB", $options['jwt_key']);
