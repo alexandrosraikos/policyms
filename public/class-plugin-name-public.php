@@ -443,7 +443,7 @@ class Plugin_Name_Public
 	 */
 
 	 public static function add_conditional_access_menu_item($items, $args) {
-		if ($args->theme_location == 'primary') {
+		// if ($args->theme_location == 'primary') {
 			if (isset($_COOKIE["ppmapi-token"])) {			
 				$link = '<a class="policycloud-logout">Log out</a>';
 			}
@@ -451,10 +451,10 @@ class Plugin_Name_Public
 				$link = '<a href="/login">Log In</a>';
 			}
 			return $items.'<li class="menu-item policycloud-access-button">'.$link.'</li>';
-		}
-		else {
-			return $items;
-		}
+		// }
+		// else {
+		// 	return $items;
+		// }
 	 }
 
 }
