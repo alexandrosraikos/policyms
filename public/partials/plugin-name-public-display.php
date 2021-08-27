@@ -162,6 +162,7 @@ function login_form_html()
                         </div> <!-- form-group// -->
                         <div class="login-error">
                         <p class="text-center">
+                            <!-- TODO: Add forgot password page link. -->
                             <a href="">Forgot password</a> 
                         </p>
                         </div>

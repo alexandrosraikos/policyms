@@ -182,10 +182,10 @@ class Plugin_Name {
 		// Προσθήκη AJAX endpoint για την εγγραφή.
 		$this->loader->add_action('wp_ajax_registration', $plugin_public, 'user_registration_handler');
 
-		// TODO@alexandrosraikos: Προσθήκη log in ως διπλότυπο registration.
-
 		// Προσθήκη shortcode και script για την είσοδο.
 		add_shortcode('wpbiskoto-login','Plugin_Name_Public::login_shortcode');
+
+		// TODO: Add "Forgot password" shortcode to send email to a new API endpoint.
 
 		// Προσθήκη AJAX endpoint για την είσοδο.
 		$this->loader->add_action('wp_ajax_login', $plugin_public, 'user_login_handler');
