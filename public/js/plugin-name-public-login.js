@@ -28,7 +28,7 @@
               date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
               const expires = "expires=" + date.toUTCString();
               document.cookie =
-                "ppmapi-token=" + response_data.data + "; " + expires;
+                "ppmapi-token=" + response_data.data + "; Path=/; " + expires;
               window.location.href = "/";
             }
           } else {
