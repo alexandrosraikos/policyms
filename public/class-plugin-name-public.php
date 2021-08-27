@@ -448,7 +448,7 @@ class Plugin_Name_Public
 				$link = '<a class="policycloud-logout">Log out</a>';
 			}
 			else {
-				$link = '<a href="/login">Log In</a>';
+				$link = '<a class="menu-link" href="/login">Log In</a>';
 			}
 			return $items.'<li class="menu-item menu-item-type-post_type menu-item-object-page policycloud-access-button">'.$link.'</li>';
 		// }
