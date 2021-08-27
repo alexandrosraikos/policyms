@@ -450,7 +450,7 @@ class Plugin_Name_Public
 			else {
 				$link = '<a href="/login">Log In</a>';
 			}
-			return $items.'<li class="menu-item policycloud-access-button">'.$link.'</li>';
+			return $items.'<li class="menu-item menu-item-type-post_type menu-item-object-page policycloud-access-button">'.$link.'</li>';
 		// }
 		// else {
 		// 	return $items;
