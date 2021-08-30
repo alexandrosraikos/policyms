@@ -109,6 +109,7 @@ class Plugin_Name_Public
 		wp_register_script("wpbiskoto-login", plugin_dir_url(__FILE__) . 'js/plugin-name-public-login.js', array('jquery'), $this->version, false);
 
 		wp_enqueue_script("wpbiskoto-logout", plugin_dir_url(__FILE__) . 'js/plugin-name-public-logout.js', array('jquery'), $this->version, false);
+		wp_register_script("upload_ste", plugin_dir_url(__FILE__) . 'js/plugin-name-public-up.js', array('jquery'), $this->version, false);
 	}
 
 	/**
@@ -456,5 +457,18 @@ class Plugin_Name_Public
 		// 	return $items;
 		// }
 	 }
+	 //Shortcode handler for multi-step upload form
+	 public static function upload_ste_shortcode()
+	{
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/plugin-name-public-display.php';
+
+		wp_enqueue_script("upload_ste");
+		wp_localize_script('upload_ste', 'ajax_prop', array(
+			'ajax_url' => admin_url('admin-ajax.php'),
+			'nonce' => wp_create_nonce('ajax_upload'),
+		));
+
+		return upload_step();
+	}
 
 }

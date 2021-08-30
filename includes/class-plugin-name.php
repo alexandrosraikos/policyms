@@ -192,6 +192,8 @@ class Plugin_Name {
 
 		// Προσθήκη υποθετικού ελέγχου σύνδεσης στο μενού.
 		$this->loader->add_filter('wp_nav_menu_items', $plugin_public, 'add_conditional_access_menu_item', 10, 2);
+		//Προσθήκη shortcode για το ανέβασμα του αρχείου
+		add_shortcode('upload_ste','Plugin_Name_Public::upload_ste_shortcode');
 	}
 
 	/**
