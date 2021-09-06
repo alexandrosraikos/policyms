@@ -3,11 +3,11 @@
 /**
  * Fired during plugin deactivation
  *
- * @link       http://example.com
+ * @link       https://dac.ds.unipi.gr/policycloud-eu/
  * @since      1.0.0
  *
- * @package    Plugin_Name
- * @subpackage Plugin_Name/includes
+ * @package    PolicyCloud_Marketplace
+ * @subpackage PolicyCloud_Marketplace/includes
  */
 
 /**
@@ -16,11 +16,11 @@
  * This class defines all code necessary to run during the plugin's deactivation.
  *
  * @since      1.0.0
- * @package    Plugin_Name
- * @subpackage Plugin_Name/includes
+ * @package    PolicyCloud_Marketplace
+ * @subpackage PolicyCloud_Marketplace/includes
  * @author     Your Name <email@example.com>
  */
-class Plugin_Name_Deactivator {
+class PolicyCloud_Marketplace_Deactivator {
 
 	/**
 	 * Short Description. (use period)

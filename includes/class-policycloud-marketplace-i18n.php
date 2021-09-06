@@ -6,11 +6,11 @@
  * Loads and defines the internationalization files for this plugin
  * so that it is ready for translation.
  *
- * @link       http://example.com
+ * @link       https://dac.ds.unipi.gr/policycloud-eu/
  * @since      1.0.0
  *
- * @package    Plugin_Name
- * @subpackage Plugin_Name/includes
+ * @package    PolicyCloud_Marketplace
+ * @subpackage PolicyCloud_Marketplace/includes
  */
 
 /**
@@ -20,11 +20,11 @@
  * so that it is ready for translation.
  *
  * @since      1.0.0
- * @package    Plugin_Name
- * @subpackage Plugin_Name/includes
+ * @package    PolicyCloud_Marketplace
+ * @subpackage PolicyCloud_Marketplace/includes
  * @author     Your Name <email@example.com>
  */
-class Plugin_Name_i18n {
+class PolicyCloud_Marketplace_i18n {
 
 
 	/**
@@ -35,7 +35,7 @@ class Plugin_Name_i18n {
 	public function load_plugin_textdomain() {
 
 		load_plugin_textdomain(
-			'plugin-name',
+			'policycloud-marketplace',
 			false,
 			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
 		);

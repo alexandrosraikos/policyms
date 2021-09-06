@@ -3,11 +3,11 @@
 /**
  * The public-facing functionality of the plugin.
  *
- * @link       http://example.com
+ * @link       https://dac.ds.unipi.gr/policycloud-eu/
  * @since      1.0.0
  *
- * @package    Plugin_Name
- * @subpackage Plugin_Name/public
+ * @package    PolicyCloud_Marketplace
+ * @subpackage PolicyCloud_Marketplace/public
  */
 
 /**
@@ -16,15 +16,15 @@
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the public-facing stylesheet and JavaScript.
  *
- * @package    Plugin_Name
- * @subpackage Plugin_Name/public
+ * @package    PolicyCloud_Marketplace
+ * @subpackage PolicyCloud_Marketplace/public
  * @author     Your Name <email@example.com>
  */
 
 require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/vendor/autoload.php';
 use Firebase\JWT\JWT;
 
-class Plugin_Name_Public
+class PolicyCloud_Marketplace_Public
 {
 
 	/**
@@ -71,15 +71,15 @@ class Plugin_Name_Public
 		 * This function is provided for demonstration purposes only.
 		 *
 		 * An instance of this class should be passed to the run() function
-		 * defined in Plugin_Name_Loader as all of the hooks are defined
+		 * defined in PolicyCloud_Marketplace_Loader as all of the hooks are defined
 		 * in that particular class.
 		 *
-		 * The Plugin_Name_Loader will then create the relationship
+		 * The PolicyCloud_Marketplace_Loader will then create the relationship
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
 
-		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/plugin-name-public.css', array(), $this->version, 'all');
+		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/policycloud-marketplace-public.css', array(), $this->version, 'all');
 	}
 
 	/**
@@ -94,23 +94,23 @@ class Plugin_Name_Public
 		 * This function is provided for demonstration purposes only.
 		 *
 		 * An instance of this class should be passed to the run() function
-		 * defined in Plugin_Name_Loader as all of the hooks are defined
+		 * defined in PolicyCloud_Marketplace_Loader as all of the hooks are defined
 		 * in that particular class.
 		 *
-		 * The Plugin_Name_Loader will then create the relationship
+		 * The PolicyCloud_Marketplace_Loader will then create the relationship
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
 
-		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/plugin-name-public.js', array('jquery'), $this->version, false);
+		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public.js', array('jquery'), $this->version, false);
 
-		wp_register_script("wpbiskoto-registration", plugin_dir_url(__FILE__) . 'js/plugin-name-public-registration.js', array('jquery'), $this->version, false);
+		wp_register_script("policycloud-marketplace-registration", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-registration.js', array('jquery'), $this->version, false);
 
-		wp_register_script("wpbiskoto-login", plugin_dir_url(__FILE__) . 'js/plugin-name-public-login.js', array('jquery'), $this->version, false);
+		wp_register_script("policycloud-marketplace-login", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-login.js', array('jquery'), $this->version, false);
 
-		wp_enqueue_script("wpbiskoto-logout", plugin_dir_url(__FILE__) . 'js/plugin-name-public-logout.js', array('jquery'), $this->version, false);
+		wp_enqueue_script("policycloud-marketplace-logout", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-logout.js', array('jquery'), $this->version, false);
 
-		wp_register_script("upload_ste", plugin_dir_url(__FILE__) . 'js/plugin-name-public-up.js', array('jquery'), $this->version, false);
+		wp_register_script("upload_ste", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-up.js', array('jquery'), $this->version, false);
 	}
 
 	/**
@@ -130,10 +130,10 @@ class Plugin_Name_Public
 	 */
 	public static function registration_shortcode()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/plugin-name-public-display.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 
-		wp_enqueue_script("wpbiskoto-registration");
-		wp_localize_script('wpbiskoto-registration', 'ajax_prop', array(
+		wp_enqueue_script("policycloud-marketplace-registration");
+		wp_localize_script('policycloud-marketplace-registration', 'ajax_prop', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce('ajax_registration'),
 		));
@@ -298,7 +298,7 @@ class Plugin_Name_Public
 		try {
 			$response = array(
 				'status' => 'success',
-				'data' => Plugin_Name_Public::user_registration($_POST)
+				'data' => PolicyCloud_Marketplace_Public::user_registration($_POST)
 			);
 		} catch (Exception $e) {
 			$response = array(
@@ -330,10 +330,10 @@ class Plugin_Name_Public
 	 */
 	public static function login_shortcode()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/plugin-name-public-display.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 
-		wp_enqueue_script('wpbiskoto-login');
-		wp_localize_script('wpbiskoto-login', 'ajax_prop', array(
+		wp_enqueue_script('policycloud-marketplace-login');
+		wp_localize_script('policycloud-marketplace-login', 'ajax_prop', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce('ajax_login'),
 		));
@@ -419,7 +419,7 @@ class Plugin_Name_Public
 		try {
 			$response = array(
 				'status' => 'success',
-				'data' => Plugin_Name_Public::user_login($_POST)
+				'data' => PolicyCloud_Marketplace_Public::user_login($_POST)
 			);
 		} catch (Exception $e) {
 			$response = array(
@@ -500,7 +500,7 @@ class Plugin_Name_Public
 	 //Shortcode handler for multi-step upload form
 	 public static function upload_ste_shortcode()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/plugin-name-public-display.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 
 		wp_enqueue_script("upload_ste");
 		wp_localize_script('upload_ste', 'ajax_prop', array(

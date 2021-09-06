@@ -6,11 +6,11 @@
  * A class definition that includes attributes and functions used across both the
  * public-facing side of the site and the admin area.
  *
- * @link       http://example.com
+ * @link       https://dac.ds.unipi.gr/policycloud-eu/
  * @since      1.0.0
  *
- * @package    Plugin_Name
- * @subpackage Plugin_Name/includes
+ * @package    PolicyCloud_Marketplace
+ * @subpackage PolicyCloud_Marketplace/includes
  */
 
 /**
@@ -23,11 +23,11 @@
  * version of the plugin.
  *
  * @since      1.0.0
- * @package    Plugin_Name
- * @subpackage Plugin_Name/includes
+ * @package    PolicyCloud_Marketplace
+ * @subpackage PolicyCloud_Marketplace/includes
  * @author     Your Name <email@example.com>
  */
-class Plugin_Name {
+class PolicyCloud_Marketplace {
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -35,7 +35,7 @@ class Plugin_Name {
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      Plugin_Name_Loader    $loader    Maintains and registers all hooks for the plugin.
+	 * @var      PolicyCloud_Marketplace_Loader    $loader    Maintains and registers all hooks for the plugin.
 	 */
 	protected $loader;
 
@@ -67,12 +67,12 @@ class Plugin_Name {
 	 * @since    1.0.0
 	 */
 	public function __construct() {
-		if ( defined( 'PLUGIN_NAME_VERSION' ) ) {
-			$this->version = PLUGIN_NAME_VERSION;
+		if ( defined( 'POLICYCLOUD_MARKETPLACE_VERSION' ) ) {
+			$this->version = POLICYCLOUD_MARKETPLACE_VERSION;
 		} else {
 			$this->version = '1.0.0';
 		}
-		$this->plugin_name = 'plugin-name';
+		$this->plugin_name = 'policycloud-marketplace';
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -86,10 +86,10 @@ class Plugin_Name {
 	 *
 	 * Include the following files that make up the plugin:
 	 *
-	 * - Plugin_Name_Loader. Orchestrates the hooks of the plugin.
-	 * - Plugin_Name_i18n. Defines internationalization functionality.
-	 * - Plugin_Name_Admin. Defines all hooks for the admin area.
-	 * - Plugin_Name_Public. Defines all hooks for the public side of the site.
+	 * - PolicyCloud_Marketplace_Loader. Orchestrates the hooks of the plugin.
+	 * - PolicyCloud_Marketplace_i18n. Defines internationalization functionality.
+	 * - PolicyCloud_Marketplace_Admin. Defines all hooks for the admin area.
+	 * - PolicyCloud_Marketplace_Public. Defines all hooks for the public side of the site.
 	 *
 	 * Create an instance of the loader which will be used to register the hooks
 	 * with WordPress.
@@ -103,33 +103,33 @@ class Plugin_Name {
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-plugin-name-loader.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-policycloud-marketplace-loader.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-plugin-name-i18n.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-policycloud-marketplace-i18n.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-plugin-name-admin.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-policycloud-marketplace-admin.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-plugin-name-public.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-policycloud-marketplace-public.php';
 
-		$this->loader = new Plugin_Name_Loader();
+		$this->loader = new PolicyCloud_Marketplace_Loader();
 
 	}
 
 	/**
 	 * Define the locale for this plugin for internationalization.
 	 *
-	 * Uses the Plugin_Name_i18n class in order to set the domain and to register the hook
+	 * Uses the PolicyCloud_Marketplace_i18n class in order to set the domain and to register the hook
 	 * with WordPress.
 	 *
 	 * @since    1.0.0
@@ -137,7 +137,7 @@ class Plugin_Name {
 	 */
 	private function set_locale() {
 
-		$plugin_i18n = new Plugin_Name_i18n();
+		$plugin_i18n = new PolicyCloud_Marketplace_i18n();
 
 		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
 
@@ -152,7 +152,7 @@ class Plugin_Name {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Plugin_Name_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new PolicyCloud_Marketplace_Admin( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
@@ -171,19 +171,19 @@ class Plugin_Name {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new Plugin_Name_Public( $this->get_plugin_name(), $this->get_version() );
+		$plugin_public = new PolicyCloud_Marketplace_Public( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
 		// Προσθήκη shortcode και script για την εγγραφή.
-		add_shortcode('wpbiskoto-registration','Plugin_Name_Public::registration_shortcode');
+		add_shortcode('policycloud-marketplace-registration','PolicyCloud_Marketplace_Public::registration_shortcode');
 
 		// Προσθήκη AJAX endpoint για την εγγραφή.
 		$this->loader->add_action('wp_ajax_registration', $plugin_public, 'user_registration_handler');
 
 		// Προσθήκη shortcode και script για την είσοδο.
-		add_shortcode('wpbiskoto-login','Plugin_Name_Public::login_shortcode');
+		add_shortcode('policycloud-marketplace-login','PolicyCloud_Marketplace_Public::login_shortcode');
 
 		// TODO: Add "Forgot password" shortcode to send email to a new API endpoint.
 
@@ -193,7 +193,7 @@ class Plugin_Name {
 		// Προσθήκη υποθετικού ελέγχου σύνδεσης στο μενού.
 		$this->loader->add_filter('wp_nav_menu_items', $plugin_public, 'add_conditional_access_menu_item', 10, 2);
 		//Προσθήκη shortcode για το ανέβασμα του αρχείου
-		add_shortcode('upload_ste','Plugin_Name_Public::upload_ste_shortcode');
+		add_shortcode('upload_ste','PolicyCloud_Marketplace_Public::upload_ste_shortcode');
 	}
 
 	/**
@@ -220,7 +220,7 @@ class Plugin_Name {
 	 * The reference to the class that orchestrates the hooks with the plugin.
 	 *
 	 * @since     1.0.0
-	 * @return    Plugin_Name_Loader    Orchestrates the hooks of the plugin.
+	 * @return    PolicyCloud_Marketplace_Loader    Orchestrates the hooks of the plugin.
 	 */
 	public function get_loader() {
 		return $this->loader;

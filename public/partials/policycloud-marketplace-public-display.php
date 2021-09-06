@@ -5,11 +5,11 @@
  *
  * This file is used to markup the public-facing aspects of the plugin.
  *
- * @link       http://example.com
+ * @link       https://dac.ds.unipi.gr/policycloud-eu/
  * @since      1.0.0
  *
- * @package    Plugin_Name
- * @subpackage Plugin_Name/public/partials
+ * @package    PolicyCloud_Marketplace
+ * @subpackage PolicyCloud_Marketplace/public/partials
  */
 ?>
 
