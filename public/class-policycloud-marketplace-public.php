@@ -480,7 +480,7 @@ class PolicyCloud_Marketplace_Public
 
 		/**
 		*	TODO @alexandrosraikos: Δημιουργία και χρήση της validate_token().
-		*	TODO @alexandrosraikos: Ανάγνωση $_GET για την κατασκευή της κατάλληλης φιλτραρισμένης κλήσης API. 
+		*	TODO @alexandrosraikos: Ανάγνωση $_GET για την κατασκευή της κατάλληλης φιλτραρισμένης κλήσης API.
 		*	Σημείωση: Δημιουργία μεταβλητής $request = '/φτιάξε/το/αντίστοιχο/endpoint' και χρήση της στο curl μετά.
 		*	Σχήμα δεδομένων φίλτρων:
 		*/

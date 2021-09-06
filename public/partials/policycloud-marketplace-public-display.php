@@ -173,22 +173,28 @@ function login_form_html()
 
     </div>
 
-<?php
+    <?php
 }
 
 function read_multiple_html($description_objects)
 {
     /**
      * TODO @elefkour: Εκτύπωση sidebar φίλτρων. 
-     * Σημείωση: Ανάγνωση $_GET για ενεργοποίηση ήδη ενεργών φίλτρων 
+     * Σημείωση: Ανάγνωση $_GET για ενεργοποίηση ήδη ενεργών φίλτρων.
      * (π.χ. $_GET['category'] == 'ταδε' να εκτυπώνει checked το checkbox του 'ταδε' category).
-     * 
-     * TODO @elefkour: Εκτύπωση λίστας αντικειμένων $description_objects (με foreach).
-     * Σχήμα δεδομένων:
-     * 
      */
 
 
+    /**
+     * TODO @elefkour: Εκτύπωση λίστας αντικειμένων $description_objects (με foreach).
+     * Σχήμα δεδομένων:
+     */
+    foreach ($description_objects as $object) {
+    ?>
+    
+    <?php
+
+    }
 }
 
 function upload_step()

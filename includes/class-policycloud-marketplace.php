@@ -192,10 +192,10 @@ class PolicyCloud_Marketplace {
 		// -- CRUD operations on database.
 
 		// Read multiple objects sequence.
-		add_shortcode('policycloud-marketplace-read-multiple','read_multiple');
+		add_shortcode('policycloud-marketplace-read-multiple','read_multiple_objects');
 			
 		// Read single object sequence.
-		add_shortcode('policycloud-marketplace-read-single','read_single');
+		add_shortcode('policycloud-marketplace-read-single','read_single_object');
 
 		// Create object sequence.
 		add_shortcode('policycloud-marketplace-create', 'create_object');
