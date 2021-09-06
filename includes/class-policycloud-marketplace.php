@@ -176,24 +176,29 @@ class PolicyCloud_Marketplace {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
-		// Προσθήκη shortcode και script για την εγγραφή.
+		// Registration sequence.
 		add_shortcode('policycloud-marketplace-registration','PolicyCloud_Marketplace_Public::registration_shortcode');
-
-		// Προσθήκη AJAX endpoint για την εγγραφή.
 		$this->loader->add_action('wp_ajax_registration', $plugin_public, 'user_registration_handler');
 
-		// Προσθήκη shortcode και script για την είσοδο.
+		// Log in sequence.
 		add_shortcode('policycloud-marketplace-login','PolicyCloud_Marketplace_Public::login_shortcode');
-
-		// TODO: Add "Forgot password" shortcode to send email to a new API endpoint.
-
-		// Προσθήκη AJAX endpoint για την είσοδο.
 		$this->loader->add_action('wp_ajax_login', $plugin_public, 'user_login_handler');
+		// TODO: Add email verification shortcode sequence.
+		// TODO: Add password reset shortcode sequence.
 
-		// Προσθήκη υποθετικού ελέγχου σύνδεσης στο μενού.
+		// Add user access management menu item.
 		$this->loader->add_filter('wp_nav_menu_items', $plugin_public, 'add_conditional_access_menu_item', 10, 2);
-		//Προσθήκη shortcode για το ανέβασμα του αρχείου
-		add_shortcode('upload_ste','PolicyCloud_Marketplace_Public::upload_ste_shortcode');
+
+		// -- CRUD operations on database.
+
+		// Read multiple objects sequence.
+		add_shortcode('policycloud-marketplace-read-multiple','read_multiple');
+			
+		// Read single object sequence.
+		add_shortcode('policycloud-marketplace-read-single','read_single');
+
+		// Create object sequence.
+		add_shortcode('policycloud-marketplace-create', 'create_object');
 	}
 
 	/**

@@ -22,6 +22,7 @@
  */
 
 require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/vendor/autoload.php';
+
 use Firebase\JWT\JWT;
 
 class PolicyCloud_Marketplace_Public
@@ -254,10 +255,9 @@ class PolicyCloud_Marketplace_Public
 		curl_close($curl);
 		error_log(json_encode($response));
 		// Return encypted token.
-		if (!isset($response)){
+		if (!isset($response)) {
 			throw new Exception("Unable to reach the Marketplace server.");
-		}
-		elseif ($response['_status'] == 'successful') {
+		} elseif ($response['_status'] == 'successful') {
 
 			try {
 
@@ -322,7 +322,7 @@ class PolicyCloud_Marketplace_Public
 	 * 
 	 * -----------
 	 */
-	
+
 	/**
 	 * Register the shortcode for user login.
 	 *
@@ -377,10 +377,9 @@ class PolicyCloud_Marketplace_Public
 		$response = json_decode(curl_exec($curl), true);
 		curl_close($curl);
 		// Return encypted token.
-		if (!isset($response)) {			
+		if (!isset($response)) {
 			throw new Exception("Unable to reach the Marketplace server.");
-		}
-		elseif ($response['_status'] == 'successful') {
+		} elseif ($response['_status'] == 'successful') {
 
 			try {
 
@@ -444,22 +443,20 @@ class PolicyCloud_Marketplace_Public
 	 * 
 	 */
 
-	 public static function add_conditional_access_menu_item($items, $args) {
+	public static function add_conditional_access_menu_item($items, $args)
+	{
 		// if ($args->theme_location == 'primary') {
-			if (isset($_COOKIE["ppmapi-token"])) {			
-				$link = '<a class="menu-link elementor-item policycloud-logout">Log out</a>';
-			}
-			else {
-				$link = '<a class="menu-link elementor-item" href="/login">Log In</a>';
-			}
-			return $items.'<li class="menu-item menu-item-type-post_type menu-item-object-page policycloud-access-button">'.$link.'</li>';
+		if (isset($_COOKIE["ppmapi-token"])) {
+			$link = '<a class="menu-link elementor-item policycloud-logout">Log out</a>';
+		} else {
+			$link = '<a class="menu-link elementor-item" href="/login">Log In</a>';
+		}
+		return $items . '<li class="menu-item menu-item-type-post_type menu-item-object-page policycloud-access-button">' . $link . '</li>';
 		// }
 		// else {
 		// 	return $items;
 		// }
-	 }
-
-
+	}
 
 
 	/**
@@ -472,7 +469,35 @@ class PolicyCloud_Marketplace_Public
 	 */
 
 
+	/**
+	 * Display multiple objects for visitors and privileged users.
+	 *
+	 * @since    1.0.0
+	 */
+	function read_multiple_objects()
+	{
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 
+		/**
+		*	TODO @alexandrosraikos: Δημιουργία και χρήση της validate_token().
+		*	TODO @alexandrosraikos: Ανάγνωση $_GET για την κατασκευή της κατάλληλης φιλτραρισμένης κλήσης API. 
+		*	Σημείωση: Δημιουργία μεταβλητής $request = '/φτιάξε/το/αντίστοιχο/endpoint' και χρήση της στο curl μετά.
+		*	Σχήμα δεδομένων φίλτρων:
+		*/
+
+		// Access control checking.
+		$logged_in = false;
+		if (isset($_COOKIE['ppmpapi-token'])) {
+		}
+		else {
+		}
+
+		// PolicyCloud API call for multiple Description objects.
+		$response = array();
+
+		// Print response data to front end.
+		read_multiple_html($response);
+	}
 
 
 	/**
@@ -484,8 +509,9 @@ class PolicyCloud_Marketplace_Public
 	 * -----------
 	 */
 
-
-
+	function read_single_object()
+	{
+	}
 
 
 	/**
@@ -496,9 +522,9 @@ class PolicyCloud_Marketplace_Public
 	 * 
 	 * -----------
 	 */
-	 
-	 //Shortcode handler for multi-step upload form
-	 public static function upload_ste_shortcode()
+
+
+	function create_object()
 	{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 
@@ -532,5 +558,4 @@ class PolicyCloud_Marketplace_Public
 	 * 
 	 * -----------
 	 */
-
 }
