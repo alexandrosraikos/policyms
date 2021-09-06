@@ -109,6 +109,7 @@ class Plugin_Name_Public
 		wp_register_script("wpbiskoto-login", plugin_dir_url(__FILE__) . 'js/plugin-name-public-login.js', array('jquery'), $this->version, false);
 
 		wp_enqueue_script("wpbiskoto-logout", plugin_dir_url(__FILE__) . 'js/plugin-name-public-logout.js', array('jquery'), $this->version, false);
+
 		wp_register_script("upload_ste", plugin_dir_url(__FILE__) . 'js/plugin-name-public-up.js', array('jquery'), $this->version, false);
 	}
 
@@ -457,6 +458,45 @@ class Plugin_Name_Public
 		// 	return $items;
 		// }
 	 }
+
+
+
+
+	/**
+	 * 
+	 * -----------
+	 * 
+	 * READ MULTIPLE
+	 * 
+	 * -----------
+	 */
+
+
+
+
+
+	/**
+	 * 
+	 * -----------
+	 * 
+	 * READ SINGLE
+	 * 
+	 * -----------
+	 */
+
+
+
+
+
+	/**
+	 * 
+	 * -----------
+	 * 
+	 * CREATE
+	 * 
+	 * -----------
+	 */
+	 
 	 //Shortcode handler for multi-step upload form
 	 public static function upload_ste_shortcode()
 	{
@@ -470,5 +510,27 @@ class Plugin_Name_Public
 
 		return upload_step();
 	}
+
+
+
+
+	/**
+	 * 
+	 * -----------
+	 * 
+	 * UPDATE
+	 * 
+	 * -----------
+	 */
+
+
+	/**
+	 * 
+	 * -----------
+	 * 
+	 * DELETE
+	 * 
+	 * -----------
+	 */
 
 }
