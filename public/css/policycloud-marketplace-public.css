@@ -47,3 +47,215 @@
   cursor: wait;
   pointer-events: none;
 }
+.my_kws {
+  display: inline;
+  column-gap: 3px;
+}
+
+.fa-user-o {
+  margin-left: 300px;
+}
+
+.grid-container {
+  column-gap: 4px;
+  display: grid;
+  margin-top: 30px;
+  grid-template-columns: auto auto auto;
+  background-color: white;
+  padding: 30px;
+}
+
+.card {
+  font-size: 15px;
+
+  width: 325px;
+  background: #fff;
+  transition: box-shadow 0.3s ease-in-out;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+  margin-top: 30px;
+
+  border: 1px solid rgb(0 0 0 / 13%);
+
+  overflow: hidden;
+}
+
+.text-block {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background-color: black;
+  color: white;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.container1 {
+  position: relative;
+  font-family: Arial;
+}
+
+.photo {
+  height: 200px;
+  width: 100%;
+}
+
+.photo img {
+  height: 100%;
+  width: 100%;
+}
+
+.photos {
+  width: 50%;
+  height: 30px;
+  background-color: #000080;
+  color: white;
+  position: relative;
+  top: -30px;
+  padding-left: 10px;
+  font-size: 20px;
+}
+
+.like {
+  float: right;
+  font-size: 22px;
+  position: relative;
+  top: 20px;
+  color: #333333;
+}
+
+.fa-gratipay {
+  margin-right: 10px;
+  transition: 0.5s;
+}
+
+.txt3 {
+  color: gray;
+  position: relative;
+  top: 18px;
+  font-size: 14px;
+}
+
+.comments {
+  float: right;
+  cursor: pointer;
+}
+
+.fa-clock,
+.fa-comments {
+  margin-right: 7px;
+}
+
+.container {
+  overflow: hidden;
+  padding: 2px 16px;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+input[type="text"] {
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: white;
+  background-image: url("searchicon.png");
+  background-position: 10px 10px;
+  background-repeat: no-repeat;
+  padding: 12px 20px 12px 40px;
+  -webkit-transition: width 0.4s ease-in-out;
+
+  transition: width 0.4s ease-in-out;
+}
+
+/* Fixed sidenav, full height */
+.sidenav {
+  height: 100%;
+  width: 325px;
+  position: fixed;
+  z-index: 1;
+  top: 9;
+  left: 0;
+  background-color: #000080;
+  overflow-x: hidden;
+}
+
+/* Style the sidenav links and the dropdown button */
+.sidenav a,
+.dropdown-btn {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 20px;
+  color: white;
+  display: block;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+}
+
+/* On mouse-over */
+.sidenav a:hover,
+.dropdown-btn:hover {
+  color: none;
+}
+
+/* Main content */
+.main {
+  margin-left: 150px;
+  /* Same as the width of the sidenav */
+  font-size: 20px;
+  /* Increased text to enable scrolling */
+  padding: 0px 10px;
+}
+
+/* Add an active class to the active dropdown button */
+.active {
+  color: white;
+}
+
+/* Dropdown container (hidden by default). Optional: add a lighter background color and some left padding to change the design of the dropdown content */
+.dropdown-container {
+  display: none;
+  background-color: none;
+  padding-left: 8px;
+}
+
+/* Optional: Style the caret down icon */
+.fa-caret-down {
+  float: right;
+  padding-right: 8px;
+}
+
+.remove {
+  background-color: none;
+  border: none;
+  color: white;
+  padding-top: 10px;
+  padding: 10px 10px;
+  font-size: 8px;
+  cursor: pointer;
+}
+
+.add {
+  background-color: none;
+  border: none;
+  color: white;
+  padding: 10px 10px;
+  font-size: 8px;
+  cursor: pointer;
+}
+
+/* Some media queries for responsiveness */
+@media screen and (max-height: 450px) {
+  .sidenav {
+    padding-top: 15px;
+  }
+
+  .sidenav a {
+    font-size: 18px;
+  }
+}
