@@ -383,7 +383,6 @@ class PolicyCloud_Marketplace_Public
 		if (!isset($response)) {
 			throw new Exception("Unable to reach the Marketplace server.");
 		} elseif ($response['_status'] == 'successful') {
-
 			try {
 
 				// Αποκωδικοποίηση και επιστροφή κρυπτογραφημένου token.
@@ -515,13 +514,6 @@ class PolicyCloud_Marketplace_Public
 
 	public static function get_specific_description(string $api_host, string $token, $id)
 	{
-		// Retrieve credentials.
-		$options = get_option('policycloud_marketplace_plugin_settings');
-		if (!$options) {
-			throw new Exception("No PolicyCloud Marketplace credentials defined in WordPress settings.");
-		}
-		if (!isset($options['jwt_key'])) throw new Exception("No Marketplace Key defined in WordPress settings.");
-
 		// Contact Marketplace login API endpoint.
 		$curl = curl_init();
 
@@ -559,49 +551,94 @@ class PolicyCloud_Marketplace_Public
 	 */
 	function read_multiple_objects()
 	{
-		function get_all_descriptions(string $api_host)
+		function get_public_descriptions(string $api_host, array $collections = null)
 		{
-			// Contact PolicyCloud Marketplace API.
-			$curl = curl_init();
+			// Get all descriptions.
+			if (!isset($collections)) {
 
-			curl_setopt_array($curl, array(
-				CURLOPT_PORT => "4444",
-				CURLOPT_URL => 'https://' . $api_host . '/descriptions/all',
-				CURLOPT_RETURNTRANSFER => true,
-				CURLOPT_ENCODING => "",
-				CURLOPT_MAXREDIRS => 10,
-				CURLOPT_TIMEOUT => 30,
-				CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-				CURLOPT_CUSTOMREQUEST => "GET",
-			));
+				// Contact PolicyCloud Marketplace API.
+				$curl = curl_init();
 
-			// Get data.
-			$response = curl_exec($curl);
+				curl_setopt_array($curl, array(
+					CURLOPT_URL => 'https://' . $api_host . '/descriptions/all',
+					CURLOPT_RETURNTRANSFER => true,
+					CURLOPT_ENCODING => "",
+					CURLOPT_MAXREDIRS => 10,
+					CURLOPT_TIMEOUT => 30,
+					CURLOPT_FOLLOWLOCATION => true,
+					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+					CURLOPT_CUSTOMREQUEST => "GET",
+				));
 
-			// Handle errors.
-			if (!empty(curl_error($curl))) {
-				throw new Exception("There was a connection error while attempting to retrieve all descriptions.");
+				// Get data.
+				$descriptions = json_decode(curl_exec($curl), true);
+
+				// Handle errors.
+				if (!empty(curl_error($curl))) {
+					throw new Exception("There was a connection error while attempting to retrieve all descriptions.");
+				}
+
+				// Close session.
+				curl_close($curl);
 			}
 
-			// Close session.
-			curl_close($curl);
+			// Get collection-filtered descriptions.
+			else {
+				$descriptions = array();
+				foreach ($collections as $collection) {
 
-			return $response;
+					// Contact PolicyCloud Marketplace API.
+					$curl = curl_init();
+
+					curl_setopt_array($curl, array(
+						CURLOPT_URL => 'https://' . $api_host . '/descriptions/' . $collection,
+						CURLOPT_RETURNTRANSFER => true,
+						CURLOPT_ENCODING => "",
+						CURLOPT_MAXREDIRS => 10,
+						CURLOPT_TIMEOUT => 30,
+						CURLOPT_FOLLOWLOCATION => true,
+						CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+						CURLOPT_CUSTOMREQUEST => "GET",
+					));
+
+					// Append descriptions
+					$descriptions += (array) json_decode(curl_exec($curl), true);
+
+					// Handle errors.
+					if (!empty(curl_error($curl))) throw new Exception("There was a connection error while attempting to retrieve all descriptions.");
+
+					// Close session.
+					curl_close($curl);
+				}
+			}
+
+			return $descriptions;
 		}
+
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 
-		/**
-		 *	TODO @alexandrosraikos: Ανάγνωση $_GET για την κατασκευή της κατάλληλης φιλτραρισμένης κλήσης API.
-		 *	Σημείωση: Δημιουργία μεταβλητής $request = '/φτιάξε/το/αντίστοιχο/endpoint' και χρήση της στο curl μετά.
-		 *	Σχήμα δεδομένων φίλτρων:
-		 */
-
-		// Get all publicly available descriptions.
+		// Retrieve credentials.
 		$options = get_option('policycloud_marketplace_plugin_settings');
 		if (!$options) error_log("No PolicyCloud Marketplace credentials defined in WordPress settings.");
+		if (empty($options['marketplace_host'])) error_log("No Marketplace Host was defined in WordPress settings.");
+
 		try {
-			$descriptions = get_all_descriptions($options['marketplace_host']);
+
+			// Get all publicly available descriptions.
+			$descriptions = get_public_descriptions($options['marketplace_host']);
+
+			/**
+			 *	TODO @alexandrosraikos: Ανάγνωση $_GET για την κατασκευή της κατάλληλης φιλτραρισμένης κλήσης API.
+			 *	Σημείωση: Δημιουργία μεταβλητής $request = '/φτιάξε/το/αντίστοιχο/endpoint' και χρήση της στο curl μετά.
+			 *	Σχήμα δεδομένων φίλτρων:
+			 */
+
+			if (isset($_GET['search'])) {
+			}
+			if (isset($_GET['collections'])) {
+				$descriptions = get_public_descriptions($options['marketplace_host'], $_GET['collections']);
+			}
 		} catch (Exception $e) {
 			error_log($e->getMessage());
 			$descriptions = array();
@@ -617,7 +654,6 @@ class PolicyCloud_Marketplace_Public
 				$descriptions = array_map(function ($guest_description) use ($options, $token) {
 					return PolicyCloud_Marketplace_Public::get_specific_description($options['marketplace_host'], $token, $guest_description['id']);
 				}, $descriptions);
-				
 			} catch (Exception $e) {
 				error_log($e->getMessage());
 			}
