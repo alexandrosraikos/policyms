@@ -169,11 +169,10 @@ function login_form_html()
         </div>
         </form>
         </article>
-    </div> <!-- card.// -->
-
+    </div>
     </div>
 
-    <?php
+<?php
 }
 
 function read_multiple_html($description_objects)
@@ -189,12 +188,132 @@ function read_multiple_html($description_objects)
      * TODO @elefkour: Εκτύπωση λίστας αντικειμένων $description_objects (με foreach).
      * Σχήμα δεδομένων:
      */
-    foreach ($description_objects as $object) {
-    ?>
-    
-    <?php
+?>
 
-    }
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+    <div class="sidenav">
+        <a>Filter by</a>
+
+        <form action="">
+            <input type="text" style="width:100%;" name="type" placeholder="Search..">
+        </form>
+        <button class="dropdown-btn">Advanced Search
+            <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-container">
+            ​<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+            <div id="my_kws">
+                <div class="form-row">
+                    <form action="">
+                        ​<div class="row">
+                            <span class="col-sm">
+                                ​ <input type="text" size="5" name="kw" placeholder="Add your keyword..." />
+                            </span><span class="col-sm">
+                                ​<input type="text" size="5" name="kval" placeholder="Add your value..." /> <button class="remove"><i class="fa fa-close"></i></button>
+                            </span>
+                        </div>
+                </div>
+                <div><button class="add" id="add"><i class="fas fa-plus"></i></button></div>
+            </div>
+            </form>
+        </div>
+        <button class="dropdown-btn">Asset Types
+            <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-container">
+            <a href="http://localhost/marketplace/discover?type=algorithms">Algorithms</a>
+            <a href="http://localhost/marketplace/discover?type=tools">Tools</a>
+            <a href="http://localhost/marketplace/discover?type=datasets">Datasets</a>
+            <a href="http://localhost/marketplace/discover?type=outcomes">Project's Outcomes</a>
+            <a href="http://localhost/marketplace/discover?type=webinars">Webinars</a>
+            <a href="http://localhost/marketplace/discover?type=tutorials">Tutorials</a>
+        </div>
+        <a href="#about">About</a>
+        <a href="#services">Services</a>
+        <a href="#clients">Clients</a>
+        <a href="#contact">Contact</a>
+
+
+    </div>
+    <div class="main">
+        <h1>The display Property:</h1>
+
+        <div class="grid-container">
+            <?php
+            foreach ($description_objects as $someObject) {
+
+                //$id = $someObject['id'];
+                $asset_name = $someObject['info']['title'];
+                //$info=$some0bject['info'];
+                //echo $id;
+                $asset_fieldofuse = $someObject['info']['fieldOfUse'];
+                $asset_collection = $someObject['collection'];
+                $asset_subtype = $someObject['info']['subtype'];
+                $short_desc = $someObject['info']['short_desc'];
+
+            ?>
+
+                <div class="card">
+                    <div class='container1'>
+                        <div class="photo"> <img src="http://localhost/marketplace/wp-content/uploads/2021/06/aac315_584ccfe01d2941cc9c2abae9e937d316_mv2.jpeg">
+                            <div class="photos"><?php echo $asset_collection; ?> </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <span class="card-link" style="color:gray;font-size:12px;"><i class="far fa-user"></i> University of Nicosia | <i class="far fa-eye"></i> 100 | <i class="far fa-calendar-alt"></i> 2.23.2021</span>
+                        <b>
+                            <h4><?php echo $asset_name; ?></h4>
+                        </b>
+                        <p class="card-text"><?php echo $short_desc; ?></p>
+
+                    </div>
+                </div>
+
+            <?php
+            }
+            ?>
+        </div>
+
+        <p>Set the <em>display</em> property to <em>inline-grid</em> to make an inline grid container.</p>
+
+        Next
+        Copy
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-end">
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">Previous</a>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="#">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <script>
+        /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
+        var dropdown = document.getElementsByClassName("dropdown-btn");
+        var i;
+
+        for (i = 0; i < dropdown.length; i++) {
+            dropdown[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var dropdownContent = this.nextElementSibling;
+                if (dropdownContent.style.display === "block") {
+                    dropdownContent.style.display = "none";
+                } else {
+                    dropdownContent.style.display = "block";
+                }
+            });
+        }
+    </script>
+
+<?php
 }
 
 function upload_step()
