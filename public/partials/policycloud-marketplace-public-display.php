@@ -193,12 +193,10 @@ function read_multiple_html($description_objects)
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-
     <div class="sidenav">
         <a>Filter by</a>
-
         <form action="">
-            <input type="text" style="width:100%;" name="type" placeholder="Search..">
+            <input type="text" style="width:100%;" name="search" placeholder="Search..">
         </form>
         <button class="dropdown-btn">Advanced Search
             <i class="fa fa-caret-down"></i>
@@ -224,19 +222,17 @@ function read_multiple_html($description_objects)
             <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-container">
-            <a href="http://localhost/marketplace/discover?type=algorithms">Algorithms</a>
-            <a href="http://localhost/marketplace/discover?type=tools">Tools</a>
-            <a href="http://localhost/marketplace/discover?type=datasets">Datasets</a>
-            <a href="http://localhost/marketplace/discover?type=outcomes">Project's Outcomes</a>
-            <a href="http://localhost/marketplace/discover?type=webinars">Webinars</a>
-            <a href="http://localhost/marketplace/discover?type=tutorials">Tutorials</a>
+            <a href="<?php echo site_url() ?>/discover?collections=algorithms" class="<?php echo ($_GET['collections'] == 'algorithms') ? "highlighted" : "" ?>">Algorithms</a>
+            <a href="<?php echo site_url() ?>/discover?collections=tools">Tools</a>
+            <a href="<?php echo site_url() ?>/discover?collections=datasets">Datasets</a>
+            <a href="<?php echo site_url() ?>/discover?collections=outcomes">Project's Outcomes</a>
+            <a href="<?php echo site_url() ?>/discover?collections=webinars">Webinars</a>
+            <a href="<?php echo site_url() ?>/discover?collections=tutorials">Tutorials</a>
         </div>
         <a href="#about">About</a>
         <a href="#services">Services</a>
         <a href="#clients">Clients</a>
         <a href="#contact">Contact</a>
-
-
     </div>
     <div class="main">
         <h1>The display Property:</h1>
@@ -255,7 +251,6 @@ function read_multiple_html($description_objects)
                 $short_desc = $someObject['info']['short_desc'];
 
             ?>
-
                 <div class="card">
                     <div class='container1'>
                         <div class="photo"> <img src="http://localhost/marketplace/wp-content/uploads/2021/06/aac315_584ccfe01d2941cc9c2abae9e937d316_mv2.jpeg">
@@ -276,24 +271,6 @@ function read_multiple_html($description_objects)
             }
             ?>
         </div>
-
-        <p>Set the <em>display</em> property to <em>inline-grid</em> to make an inline grid container.</p>
-
-        Next
-        Copy
-        <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-end">
-                <li class="page-item disabled">
-                    <a class="page-link" href="#" tabindex="-1">Previous</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#">Next</a>
-                </li>
-            </ul>
-        </nav>
     </div>
     <script>
         /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */

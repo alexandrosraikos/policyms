@@ -192,13 +192,13 @@ class PolicyCloud_Marketplace {
 		// -- CRUD operations on database.
 
 		// Read multiple objects sequence.
-		add_shortcode('policycloud-marketplace-read-multiple','read_multiple_objects');
+		add_shortcode('policycloud-marketplace-read-multiple','PolicyCloud_Marketplace_Public::read_multiple_objects');
 			
 		// Read single object sequence.
-		add_shortcode('policycloud-marketplace-read-single','read_single_object');
+		add_shortcode('policycloud-marketplace-read-single','PolicyCloud_Marketplace_Public::read_single_object');
 
 		// Create object sequence.
-		add_shortcode('policycloud-marketplace-create', 'create_object');
+		add_shortcode('policycloud-marketplace-create', 'PolicyCloud_Marketplace_Public::create_object');
 	}
 
 	/**

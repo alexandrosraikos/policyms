@@ -549,7 +549,7 @@ class PolicyCloud_Marketplace_Public
 	 *
 	 * @since    1.0.0
 	 */
-	function read_multiple_objects()
+	public static function read_multiple_objects()
 	{
 		function get_public_descriptions(string $api_host, array $collections = null)
 		{
@@ -624,7 +624,7 @@ class PolicyCloud_Marketplace_Public
 		if (empty($options['marketplace_host'])) error_log("No Marketplace Host was defined in WordPress settings.");
 
 		try {
-
+			
 			// Get all publicly available descriptions.
 			$descriptions = get_public_descriptions($options['marketplace_host']);
 
@@ -660,10 +660,11 @@ class PolicyCloud_Marketplace_Public
 		}
 
 		// Print response data to front end.
+		wp_enqueue_script("policycloud-marketplace-read-multiple", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-multiple.js', array('jquery'));
 		read_multiple_html($descriptions);
 	}
 
-	function read_single_object()
+	public static function read_single_object()
 	{
 	}
 
@@ -678,7 +679,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 
 
-	function create_object()
+	public static function create_object()
 	{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 
