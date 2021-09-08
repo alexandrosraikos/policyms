@@ -23,7 +23,10 @@
 
 require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/vendor/autoload.php';
 
+use Firebase\JWT\BeforeValidException;
+use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
+use Firebase\JWT\SignatureInvalidException;
 
 class PolicyCloud_Marketplace_Public
 {
@@ -386,9 +389,8 @@ class PolicyCloud_Marketplace_Public
 				// Αποκωδικοποίηση και επιστροφή κρυπτογραφημένου token.
 				$options = get_option('policycloud_marketplace_plugin_settings');
 				error_log($options['jwt_key']);
-				$data = JWT::decode($response['token'], $options['jwt_key'], array('HS256'));
 
-				return openssl_encrypt(json_encode($data), "AES-128-ECB", $options['jwt_key']);
+				return openssl_encrypt($response['token'], "AES-128-ECB", $options['jwt_key']);
 			} catch (Exception $e) {
 				throw new Exception($e->getMessage());
 			}
@@ -433,6 +435,49 @@ class PolicyCloud_Marketplace_Public
 		die();
 	}
 
+	public static function prepare_token($token, $encrypted = true)
+	{
+		// Retrieve credentials.
+		$options = get_option('policycloud_marketplace_plugin_settings');
+		if (!$options) {
+			throw new Exception("No PolicyCloud Marketplace credentials defined in WordPress settings.");
+		}
+		if (!isset($options['jwt_key'])) throw new Exception("No Marketplace Key defined in WordPress settings.");
+
+
+		if ($encrypted) {
+			// Decrypt token.
+			$token = openssl_decrypt($token, "AES-128-ECB", $options['jwt_key']);
+			if (!$token) throw new Exception("Decryption was unsuccessful.");
+		}
+
+		// Validate using JWT.
+		try {
+			JWT::decode($token, $options['jwt_key'], array('HS256'));
+		} catch (InvalidArgumentException $e) {
+			error_log($e->getMessage());
+			return false;
+		} catch (UnexpectedValueException $e) {
+			error_log($e->getMessage());
+			return false;
+		} catch (SignatureInvalidException $e) {
+			error_log($e->getMessage());
+			return false;
+		} catch (BeforeValidException $e) {
+			error_log($e->getMessage());
+			return false;
+		} catch (ExpiredException $e) {
+			error_log($e->getMessage());
+			return false;
+		}
+
+		if ($encrypted) {
+			return $token;
+		} else {
+			return true;
+		}
+	}
+
 	/**
 	 * 
 	 * ----------
@@ -463,10 +508,48 @@ class PolicyCloud_Marketplace_Public
 	 * 
 	 * -----------
 	 * 
-	 * READ MULTIPLE
+	 * READ DATA
 	 * 
 	 * -----------
 	 */
+
+	public static function get_specific_description(string $api_host, string $token, $id)
+	{
+		// Retrieve credentials.
+		$options = get_option('policycloud_marketplace_plugin_settings');
+		if (!$options) {
+			throw new Exception("No PolicyCloud Marketplace credentials defined in WordPress settings.");
+		}
+		if (!isset($options['jwt_key'])) throw new Exception("No Marketplace Key defined in WordPress settings.");
+
+		// Contact Marketplace login API endpoint.
+		$curl = curl_init();
+
+		curl_setopt_array($curl, array(
+			CURLOPT_URL => 'https://' . $api_host . '/descriptions/all/' . $id,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_ENCODING => '',
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_TIMEOUT => 0,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST => 'POST',
+			CURLOPT_HTTPHEADER => array('Content-Type: application/json', 'x-access-token: ' . $token)
+		));
+
+		// Get data,
+		$description = json_decode(curl_exec($curl), true);
+
+		// Handle errors.
+		if (!empty(curl_error($curl))) {
+			throw new Exception("There was a connection error while attempting to retrieve all descriptions.");
+		}
+
+		// Close session.
+		curl_close($curl);
+
+		return $description;
+	}
 
 
 	/**
@@ -476,38 +559,73 @@ class PolicyCloud_Marketplace_Public
 	 */
 	function read_multiple_objects()
 	{
+		function get_all_descriptions(string $api_host)
+		{
+			// Contact PolicyCloud Marketplace API.
+			$curl = curl_init();
+
+			curl_setopt_array($curl, array(
+				CURLOPT_PORT => "4444",
+				CURLOPT_URL => 'https://' . $api_host . '/descriptions/all',
+				CURLOPT_RETURNTRANSFER => true,
+				CURLOPT_ENCODING => "",
+				CURLOPT_MAXREDIRS => 10,
+				CURLOPT_TIMEOUT => 30,
+				CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+				CURLOPT_CUSTOMREQUEST => "GET",
+			));
+
+			// Get data.
+			$response = curl_exec($curl);
+
+			// Handle errors.
+			if (!empty(curl_error($curl))) {
+				throw new Exception("There was a connection error while attempting to retrieve all descriptions.");
+			}
+
+			// Close session.
+			curl_close($curl);
+
+			return $response;
+		}
+
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 
 		/**
-		*	TODO @alexandrosraikos: Δημιουργία και χρήση της validate_token().
-		*	TODO @alexandrosraikos: Ανάγνωση $_GET για την κατασκευή της κατάλληλης φιλτραρισμένης κλήσης API.
-		*	Σημείωση: Δημιουργία μεταβλητής $request = '/φτιάξε/το/αντίστοιχο/endpoint' και χρήση της στο curl μετά.
-		*	Σχήμα δεδομένων φίλτρων:
-		*/
+		 *	TODO @alexandrosraikos: Ανάγνωση $_GET για την κατασκευή της κατάλληλης φιλτραρισμένης κλήσης API.
+		 *	Σημείωση: Δημιουργία μεταβλητής $request = '/φτιάξε/το/αντίστοιχο/endpoint' και χρήση της στο curl μετά.
+		 *	Σχήμα δεδομένων φίλτρων:
+		 */
+
+		// Get all publicly available descriptions.
+		$options = get_option('policycloud_marketplace_plugin_settings');
+		if (!$options) error_log("No PolicyCloud Marketplace credentials defined in WordPress settings.");
+		try {
+			$descriptions = get_all_descriptions($options['marketplace_host']);
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			$descriptions = array();
+		}
 
 		// Access control checking.
-		$logged_in = false;
 		if (isset($_COOKIE['ppmpapi-token'])) {
-		}
-		else {
-		}
+			try {
+				// Retrieve token.
+				$token = PolicyCloud_Marketplace_Public::prepare_token($_COOKIE['ppmpapi-token']);
 
-		// PolicyCloud API call for multiple Description objects.
-		$response = array();
+				// Get specific description data from the list for authorized users.
+				$descriptions = array_map(function ($guest_description) use ($options, $token) {
+					return PolicyCloud_Marketplace_Public::get_specific_description($options['marketplace_host'], $token, $guest_description['id']);
+				}, $descriptions);
+				
+			} catch (Exception $e) {
+				error_log($e->getMessage());
+			}
+		}
 
 		// Print response data to front end.
-		read_multiple_html($response);
+		read_multiple_html($descriptions);
 	}
-
-
-	/**
-	 * 
-	 * -----------
-	 * 
-	 * READ SINGLE
-	 * 
-	 * -----------
-	 */
 
 	function read_single_object()
 	{
