@@ -277,6 +277,13 @@ function read_multiple_html($description_objects)
 <?php
 }
 
+// TODO @elefkour
+function read_single_html($description_object) {
+    ?>
+    
+    <?php
+}
+
 function upload_step()
 { ?>
     <script src="//cdn.ckeditor.com/4.14.1/standard/ckeditor.js"></script>

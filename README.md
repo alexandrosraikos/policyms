@@ -24,6 +24,16 @@ To add a registration form to a requested page, add the following shortcode:
 
 `[policycloud-marketplace-registration]`
 
+## Views
+
+To view multiple Description Objects, add the following shortcode:
+
+`[policycloud-marketplace-read-single]`
+
+To view single Description Objects, add the following shortcode:
+
+`[policycloud-marketplace-read-multiple]`
+
 ## Other features
 
 This plugin also enables the following features:

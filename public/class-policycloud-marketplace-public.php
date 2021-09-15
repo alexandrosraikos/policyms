@@ -666,6 +666,13 @@ class PolicyCloud_Marketplace_Public
 
 	public static function read_single_object()
 	{
+		// TODO @alexandrosraikos: Fetch Description data from the API.
+		
+		// Print response data to front end.
+		wp_enqueue_script("policycloud-marketplace-read-single", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-single.js', array('jquery'));
+		
+		$description = "Hello";
+		read_multiple_html($description);
 	}
 
 
