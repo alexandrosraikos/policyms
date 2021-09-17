@@ -292,9 +292,26 @@ function read_single_html($description_object) {
   </ul> <!-- END tabs-nav -->
   <div id="tabs-content">
     <div id="tab1" class="tab-content">
-    <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/seattle.jpg" alt="Workplace" usemap="#workmap" width="400" height="379">
+   <h1>Images</h1>
 
+<div  id="slideshow">
+   <div class= "slide-tab">
+     <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/seattle.jpg">
+   </div>
+   <div class= "slide-tab">
+     <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/nightportrait.jpg">
+   </div>
+   <div class= "slide-tab">
+     <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/6lifeftw.jpg">
+   </div>
+  <div class= "slide-tab">
+     <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/mountain.jpg">
+   </div>
+  <div class= "slide-tab">
+     <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/bird.jpg">
+   </div>
 
+</div>
     </div>
     <div id="tab2" class="tab-content">
     <button class="accordion">Algorithm</button>

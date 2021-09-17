@@ -18,7 +18,16 @@ $('#tabs-nav li').click(function(){
   return false;
 });
 /*slideshow */
+$("#slideshow > div:gt(0)").hide();
 
+setInterval(function() { 
+  $('#slideshow > .slide-tab:first')
+    .fadeOut(1000)
+    .next()
+    .fadeIn(1000)
+    .end()
+    .appendTo('#slideshow');
+},  3000);
     /*accordion */
     $(".accordion").on( "click", function() {
       $(this).toggleClass('active');
