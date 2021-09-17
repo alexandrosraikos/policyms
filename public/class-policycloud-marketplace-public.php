@@ -115,6 +115,7 @@ class PolicyCloud_Marketplace_Public
 		wp_enqueue_script("policycloud-marketplace-logout", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-logout.js', array('jquery'), $this->version, false);
 
 		wp_register_script("upload_ste", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-up.js', array('jquery'), $this->version, false);
+		wp_register_script("policycloud-marketplace-read-single", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-single.js', array('jquery'), $this->version, false);
 	}
 
 	/**
@@ -668,11 +669,12 @@ class PolicyCloud_Marketplace_Public
 	{
 		// TODO @alexandrosraikos: Fetch Description data from the API.
 		
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 		// Print response data to front end.
-		wp_enqueue_script("policycloud-marketplace-read-single", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-single.js', array('jquery'));
-		
+	//	wp_enqueue_script("policycloud-marketplace-read-single", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-single.js', array('jquery'));
+	wp_enqueue_script("policycloud-marketplace-read-single");
 		$description = "Hello";
-		read_multiple_html($description);
+		read_single_html($description);
 	}
 
 

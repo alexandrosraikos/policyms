@@ -280,7 +280,88 @@ function read_multiple_html($description_objects)
 // TODO @elefkour
 function read_single_html($description_object) {
     ?>
+    <section style="width: 1349px; left: 0px;">
+ <div class="parent">
+ <div class="column">
+ <div class="tabs">
+  <ul id="tabs-nav">
+    <li><a href="#tab1"><i class="fas fa-file-alt"></i> Description</a></li>
+    <li><a href="#tab2"><i class="fas fa-file-download"> Files</i></a></li>
+    <li><a href="#tab3"><i class="fas fa-comments"></i> Comments</a></li>
     
+  </ul> <!-- END tabs-nav -->
+  <div id="tabs-content">
+    <div id="tab1" class="tab-content">
+    <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/seattle.jpg" alt="Workplace" usemap="#workmap" width="400" height="379">
+
+
+    </div>
+    <div id="tab2" class="tab-content">
+    <button class="accordion">Algorithm</button>
+<div class="panel">
+ <table style="width: 100%;">
+<tbody>
+<tr>
+<th>Asset Name</th>
+<th>Version</th>
+<th>Size</th>
+<th>Modified on</th>
+<th>Action</th>
+</tr>
+<tr>
+<td>2.0</td>
+<td>2.1</td>
+<td>2.2</td>
+<td>2.2</td>
+<td>
+<ul class="elementor-icon-list-items">
+ 	<li class="elementor-icon-list-item"><a href="https://www.youtube.com/"> <span class="elementor-icon-list-icon">
+<i class="fas fa-download" aria-hidden="true"></i> </span>
+
+</a></li>
+</ul>
+</td>
+</tr>
+<tr>
+<td>Eve</td>
+<td>Jackson</td>
+<td>94</td>
+<td>2.2</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<button class="accordion">Videos</button>
+<div class="panel">
+  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+</div>
+    </div>
+    <div id="tab3" class="tab-content">
+      <h2>Randall Graves</h2>
+      
+    </div>
+    
+  </div> <!-- END tabs-content -->
+</div> <!-- END tabs -->
+</div>
+<div class="column">
+<div class="main-display">
+  <h2 class="h2title">Deep Learning</h2>
+  <span class="card-link" style="color:gray;font-size:12px;"><i class="far fa-user"></i> University of Nicosia | <i class="far fa-eye"></i> 100 | <i class="far fa-calendar-alt"></i> 2.23.2021</span>
+<h6><b>Algorithms</b>|<b>Finance</b></h6>
+<a style="color:blue;font-size:15px;"> <i class="fas fa-envelope"  ></i> example@gmail.com</a>
+<br>
+  <p>I am text block. Click edit button to change this text. Lor
+    em ipsum dolor sit amet, consectetur adipiscing elit. Ut elit te
+    llus, luctus nec ullamcorper mattis, pulvinar dapibus leo.</p>
+  <br>
+  <button class="info">Download</button>
+</div>
+</div>
+</div>
+ </section>
     <?php
 }
 
