@@ -52,15 +52,47 @@ class PolicyCloud_Marketplace_Public
 	/**
 	 * Initialize the class and set its properties.
 	 *
-	 * @since    1.0.0
-	 * @param      string    $plugin_name       The name of the plugin.
-	 * @param      string    $version    The version of this plugin.
+	 * @since 	1.0.0
+	 * @param	string    $plugin_name       The name of the plugin.
+	 * @param	string    $version    The version of this plugin.
 	 */
 	public function __construct($plugin_name, $version)
 	{
-
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
+	}
+
+	/**
+	 * Register all the shortcodes concerning user authentication.
+	 *
+	 * @since    1.0.0
+	 */
+	public function add_authentication_shortcodes()
+	{
+
+		// Registration sequence.
+		add_shortcode('policycloud-marketplace-registration', 'PolicyCloud_Marketplace_Public::registration_shortcode');
+
+		// Log in sequence.
+		add_shortcode('policycloud-marketplace-login', 'PolicyCloud_Marketplace_Public::login_shortcode');
+	}
+
+	/**
+	 * Register all the shortcodes concerning content handling.
+	 *
+	 * @since    1.0.0
+	 */
+	public function add_content_shortcodes()
+	{
+
+		// Read multiple objects sequence.
+		add_shortcode('policycloud-marketplace-read-multiple', 'PolicyCloud_Marketplace_Public::read_multiple_objects');
+
+		// Read single object sequence.
+		add_shortcode('policycloud-marketplace-read-single', 'PolicyCloud_Marketplace_Public::read_single_object');
+
+		// Create object sequence.
+		add_shortcode('policycloud-marketplace-create', 'PolicyCloud_Marketplace_Public::create_object');
 	}
 
 	/**
@@ -70,19 +102,6 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public function enqueue_styles()
 	{
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in PolicyCloud_Marketplace_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The PolicyCloud_Marketplace_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/policycloud-marketplace-public.css', array(), $this->version, 'all');
 	}
 
@@ -93,25 +112,10 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public function enqueue_scripts()
 	{
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in PolicyCloud_Marketplace_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The PolicyCloud_Marketplace_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public.js', array('jquery'), $this->version, false);
 
 		wp_register_script("policycloud-marketplace-registration", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-registration.js', array('jquery'), $this->version, false);
-
 		wp_register_script("policycloud-marketplace-login", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-login.js', array('jquery'), $this->version, false);
-
 		wp_enqueue_script("policycloud-marketplace-logout", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-logout.js', array('jquery'), $this->version, false);
 
 		wp_register_script("upload_ste", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-up.js', array('jquery'), $this->version, false);
@@ -119,17 +123,7 @@ class PolicyCloud_Marketplace_Public
 	}
 
 	/**
-	 * 
-	 * -----------
-	 * 
-	 * REGISTRATION
-	 * 
-	 * -----------
-	 */
-
-
-	/**
-	 * Register the shortcode for user registration.
+	 * Register the shortcodes for user registration.
 	 *
 	 * @since    1.0.0
 	 */
@@ -143,25 +137,36 @@ class PolicyCloud_Marketplace_Public
 			'nonce' => wp_create_nonce('ajax_registration'),
 		));
 
-		return registration_form_html();
+		registration_form_html();
 	}
 
 
 	/**
 	 * Enact user registration using the Marketplace API.
-	 *
-	 * @since    1.0.0
+	 * For more information concerning the schema of the registration data, please visit:
+	 * https://documenter.getpostman.com/view/16776360/TzsZs8kn#17a87988-323b-4209-b93c-ea3854616ab3 
+	 * 
+	 * @param	array $data The user information to be registered with the Marketplace API.
+	 * @usedby PolicyCloud_Marketplace_Public::user_registration_handler()
+	 * @since	1.0.0
 	 */
 	private static function user_registration($data)
 	{
-		function marketplace_username_exists($username)
+		/**
+		 * Check username availability using the Marketplace API.
+		 * For more information concerning the schema of the registration data, please visit:
+		 * https://documenter.getpostman.com/view/16776360/TzsZs8kn#135d37d6-0eef-47e5-a31f-df4153962503
+		 * 
+		 * @param	string $username The username to be registered.
+		 * @return	bool The availability of the requested username.
+		 * @since	1.0.0
+		 */
+		function marketplace_username_exists($hostname, $username)
 		{
-
-			$options = get_option('policycloud_marketplace_plugin_settings');
+			// Request username availability status.
 			$curl = curl_init();
-
-			curl_setopt_array($curl, array(
-				CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/username/availability',
+			curl_setopt_array($curl, [
+				CURLOPT_URL => 'https://' . $hostname . '/username/availability',
 				CURLOPT_RETURNTRANSFER => true,
 				CURLOPT_ENCODING => '',
 				CURLOPT_MAXREDIRS => 10,
@@ -169,22 +174,18 @@ class PolicyCloud_Marketplace_Public
 				CURLOPT_FOLLOWLOCATION => true,
 				CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 				CURLOPT_CUSTOMREQUEST => 'GET',
-				CURLOPT_HTTPHEADER => array(
+				CURLOPT_HTTPHEADER => [
 					'username: "' . $username . '"'
-				),
-			));
-			$isexist = false;
-			$response = curl_exec($curl);
-			$response = json_decode($response, true);
-			if ($response['_status'] == 'successful') {
-				$isexist = true;
-			}
+				],
+			]);
+			$response = json_decode(curl_exec($curl), true);
 			curl_close($curl);
-			//echo $response;
-			return $isexist;
+
+			// Return status.
+			return ($response['_status'] ?? '') == 'successful';
 		}
 
-		// Information validation.
+		// Information validation checks and errors.
 		if (
 			empty($data['username']) ||
 			empty($data['password']) ||
@@ -195,53 +196,27 @@ class PolicyCloud_Marketplace_Public
 			empty($data['gender']) ||
 			empty($data['organization']) ||
 			empty($data['phone'])
-		) {
+		) throw new Exception('Please fill all required fields!');
+		if (!filter_var($data["email"], FILTER_VALIDATE_EMAIL)) throw new Exception("Please enter a valid email");
+		if ($data['password'] !== $data['password_confirm']) throw new Exception('Password and password confirmation should match!');
+		if (
+			!empty(preg_match('@[A-Z]@', $data['password'])) ||
+			!empty(preg_match('@[a-z]@', $data['password'])) ||
+			!empty(preg_match('@[0-9]@', $data['password'])) ||
+			!empty(preg_match('@[^\w]@', $data['password'])) ||
+			strlen($data['password']) < 8
+		) throw new Exception('Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character.');
+		if ($data['username'] <= 2) throw new Exception("Username must be at least 2 chars");
 
-			throw new Exception('Please fill all required fields!');
-		}
+		// Retrieve API credentials.
+		$options = get_option('policycloud_marketplace_plugin_settings');
+		if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
 
-		if (!filter_var($data["email"], FILTER_VALIDATE_EMAIL)) {
-			throw new Exception("Please enter a valid email");
-		}
+		// Username availability check.
+		if (!marketplace_username_exists($options['marketplace_host'], $data['username'])) throw new Exception("Username already exists.");
 
-		if ($data['password'] !== $data['password_confirm']) {
-			throw new Exception('Password and Confirm password should match!');
-		}
-		$uppercase = preg_match('@[A-Z]@', $data['password']);
-		$lowercase = preg_match('@[a-z]@', $data['password']);
-		$number    = preg_match('@[0-9]@', $data['password']);
-		$specialChars = preg_match('@[^\w]@', $data['password']);
-
-		if (!$uppercase || !$lowercase || !$number || !$specialChars || strlen($data['password']) < 8) {
-			throw new Exception('Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character.');
-		}
-		if (!marketplace_username_exists($data['username'])) {
-			throw new Exception("Username already exists.");
-			// }
-		}
-		if ($data['username'] <= 2) {
-			throw new Exception("Username must be at least 2 chars");
-		}
 		// Contact Marketplace registration API.
 		$curl = curl_init();
-
-		$options = get_option('policycloud_marketplace_plugin_settings');
-		error_log(json_encode($data));
-		$registration_data = array(
-			'username' => $data['username'],
-			'account' => array(
-				'password' => $data['password']
-			),
-			'info' => array(
-				'name' => $data['name'],
-				'surname' => $data['surname'],
-				'title' => $data['title'],
-				'gender' => $data['gender'],
-				'organization' => $data['organization'],
-				'phone' => $data['phone'] ?? '',
-				'email' => $data['email']
-			)
-		);
 		curl_setopt_array($curl, array(
 			CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/registration/users',
 			CURLOPT_RETURNTRANSFER => true,
@@ -251,81 +226,66 @@ class PolicyCloud_Marketplace_Public
 			CURLOPT_FOLLOWLOCATION => true,
 			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 			CURLOPT_CUSTOMREQUEST => 'POST',
-			CURLOPT_POSTFIELDS => json_encode($registration_data),
+			CURLOPT_POSTFIELDS => json_encode([
+				'username' => $data['username'],
+				'account' => [
+					'password' => $data['password']
+				],
+				'info' => [
+					'name' => $data['name'],
+					'surname' => $data['surname'],
+					'title' => $data['title'],
+					'gender' => $data['gender'],
+					'organization' => $data['organization'],
+					'phone' => $data['phone'] ?? '',
+					'email' => $data['email']
+				]
+			]),
 			CURLOPT_HTTPHEADER => array('Content-Type: application/json')
 		));
-
 		$response = json_decode(curl_exec($curl), true);
 		curl_close($curl);
-		error_log(json_encode($response));
-		// Return encypted token.
-		if (!isset($response)) {
-			throw new Exception("Unable to reach the Marketplace server.");
-		} elseif ($response['_status'] == 'successful') {
 
+		// Check response and return encypted token.
+		if (!isset($response)) throw new Exception("Unable to reach the Marketplace server.");
+		elseif ($response['_status'] == 'successful') {
 			try {
-
-				// Αποκωδικοποίηση και επιστροφή κρυπτογραφημένου token.
-				$options = get_option('policycloud_marketplace_plugin_settings');
-
-				error_log($options['jwt_key']);
-				$data = JWT::decode($response['token'], $options['jwt_key'], array('HS256'));
-
+				// Encrypt token using the same key and return.
 				return openssl_encrypt(json_encode($data), "AES-128-ECB", $options['jwt_key']);
 			} catch (Exception $e) {
 				throw new Exception($e->getMessage());
 			}
-		} elseif ($response['_status'] == 'unsuccessful') {
-
-			// Επιστροφή σφάλματος.
-			throw new Exception($response['message']);
-		}
+		} elseif ($response['_status'] == 'unsuccessful') throw new Exception($response['message']);
 	}
 
 
 	/**
 	 * Handle user registration AJAX requests.
 	 *
-	 * @since    1.0.0
+	 * @uses 	PolicyCloud_Marketplace_Public::user_registration()
+	 * @since	1.0.0
 	 */
 	public function user_registration_handler()
 	{
-
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_registration')) {
 			die("Unverified request to register user.");
 		}
 
-		$response = array();
-
 		// Attempt to send shipment using POST data.
 		try {
-			$response = array(
+			die(json_encode([
 				'status' => 'success',
 				'data' => PolicyCloud_Marketplace_Public::user_registration($_POST)
-			);
+			]));
 		} catch (Exception $e) {
-			$response = array(
+			die(json_encode([
 				'status' => 'failure',
 				'data' => $e->getMessage()
-			);
+			]));
 		}
-
-		echo json_encode($response);
-
-		// Return success.
-		die();
 	}
 
-
-	/**
-	 * 
-	 * -----------
-	 * 
-	 * LOGIN
-	 * 
-	 * -----------
-	 */
 
 	/**
 	 * Register the shortcode for user login.
@@ -342,30 +302,31 @@ class PolicyCloud_Marketplace_Public
 			'nonce' => wp_create_nonce('ajax_login'),
 		));
 
-		return login_form_html();
+		login_form_html();
 	}
 
 	/**
 	 * Enact user registration using the Marketplace API.
 	 *
+	 * @param array $data The data user for existing user authentication (username, password).
+	 * @return string The encoded Marketplace API token for the successfully authenticated user.
+	 * @usedby PolicyCloud_Marketplace_Public::user_login_handler()
 	 * @since    1.0.0
 	 */
 	private static function user_login($data)
 	{
-		// Information validation.
+		// Check submitted log in information.
 		if (
 			empty($data['username']) ||
 			empty($data['password'])
-		) {
-			throw new Exception('Please fill all required fields!');
-		}
+		) throw new Exception('Please fill in all required fields.');
+
+		$options = get_option('policycloud_marketplace_plugin_settings');
+		if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
 
 		// Contact Marketplace login API endpoint.
 		$curl = curl_init();
-
-		$options = get_option('policycloud_marketplace_plugin_settings');
-
-		curl_setopt_array($curl, array(
+		curl_setopt_array($curl, [
 			CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/authorization/users',
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING => '',
@@ -374,152 +335,128 @@ class PolicyCloud_Marketplace_Public
 			CURLOPT_FOLLOWLOCATION => true,
 			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 			CURLOPT_CUSTOMREQUEST => 'POST',
-			CURLOPT_POSTFIELDS => '{"password": "' . $data['password'] . '", "username": "' . $data['username'] . '"}',
-			CURLOPT_HTTPHEADER => array('Content-Type: application/json')
-		));
-
+			CURLOPT_POSTFIELDS => json_encode($data),
+			CURLOPT_HTTPHEADER => ['Content-Type: application/json']
+		]);
 		$response = json_decode(curl_exec($curl), true);
 		curl_close($curl);
+
 		// Return encypted token.
 		if (!isset($response)) {
 			throw new Exception("Unable to reach the Marketplace server.");
 		} elseif ($response['_status'] == 'successful') {
 			try {
-
-				// Αποκωδικοποίηση και επιστροφή κρυπτογραφημένου token.
-				$options = get_option('policycloud_marketplace_plugin_settings');
-				error_log($options['jwt_key']);
-
+				// Encrypt token using the same key and return.
 				return openssl_encrypt($response['token'], "AES-128-ECB", $options['jwt_key']);
 			} catch (Exception $e) {
 				throw new Exception($e->getMessage());
 			}
-		} elseif ($response['_status'] == 'unsuccessful') {
-
-			// Επιστροφή σφάλματος.
-			throw new Exception($response['message']);
-		}
+		} elseif ($response['_status'] == 'unsuccessful') throw new Exception($response['message']);
 	}
 
 	/**
 	 * Handle user login AJAX requests.
 	 *
-	 * @since    1.0.0
+	 * @uses	PolicyCloud_Marketplace_Public::user_login()
+	 * @since	1.0.0
 	 */
 	public function user_login_handler()
 	{
-
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_login')) {
 			die("Unverified request to register user.");
 		}
 
-		$response = array();
-
 		// Attempt to send shipment using POST data.
 		try {
-			$response = array(
+			die(json_encode([
 				'status' => 'success',
 				'data' => PolicyCloud_Marketplace_Public::user_login($_POST)
-			);
+			]));
 		} catch (Exception $e) {
-			$response = array(
+			die(json_encode([
 				'status' => 'failure',
 				'data' => $e->getMessage()
-			);
+			]));
 		}
-
-		echo json_encode($response);
-
-		// Return success.
-		die();
 	}
 
-	public static function prepare_token($token, $encrypted = true)
+
+	/**
+	 * Retrieve and decrypt the token from the user.
+	 * @param	bool $decode Pass *true* if the token must be returned decoded as well.
+	 * @return	string|bool Returns the token, decrypted and/or decoded. Returns *false* if there is no token.
+	 * @since	1.0.0
+	 */
+	private static function retrieve_token(bool $decode = false)
 	{
 		// Retrieve credentials.
 		$options = get_option('policycloud_marketplace_plugin_settings');
-		if (!$options) {
-			throw new Exception("No PolicyCloud Marketplace credentials defined in WordPress settings.");
-		}
-		if (!isset($options['jwt_key'])) throw new Exception("No Marketplace Key defined in WordPress settings.");
+		if (empty($options['jwt_key'])) throw new Exception("No PolicyCloud Marketplace API Key defined in WordPress settings.");
 
+		// Retrieve saved token.
+		if (!empty($_COOKIE['ppmpapi-token'])) {
 
-		if ($encrypted) {
 			// Decrypt token.
-			$token = openssl_decrypt($token, "AES-128-ECB", $options['jwt_key']);
-			if (!$token) throw new Exception("Decryption was unsuccessful.");
-		}
+			$token = openssl_decrypt($_COOKIE['ppmpapi-token'], "AES-128-ECB", $options['jwt_key']);
+			if (empty($token)) throw new Exception("Decryption was unsuccessful.");
 
-		// Validate using JWT.
-		try {
-			JWT::decode($token, $options['jwt_key'], array('HS256'));
-		} catch (InvalidArgumentException $e) {
-			error_log($e->getMessage());
-			return false;
-		} catch (UnexpectedValueException $e) {
-			error_log($e->getMessage());
-			return false;
-		} catch (SignatureInvalidException $e) {
-			error_log($e->getMessage());
-			return false;
-		} catch (BeforeValidException $e) {
-			error_log($e->getMessage());
-			return false;
-		} catch (ExpiredException $e) {
-			error_log($e->getMessage());
-			return false;
-		}
+			// Validate token age, signature and content.
+			try {
+				$decoded_token = JWT::decode($token, $options['jwt_key'], array('HS256'));
+			} catch (InvalidArgumentException $e) {
+				throw new Exception($e->getMessage());
+			} catch (UnexpectedValueException $e) {
+				throw new Exception($e->getMessage());
+			} catch (SignatureInvalidException $e) {
+				throw new Exception($e->getMessage());
+			} catch (BeforeValidException $e) {
+				throw new Exception($e->getMessage());
+			} catch (ExpiredException $e) {
+				throw new Exception($e->getMessage());
+			}
 
-		if ($encrypted) {
-			return $token;
-		} else {
-			return true;
-		}
+			return ($decode) ? $decoded_token : $token;
+		} else return false;
 	}
 
-	/**
-	 * 
-	 * ----------
-	 * 
-	 * MENU ITEM
-	 * 
-	 * ----------
-	 * 
-	 */
 
 	public static function add_conditional_access_menu_item($items, $args)
 	{
-		// if ($args->theme_location == 'primary') {
-		if (isset($_COOKIE["ppmapi-token"])) {
-			$link = '<a class="menu-link elementor-item policycloud-logout">Log out</a>';
-		} else {
+		// TODO @alexandrosraikos: Add log in page selector in settings and retrieve URL here.
+		try {
+			if (!empty(PolicyCloud_Marketplace_Public::retrieve_token())) {
+				$link = '<a class="menu-link elementor-item policycloud-logout">Log out</a>';
+			} else {
+				$link = '<a class="menu-link elementor-item" href="/login">Log In</a>';
+			}
+		} catch (\Exception $e) {
 			$link = '<a class="menu-link elementor-item" href="/login">Log In</a>';
 		}
 		return $items . '<li class="menu-item menu-item-type-post_type menu-item-object-page policycloud-access-button">' . $link . '</li>';
-		// }
-		// else {
-		// 	return $items;
-		// }
 	}
 
-
 	/**
+	 * Retrieve a specific Description Object from the Marketplace API.
+	 * For more information on the retrieved schema, visit: 
+	 * https://documenter.getpostman.com/view/16776360/TzsZs8kn#8191ba2b-f1aa-4b05-8e66-12025c85d999
 	 * 
-	 * -----------
-	 * 
-	 * READ DATA
-	 * 
-	 * -----------
+	 * @param	string $api_host The hostname of the Marketplace API server.
+	 * @param	string $token The user's access token used for authorization (encoded).
+	 * @return  array An array containing the description information.
+	 * @since    1.0.0
 	 */
-
-	public static function get_specific_description(string $api_host, string $token, $id)
+	private static function get_specific_description(string $token, $id)
 	{
+		// Retrieve credentials.
+		$options = get_option('policycloud_marketplace_plugin_settings');
+		if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
+
 		// Contact Marketplace login API endpoint.
 		$curl = curl_init();
 
 		curl_setopt_array($curl, array(
-			CURLOPT_URL => 'https://' . $api_host . '/descriptions/all/' . $id,
+			CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/descriptions/all/' . $id,
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING => '',
 			CURLOPT_MAXREDIRS => 10,
@@ -527,41 +464,54 @@ class PolicyCloud_Marketplace_Public
 			CURLOPT_FOLLOWLOCATION => true,
 			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 			CURLOPT_CUSTOMREQUEST => 'POST',
-			CURLOPT_HTTPHEADER => array('Content-Type: application/json', 'x-access-token: ' . $token)
+			CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'x-access-token: ' . $token]
 		));
 
 		// Get data,
 		$description = json_decode(curl_exec($curl), true);
 
 		// Handle errors.
-		if (!empty(curl_error($curl))) {
-			throw new Exception("There was a connection error while attempting to retrieve all descriptions.");
-		}
+		if (!empty(curl_error($curl))) throw new Exception("There was a connection error while attempting to retrieve all descriptions.");
 
 		// Close session.
 		curl_close($curl);
-
 		return $description;
 	}
 
 
 	/**
-	 * Display multiple objects for visitors and privileged users.
+	 * Display multiple Description Objects for visitors and authenticated users.
 	 *
 	 * @since    1.0.0
 	 */
 	public static function read_multiple_objects()
 	{
-		function get_public_descriptions(string $api_host, array $collections = null)
+		/**
+		* Retrieve publicly available Description Objects from the Marketplace API, also filtered by collection.
+		*
+		* To learn more about the Marketplace API data schema for retrieving all objects, visit:
+		* https://documenter.getpostman.com/view/16776360/TzsZs8kn#6c8e45e3-5be6-4c10-82a6-7d698b092e9e
+		*
+		* To learn more about the Marketplace API data schema for retrieving collection-filtered objects, visit:
+		* https://documenter.getpostman.com/view/16776360/TzsZs8kn#727d8cbb-6d1c-409a-9c86-8f5fe99f1c11
+		*
+		* @param	array $collections An array of collection title strings to filter the search.
+		* @since    1.0.0
+		*/
+		function get_public_descriptions(array $collections = null)
 		{
+			// Retrieve credentials.
+			$options = get_option('policycloud_marketplace_plugin_settings');
+			if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
+	
+			$curl = curl_init();
+
 			// Get all descriptions.
 			if (!isset($collections)) {
 
 				// Contact PolicyCloud Marketplace API.
-				$curl = curl_init();
-
-				curl_setopt_array($curl, array(
-					CURLOPT_URL => 'https://' . $api_host . '/descriptions/all',
+				curl_setopt_array($curl, [
+					CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/descriptions/all',
 					CURLOPT_RETURNTRANSFER => true,
 					CURLOPT_ENCODING => "",
 					CURLOPT_MAXREDIRS => 10,
@@ -569,18 +519,13 @@ class PolicyCloud_Marketplace_Public
 					CURLOPT_FOLLOWLOCATION => true,
 					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 					CURLOPT_CUSTOMREQUEST => "GET",
-				));
+				]);
+
+				// Handle errors.
+				if (!empty(curl_error($curl))) throw new Exception("There was a connection error while attempting to retrieve all descriptions.");
 
 				// Get data.
 				$descriptions = json_decode(curl_exec($curl), true);
-
-				// Handle errors.
-				if (!empty(curl_error($curl))) {
-					throw new Exception("There was a connection error while attempting to retrieve all descriptions.");
-				}
-
-				// Close session.
-				curl_close($curl);
 			}
 
 			// Get collection-filtered descriptions.
@@ -590,9 +535,8 @@ class PolicyCloud_Marketplace_Public
 
 					// Contact PolicyCloud Marketplace API.
 					$curl = curl_init();
-
-					curl_setopt_array($curl, array(
-						CURLOPT_URL => 'https://' . $api_host . '/descriptions/' . $collection,
+					curl_setopt_array($curl, [
+						CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/descriptions/' . $collection,
 						CURLOPT_RETURNTRANSFER => true,
 						CURLOPT_ENCODING => "",
 						CURLOPT_MAXREDIRS => 10,
@@ -600,97 +544,80 @@ class PolicyCloud_Marketplace_Public
 						CURLOPT_FOLLOWLOCATION => true,
 						CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 						CURLOPT_CUSTOMREQUEST => "GET",
-					));
-
-					// Append descriptions
-					$descriptions += (array) json_decode(curl_exec($curl), true);
+					]);
 
 					// Handle errors.
 					if (!empty(curl_error($curl))) throw new Exception("There was a connection error while attempting to retrieve all descriptions.");
 
-					// Close session.
-					curl_close($curl);
+					// Append descriptions
+					$descriptions += (array) json_decode(curl_exec($curl), true);
 				}
 			}
 
+			// Close session.
+			curl_close($curl);
 			return $descriptions;
 		}
 
-
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 
-		// Retrieve credentials.
-		$options = get_option('policycloud_marketplace_plugin_settings');
-		if (!$options) error_log("No PolicyCloud Marketplace credentials defined in WordPress settings.");
-		if (empty($options['marketplace_host'])) error_log("No Marketplace Host was defined in WordPress settings.");
-
 		try {
-			
 			// Get all publicly available descriptions.
-			$descriptions = get_public_descriptions($options['marketplace_host']);
-
-			/**
-			 *	TODO @alexandrosraikos: Ανάγνωση $_GET για την κατασκευή της κατάλληλης φιλτραρισμένης κλήσης API.
-			 *	Σημείωση: Δημιουργία μεταβλητής $request = '/φτιάξε/το/αντίστοιχο/endpoint' και χρήση της στο curl μετά.
-			 *	Σχήμα δεδομένων φίλτρων:
-			 */
+			$descriptions = get_public_descriptions($_GET['collections'] ?? null);
 
 			if (isset($_GET['search'])) {
-			}
-			if (isset($_GET['collections'])) {
-				$descriptions = get_public_descriptions($options['marketplace_host'], $_GET['collections']);
+
+				/** 
+				 * 
+				 * 	TODO @alexandrosraikos: Coordinate & create search filtering criteria. More information here:
+				 *  https://documenter.getpostman.com/view/16776360/TzsZs8kn#595b5504-1d07-49f8-8166-8efdb400c5f4
+				 * 
+				 * */
 			}
 		} catch (Exception $e) {
-			error_log($e->getMessage());
-			$descriptions = array();
+			$error = $e->getMessage();
 		}
 
 		// Access control checking.
-		if (isset($_COOKIE['ppmpapi-token'])) {
-			try {
-				// Retrieve token.
-				$token = PolicyCloud_Marketplace_Public::prepare_token($_COOKIE['ppmpapi-token']);
+		try {
+			// Retrieve token.
+			$token = PolicyCloud_Marketplace_Public::retrieve_token($_COOKIE['ppmpapi-token']);
+			if (!empty($token)) {
 
 				// Get specific description data from the list for authorized users.
-				$descriptions = array_map(function ($guest_description) use ($options, $token) {
-					return PolicyCloud_Marketplace_Public::get_specific_description($options['marketplace_host'], $token, $guest_description['id']);
+				$descriptions = array_map(function ($public_description) use ($token) {
+					return PolicyCloud_Marketplace_Public::get_specific_description($token, $public_description['id']);
 				}, $descriptions);
-			} catch (Exception $e) {
-				error_log($e->getMessage());
 			}
+		} catch (Exception $e) {
+			$error = $e->getMessage();
 		}
 
 		// Print response data to front end.
 		wp_enqueue_script("policycloud-marketplace-read-multiple", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-multiple.js', array('jquery'));
-		read_multiple_html($descriptions);
+		read_multiple_html($descriptions ?? [], $error ?? null);
 	}
 
 	public static function read_single_object()
 	{
-		// TODO @alexandrosraikos: Fetch Description data from the API.
-		
+		// TODO @alexandrosraikos: Use $_GET for selecting the specific Description Object.
+		// TODO @alexandrosraikos: Use retrieve_token() to enable authenticated access.
+		// TODO @alexandrosraikos: Conditionally fetch Description Object data (public / authenticated) for display.
+		// TODO @alexandrosraikos: Coordinate the addition of the editing form in the generated HTML.
+		// TODO @alexandrosraikos: Create AJAX handler and script for description object editing.
+
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		// Print response data to front end.
-	//	wp_enqueue_script("policycloud-marketplace-read-single", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-single.js', array('jquery'));
-	wp_enqueue_script("policycloud-marketplace-read-single");
-		$description = "Hello";
-		read_single_html($description);
+		wp_enqueue_script("policycloud-marketplace-read-single");
+		read_single_html($description ?? "Hello");
 	}
-
-
-	/**
-	 * 
-	 * -----------
-	 * 
-	 * CREATE
-	 * 
-	 * -----------
-	 */
 
 
 	public static function create_object()
 	{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
+
+		// TODO @alexandrosraikos: Coordinate the addition of the editing form in the generated HTML.
+		// TODO @alexandrosraikos: Create AJAX handler and script for description object creation.
 
 		wp_enqueue_script("upload_ste");
 		wp_localize_script('upload_ste', 'ajax_prop', array(
@@ -698,28 +625,7 @@ class PolicyCloud_Marketplace_Public
 			'nonce' => wp_create_nonce('ajax_upload'),
 		));
 
-		return upload_step();
+		upload_step();
 	}
 
-
-
-
-	/**
-	 * 
-	 * -----------
-	 * 
-	 * UPDATE
-	 * 
-	 * -----------
-	 */
-
-
-	/**
-	 * 
-	 * -----------
-	 * 
-	 * DELETE
-	 * 
-	 * -----------
-	 */
 }

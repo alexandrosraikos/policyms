@@ -176,13 +176,10 @@ class PolicyCloud_Marketplace {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
-		// Registration sequence.
-		add_shortcode('policycloud-marketplace-registration','PolicyCloud_Marketplace_Public::registration_shortcode');
 		$this->loader->add_action('wp_ajax_registration', $plugin_public, 'user_registration_handler');
-
-		// Log in sequence.
-		add_shortcode('policycloud-marketplace-login','PolicyCloud_Marketplace_Public::login_shortcode');
 		$this->loader->add_action('wp_ajax_login', $plugin_public, 'user_login_handler');
+		$this->loader->add_action('init', $plugin_public, 'add_authentication_shortcodes');
+
 		// TODO: Add email verification shortcode sequence.
 		// TODO: Add password reset shortcode sequence.
 
@@ -190,15 +187,7 @@ class PolicyCloud_Marketplace {
 		$this->loader->add_filter('wp_nav_menu_items', $plugin_public, 'add_conditional_access_menu_item', 10, 2);
 
 		// -- CRUD operations on database.
-
-		// Read multiple objects sequence.
-		add_shortcode('policycloud-marketplace-read-multiple','PolicyCloud_Marketplace_Public::read_multiple_objects');
-			
-		// Read single object sequence.
-		add_shortcode('policycloud-marketplace-read-single','PolicyCloud_Marketplace_Public::read_single_object');
-
-		// Create object sequence.
-		add_shortcode('policycloud-marketplace-create', 'PolicyCloud_Marketplace_Public::create_object');
+		$this->loader->add_action('init', $plugin_public, 'add_content_shortcodes');
 	}
 
 	/**
