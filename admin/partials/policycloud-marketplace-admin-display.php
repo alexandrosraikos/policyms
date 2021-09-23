@@ -89,3 +89,26 @@ function policycloud_marketplace_plugin_menu_selector()
     <p>Select the menu where the Log In and Log Out buttons to appear.</p>
 <?php
 }
+
+function policycloud_marketplace_plugin_section_three()
+{
+    echo '<p>Select your preferred operating settings.</p>';
+}
+
+function policycloud_marketplace_plugin_description_page_selector()
+{
+    $options = get_option('policycloud_marketplace_plugin_settings');
+    $pages = get_pages([
+        'post_status' => 'publish'
+    ]);
+?>
+    <select name="policycloud_marketplace_plugin_settings[description_page]">
+        <?php
+        foreach ($pages as $page) {
+            echo '<option value="' . get_page_link($page->ID) . '" '.($options['description_page']==get_page_link($page->ID) ? 'selected' : '').'>' . $page->post_title . '</option>';
+        }
+        ?>
+    </select>
+    <p>Select the page where you've inserted the <em>[policycloud-marketplace-read-single]</em> shortcode.</p>
+<?php
+}

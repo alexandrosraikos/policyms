@@ -490,36 +490,64 @@ class PolicyCloud_Marketplace_Public
 		return $description;
 	}
 
-
 	/**
-	 * Display multiple Description Objects for visitors and authenticated users.
+	 * Retrieve publicly available Description Objects from the Marketplace API, also filtered by collection.
 	 *
+	 * To learn more about the Marketplace API data schema for retrieving objects and filtering them, visit:
+	 * https://documenter.getpostman.com/view/16776360/TzsZs8kn#6c8e45e3-5be6-4c10-82a6-7d698b092e9e
+	 *
+	 * @param	array $args An array of arguments to filter the search.
 	 * @since    1.0.0
 	 */
-	public static function read_multiple_objects()
-	{
-		/**
-		 * Retrieve publicly available Description Objects from the Marketplace API, also filtered by collection.
-		 *
-		 * To learn more about the Marketplace API data schema for retrieving all objects, visit:
-		 * https://documenter.getpostman.com/view/16776360/TzsZs8kn#6c8e45e3-5be6-4c10-82a6-7d698b092e9e
-		 *
-		 * To learn more about the Marketplace API data schema for retrieving collection-filtered objects, visit:
-		 * https://documenter.getpostman.com/view/16776360/TzsZs8kn#727d8cbb-6d1c-409a-9c86-8f5fe99f1c11
-		 *
-		 * @param	array $collections An array of collection title strings to filter the search.
-		 * @since    1.0.0
-		 */
-		function get_public_descriptions(array $collections = null)
-		{
+	private static function get_descriptions(array $args) {
+
 			// Retrieve credentials.
 			$options = get_option('policycloud_marketplace_plugin_settings');
 			if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
 
+			/** 
+			 * 
+			 * 	TODO @alexandrosraikos: Coordinate & create search filtering criteria. More information here:
+			 *  https://documenter.getpostman.com/view/16776360/TzsZs8kn#595b5504-1d07-49f8-8166-8efdb400c5f4
+			 * 
+			 * */
+
+			// Filtering by information.
+			if (!empty($args['owner'])) {
+			}
+			if (!empty($args['title'])) {
+			}
+			if (!empty($args['type'])) {
+			}
+			if (!empty($args['subtype'])) {
+			}
+			if (!empty($args['comments'])) {
+			}
+			if (!empty($args['contact'])) {
+			}
+			if (!empty($args['description'])) {
+			}
+			if (!empty($args['field_of_use'])) {
+			}
+
+			// Filtering by metadata.
+			if (!empty($args['provider'])) {
+			}
+			if (!empty($args['upload_date'])) {
+			}
+			if (!empty($args['update_date'])) {
+			}
+			if (!empty($args['last_updated_by'])) {
+			}
+			if (!empty($args['version'])) {
+			}
+			if (!empty($args['views'])) {
+			}
+
 			$curl = curl_init();
 
 			// Get all descriptions.
-			if (!isset($collections)) {
+			if (!isset($args['collections'])) {
 
 				// Contact PolicyCloud Marketplace API.
 				curl_setopt_array($curl, [
@@ -540,10 +568,10 @@ class PolicyCloud_Marketplace_Public
 				$descriptions = json_decode(curl_exec($curl), true);
 			}
 
-			// Get collection-filtered descriptions.
+			// Filtering by collection.
 			else {
 				$descriptions = array();
-				foreach ($collections as $collection) {
+				foreach ($args['collection'] as $collection) {
 
 					// Contact PolicyCloud Marketplace API.
 					$curl = curl_init();
@@ -569,58 +597,68 @@ class PolicyCloud_Marketplace_Public
 			// Close session.
 			curl_close($curl);
 			return $descriptions;
-		}
+	}
 
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 
+	/**
+	 * Display multiple Description Objects for visitors and authenticated users.
+	 *
+	 * @since    1.0.0
+	 */
+	public static function read_multiple_objects()
+	{
 		try {
-			// Get all publicly available descriptions.
-			$descriptions = get_public_descriptions($_GET['collections'] ?? null);
+			// Retrieve all public descriptions based on GET parameter filtering.
+			$descriptions = PolicyCloud_Marketplace_Public::get_descriptions($_GET);
 
-			if (isset($_GET['search'])) {
-
-				/** 
-				 * 
-				 * 	TODO @alexandrosraikos: Coordinate & create search filtering criteria. More information here:
-				 *  https://documenter.getpostman.com/view/16776360/TzsZs8kn#595b5504-1d07-49f8-8166-8efdb400c5f4
-				 * 
-				 * */
-			}
-		} catch (Exception $e) {
-			$error = $e->getMessage();
-		}
-
-		// Access control checking.
-		try {
-			// Retrieve token.
-			$token = PolicyCloud_Marketplace_Public::retrieve_token($_COOKIE['ppmpapi-token']);
+			// Get specific description data from the list for authorized users.
+			$token = PolicyCloud_Marketplace_Public::retrieve_token();
 			if (!empty($token)) {
-
-				// Get specific description data from the list for authorized users.
 				$descriptions = array_map(function ($public_description) use ($token) {
 					return PolicyCloud_Marketplace_Public::get_specific_description($token, $public_description['id']);
 				}, $descriptions);
+				$authenticated = true;
 			}
+			else $authenticated = false;
 		} catch (Exception $e) {
 			$error = $e->getMessage();
 		}
 
+		// Retrieve description page URL.
+		$options = get_option('policycloud_marketplace_plugin_settings');
+		if (empty($options['description_page'])) $error = "You have not set a Description page in your PolicyCloud Marketplace settings.";
+
 		// Print response data to front end.
 		wp_enqueue_script("policycloud-marketplace-read-multiple", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-multiple.js', array('jquery'));
-		read_multiple_html($descriptions ?? [], $error ?? null);
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
+		read_multiple_html($descriptions, [
+			"authenticated" => $authenticated ?? false,
+			"description_url" => $options['description_page'],
+			"error" => $error ?? null
+		]);
 	}
 
 	public static function read_single_object()
 	{
-		// TODO @alexandrosraikos: Use $_GET for selecting the specific Description Object.
-		// TODO @alexandrosraikos: Use retrieve_token() to enable authenticated access.
-		// TODO @alexandrosraikos: Conditionally fetch Description Object data (public / authenticated) for display.
+		// TODO @alexandrosraikos: Conditionally fetch Description Object data (public / authenticated) for display. (?)
 		// TODO @alexandrosraikos: Coordinate the addition of the editing form in the generated HTML.
 		// TODO @alexandrosraikos: Create AJAX handler and script for description object editing.
 
+		try {
+			// Get specific description data for authorized users.
+			$token = PolicyCloud_Marketplace_Public::retrieve_token();
+			if (!empty($token)) {
+				$description = PolicyCloud_Marketplace_Public::get_specific_description($token, $_GET['did']);
+			}
+			else $error = "Please log in to view this content.";
+		} catch (Exception $e) {
+			$error = $e->getMessage();
+		}
+
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 		wp_enqueue_script("policycloud-marketplace-read-single");
-		read_single_html($description ?? "Hello");
+
+		read_single_html($description, $error ?? null);
 	}
 
 

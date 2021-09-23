@@ -80,6 +80,7 @@ class PolicyCloud_Marketplace_Admin
 		$output['marketplace_host'] = sanitize_text_field( $input['marketplace_host']);
 		$output['login_page'] = esc_url($input['login_page']);
 		$output['selected_menu'] = sanitize_text_field($input['selected_menu']);
+		$output['description_page'] = esc_url($input['description_page']);
 		return $output;
 	}
 
@@ -116,7 +117,7 @@ class PolicyCloud_Marketplace_Admin
 
 		add_settings_section(
 		  'section_two',
-		  'Menu Item Settings',
+		  'Menu Settings',
 		  'policycloud_marketplace_plugin_section_two',
 		  'policycloud_marketplace_plugin'
 		);
@@ -135,6 +136,21 @@ class PolicyCloud_Marketplace_Admin
 			'policycloud_marketplace_plugin_login_page_selector',
 			'policycloud_marketplace_plugin',
 			'section_two'
+		);
+
+		add_settings_section(
+		  'section_three',
+		  'Content Settings',
+		  'policycloud_marketplace_plugin_section_three',
+		  'policycloud_marketplace_plugin'
+		);
+
+		add_settings_field(
+			'description_page',
+			'Redirect to single Description page',
+			'policycloud_marketplace_plugin_description_page_selector',
+			'policycloud_marketplace_plugin',
+			'section_three'
 		);
 
 	  }
