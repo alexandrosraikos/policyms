@@ -378,3 +378,264 @@ ul#tabs-nav li.active {
   flex: 1 1 0px;
   border: 1px solid white;
 }
+
+/*   multi    */
+body {margin: 0;}
+/*dropdown sidebar style*/
+.sidenav a,
+      .dropdown-btn1 {
+        background-color: #4682B4;
+          padding: 6px 8px 6px 16px;
+          text-decoration: none;
+          font-size: 20px;
+          color: white;
+          display: block;
+          border: none;
+          background: none;
+          width: 100%;
+          text-align: left;
+          cursor: pointer;
+          outline: none;
+      }
+
+      /* On mouse-over */
+      .sidenav a:hover,
+      .dropdown-btn1:hover {
+          color: none;
+          background-color: #4682B4;
+      }
+      .dropdown-btn1 a{
+        background-color: #4682B4;
+      }
+      /* Main content */
+      .main {
+          margin-left: 150px;
+          /* Same as the width of the sidenav */
+          font-size: 20px;
+          /* Increased text to enable scrolling */
+          padding: 0px 10px;
+      }
+
+      /* Add an active class to the active dropdown button */
+      .active {
+
+        background-color: #4682B4;
+          color: white;
+      }
+
+      /* Dropdown container (hidden by default). Optional: add a lighter background color and some left padding to change the design of the dropdown content */
+      .dropdown-container {
+          display: none;
+          background-color: none;
+          padding-left: 8px;
+
+      }
+
+      /* Optional: Style the caret down icon */
+      .fa-caret-down {
+          float: right;
+          padding-right: 8px;
+      }
+
+/*sidebar the list*/
+ul.sidenav {
+list-style-type: none;
+margin: 0;
+padding: 0;
+width: 25%;
+background-image: url("https://nkfitness.gr/wp-content/uploads/2017/07/photo-placeholder-1.jpg");
+background-color:#4682B4;
+position: fixed;
+height: 100%;
+overflow: auto;
+}
+
+ul.sidenav li a {
+display: block;
+color: white;
+padding: 8px 16px;
+text-decoration: none;
+}
+
+ul.sidenav li a.active {
+background-color: #4682B4;
+color: white;
+}
+
+ul.sidenav li a:hover:not(.active) {
+background-color: #4682B4;
+color: white;
+}
+
+div.content {
+margin-left: 25%;
+padding: 1px 16px;
+height: 1000px;
+}
+
+@media screen and (max-width: 900px) {
+ul.sidenav {
+  width: 100%;
+  height: auto;
+  position: relative;
+}
+
+ul.sidenav li a {
+  float: left;
+  padding: 15px;
+}
+
+div.content {margin-left: 0;}
+}
+
+@media screen and (max-width: 400px) {
+ul.sidenav li a {
+  text-align: center;
+  float: none;
+}
+}
+/***************************           Cards            *******************************/
+img {
+display: block;
+  border: 0;
+  width: 100%;
+  height: auto;
+}
+.title1 {
+color: #4682B4;
+margin: 2rem 0 .5rem;
+font-size: 1.40rem;
+font-weight: 400;
+
+}
+.cards {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(250px, 4fr)); /* see notes below */
+grid-auto-rows: minmax(200px, auto);
+grid-gap: 1rem;
+font-family: "Montserrat";
+}
+
+.card1 {
+  max-width: 95%;
+/*height: 200px;*/
+/*background: red;*/
+border: 2px solid #e7e7e7;
+border-radius: 4px;
+padding: .5rem;
+-webkit-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.15);
+box-shadow: 0 2px 2px rgba(0, 0, 0, 0.15);
+display: flex;
+/* -webkit-box-orient: vertical; */
+/* -webkit-box-direction: normal; */
+-ms-flex-direction: column;
+flex-direction: column;
+position: relative;
+color: #5d5e5e;
+} /* li item */
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700');
+
+* {
+-webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.thumbnail1 img {
+/* fill: #c7c4c4;*/
+height: 200px;
+width: 100%;
+padding: 1.5rem;
+object-fit: scale-down;
+}
+
+.card-content {
+font-size: .75rem;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.panel.card1-panel .panel-header {
+  background-color: #ffffff;
+  font-size: .75rem;
+  font-weight: 400;
+  height: 25px !important;
+}
+
+.panel.card1-panel .panel-content {
+-webkit-box-flex: 1;
+-ms-flex: 1;
+flex: 1;
+}
+
+.category {
+font-size: .75rem;
+text-transform: uppercase;
+}
+
+.footer1 {
+
+border-top: 2px solid #e7e7e7;
+margin: .5rem 0 0;
+min-height: 30px;
+font-size: 1.2rem;
+margin-top: auto;
+}
+
+.category1 {
+
+  position: absolute;
+  top: 160px;
+  left: 3;
+  color: #fff;
+  background: #e74c3c;
+  padding: 12px 15px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.category__01 {
+
+/*background-color: #cccccc;*/
+/*background-color: #50c6db;*/
+}
+.category__01_plaisio{
+background-color:#006489;
+}
+.category__02 {
+background-color: #5d5e5e;
+}
+
+.category__03 {
+background-color: #51bb7b;
+}
+
+.category__04 {
+background-color: #f47820;
+}
+
+.category__05 {
+background-color: #8350a0;
+}
+
+.post-meta1 {
+margin-top: .5rem;
+}
+
+.comments1 {
+margin-left: .5rem;
+}
+.views1{
+margin-left: .5rem;
+}
+/*koubia */
+.myinp{
+width: 30.33%
+
+}
