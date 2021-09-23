@@ -62,19 +62,6 @@ class PolicyCloud_Marketplace_Admin
 	 */
 	public function enqueue_styles()
 	{
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in PolicyCloud_Marketplace_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The PolicyCloud_Marketplace_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/policycloud-marketplace-admin.css', array(), $this->version, 'all');
 	}
 
@@ -85,25 +72,14 @@ class PolicyCloud_Marketplace_Admin
 	 */
 	public function enqueue_scripts()
 	{
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in PolicyCloud_Marketplace_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The PolicyCloud_Marketplace_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-admin.js', array('jquery'), $this->version, false);
 	}
 
 	function policycloud_marketplace_validate_plugin_settings( $input ) {
 		$output['jwt_key']      = sanitize_text_field( $input['jwt_key'] );
 		$output['marketplace_host'] = sanitize_text_field( $input['marketplace_host']);
+		$output['login_page'] = esc_url($input['login_page']);
+		$output['selected_menu'] = sanitize_text_field($input['selected_menu']);
 		return $output;
 	}
 
@@ -136,6 +112,29 @@ class PolicyCloud_Marketplace_Admin
 		  'policycloud_marketplace_plugin_jwt_key',
 		  'policycloud_marketplace_plugin',
 		  'section_one'
+		);
+
+		add_settings_section(
+		  'section_two',
+		  'Menu Item Settings',
+		  'policycloud_marketplace_plugin_section_two',
+		  'policycloud_marketplace_plugin'
+		);
+
+		add_settings_field(
+			'selected_menu',
+			'Selected Menu',
+			'policycloud_marketplace_plugin_menu_selector',
+			'policycloud_marketplace_plugin',
+			'section_two'
+		);
+
+		add_settings_field(
+			'login_page',
+			'Redirect to Log In',
+			'policycloud_marketplace_plugin_login_page_selector',
+			'policycloud_marketplace_plugin',
+			'section_two'
 		);
 
 	  }

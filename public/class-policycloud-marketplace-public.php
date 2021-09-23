@@ -421,19 +421,31 @@ class PolicyCloud_Marketplace_Public
 	}
 
 
+	/**
+	 * Add a menu item to a selected menu, which conditionally switches
+	 * from log in to log out actions.
+	 * 
+	 * @since    1.0.0
+	 */
 	public static function add_conditional_access_menu_item($items, $args)
 	{
-		// TODO @alexandrosraikos: Add log in page selector in settings and retrieve URL here.
-		try {
-			if (!empty(PolicyCloud_Marketplace_Public::retrieve_token())) {
-				$link = '<a class="menu-link elementor-item policycloud-logout">Log out</a>';
-			} else {
-				$link = '<a class="menu-link elementor-item" href="/login">Log In</a>';
+		// Retrieve credentials.
+		$options = get_option('policycloud_marketplace_plugin_settings');
+		if (empty($options['selected_menu']) || empty($options['login_page'])) return $items;
+
+		// Add conditional menu item.
+		if ($args->theme_location == $options['selected_menu']) {
+			try {
+				if (!empty(PolicyCloud_Marketplace_Public::retrieve_token())) {
+					$link = '<a class="menu-link elementor-item policycloud-logout">Log out</a>';
+				} else {
+					$link = '<a class="menu-link elementor-item" href="' . $options['login_page'] . '">Log In</a>';
+				}
+			} catch (\Exception $e) {
+				$link = '<a class="menu-link elementor-item" href="' . $options['login_page'] . '">Log In</a>';
 			}
-		} catch (\Exception $e) {
-			$link = '<a class="menu-link elementor-item" href="/login">Log In</a>';
-		}
-		return $items . '<li class="menu-item menu-item-type-post_type menu-item-object-page policycloud-access-button">' . $link . '</li>';
+			return $items . '<li class="menu-item menu-item-type-post_type menu-item-object-page policycloud-access-button">' . $link . '</li>';
+		} else return $items;
 	}
 
 	/**
@@ -487,23 +499,23 @@ class PolicyCloud_Marketplace_Public
 	public static function read_multiple_objects()
 	{
 		/**
-		* Retrieve publicly available Description Objects from the Marketplace API, also filtered by collection.
-		*
-		* To learn more about the Marketplace API data schema for retrieving all objects, visit:
-		* https://documenter.getpostman.com/view/16776360/TzsZs8kn#6c8e45e3-5be6-4c10-82a6-7d698b092e9e
-		*
-		* To learn more about the Marketplace API data schema for retrieving collection-filtered objects, visit:
-		* https://documenter.getpostman.com/view/16776360/TzsZs8kn#727d8cbb-6d1c-409a-9c86-8f5fe99f1c11
-		*
-		* @param	array $collections An array of collection title strings to filter the search.
-		* @since    1.0.0
-		*/
+		 * Retrieve publicly available Description Objects from the Marketplace API, also filtered by collection.
+		 *
+		 * To learn more about the Marketplace API data schema for retrieving all objects, visit:
+		 * https://documenter.getpostman.com/view/16776360/TzsZs8kn#6c8e45e3-5be6-4c10-82a6-7d698b092e9e
+		 *
+		 * To learn more about the Marketplace API data schema for retrieving collection-filtered objects, visit:
+		 * https://documenter.getpostman.com/view/16776360/TzsZs8kn#727d8cbb-6d1c-409a-9c86-8f5fe99f1c11
+		 *
+		 * @param	array $collections An array of collection title strings to filter the search.
+		 * @since    1.0.0
+		 */
 		function get_public_descriptions(array $collections = null)
 		{
 			// Retrieve credentials.
 			$options = get_option('policycloud_marketplace_plugin_settings');
 			if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
-	
+
 			$curl = curl_init();
 
 			// Get all descriptions.
@@ -627,5 +639,4 @@ class PolicyCloud_Marketplace_Public
 
 		upload_step();
 	}
-
 }

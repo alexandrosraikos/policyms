@@ -35,15 +35,57 @@ function policycloud_marketplace_plugin_section_one()
 
 function policycloud_marketplace_plugin_host()
 {
-
     $options = get_option('policycloud_marketplace_plugin_settings');
-
-    echo '<input type="text" name="policycloud_marketplace_plugin_settings[marketplace_host]" value="' . (($options != false) ? $options['marketplace_host'] : '') . '" /><p>The Marketplace server address endpoint.</p>';
+?>
+    <input type="text" name="policycloud_marketplace_plugin_settings[marketplace_host]" value="<?php echo (($options != false) ? $options['marketplace_host'] : '') ?>" />
+    <p>The Marketplace server address endpoint.</p>
+<?php
 }
 
 function policycloud_marketplace_plugin_jwt_key()
 {
-
     $options = get_option('policycloud_marketplace_plugin_settings');
-    echo '<input type="text" name="policycloud_marketplace_plugin_settings[jwt_key]" value="' . (($options != false) ? $options['jwt_key'] : '') . '" /><p>The Marketplace server token decoding key.</p>';
+?>
+    <input type="text" name="policycloud_marketplace_plugin_settings[jwt_key]" value="<?php echo (($options != false) ? $options['jwt_key'] : '') ?>" />
+    <p>The Marketplace server token decoding key.</p>
+<?php
+}
+
+function policycloud_marketplace_plugin_section_two()
+{
+    echo '<p>Select your preferred operating settings.</p>';
+}
+
+function policycloud_marketplace_plugin_login_page_selector()
+{
+    $options = get_option('policycloud_marketplace_plugin_settings');
+    $pages = get_pages([
+        'post_status' => 'publish'
+    ]);
+?>
+    <select name="policycloud_marketplace_plugin_settings[login_page]">
+        <?php
+        foreach ($pages as $page) {
+            echo '<option value="' . get_page_link($page->ID) . '" '.($options['login_page']==get_page_link($page->ID) ? 'selected' : '').'>' . $page->post_title . '</option>';
+        }
+        ?>
+    </select>
+    <p>Select the log in page where the "Log In" menu item should redirect.</p>
+<?php
+}
+
+function policycloud_marketplace_plugin_menu_selector()
+{
+    $options = get_option('policycloud_marketplace_plugin_settings');
+    $menus = get_registered_nav_menus();
+?>
+    <select name="policycloud_marketplace_plugin_settings[selected_menu]">
+        <?php
+        foreach ($menus as $location => $description) {
+            echo '<option value="' . $location . '" '.($options['selected_menu']==$location ? 'selected' : '').'>' . $description. '</option>';
+        }
+        ?>
+    </select>
+    <p>Select the menu where the Log In and Log Out buttons to appear.</p>
+<?php
 }
