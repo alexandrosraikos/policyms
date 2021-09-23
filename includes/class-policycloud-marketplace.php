@@ -188,6 +188,8 @@ class PolicyCloud_Marketplace {
 
 		// -- CRUD operations on database.
 		$this->loader->add_action('init', $plugin_public, 'add_content_shortcodes');
+		$this->loader->add_action('wp_ajax_description_editing', $plugin_public, 'description_editing_handler');
+		$this->loader->add_action('wp_ajax_description_creation', $plugin_public, 'description_creation_handler');
 	}
 
 	/**
