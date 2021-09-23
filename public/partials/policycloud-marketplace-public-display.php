@@ -175,30 +175,21 @@ function login_form_html()
 <?php
 }
 
-function read_multiple_html($description_objects)
+function read_multiple_html($description_objects, $args)
 {
-    /**
-     * TODO @elefkour: Εκτύπωση sidebar φίλτρων. 
-     * Σημείωση: Ανάγνωση $_GET για ενεργοποίηση ήδη ενεργών φίλτρων.
-     * (π.χ. $_GET['category'] == 'ταδε' να εκτυπώνει checked το checkbox του 'ταδε' category).
-     */
-
-
-    /**
-     * TODO @elefkour: Εκτύπωση λίστας αντικειμένων $description_objects (με foreach).
-     * Σχήμα δεδομένων:
-     */
 ?>
-
-
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" type="text/css">
-
-
-
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+    <?php
+    // TODO @elekfour: Create error message.
+    if (!empty($args['error'])) {
+        echo 'Error: ' . $args['error'];
+    }
+    ?>
+
     <ul class="sidenav">
         <a>Filter by</a>
         <form action="">
@@ -208,7 +199,7 @@ function read_multiple_html($description_objects)
             <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-container">
-            <a href="<?php echo site_url() ?>/discover?collections=algorithms" class="<?php echo ($_GET['collections'] == 'algorithms') ? "highlighted" : "" ?>">Algorithms</a>
+            <a href="<?php echo site_url() ?>/discover?collections=algorithms">Algorithms</a>
             <a href="<?php echo site_url() ?>/discover?collections=tools">Tools</a>
             <a href="<?php echo site_url() ?>/discover?collections=datasets">Datasets</a>
             <a href="<?php echo site_url() ?>/discover?collections=outcomes">Project's Outcomes</a>
@@ -219,17 +210,12 @@ function read_multiple_html($description_objects)
             <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-container">
-
-
-
             <div class="col-1">
                 <div class="form" action="">
                     <input type="text" class="myinp" placeholder="Add Key"> <input class="myinp" type="text" placeholder="Value">
-
                     <button class="btn btn-primary add_field_button"><i class="fa fa-plus"></i> Add More</button>
                 </div>
             </div>
-
             <div class="input_fields_wrap">
                 <!-- Dynamic Fields go here -->
             </div>
@@ -238,62 +224,53 @@ function read_multiple_html($description_objects)
     </ul>
 
     <div class="content">
-
-
-
         <!-- Content -->
-
         <h1></h1>
-
-
         <section class="cards">
             <?php
-            // $file=file_get_contents("http://localhost/marketplace/all.json");
-            //$someObjects= json_decode(file_get_contents($file), true);
-            // $someObjects=json_decode($file,true);
-            foreach ($description_objects as $someObject) {
-
-
-                $asset_name = $someObject['info']['title'];
-                //$info=$some0bject['info'];
-                //echo $id;
-                $asset_fieldofuse = $someObject['info']['fieldOfUse'];
-                $asset_collection = $someObject['collection'];
-                $asset_subtype = $someObject['info']['subtype'];
-                $short_desc = $someObject['info']['short_desc']; ?>
-
+            // TODO @elefkour: Check for empty $description_objects
+            foreach ($description_objects as $description) {
+            ?>
                 <!--   card 1 -->
                 <article class="card1">
-
                     <picture class="thumbnail1">
-                        <a style="color:gray;" href="http://localhost/marketplace/read-single/">
+                        <a style="color:gray;" href="<?php echo $args['description_url'] . '?did=' . $description['id'] ?>">
                             <img class="category__01" src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8Mnx8fGVufDB8fHx8&w=1000&q=80" alt="" />
                     </picture>
                     <div class="card-content">
-                        <p class="category1 category__01_plaisio"> <?php echo  $asset_collection; ?></p>
+                        <p class="category1 category__01_plaisio"> <?php echo  $description['collection']; ?></p>
                         <br>
                         <span style="color:gray;font-size:12px;"> <i class="far fa-eye"></i> 100 | <i class="far fa-calendar-alt"></i> 2.23.2021</span>
-                        <h1 class="title1"> <b><?php echo  $asset_name; ?></b></h1>
-                        <p class="h6"> <?php echo $short_desc; ?></p>
+                        <h1 class="title1"> <b><?php echo  $description['info']['title']; ?></b></h1>
+                        <p class="h6"> <?php echo $description['info']['short_desc']; ?></p>
                     </div><!-- .card-content -->
                     <footer class="footer1">
                         <div class="post-meta1">
-                            <span class="views1"><i class="fas fa-folder-open"></i> <a href="#"> <?php echo  $asset_collection; ?></a></span>
+                            <span class="views1"><i class="fas fa-folder-open"></i> <a href="#"> <?php echo  $description['collection']; ?></a></span>
                             <span class="views1"><i class="fas fa-user"></i> <a href="#"> University of Nicosia</a></span>
                         </div>
                     </footer>
                 </article>
-
-
             <?php
             } ?>
         </section>
     <?php
 }
 
-// TODO @elefkour
-function read_single_html($description_object)
+function read_single_html($description_object, $args)
 {
+
+    // TODO @elefkour: Create HTML error message.
+    if (!empty($args['error'])) {
+        echo 'Error: ' . $args['error'];
+    }
+
+    // TODO @elefkour: Create owner buttons (copy & paste where needed).
+    if (!empty($args['is_owner'])) { // true or false
+        echo ($args['is_owner']) ? "Owner!" : "Stranger.";
+    }
+
+    // TODO @elefkour: Check empty description_object.
     ?>
         <section style="width: 1349px; left: 0px;">
             <div class="parent">
@@ -303,7 +280,6 @@ function read_single_html($description_object)
                             <li><a href="#tab1"><i class="fas fa-file-alt"></i> Description</a></li>
                             <li><a href="#tab2"><i class="fas fa-file-download"> Files</i></a></li>
                             <li><a href="#tab3"><i class="fas fa-comments"></i> Comments</a></li>
-
                         </ul> <!-- END tabs-nav -->
                         <div id="tabs-content">
                             <div id="tab1" class="tab-content">
@@ -383,7 +359,7 @@ function read_single_html($description_object)
                 </div>
                 <div class="column">
                     <div class="main-display">
-                        <h2 class="h2title">Deep Learning</h2>
+                        <h2 id="description-title" class="h2title">Deep Learning</h2>
                         <span class="card-link" style="color:gray;font-size:12px;"><i class="far fa-user"></i> University of Nicosia | <i class="far fa-eye"></i> 100 | <i class="far fa-calendar-alt"></i> 2.23.2021</span>
                         <h6><b>Algorithms</b>|<b>Finance</b></h6>
                         <a style="color:blue;font-size:15px;"> <i class="fas fa-envelope"></i> example@gmail.com</a>

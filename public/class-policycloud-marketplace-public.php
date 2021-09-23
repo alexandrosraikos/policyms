@@ -631,6 +631,7 @@ class PolicyCloud_Marketplace_Public
 		// Print response data to front end.
 		wp_enqueue_script("policycloud-marketplace-read-multiple", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-multiple.js', array('jquery'));
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
+		
 		read_multiple_html($descriptions, [
 			"authenticated" => $authenticated ?? false,
 			"description_url" => $options['description_page'],
@@ -657,6 +658,8 @@ class PolicyCloud_Marketplace_Public
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 		wp_enqueue_script("policycloud-marketplace-read-single");
+
+		// TODO @alexandrosraikos: Cross reference and check non-approved.
 
 		read_single_html($description, [
 			"is_owner" => false,

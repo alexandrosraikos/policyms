@@ -259,8 +259,10 @@ input[type="text"] {
     font-size: 18px;
   }
 }
-body {font-family: Arial;}
-.containert{
+body {
+  font-family: Arial;
+}
+.containert {
   height: 100%;
   width: 600px;
   top: 10;
@@ -268,7 +270,6 @@ body {font-family: Arial;}
 }
 /* Style the tab */
 .tabs {
-
   width: 600px;
   background-color: rgba(163, 159, 159, 0.692);
   border-radius: 5px 5px 5px 5px;
@@ -291,41 +292,40 @@ ul#tabs-nav li {
 }
 ul#tabs-nav li:hover,
 ul#tabs-nav li.active {
-  background-color:rgba(0, 0, 0, 0.329);
+  background-color: rgba(0, 0, 0, 0.329);
 }
 #tabs-nav li a {
   text-decoration: none;
-  color: #FFF;
+  color: #fff;
 }
 .tab-content {
   padding: 10px;
   border: 5px solid #fdfafa;
-  background-color: #FFF;
+  background-color: #fff;
 }
 
 /* Just for CodePen styling - don't include if you copy paste */
 /*style accordion*/
-   .w3-container{
-     width: 30%;
-   }
-   .accordion {
+.w3-container {
+  width: 30%;
+}
+.accordion {
   background-color: #eee;
   color: black;
   cursor: pointer;
   padding: 18px;
   width: 100%;
   border: solid;
-  border-color:white;
+  border-color: white;
   text-align: left;
   outline: none;
   font-size: 15px;
   transition: 0.4s;
-  
 }
 
-.active, .accordion:hover {
+.active,
+.accordion:hover {
   background-color: #ccc;
-  
 }
 .panel {
   padding: 0 18px;
@@ -335,43 +335,41 @@ ul#tabs-nav li.active {
   transition: max-height 0.2s ease-out;
 }
 /*slideshow in the ta1 style */
-#slideshow { 
-  margin: 50px auto; 
-  position: relative; 
-  width: 500px; 
-  height: 500px; 
-  padding: 10px; 
+#slideshow {
+  margin: 50px auto;
+  position: relative;
+  width: 500px;
+  height: 500px;
+  padding: 10px;
 }
 
-#slideshow > div { 
-  position: absolute; 
-  top: 10px; 
-  left: 10px; 
-  right: 10px; 
-  bottom: 10px; 
+#slideshow > div {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
 }
-.main-display{
+.main-display {
   margin-right: 50px;
-            /* Same as the width of the sidenav */
-         /*  font-size: 20px;
+  /* Same as the width of the sidenav */
+  /*  font-size: 20px;
             /* Increased text to enable scrolling */
-            padding: 15px 15px;
+  padding: 15px 15px;
 }
-.h1{
+.h1 {
   font-size: 30px;
-  color:black;
+  color: black;
 }
-.h2title{
- 
-    color: #000000;
-    font-size: 65px;
-    font-weight: 600;
-    text-shadow: 4px 0px 3px rgb(0 0 0 / 30%);
-
+.h2title {
+  color: #000000;
+  font-size: 65px;
+  font-weight: 600;
+  text-shadow: 4px 0px 3px rgb(0 0 0 / 30%);
 }
 .parent {
   display: flex;
-  flex-direction:row;
+  flex-direction: row;
 }
 
 .column {
@@ -380,176 +378,182 @@ ul#tabs-nav li.active {
 }
 
 /*   multi    */
-body {margin: 0;}
 /*dropdown sidebar style*/
+
+/*
+TODO @elefkour: Rename generic selectors.
+*/
+
 .sidenav a,
-      .dropdown-btn1 {
-        background-color: #4682B4;
-          padding: 6px 8px 6px 16px;
-          text-decoration: none;
-          font-size: 20px;
-          color: white;
-          display: block;
-          border: none;
-          background: none;
-          width: 100%;
-          text-align: left;
-          cursor: pointer;
-          outline: none;
-      }
+.dropdown-btn1 {
+  background-color: #4682b4;
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 20px;
+  color: white;
+  display: block;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+}
 
-      /* On mouse-over */
-      .sidenav a:hover,
-      .dropdown-btn1:hover {
-          color: none;
-          background-color: #4682B4;
-      }
-      .dropdown-btn1 a{
-        background-color: #4682B4;
-      }
-      /* Main content */
-      .main {
-          margin-left: 150px;
-          /* Same as the width of the sidenav */
-          font-size: 20px;
-          /* Increased text to enable scrolling */
-          padding: 0px 10px;
-      }
+/* On mouse-over */
+.sidenav a:hover,
+.dropdown-btn1:hover {
+  color: none;
+  background-color: #4682b4;
+}
+.dropdown-btn1 a {
+  background-color: #4682b4;
+}
+/* Main content */
+.main {
+  margin-left: 150px;
+  /* Same as the width of the sidenav */
+  font-size: 20px;
+  /* Increased text to enable scrolling */
+  padding: 0px 10px;
+}
 
-      /* Add an active class to the active dropdown button */
-      .active {
+/* Add an active class to the active dropdown button */
+.active {
+  background-color: #4682b4;
+  color: white;
+}
 
-        background-color: #4682B4;
-          color: white;
-      }
+/* Dropdown container (hidden by default). Optional: add a lighter background color and some left padding to change the design of the dropdown content */
+.dropdown-container {
+  display: none;
+  background-color: none;
+  padding-left: 8px;
+}
 
-      /* Dropdown container (hidden by default). Optional: add a lighter background color and some left padding to change the design of the dropdown content */
-      .dropdown-container {
-          display: none;
-          background-color: none;
-          padding-left: 8px;
-
-      }
-
-      /* Optional: Style the caret down icon */
-      .fa-caret-down {
-          float: right;
-          padding-right: 8px;
-      }
+/* Optional: Style the caret down icon */
+.fa-caret-down {
+  float: right;
+  padding-right: 8px;
+}
 
 /*sidebar the list*/
 ul.sidenav {
-list-style-type: none;
-margin: 0;
-padding: 0;
-width: 25%;
-background-image: url("https://nkfitness.gr/wp-content/uploads/2017/07/photo-placeholder-1.jpg");
-background-color:#4682B4;
-position: fixed;
-height: 100%;
-overflow: auto;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  width: 25%;
+  background-image: url("https://nkfitness.gr/wp-content/uploads/2017/07/photo-placeholder-1.jpg");
+  background-color: #4682b4;
+  position: fixed;
+  height: 100%;
+  overflow: auto;
 }
 
 ul.sidenav li a {
-display: block;
-color: white;
-padding: 8px 16px;
-text-decoration: none;
+  display: block;
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
 }
 
 ul.sidenav li a.active {
-background-color: #4682B4;
-color: white;
+  background-color: #4682b4;
+  color: white;
 }
 
 ul.sidenav li a:hover:not(.active) {
-background-color: #4682B4;
-color: white;
+  background-color: #4682b4;
+  color: white;
 }
 
 div.content {
-margin-left: 25%;
-padding: 1px 16px;
-height: 1000px;
+  margin-left: 25%;
+  padding: 1px 16px;
+  height: 1000px;
 }
 
 @media screen and (max-width: 900px) {
-ul.sidenav {
-  width: 100%;
-  height: auto;
-  position: relative;
-}
+  ul.sidenav {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
 
-ul.sidenav li a {
-  float: left;
-  padding: 15px;
-}
+  ul.sidenav li a {
+    float: left;
+    padding: 15px;
+  }
 
-div.content {margin-left: 0;}
+  div.content {
+    margin-left: 0;
+  }
 }
 
 @media screen and (max-width: 400px) {
-ul.sidenav li a {
-  text-align: center;
-  float: none;
-}
+  ul.sidenav li a {
+    text-align: center;
+    float: none;
+  }
 }
 /***************************           Cards            *******************************/
 img {
-display: block;
+  display: block;
   border: 0;
   width: 100%;
   height: auto;
 }
 .title1 {
-color: #4682B4;
-margin: 2rem 0 .5rem;
-font-size: 1.40rem;
-font-weight: 400;
-
+  color: #4682b4;
+  margin: 2rem 0 0.5rem;
+  font-size: 1.4rem;
+  font-weight: 400;
 }
 .cards {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(250px, 4fr)); /* see notes below */
-grid-auto-rows: minmax(200px, auto);
-grid-gap: 1rem;
-font-family: "Montserrat";
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(250px, 4fr)
+  ); /* see notes below */
+  grid-auto-rows: minmax(200px, auto);
+  grid-gap: 1rem;
+  font-family: "Montserrat";
 }
 
 .card1 {
   max-width: 95%;
-/*height: 200px;*/
-/*background: red;*/
-border: 2px solid #e7e7e7;
-border-radius: 4px;
-padding: .5rem;
--webkit-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.15);
-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.15);
-display: flex;
-/* -webkit-box-orient: vertical; */
-/* -webkit-box-direction: normal; */
--ms-flex-direction: column;
-flex-direction: column;
-position: relative;
-color: #5d5e5e;
+  /*height: 200px;*/
+  /*background: red;*/
+  border: 2px solid #e7e7e7;
+  border-radius: 4px;
+  padding: 0.5rem;
+  -webkit-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.15);
+  display: flex;
+  /* -webkit-box-orient: vertical; */
+  /* -webkit-box-direction: normal; */
+  -ms-flex-direction: column;
+  flex-direction: column;
+  position: relative;
+  color: #5d5e5e;
 } /* li item */
-@import url('https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700');
+@import url("https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700");
 
 * {
--webkit-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 .thumbnail1 img {
-/* fill: #c7c4c4;*/
-height: 200px;
-width: 100%;
-padding: 1.5rem;
-object-fit: scale-down;
+  /* fill: #c7c4c4;*/
+  height: 200px;
+  width: 100%;
+  padding: 1.5rem;
+  object-fit: scale-down;
 }
 
 .card-content {
-font-size: .75rem;
+  font-size: 0.75rem;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
@@ -562,33 +566,31 @@ font-size: .75rem;
 
 .panel.card1-panel .panel-header {
   background-color: #ffffff;
-  font-size: .75rem;
+  font-size: 0.75rem;
   font-weight: 400;
   height: 25px !important;
 }
 
 .panel.card1-panel .panel-content {
--webkit-box-flex: 1;
--ms-flex: 1;
-flex: 1;
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
 }
 
 .category {
-font-size: .75rem;
-text-transform: uppercase;
+  font-size: 0.75rem;
+  text-transform: uppercase;
 }
 
 .footer1 {
-
-border-top: 2px solid #e7e7e7;
-margin: .5rem 0 0;
-min-height: 30px;
-font-size: 1.2rem;
-margin-top: auto;
+  border-top: 2px solid #e7e7e7;
+  margin: 0.5rem 0 0;
+  min-height: 30px;
+  font-size: 1.2rem;
+  margin-top: auto;
 }
 
 .category1 {
-
   position: absolute;
   top: 160px;
   left: 3;
@@ -601,41 +603,39 @@ margin-top: auto;
 }
 
 .category__01 {
-
-/*background-color: #cccccc;*/
-/*background-color: #50c6db;*/
+  /*background-color: #cccccc;*/
+  /*background-color: #50c6db;*/
 }
-.category__01_plaisio{
-background-color:#006489;
+.category__01_plaisio {
+  background-color: #006489;
 }
 .category__02 {
-background-color: #5d5e5e;
+  background-color: #5d5e5e;
 }
 
 .category__03 {
-background-color: #51bb7b;
+  background-color: #51bb7b;
 }
 
 .category__04 {
-background-color: #f47820;
+  background-color: #f47820;
 }
 
 .category__05 {
-background-color: #8350a0;
+  background-color: #8350a0;
 }
 
 .post-meta1 {
-margin-top: .5rem;
+  margin-top: 0.5rem;
 }
 
 .comments1 {
-margin-left: .5rem;
+  margin-left: 0.5rem;
 }
-.views1{
-margin-left: .5rem;
+.views1 {
+  margin-left: 0.5rem;
 }
 /*koubia */
-.myinp{
-width: 30.33%
-
+.myinp {
+  width: 30.33%;
 }

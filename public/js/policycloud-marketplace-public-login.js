@@ -1,7 +1,7 @@
 (function ($) {
   "use strict";
   $(document).ready(() => {
-    // TODO: Add conditional check for pre-existing cookie, then redirect to home.
+    // TODO @alexandrosraikos: Add conditional check for pre-existing cookie, then redirect to home.
 
     $("#policycloud-login").submit((e) => {
       e.preventDefault();
