@@ -658,7 +658,10 @@ class PolicyCloud_Marketplace_Public
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 		wp_enqueue_script("policycloud-marketplace-read-single");
 
-		read_single_html($description, $error ?? null);
+		read_single_html($description, [
+			"is_owner" => false,
+			"error" => $error,
+		]);
 	}
 
 
