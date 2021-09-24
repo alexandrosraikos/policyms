@@ -84,6 +84,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public function add_content_shortcodes()
 	{
+		// TODO @alexandrosraikos: Add my account page shortcode.
 
 		// Read multiple objects sequence.
 		add_shortcode('policycloud-marketplace-read-multiple', 'PolicyCloud_Marketplace_Public::read_multiple_objects');
@@ -655,7 +656,7 @@ class PolicyCloud_Marketplace_Public
 			'nonce' => wp_create_nonce('ajax_policycloud_description_editing_verification'),
 		));
 
-		// TODO @elefkour: Show approval status for owners.
+		// TODO @alexandrosraikos: Show approval status for owners.
 		read_single_html($description, [
 			"is_owner" => $owner ?? false,
 			"error" => $error ?? '',
@@ -675,6 +676,8 @@ class PolicyCloud_Marketplace_Public
 		// Retrieve credentials.
 		$options = get_option('policycloud_marketplace_plugin_settings');
 		if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
+
+		// TODO @alexandrosraikos: Include uploaded files. (hint: after creating the HTML form)
 
 		try {
 
@@ -746,8 +749,7 @@ class PolicyCloud_Marketplace_Public
 	{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 
-		// TODO @alexandrosraikos: Coordinate the addition of the editing form in the generated HTML.
-		// TODO @alexandrosraikos: Create AJAX handler and script for description object creation.
+		// TODO @alexandrosraikos: Add form HTML.
 
 		wp_enqueue_script("upload_ste");
 		wp_localize_script('upload_ste', 'ajax_prop', array(
@@ -756,5 +758,86 @@ class PolicyCloud_Marketplace_Public
 		));
 
 		upload_step();
+	}
+	
+	/**
+	 * Create Description objects using the PolicyCloud Marketplace. For more info visit:
+	 * https://documenter.getpostman.com/view/16776360/TzsZs8kn#5b7e797a-682f-4b0a-bb5f-d9c371988a05
+	 * 
+	 * @param	array $changes An array using schema fields as keys and the requested updated values.
+	 * @uses	PolicyCloud_Marketplace_Public::retrieve_token()
+	 * @since	1.0.0
+	 */
+	private static function description_creation($new)
+	{
+		// Retrieve credentials.
+		$options = get_option('policycloud_marketplace_plugin_settings');
+		if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
+
+		try {
+
+			// TODO @alexandrosraikos: Include uploaded files. (hint: after creating the HTML form)
+
+			// Check authorization status
+			$token = PolicyCloud_Marketplace_Public::retrieve_token();
+			if (!empty($token)) {
+
+				// Contact Marketplace API endpoint.
+				$curl = curl_init();
+
+				curl_setopt_array($curl, array(
+					CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/descriptions/' . $new['collection'],
+					CURLOPT_RETURNTRANSFER => false,
+					CURLOPT_ENCODING => '',
+					CURLOPT_MAXREDIRS => 10,
+					CURLOPT_TIMEOUT => 0,
+					CURLOPT_FOLLOWLOCATION => true,
+					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+					CURLOPT_CUSTOMREQUEST => 'POST',
+					CURLOPT_HTTPHEADER => ['x-access-token: ' . $token]
+				));
+
+				if (!curl_exec($curl)) {
+					throw new Exception("There an API error while creating the Description.");
+				}
+
+				// Handle errors.
+				if (!empty(curl_error($curl))) throw new Exception("There was a connection error while creating the Description.");
+
+				// Close session.
+				curl_close($curl);
+			} else throw new Exception("You need to be logged in in order to create a new object.");
+		} catch (Exception $e) {
+			throw $e;
+		}
+	}
+
+	/**
+	 * Handle description creation AJAX requests.
+	 *
+	 * @uses	PolicyCloud_Marketplace_Public::description_creation()
+	 * @since	1.0.0
+	 */
+	public function description_creation_handler()
+	{
+		// TODO @alexandrosraikos: Create AJAX script for description object creation.
+		
+		// Verify WordPress generated nonce.
+		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_description_creation_verification')) {
+			die("Unverified request to create description object.");
+		}
+
+		// Attempt to edit the description using POST data.
+		try {
+			PolicyCloud_Marketplace_Public::description_creation($_POST);
+			die(json_encode([
+				'status' => 'success'
+			]));
+		} catch (Exception $e) {
+			die(json_encode([
+				'status' => 'failure',
+				'data' => $e->getMessage()
+			]));
+		}
 	}
 }
