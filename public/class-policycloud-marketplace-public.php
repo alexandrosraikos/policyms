@@ -80,7 +80,7 @@ class PolicyCloud_Marketplace_Public
 		wp_enqueue_script("policycloud-marketplace-logout", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-logout.js', array('jquery'), $this->version, false);
 
 		// Content related scripts.
-		wp_register_script("upload_ste", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-up.js', array('jquery'), $this->version, false);
+		wp_register_script("upload_ste", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-create.js', array('jquery'), $this->version, false);
 		wp_register_script("policycloud-marketplace-read-single", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-single.js', array('jquery'), $this->version, false);
 	}
 
@@ -267,7 +267,7 @@ class PolicyCloud_Marketplace_Public
 		add_shortcode('policycloud-marketplace-read-single', 'PolicyCloud_Marketplace_Public::read_single_object');
 
 		// Create object sequence.
-		add_shortcode('policycloud-marketplace-create', 'PolicyCloud_Marketplace_Public::create_object');
+		add_shortcode('policycloud-marketplace-create-object', 'PolicyCloud_Marketplace_Public::create_object');
 
 		// Account page shortcode.
 		add_shortcode('policycloud-marketplace-account', 'PolicyCloud_Marketplace_Public::user_account');
@@ -357,9 +357,8 @@ class PolicyCloud_Marketplace_Public
 			'nonce' => wp_create_nonce('ajax_policycloud_description_creation_verification'),
 		));
 
-		// TODO Update creation view.
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		upload_step($error ?? '');
+		create_object_html($error ?? '');
 	}
 
 	/**
@@ -433,8 +432,8 @@ class PolicyCloud_Marketplace_Public
 			'nonce' => wp_create_nonce('ajax_policycloud_description_editing_verification'),
 		));
 
-		// TODO Show approval status for owners.
 		read_single_html($description, [
+			"authenticated" => !empty($token ?? null),
 			"is_owner" => $owner ?? false,
 			"error" => $error ?? '',
 		]);
@@ -465,7 +464,7 @@ class PolicyCloud_Marketplace_Public
 		}
 
 
-		// TODO Add my account page HTML.
+		// TODO @alexandrosraikos: Add my account page HTML.
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 		// user_account_html($token, $descriptions, [
 		// 	"error" => $error ?? '',

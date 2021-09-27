@@ -182,6 +182,8 @@ class PolicyCloud_Marketplace {
 
 		// TODO @alexandrosraikos: Coordinate email verification shortcode sequence.
 		// TODO @alexandrosraikos: Coordinate password reset shortcode sequence.
+		// TODO @alexandrosraikos: Support "admin" role.
+		// TODO @alexandrosraikos: Add origin header in API calls.
 
 		// Add user access management menu item.
 		$this->loader->add_filter('wp_nav_menu_items', $plugin_public, 'add_conditional_access_menu_item', 10, 2);

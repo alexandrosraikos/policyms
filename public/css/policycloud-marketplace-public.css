@@ -48,7 +48,6 @@
   pointer-events: none;
 }
 
-
 .fa-user-o {
   margin-left: 300px;
 }
@@ -364,16 +363,16 @@ ul#tabs-nav li.active {
   font-weight: 600;
   text-shadow: 4px 0px 3px rgb(0 0 0 / 30%);
 }
-input[name=dtitle] {
+input[name="dtitle"] {
   color: #000000;
   font-size: 65px;
   font-weight: 600;
   text-shadow: 4px 0px 3px rgb(0 0 0 / 30%);
 }
-.h2 input{
+.h2 input {
   color: #000000;
-  font-size: 65px!important;
-  font-weight: 600!important;
+  font-size: 65px !important;
+  font-weight: 600 !important;
   text-shadow: 4px 0px 3px rgb(0 0 0 / 30%);
 }
 .parent {
@@ -650,17 +649,18 @@ img {
   width: 30.33%;
 }
 /*-------------------sigle css------------*/
-.hidden { display: none;
+.hidden {
+  display: none;
 }
 /*error message bar*/
 .error-msg1 {
-  width:100%;
-  color: #D8000C;
-  background-color: #FFBABA;
+  width: 100%;
+  color: #d8000c;
+  background-color: #ffbaba;
   margin: 10px 0;
   padding: 10px;
   border-radius: 4px 4px 4px 4px;
-  text-align:center;
+  text-align: center;
 }
 /*close button*/
 .close {
@@ -672,18 +672,254 @@ img {
   transform: translate(0%, -50%);
 }
 
-.close:hover {background: #bbb;}
-
-/*edit accordition button*/
-.edit2{
-   
-    color:black;
-      background:none;
-      border: none;
-      color: black;
-      padding: 12px 16px;
-      font-size: 16px;
-      cursor: pointer;
-    
+.close:hover {
+  background: #bbb;
 }
 
+/*edit accordition button*/
+.edit2 {
+  color: black;
+  background: none;
+  border: none;
+  color: black;
+  padding: 12px 16px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/** UPLOAD FORM **/
+
+.container-fluid {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+.container-fluid .card {
+  width: 100%;
+}
+html {
+  height: 100%;
+}
+
+p {
+  color: grey;
+}
+
+#heading {
+  margin: auto;
+  text-transform: uppercase;
+  color: #4966cb;
+  font-weight: normal;
+}
+
+#msform {
+  width: 500px;
+  margin: 50px auto;
+  text-align: center;
+  position: relative;
+}
+
+#msform fieldset {
+  background: white;
+  border: 0 none;
+  border-radius: 3px;
+  box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.4);
+  padding: 20px 30px;
+  box-sizing: border-box;
+  width: 80%;
+  margin: 0 10%;
+
+  /*stacking fieldsets above each other*/
+  position: relative;
+}
+
+.form-card {
+  text-align: left;
+}
+
+#msform fieldset:not(:first-of-type) {
+  display: none;
+}
+
+#msform input,
+#msform textarea {
+  padding: 8px 15px 8px 15px;
+  border: 1px solid #ccc;
+  border-radius: 0px;
+  margin-bottom: 25px;
+  margin-top: 2px;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: montserrat;
+  color: #2c3e50;
+  background-color: #eceff1;
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
+#msform input:focus,
+#msform textarea:focus {
+  -moz-box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
+  border: 1px solid #673ab7;
+  outline-width: 0;
+}
+
+#msform .action-button {
+  width: 100px;
+  background: #4966cb;
+  font-weight: bold;
+  color: white;
+  border: 0 none;
+  border-radius: 0px;
+  cursor: pointer;
+  padding: 10px 5px;
+  margin: 10px 0px 10px 5px;
+  float: right;
+}
+
+#msform .action-button:hover,
+#msform .action-button:focus {
+  background-color: #4966cb;
+}
+
+#msform .action-button-previous {
+  width: 100px;
+  background: #616161;
+  font-weight: bold;
+  color: white;
+  border: 0 none;
+  border-radius: 0px;
+  cursor: pointer;
+  padding: 10px 5px;
+  margin: 10px 5px 10px 0px;
+  float: right;
+}
+
+#msform .action-button-previous:hover,
+#msform .action-button-previous:focus {
+  background-color: #000000;
+}
+
+.form-card {
+  z-index: 0;
+  border: none;
+  position: relative;
+}
+
+.fs-title {
+  font-size: 25px;
+  color: #4966cb;
+  margin-bottom: 15px;
+  font-weight: normal;
+  text-align: left;
+}
+
+.purple-text {
+  color: #4966cb;
+  font-weight: normal;
+}
+
+.steps {
+  font-size: 25px;
+  color: gray;
+  margin-bottom: 10px;
+  font-weight: normal;
+  text-align: right;
+}
+
+.fieldlabels {
+  color: gray;
+  text-align: left;
+}
+
+#progressbar {
+  margin-bottom: 30px;
+  overflow: hidden;
+  color: lightgrey;
+}
+
+#progressbar .active {
+  color: #4966cb;
+}
+
+#progressbar li {
+  list-style-type: none;
+  font-size: 15px;
+  width: 25%;
+  float: left;
+  position: relative;
+  font-weight: 400;
+}
+
+#progressbar #account:before {
+  font-family: FontAwesome;
+  content: "\f13e";
+}
+
+#progressbar #personal:before {
+  font-family: FontAwesome;
+  content: "\f007";
+}
+
+#progressbar #payment:before {
+  font-family: FontAwesome;
+  content: "\f030";
+}
+
+#progressbar #confirm:before {
+  font-family: FontAwesome;
+  content: "\f00c";
+}
+
+#progressbar li:before {
+  width: 50px;
+  height: 50px;
+  line-height: 45px;
+  display: block;
+  font-size: 20px;
+  color: #ffffff;
+  background: lightgray;
+  border-radius: 50%;
+  margin: 0 auto 10px auto;
+  padding: 2px;
+}
+
+#progressbar li:after {
+  content: "";
+  width: 100%;
+  height: 2px;
+  background: lightgray;
+  position: absolute;
+  left: 0;
+  top: 25px;
+  z-index: -1;
+}
+
+#progressbar li.active:before,
+#progressbar li.active:after {
+  color: #4966cb;
+}
+#progressbar li.active {
+  background-color: white !important;
+}
+
+.progress {
+  height: 20px;
+}
+
+.progress-bar {
+  background-color: #673ab7;
+}
+
+.fit-image {
+  width: 100%;
+}
+@import url(https://fonts.googleapis.com/css?family=Montserrat);
+
+/*basic reset*/
+* {
+  margin: 0;
+  padding: 0;
+}
