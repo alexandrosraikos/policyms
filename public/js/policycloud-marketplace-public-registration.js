@@ -1,9 +1,15 @@
 (function ($) {
   "use strict";
   $(document).ready(() => {
+    // Display pre-existing token error.
+    if (ajax_prop.error === "existing-token") {
+      $(".registration-error").html("You are already logged in.");
+    }
+
     $("#policycloud-registration").submit((e) => {
       e.preventDefault();
       $(".submit-registration").addClass("loading");
+
       // Perform AJAX request.
       $.ajax({
         url: ajax_prop.ajax_url,

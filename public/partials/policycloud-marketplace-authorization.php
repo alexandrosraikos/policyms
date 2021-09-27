@@ -1,6 +1,6 @@
 <?php
 
-require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/vendor/autoload.php';
+require_once plugin_dir_path(dirname(__FILE__)) . 'partials/vendor/autoload.php';
 
 use Firebase\JWT\BeforeValidException;
 use Firebase\JWT\ExpiredException;

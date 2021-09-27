@@ -1,7 +1,10 @@
 (function ($) {
   "use strict";
   $(document).ready(() => {
-    // TODO @alexandrosraikos: Add conditional check for pre-existing cookie, then redirect to home.
+    // Display pre-existing token error.
+    if (ajax_prop.error === "existing-token") {
+      $(".login-error").html("You are already logged in.");
+    }
 
     $("#policycloud-login").submit((e) => {
       e.preventDefault();
