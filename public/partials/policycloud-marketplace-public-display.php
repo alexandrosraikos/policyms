@@ -184,7 +184,15 @@ function read_multiple_html($description_objects, $args)
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
     <?php
-    // TODO @elekfour: Create error message.
+    //i did that
+    // if (!empty($args['error'])) {
+    // echo 'Error: ' . $args['error'];
+    //  echo  '<div class="error-msg1">
+    //<i class="fa fa-times-circle"></i>
+    // Error message'. $args['error'].
+    //'</div>';
+
+    //   }
     if (!empty($args['error'])) {
         echo 'Error: ' . $args['error'];
     }
@@ -261,214 +269,296 @@ function read_single_html($description_object, $args)
 {
 
     // TODO @elefkour: Create HTML error message.
-    if (!empty($args['error'])) {
-        echo 'Error: ' . $args['error'];
-    }
+    //i did that
+    // if (!empty($args['error'])) {
+    // echo 'Error: ' . $args['error'];
+    //  echo  '<div class="error-msg1">
+    //<i class="fa fa-times-circle"></i>
+    // Error message'. $args['error'].
+    //'</div>';
 
+    //   }
+    $ownerbutton = true;
+    $isuserlogin = true;
     // TODO @elefkour: Create owner buttons (copy & paste where needed).
+    //i did it
     if (!empty($args['is_owner'])) { // true or false
-        echo ($args['is_owner']) ? "Owner!" : "Stranger.";
+        $ownerbutton = true;
+    }
+    if (!empty($args['is_login'])) { // true or false
+        $isuserlogin = true;
     }
 
     // TODO @elefkour: Check empty description_object.
+    if (empty($description['info']['title'])) {
+        echo "Title is empty!";
+    }
+    //nomizw pws afto borei na einai kai keno 
+    if (empty($description['info']['fieldOfUse'])) {
+        echo "You have to chose field of use";
+    }
+    if (empty($description['info']['subtype'])) {
+        echo "Title is empty!";
+    }
+    if (empty($description['info']['short_desc'])) {
+        echo "Description is empty";
+    }
+    if (empty($description['info']['collection'])) {
+        echo "You have to choose collection!";
+    }
     ?>
+
         <section style="width: 1349px; left: 0px;">
-            <div class="parent">
-                <div class="column">
-                    <div class="tabs">
-                        <ul id="tabs-nav">
-                            <li><a href="#tab1"><i class="fas fa-file-alt"></i> Description</a></li>
-                            <li><a href="#tab2"><i class="fas fa-file-download"> Files</i></a></li>
-                            <li><a href="#tab3"><i class="fas fa-comments"></i> Comments</a></li>
-                        </ul> <!-- END tabs-nav -->
-                        <div id="tabs-content">
-                            <div id="tab1" class="tab-content">
-                                <h1>Images</h1>
 
-                                <div id="slideshow">
-                                    <div class="slide-tab">
-                                        <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/seattle.jpg">
+            <form id="pform">
+
+                <div class="parent">
+
+                    <?php //only login user can see this 
+                    if ($isuserlogin) { ?>
+                        <div class="column">
+                            <div class="tabs">
+                                <ul id="tabs-nav">
+                                    <li><a href="#tab1"><i class="fas fa-file-alt"></i> Files</a></li>
+                                    <li><a href="#tab2"><i class="fas fa-file-download"> Gallery</i></a></li>
+                                    <li><a href="#tab3"><i class="fas fa-comments"></i> Comments</a></li>
+                                </ul> <!-- END tabs-nav -->
+                                <div id="tabs-content">
+                                    <div id="tab1" class="tab-content">
+                                        <div class="accordion">Algorithm</div>
+
+                                        <div class="panel">
+                                            <table style="width: 100%;">
+                                                <tbody>
+                                                    <tr>
+
+                                                        <th>Asset Name</th>
+                                                        <th>Version</th>
+                                                        <th>Size</th>
+                                                        <th>Modified on</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><?php // echo $description['files']['filename'];
+                                                            ?>2.0</td>
+                                                        <td><?php //echo $asset['files']['version'];
+                                                            ?>2.1</td>
+                                                        <td><?php //echo $assset['files']['size'];
+                                                            ?>2.2</td>
+                                                        <td><?php //echo $asset['files']['updateDate'];
+                                                            ?>2.2 </td>
+                                                        <td>
+
+                                                            <a><?php //echo $asset['files']['download'];
+                                                                ?><i class="fas fa-download" aria-hidden="true"></i> </a>
+                                                            &nbsp;
+                                                            <a class="edit2"><i class="fas fa-pencil-alt"></i></a>
+
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Eve</td>
+                                                        <td>Jackson</td>
+                                                        <td>94</td>
+                                                        <td>2.2</td>
+                                                        <td>
+
+                                                            <a><i class="fas fa-download" aria-hidden="true"></i> </a>
+                                                            &nbsp;
+                                                            <a class="edit3"><i class="fas fa-pencil-alt"></i></a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div class="accordion">Videos</div>
+                                        <div class="panel">
+                                            <br>
+                                            <iframe width="420" height="345" src="https://www.youtube.com/embed/tgbNymZ7vqY">
+                                            </iframe>
+
+                                        </div>
                                     </div>
-                                    <div class="slide-tab">
-                                        <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/nightportrait.jpg">
+                                    <div id="tab2" class="tab-content">
+                                        <h1>Images</h1>
+
+                                        <div id="slideshow">
+                                            <div class="slide-tab">
+                                                <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/seattle.jpg">
+                                            </div>
+                                            <div class="slide-tab">
+                                                <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/nightportrait.jpg">
+                                            </div>
+                                            <div class="slide-tab">
+                                                <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/6lifeftw.jpg">
+                                            </div>
+                                            <div class="slide-tab">
+                                                <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/mountain.jpg">
+                                            </div>
+                                            <div class="slide-tab">
+                                                <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/bird.jpg">
+                                            </div>
+
+                                        </div>
                                     </div>
-                                    <div class="slide-tab">
-                                        <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/6lifeftw.jpg">
-                                    </div>
-                                    <div class="slide-tab">
-                                        <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/mountain.jpg">
-                                    </div>
-                                    <div class="slide-tab">
-                                        <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/bird.jpg">
+
+                                    <div id="tab3" class="tab-content">
+                                        <h2>Randall Graves</h2>
+
                                     </div>
 
-                                </div>
-                            </div>
-                            <div id="tab2" class="tab-content">
-                                <button class="accordion">Algorithm</button>
-                                <div class="panel">
-                                    <table style="width: 100%;">
-                                        <tbody>
-                                            <tr>
-                                                <th>Asset Name</th>
-                                                <th>Version</th>
-                                                <th>Size</th>
-                                                <th>Modified on</th>
-                                                <th>Action</th>
-                                            </tr>
-                                            <tr>
-                                                <td>2.0</td>
-                                                <td>2.1</td>
-                                                <td>2.2</td>
-                                                <td>2.2</td>
-                                                <td>
-                                                    <ul class="elementor-icon-list-items">
-                                                        <li class="elementor-icon-list-item"><a href="https://www.youtube.com/"> <span class="elementor-icon-list-icon">
-                                                                    <i class="fas fa-download" aria-hidden="true"></i> </span>
+                                </div> <!-- END tabs-content -->
+                            </div> <!-- END tabs -->
+                        </div>
+                    <?php
+                    } ?>
+                    <div class="column">
+                        <div class="main-display">
+                            <h2 id="description-title" class="h2title"><?php //echo $description['info']['title'];
+                                                                        ?>Deep Learning</h2>
+                            <span class="card-link" style="color:gray;font-size:12px;"><?php //if ($isuserlogin) echo '<i class="far fa-user"></i> University of Nicosia '.$descritption[info][owner].'|';
+                                                                                        ?> <i class="far fa-eye"></i> <?php //echo $description['metadata']['views'];
+                                                                                                                        ?>100 | <i class="far fa-calendar-alt"></i><?php // echo $description[info][updateDate];?> 2.23.2021 | <i class="fa fa-download"><?php //echo $description[info][downloads]?> 20</i></span>
+                            <h6><b>Algorithms <?php //echo $description['collection'];
+                                                ?></b>|<b>Finance</b></h6>
+                            <a style="color:blue;font-size:15px;"> <i class="fas fa-envelope"></i> example@gmail.com</a>
+                            <br>
 
-                                                            </a></li>
-                                                    </ul>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Eve</td>
-                                                <td>Jackson</td>
-                                                <td>94</td>
-                                                <td>2.2</td>
-                                                <td></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
 
-                                <button class="accordion">Videos</button>
-                                <div class="panel">
-                                    <br>
-                                    <iframe width="420" height="345" src="https://www.youtube.com/embed/tgbNymZ7vqY">
-                                    </iframe>
+                        </div>
+                        <?php
+                        if ($isuserlogin) {
+                            if ($ownerbutton) { ?>
+                                <p id="descp"><?php //echo description[info][description];?>I am text block. Click edit button to change this text. Lor
+                                    em ipsum dolor sit amet, consectetur adipiscing elit. Ut elit te
+                                    llus, luctus nec ullamcorper mattis, pulvinar dapibus leo</p>
 
-                                </div>
-                            </div>
-                            <div id="tab3" class="tab-content">
-                                <h2>Randall Graves</h2>
 
-                            </div>
+                              
 
-                        </div> <!-- END tabs-content -->
-                    </div> <!-- END tabs -->
-                </div>
-                <div class="column">
-                    <div class="main-display">
-                        <h2 id="description-title" class="h2title">Deep Learning</h2>
-                        <span class="card-link" style="color:gray;font-size:12px;"><i class="far fa-user"></i> University of Nicosia | <i class="far fa-eye"></i> 100 | <i class="far fa-calendar-alt"></i> 2.23.2021</span>
-                        <h6><b>Algorithms</b>|<b>Finance</b></h6>
-                        <a style="color:blue;font-size:15px;"> <i class="fas fa-envelope"></i> example@gmail.com</a>
-                        <br>
-                        <p>I am text block. Click edit button to change this text. Lor
-                            em ipsum dolor sit amet, consectetur adipiscing elit. Ut elit te
-                            llus, luctus nec ullamcorper mattis, pulvinar dapibus leo.</p>
-                        <br>
-                        <button class="info">Download</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-    <?php
+                            <?php
+                            } else { ?>
+                                <p id="descp"><?php //echo description[info][description];?>I am text block. Click edit button to change this text. Lor
+                                    em ipsum dolor sit amet, consectetur adipiscing elit. Ut elit te
+                                    llus, luctus nec ullamcorper mattis, pulvinar dapibus leo.</p>
+                            <?php  }
+                        } else { ?>
+                            <p id="descs"><?php //echo description[info][short_desc];?>I am text block. Click edit button to change this text. Lor
+                                em ipsum dolor sit amet, consectetur adipiscing elit. Ut elit te
+                                llus, luctus nec ullamcorper mattis, pulvinar dapibus leo.</p>
+                        <?php }
+                        ?>
+
+                        <div id="pguest" class="hidden">
+                            <input id="submit1" type="submit" value="Submit">
+
+                            <br>
+                        </div>
+            </form>
+            <?php if ($ownerbutton) { ?>
+                <button id="edit1">Edit</button>
+            <?php } ?>
+    </div>
+    </div>
+    </div>
+    </section>
+<?php
 }
 
 function upload_step()
 { ?>
-        <script src="//cdn.ckeditor.com/4.14.1/standard/ckeditor.js"></script>
-        <div class="container-fluid">
-            <div class="row justify-content-center">
-                <div class="col-11 col-sm-10 col-md-10 col-lg-6 col-xl-5 text-center p-0 mt-3 mb-2">
-                    <div class="card px-0 pt-4 pb-0 mt-3 mb-3">
-                        <h2 id="heading">Upload your Project</h2>
-                        <p>Fill all form field to go to next step</p>
-                        <form id="msform">
-                            <!-- progressbar -->
-                            <ul id="progressbar">
-                                <li class="active" id="account"><strong>Asset name,category and description </strong></li>
-                                <li id="personal"><strong>Field of use and Author Comment</strong></li>
-                                <li id="payment"><strong>Images and Files</strong></li>
-                                <li id="confirm"><strong>Finish</strong></li>
-                            </ul>
-                            <div class="progress">
-                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div> <br> <!-- fieldsets -->
-                            <fieldset>
-                                <div class="form-card">
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <h2 class="fs-title">Asset name,category and description:</h2>
-                                        </div>
-                                        <div class="col-5">
-                                            <h2 class="steps">Step 1 - 4</h2>
-                                        </div>
-                                    </div> <label class="fieldlabels">Asset Name: *</label> <input type="text" name="aname" placeholder="Asset name" /> <label class="fieldlabels"></label> <input id='usernameid' type="hidden" value='12345' /><label class="fieldlabels">Category: *</label> <input type="text" name="acat" placeholder="Category" /> <label class="fieldlabels">Owner: *</label> <input type="owner" name="owner" placeholder="Owner" /> <label class="fieldlabels">Description: *</label><textarea name="editor1"></textarea>
-                                    <script>
-                                        CKEDITOR.replace('editor1');
-                                    </script>
-                                </div> <input type="button" name="next" class="next action-button" value="Next" />
-                            </fieldset>
-                            <fieldset>
-                                <div class="form-card">
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <h2 class="fs-title">Asset private Information:</h2>
-                                        </div>
-                                        <div class="col-5">
-                                            <h2 class="steps">Step 2 - 4</h2>
-                                        </div>
-                                    </div> <label class="fieldlabels">Field of Use: *</label> <input type="text" name="fieldOfUse" placeholder="Key Words" /> <label class="fieldlabels">Creator Comments</label><textarea name="comment"></textarea>
-                                    <script>
-                                        CKEDITOR.replace('comment');
-                                    </script>
-                                </div> <input type="button" name="next" class="next action-button" value="Next" /> <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
-                            </fieldset>
-                            <fieldset>
-                                <div class="form-card">
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <h2 class="fs-title">Files Upload:</h2>
-                                        </div>
-                                        <div class="col-5">
-                                            <h2 class="steps">Step 3 - 4</h2>
-                                        </div>
-                                    </div> <label class="fieldlabels">Upload Your Photo:</label> <input type="file" name="pic" accept="image/*"> <label class="fieldlabels">Upload Signature Photo:</label> <input type="file" name="pic" accept="image/*">
-                                    <label class="fieldlabels">Upload your Files:</label> <input type="file" name="file_upl" id="file_upl">
-                                    <label class="fieldlabels"><b>Or</b> create your file:</label><textarea name="code"></textarea>
-                                    <script>
-                                        CKEDITOR.replace('code');
-                                    </script>
-                                </div> <input type="button" name="next" class="next action-button" value="Submit" /> <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
-                            </fieldset>
-                            <fieldset>
-                                <div class="form-card">
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <h2 class="fs-title">Finish:</h2>
-                                        </div>
-                                        <div class="col-5">
-                                            <h2 class="steps">Step 4 - 4</h2>
-                                        </div>
-                                    </div> <br><br>
-                                    <h2 class="purple-text text-center"><strong>SUCCESS !</strong></h2> <br>
-                                    <div class="row justify-content-center">
-                                        <div class="col-3"> <img src="https://i.imgur.com/GwStPmg.png" class="fit-image"> </div>
-                                    </div> <br><br>
-                                    <div class="row justify-content-center">
-                                        <div class="col-7 text-center">
-                                            <h5 class="purple-text text-center">You Have Successfully Signed Up</h5>
-                                        </div>
+    <script src="//cdn.ckeditor.com/4.14.1/standard/ckeditor.js"></script>
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-11 col-sm-10 col-md-10 col-lg-6 col-xl-5 text-center p-0 mt-3 mb-2">
+                <div class="card px-0 pt-4 pb-0 mt-3 mb-3">
+                    <h2 id="heading">Upload your Project</h2>
+                    <p>Fill all form field to go to next step</p>
+                    <form id="msform">
+                        <!-- progressbar -->
+                        <ul id="progressbar">
+                            <li class="active" id="account"><strong>Asset name,category and description </strong></li>
+                            <li id="personal"><strong>Field of use and Author Comment</strong></li>
+                            <li id="payment"><strong>Images and Files</strong></li>
+                            <li id="confirm"><strong>Finish</strong></li>
+                        </ul>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div> <br> <!-- fieldsets -->
+                        <fieldset>
+                            <div class="form-card">
+                                <div class="row">
+                                    <div class="col-7">
+                                        <h2 class="fs-title">Asset name,category and description:</h2>
+                                    </div>
+                                    <div class="col-5">
+                                        <h2 class="steps">Step 1 - 4</h2>
+                                    </div>
+                                </div> <label class="fieldlabels">Asset Name: *</label> <input type="text" name="aname" placeholder="Asset name" /> <label class="fieldlabels"></label> <input id='usernameid' type="hidden" value='12345' /><label class="fieldlabels">Category: *</label> <input type="text" name="acat" placeholder="Category" /> <label class="fieldlabels">Owner: *</label> <input type="owner" name="owner" placeholder="Owner" /> <label class="fieldlabels">Description: *</label><textarea name="editor1"></textarea>
+                                <script>
+                                    CKEDITOR.replace('editor1');
+                                </script>
+                            </div> <input type="button" name="next" class="next action-button" value="Next" />
+                        </fieldset>
+                        <fieldset>
+                            <div class="form-card">
+                                <div class="row">
+                                    <div class="col-7">
+                                        <h2 class="fs-title">Asset private Information:</h2>
+                                    </div>
+                                    <div class="col-5">
+                                        <h2 class="steps">Step 2 - 4</h2>
+                                    </div>
+                                </div> <label class="fieldlabels">Field of Use: *</label> <input type="text" name="fieldOfUse" placeholder="Key Words" /> <label class="fieldlabels">Creator Comments</label><textarea name="comment"></textarea>
+                                <script>
+                                    CKEDITOR.replace('comment');
+                                </script>
+                            </div> <input type="button" name="next" class="next action-button" value="Next" /> <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
+                        </fieldset>
+                        <fieldset>
+                            <div class="form-card">
+                                <div class="row">
+                                    <div class="col-7">
+                                        <h2 class="fs-title">Files Upload:</h2>
+                                    </div>
+                                    <div class="col-5">
+                                        <h2 class="steps">Step 3 - 4</h2>
+                                    </div>
+                                </div> <label class="fieldlabels">Upload Your Photo:</label> <input type="file" name="pic" accept="image/*"> <label class="fieldlabels">Upload Signature Photo:</label> <input type="file" name="pic" accept="image/*">
+                                <label class="fieldlabels">Upload your Files:</label> <input type="file" name="file_upl" id="file_upl">
+                                <label class="fieldlabels"><b>Or</b> create your file:</label><textarea name="code"></textarea>
+                                <script>
+                                    CKEDITOR.replace('code');
+                                </script>
+                            </div> <input type="button" name="next" class="next action-button" value="Submit" /> <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
+                        </fieldset>
+                        <fieldset>
+                            <div class="form-card">
+                                <div class="row">
+                                    <div class="col-7">
+                                        <h2 class="fs-title">Finish:</h2>
+                                    </div>
+                                    <div class="col-5">
+                                        <h2 class="steps">Step 4 - 4</h2>
+                                    </div>
+                                </div> <br><br>
+                                <h2 class="purple-text text-center"><strong>SUCCESS !</strong></h2> <br>
+                                <div class="row justify-content-center">
+                                    <div class="col-3"> <img src="https://i.imgur.com/GwStPmg.png" class="fit-image"> </div>
+                                </div> <br><br>
+                                <div class="row justify-content-center">
+                                    <div class="col-7 text-center">
+                                        <h5 class="purple-text text-center">You Have Successfully Signed Up</h5>
                                     </div>
                                 </div>
-                            </fieldset>
-                        </form>
-                    </div>
+                            </div>
+                        </fieldset>
+                    </form>
                 </div>
             </div>
         </div>
-    <?php
+    </div>
+<?php
 }
-    ?>
+?>
