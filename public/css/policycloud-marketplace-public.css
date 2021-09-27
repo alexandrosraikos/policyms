@@ -923,3 +923,176 @@ p {
   margin: 0;
   padding: 0;
 }
+
+/*
+  * My Account page styling.
+  *
+*/
+
+.pcimage {
+  display: flex;
+  justify-content: space-between;
+  margin: auto;
+  width: 35%;
+}
+
+.pcdivbio {
+  margin: auto;
+  width: 100%;
+  padding: 90px;
+}
+
+.pc_user1 {
+  border-radius: 50% !important;
+  height: 15rem !important;
+  width: 15rem !important;
+}
+
+.fa-github {
+  padding: 10px;
+  font-size: 30px;
+  width: 70px;
+  text-align: center;
+  text-decoration: none;
+  margin: 5px 2px;
+  background: black;
+  color: white;
+}
+
+.fa-facebook {
+  padding: 10px;
+  font-size: 30px;
+  width: 70px;
+  text-align: center;
+  text-decoration: none;
+  margin: 5px 2px;
+  background: #3b5998;
+  color: white;
+}
+
+.fa-linkedin {
+  padding: 10px;
+  font-size: 30px;
+  width: 70px;
+  text-align: center;
+  text-decoration: none;
+  margin: 5px 2px;
+  background: #007bb5;
+  color: white;
+}
+
+.fa-twitter {
+  padding: 10px;
+  font-size: 30px;
+  width: 70px;
+  text-align: center;
+  text-decoration: none;
+  margin: 5px 2px;
+  background: #55acee;
+  color: white;
+}
+
+.pcabout {
+}
+
+/* Style the tab */
+.tabs2 {
+  text-align: center;
+  flex: 1 1 auto;
+  margin: auto;
+  width: 50%;
+
+  border-radius: 5px 5px 5px 5px;
+}
+
+ul#tabs2-nav {
+  justify-content: center;
+  background-color: #f1f1f1;
+  color: black;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  text-align: center;
+  list-style: none;
+  margin: 0;
+  padding: 5px;
+  overflow: auto;
+  flex: 1 1 auto;
+}
+
+ul#tabs2-nav li {
+  background-color: #f1f1f1;
+  color: black;
+  overflow: hidden;
+  width: 250px;
+  justify-content: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  text-align: center;
+  flex: 1 1 auto;
+  float: left;
+  font-weight: bold;
+  margin-right: 2px;
+  padding: 8px 10px;
+  border-radius: 5px 5px 5px 5px;
+  /*border: 1px solid #d5d5de;
+border-bottom: none;*/
+  cursor: pointer;
+}
+
+ul#tabs2-nav li:hover,
+ul#tabs2-nav li.active {
+  background-color: #444;
+  color: white;
+}
+
+#tabs2-nav li a {
+  color: inherit;
+}
+
+.tab-content {
+  padding: 10px;
+  border: 5px solid #fdfafa;
+  background-color: #fff;
+}
+
+/* Just for CodePen styling - don't include if you copy paste */
+/*style accordion*/
+.w3-container {
+  width: 30%;
+}
+
+.accordion {
+  background-color: #eee;
+  color: black;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: solid;
+  border-color: white;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+  transition: 0.4s;
+}
+
+.active,
+.accordion:hover {
+  background-color: #ccc;
+}
+
+.panel {
+  padding: 0 18px;
+  background-color: white;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+}
+
+.pcsocial {
+  display: inline-block !important;
+  width: 100%;
+  word-spacing: var(--grid-column-gap) !important;
+  margin-bottom: calc(-1 * var(--grid-row-gap)) !important;
+}

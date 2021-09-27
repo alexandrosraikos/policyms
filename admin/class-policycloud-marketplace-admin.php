@@ -79,6 +79,8 @@ class PolicyCloud_Marketplace_Admin
 		$output['jwt_key']      = sanitize_text_field( $input['jwt_key'] );
 		$output['marketplace_host'] = sanitize_text_field( $input['marketplace_host']);
 		$output['login_page'] = esc_url($input['login_page']);
+		$output['registration_page'] = esc_url($input['registration_page']);
+		$output['account_page'] = esc_url($input['account_page']);
 		$output['selected_menu'] = sanitize_text_field($input['selected_menu']);
 		$output['description_page'] = esc_url($input['description_page']);
 		return $output;
@@ -138,6 +140,22 @@ class PolicyCloud_Marketplace_Admin
 			'section_two'
 		);
 
+		add_settings_field(
+			'registration_page',
+			'Redirect to Registration',
+			'policycloud_marketplace_plugin_registration_page_selector',
+			'policycloud_marketplace_plugin',
+			'section_two'
+		);
+
+		add_settings_field(
+			'account_page',
+			'Redirect to My Account',
+			'policycloud_marketplace_plugin_account_page_selector',
+			'policycloud_marketplace_plugin',
+			'section_two'
+		);
+
 		add_settings_section(
 		  'section_three',
 		  'Content Settings',
@@ -152,7 +170,6 @@ class PolicyCloud_Marketplace_Admin
 			'policycloud_marketplace_plugin',
 			'section_three'
 		);
-
 	  }
 	  
 	public function add_settings_page()

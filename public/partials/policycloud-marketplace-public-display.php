@@ -294,7 +294,7 @@ function read_multiple_html($description_objects, $args)
 
         if (empty($description_object)) {
 
-        // TODO @elefkour: Show empty description_object error.
+            // TODO @elefkour: Show empty description_object error.
 
         } else {
             if (empty($description['info']['title'])) {
@@ -413,7 +413,7 @@ function read_multiple_html($description_objects, $args)
                                 <span class="card-link" style="color:gray;font-size:12px;">
                                     <?php //if ($isuserlogin) echo '<i class="far fa-user"></i> University of Nicosia '.$descritption[info][owner].'|';
                                     ?> <i class="far fa-eye"></i> <?php //echo $description['metadata']['views']; 
-                                                                ?>
+                                                                    ?>
                                     100 | <i class="far fa-calendar-alt"></i>
                                     <?php // echo $description[info][updateDate];
                                     ?>
@@ -563,4 +563,117 @@ function read_multiple_html($description_objects, $args)
 </div>
 <?php
     }
+
+
+    /**
+     * Display the account page HTML for authenticated users.
+     *
+     * @since    1.0.0
+     */
+    function user_account_html(array|bool $token, array $descriptions = null, array $args)
+    {
+
+        // TODO @alexandrosraikos: Work on existing HTML + CSS + JS.
+        if (empty($token)) {
+            if (!empty($args['error'])) {
+                echo  '<div class="error-msg1"><i class="fa fa-times-circle"></i>Error message' . $args['error'] .'</div>';
+            }
+        } else {
 ?>
+    <div class='pcdivbio'>
+        <div class="pcimage">
+            <img class='pc_user1' src="http://localhost/marketplace/wp-content/uploads/2021/07/user23123.jpg">
+            <div>
+                <h2><b>Dr Sandra doue</b></h2> <br>
+                <p id="pcabout">Lecturer<br>
+                    School of Sciences and Engineering <br>
+                    Department of Life and Health Sciences.</p>
+                <div id="pcsocial">
+                    <a href="#" class="fa fa-facebook"></a>
+                    <a href="#" class="fa fa-twitter"></a>
+                    <a href="#" class="fa fa-github"></a>
+                    <a href="#" class="fa fa-linkedin"></a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="tabs2">
+        <ul id="tabs2-nav">
+            <li><a href="#tab1"><i class="fas fa-file-alt"> </i> About </a></li>
+            <li><a href="#tab2"><i class="fas fa-file-download"> </i> Assets Uploaded </a></li>
+            <li><a href="#tab3"><i class="fas fa-star"></i> Reviews </a></li>
+        </ul>
+        <div id="tabs2-content">
+            <div id="tab1" class="tab-content">
+                <h1>Images</h1>
+            </div>
+            <div id="tab2" class="tab-content">
+                <button class="accordion">Algorithms</button>
+                <div class="panel">
+                    <table style="width: 100%;">
+                        <tbody>
+                            <tr>
+                                <th>Asset Name</th>
+                                <th>Version</th>
+                                <th>Size</th>
+                                <th>Modified on</th>
+                                <th>Action</th>
+                            </tr>
+                            <tr>
+                                <td>2.0</td>
+                                <td>2.1</td>
+                                <td>2.2</td>
+                                <td>2.2 </td>
+                                <td>
+                                    <a><i class="fas fa-download" aria-hidden="true"></i> </a>
+                                    &nbsp;
+                                    <a class="edit2"><i class="fas fa-pencil-alt"></i></a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Eve</td>
+                                <td>Jackson</td>
+                                <td>94</td>
+                                <td>2.2</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button class="accordion">Tools</button>
+                <div class="panel">
+                    <br>
+                    <iframe width="420" height="345" src="https://www.youtube.com/embed/tgbNymZ7vqY">
+                    </iframe>
+                </div>
+                <button class="accordion">Datasets</button>
+                <div class="panel">
+                    <br>
+                    <iframe width="420" height="345" src="https://www.youtube.com/embed/tgbNymZ7vqY">
+                    </iframe>
+                </div>
+                <button class="accordion">Project's Outcomes</button>
+                <div class="panel">
+                    <br>
+                </div>
+                <button class="accordion">Webinars</button>
+                <div class="panel">
+                    <br>
+                </div>
+                <button class="accordion">Tutorials</button>
+                <div class="panel">
+                    <br>
+                </div>
+            </div>
+            <div id="tab3" class="tab-content">
+                <h2>Randall Graves</h2>
+            </div>
+        </div> <!-- END tabs-content -->
+    </div> <!-- END tabs -->
+    </div>
+<?php
+        }
+    }

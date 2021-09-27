@@ -189,10 +189,10 @@ function retrieve_token(bool $decode = false)
     if (empty($options['jwt_key'])) throw new Exception("No PolicyCloud Marketplace API Key defined in WordPress settings.");
 
     // Retrieve saved token.
-    if (!empty($_COOKIE['ppmpapi-token'])) {
+    if (!empty($_COOKIE['ppmapi-token'])) {
 
         // Decrypt token.
-        $token = openssl_decrypt($_COOKIE['ppmpapi-token'], "AES-128-ECB", $options['jwt_key']);
+        $token = openssl_decrypt($_COOKIE['ppmapi-token'], "AES-128-ECB", $options['jwt_key']);
         if (empty($token)) throw new Exception("Decryption was unsuccessful.");
 
         // Validate token age, signature and content.

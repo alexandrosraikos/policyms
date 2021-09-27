@@ -235,15 +235,17 @@ class PolicyCloud_Marketplace_Public
 
 		// Retrieve credentials.
 		$options = get_option('policycloud_marketplace_plugin_settings');
-		if (empty($options['selected_menu']) || empty($options['login_page'])) return $items;
+		if (empty($options['selected_menu']) || empty($options['login_page']) || empty($options['account_page']) || empty($options['registration_page'])) return $items;
 
 		// Add conditional menu item.
 		if ($args->theme_location == $options['selected_menu']) {
 			try {
 				if (!empty(retrieve_token())) {
-					$link = '<a class="menu-link elementor-item policycloud-logout">Log out</a>';
+					$link = '<a class="menu-link elementor-item" href="' . $options['account_page'] . '">My Account</a>';
+					$link .= '<a class="menu-link elementor-item policycloud-logout">Log out</a>';
 				} else {
 					$link = '<a class="menu-link elementor-item" href="' . $options['login_page'] . '">Log In</a>';
+					$link .= '<a class="menu-link elementor-item" href="' . $options['registration_page'] . '">Register</a>';
 				}
 			} catch (\Exception $e) {
 				$link = '<a class="menu-link elementor-item" href="' . $options['login_page'] . '">Log In</a>';
@@ -440,7 +442,7 @@ class PolicyCloud_Marketplace_Public
 	}
 
 	/**
-	 * Display account page for authenticated users.
+	 * Display the account page for authenticated users.
 	 *
 	 * @since    1.0.0
 	 */
@@ -453,10 +455,10 @@ class PolicyCloud_Marketplace_Public
 			$token = retrieve_token(true);
 			if (!empty($token)) {
 				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
-
+				print_r($token['decoded']);
 				// Specify Description ownership.
 				$descriptions = get_descriptions([
-					'owner' => $token['decoded']['info']['username']
+					'owner' => $token['decoded']->username
 				]);
 			}
 		} catch (Exception $e) {
@@ -464,10 +466,9 @@ class PolicyCloud_Marketplace_Public
 		}
 
 
-		// TODO @alexandrosraikos: Add my account page HTML.
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		// user_account_html($token, $descriptions, [
-		// 	"error" => $error ?? '',
-		// ]);
+		user_account_html($token, $descriptions ?? null, [
+			"error" => $error ?? '',
+		]);
 	}
 }
