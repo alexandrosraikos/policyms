@@ -341,18 +341,25 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public static function create_object()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-
-		// TODO @alexandrosraikos: Add form HTML.
-		// TODO @alexandrosraikos: Check token validity.
-
 		wp_enqueue_script("upload_ste");
+
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
+		try {
+			// Get specific Description data for authorized users.
+			$token = retrieve_token();
+			if (empty($token)) $error = "You need to be logged in to create a Description Object.";
+		} catch (Exception $e) {
+			$error = $e->getMessage();
+		}
+
 		wp_localize_script('upload_ste', 'ajax_prop', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce('ajax_policycloud_description_creation_verification'),
 		));
 
-		upload_step();
+		// TODO Update creation view.
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
+		upload_step($error ?? '');
 	}
 
 	/**
@@ -426,7 +433,7 @@ class PolicyCloud_Marketplace_Public
 			'nonce' => wp_create_nonce('ajax_policycloud_description_editing_verification'),
 		));
 
-		// TODO @alexandrosraikos: Show approval status for owners.
+		// TODO Show approval status for owners.
 		read_single_html($description, [
 			"is_owner" => $owner ?? false,
 			"error" => $error ?? '',
@@ -458,7 +465,7 @@ class PolicyCloud_Marketplace_Public
 		}
 
 
-		// TODO @alexandrosraikos: Add my account page HTML.
+		// TODO Add my account page HTML.
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 		// user_account_html($token, $descriptions, [
 		// 	"error" => $error ?? '',
