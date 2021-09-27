@@ -116,8 +116,7 @@ class PolicyCloud_Marketplace_Public
 					'error' => 'existing-token'
 				));
 			}
-		}
-		catch (\Exception $e) {
+		} catch (\Exception $e) {
 			$errorMessage =  $e->getMessage();
 		}
 
@@ -179,8 +178,7 @@ class PolicyCloud_Marketplace_Public
 					'error' => 'existing-token'
 				));
 			}
-		}
-		catch (\Exception $e) {
+		} catch (\Exception $e) {
 			$errorMessage =  $e->getMessage();
 		}
 
@@ -204,7 +202,7 @@ class PolicyCloud_Marketplace_Public
 	public function user_login_handler()
 	{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
-		
+
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_login')) {
 			die("Unverified request to register user.");
@@ -261,7 +259,6 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public function add_content_shortcodes()
 	{
-		// TODO @alexandrosraikos: Add my account page shortcode.
 
 		// Read multiple objects sequence.
 		add_shortcode('policycloud-marketplace-read-multiple', 'PolicyCloud_Marketplace_Public::read_multiple_objects');
@@ -271,8 +268,92 @@ class PolicyCloud_Marketplace_Public
 
 		// Create object sequence.
 		add_shortcode('policycloud-marketplace-create', 'PolicyCloud_Marketplace_Public::create_object');
+
+		// Account page shortcode.
+		add_shortcode('policycloud-marketplace-account', 'PolicyCloud_Marketplace_Public::user_account');
 	}
 
+	/**
+	 * Handle description editing AJAX requests.
+	 *
+	 * @uses	PolicyCloud_Marketplace_Public::description_editing()
+	 * @since	1.0.0
+	 */
+	public function description_editing_handler()
+	{
+		// TODO @alexandrosraikos: Create AJAX script for description object editing.
+
+		// Verify WordPress generated nonce.
+		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_description_editing_verification')) {
+			die("Unverified request to edit description object.");
+		}
+
+		// Attempt to edit the description using POST data.
+		try {
+			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
+
+			description_editing($_POST);
+			die(json_encode([
+				'status' => 'success'
+			]));
+		} catch (Exception $e) {
+			die(json_encode([
+				'status' => 'failure',
+				'data' => $e->getMessage()
+			]));
+		}
+	}
+
+	/**
+	 * Handle description creation AJAX requests.
+	 *
+	 * @uses	PolicyCloud_Marketplace_Public::description_creation()
+	 * @since	1.0.0
+	 */
+	public function description_creation_handler()
+	{
+		// TODO @alexandrosraikos: Create AJAX script for description object creation.
+
+		// Verify WordPress generated nonce.
+		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_description_creation_verification')) {
+			die("Unverified request to create description object.");
+		}
+
+		// Attempt to edit the description using POST data.
+		try {
+			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
+			description_creation($_POST);
+			die(json_encode([
+				'status' => 'success'
+			]));
+		} catch (Exception $e) {
+			die(json_encode([
+				'status' => 'failure',
+				'data' => $e->getMessage()
+			]));
+		}
+	}
+
+	/**
+	 * Display Description Object creation form for authenticated users.
+	 *
+	 * @since    1.0.0
+	 */
+	public static function create_object()
+	{
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
+
+		// TODO @alexandrosraikos: Add form HTML.
+		// TODO @alexandrosraikos: Check token validity.
+
+		wp_enqueue_script("upload_ste");
+		wp_localize_script('upload_ste', 'ajax_prop', array(
+			'ajax_url' => admin_url('admin-ajax.php'),
+			'nonce' => wp_create_nonce('ajax_policycloud_description_creation_verification'),
+		));
+
+		upload_step();
+	}
 
 	/**
 	 * Display multiple Description Objects for visitors and authenticated users.
@@ -315,6 +396,11 @@ class PolicyCloud_Marketplace_Public
 		]);
 	}
 
+	/**
+	 * Display a single description object for authenticated users.
+	 *
+	 * @since    1.0.0
+	 */
 	public static function read_single_object()
 	{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
@@ -348,79 +434,34 @@ class PolicyCloud_Marketplace_Public
 	}
 
 	/**
-	 * Handle description editing AJAX requests.
+	 * Display account page for authenticated users.
 	 *
-	 * @uses	PolicyCloud_Marketplace_Public::description_editing()
-	 * @since	1.0.0
+	 * @since    1.0.0
 	 */
-	public function description_editing_handler()
+	public static function user_account()
 	{
-		// TODO @alexandrosraikos: Create AJAX script for description object editing.
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
 
-		// Verify WordPress generated nonce.
-		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_description_editing_verification')) {
-			die("Unverified request to edit description object.");
-		}
-
-		// Attempt to edit the description using POST data.
 		try {
-			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
+			// Get specific Description data for authorized users.
+			$token = retrieve_token(true);
+			if (!empty($token)) {
+				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
 
-			description_editing($_POST);
-			die(json_encode([
-				'status' => 'success'
-			]));
+				// Specify Description ownership.
+				$descriptions = get_descriptions([
+					'owner' => $token['decoded']['info']['username']
+				]);
+			}
 		} catch (Exception $e) {
-			die(json_encode([
-				'status' => 'failure',
-				'data' => $e->getMessage()
-			]));
+			$error = $e->getMessage();
 		}
-	}
 
-	public static function create_object()
-	{
+
+		// TODO @alexandrosraikos: Add my account page HTML.
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-
-		// TODO @alexandrosraikos: Add form HTML.
-
-		wp_enqueue_script("upload_ste");
-		wp_localize_script('upload_ste', 'ajax_prop', array(
-			'ajax_url' => admin_url('admin-ajax.php'),
-			'nonce' => wp_create_nonce('ajax_policycloud_description_creation_verification'),
-		));
-
-		upload_step();
-	}
-
-	/**
-	 * Handle description creation AJAX requests.
-	 *
-	 * @uses	PolicyCloud_Marketplace_Public::description_creation()
-	 * @since	1.0.0
-	 */
-	public function description_creation_handler()
-	{
-		// TODO @alexandrosraikos: Create AJAX script for description object creation.
-
-		// Verify WordPress generated nonce.
-		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_description_creation_verification')) {
-			die("Unverified request to create description object.");
-		}
-
-		// Attempt to edit the description using POST data.
-		try {
-			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
-
-			description_creation($_POST);
-			die(json_encode([
-				'status' => 'success'
-			]));
-		} catch (Exception $e) {
-			die(json_encode([
-				'status' => 'failure',
-				'data' => $e->getMessage()
-			]));
-		}
+		// user_account_html($token, $descriptions, [
+		// 	"error" => $error ?? '',
+		// ]);
 	}
 }

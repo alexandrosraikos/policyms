@@ -24,15 +24,27 @@ To add a registration form to a requested page, add the following shortcode:
 
 `[policycloud-marketplace-registration]`
 
-## Views
+### Show available Description Objects
 
 To view multiple Description Objects, add the following shortcode:
 
 `[policycloud-marketplace-read-single]`
 
-To view single Description Objects, add the following shortcode:
+To view single Description Objects (for authorized users), add the following shortcode:
 
 `[policycloud-marketplace-read-multiple]`
+
+### Upload Description Object
+
+To view the upload form for creating a Description Object for authorized users, add the following shortcode:
+
+`[policycloud-marketplace-create-object]`
+
+### PolicyCloud Marketplace account page
+
+To view the account page for an authorized user, add the following shortcode:
+
+`[policycloud-marketplace-account]`
 
 ## Other features
 
