@@ -82,6 +82,7 @@ class PolicyCloud_Marketplace_Public
 		// Content related scripts.
 		wp_register_script("upload_ste", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-create.js', array('jquery'), $this->version, false);
 		wp_register_script("policycloud-marketplace-read-single", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-single.js', array('jquery'), $this->version, false);
+		wp_register_script("policycloud-marketplace-account", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account.js', array('jquery'), $this->version, false);
 	}
 
 	/**
@@ -416,12 +417,12 @@ class PolicyCloud_Marketplace_Public
 
 		try {
 			// Get specific Description data for authorized users.
-			$token = retrieve_token();
+			$token = retrieve_token(true);
 			if (!empty($token)) {
 				$description = get_specific_description($_GET['did'], $token['encoded']);
 
 				// Specify Description ownership.
-				$owner = ($description['info']['provider'] == $token['decoded']['info']['username']);
+				$owner = ($description['info']['provider'] == $token['decoded']->username);
 			} else $description = get_specific_description($_GET['did']);
 		} catch (Exception $e) {
 			$error = $e->getMessage();
@@ -455,20 +456,29 @@ class PolicyCloud_Marketplace_Public
 			$token = retrieve_token(true);
 			if (!empty($token)) {
 				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
-				print_r($token['decoded']);
+
 				// Specify Description ownership.
 				$descriptions = get_descriptions([
-					'owner' => $token['decoded']->username
+					'provider' => $token['decoded']->username
 				]);
+			}
+			else {
+				$error = "not-logged-in";
 			}
 		} catch (Exception $e) {
 			$error = $e->getMessage();
 		}
 
+		// Retrieve credentials.
+		$options = get_option('policycloud_marketplace_plugin_settings');
 
+		wp_enqueue_script('policycloud-marketplace-account');
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		user_account_html($token, $descriptions ?? null, [
+		user_account_html($token['decoded'] ?? false, $descriptions ?? null, [
 			"error" => $error ?? '',
+			"login_page" => $options['login_page'] ?? '',
+			"registration_page" => $options['registration_page'] ?? '',
+			"description_page" => $options['description_page']
 		]);
 	}
 }

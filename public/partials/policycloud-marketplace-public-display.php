@@ -570,109 +570,248 @@ function read_multiple_html($description_objects, $args)
      *
      * @since    1.0.0
      */
-    function user_account_html(array|bool $token, array $descriptions = null, array $args)
+    function user_account_html($token, array $descriptions = null, array $args)
     {
-
-        // TODO @alexandrosraikos: Work on existing HTML + CSS + JS.
         if (empty($token)) {
             if (!empty($args['error'])) {
-                echo  '<div class="error-msg1"><i class="fa fa-times-circle"></i>Error message' . $args['error'] .'</div>';
+                if (!empty($args['login_page']) || !empty($args['registration_page'])) {
+                    echo  '<div class="policycloud-error policycloud-account-error">
+                    You are not logged in, please <a href="' . $args['login_page'] . '">log in</a> to your account. Don\'t have an account yet? You can <a href="' . $args['registration_page'] . '">register</a> here.';
+                } else {
+                    echo  '<div class="policycloud-error policycloud-account-error">
+                    An error occured: ' . $args['error'] . '</div>';
+                }
             }
         } else {
 ?>
-    <div class='pcdivbio'>
-        <div class="pcimage">
-            <img class='pc_user1' src="http://localhost/marketplace/wp-content/uploads/2021/07/user23123.jpg">
-            <div>
-                <h2><b>Dr Sandra doue</b></h2> <br>
-                <p id="pcabout">Lecturer<br>
-                    School of Sciences and Engineering <br>
-                    Department of Life and Health Sciences.</p>
-                <div id="pcsocial">
-                    <a href="#" class="fa fa-facebook"></a>
-                    <a href="#" class="fa fa-twitter"></a>
-                    <a href="#" class="fa fa-github"></a>
-                    <a href="#" class="fa fa-linkedin"></a>
+    <div id="policycloud-account">
+        <div id="policycloud-account-sidebar">
+            <img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/user.svg') ?>" />
+            <!-- This is displayed only in the mobile version -->
+            <div class="policycloud-account-title">
+                <h2>
+                    <?php
+                    echo ($token->info->title ?? '') . ' ' . ($token->info->name ?? '') . ' ' . ($token->info->surname ?? '');
+                    ?>
+                </h2>
+                <div>
+                    <?php
+                    echo ($token->info->organization ?? '');
+                    ?>
                 </div>
-
             </div>
-
+            <!--------------------------------------------------->
+            <div id="policycloud-account-hyperlinks">
+                <?php
+                ?>
+                <a title="Send an email" href="mailto:<?php echo sanitize_email($token->info->email ?? '') ?>"><img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/email.svg') ?>" /></a>
+                <?php
+                ?>
+                <!-- TODO @alexandrosraikos: Add phone number button. -->
+                <!-- TODO @alexandrosraikos: Conditionalize these fields using "public_". -->
+                <a title="Visit the official webpage" href="<?php echo esc_url($token->info->webpage ?? '') ?>"><img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/globe.svg') ?>" /></a>
+                <?php
+                ?>
+            </div>
+            <nav>
+                <button id="policycloud-account-overview" class="active">Overview</button>
+                <button id="policycloud-account-assets">Assets</button>
+                <button id="policycloud-account-likes">Likes</button>
+            </nav>
         </div>
-
-    </div>
-    <div class="tabs2">
-        <ul id="tabs2-nav">
-            <li><a href="#tab1"><i class="fas fa-file-alt"> </i> About </a></li>
-            <li><a href="#tab2"><i class="fas fa-file-download"> </i> Assets Uploaded </a></li>
-            <li><a href="#tab3"><i class="fas fa-star"></i> Reviews </a></li>
-        </ul>
-        <div id="tabs2-content">
-            <div id="tab1" class="tab-content">
-                <h1>Images</h1>
+        <div id="policycloud-account-content">
+            <!-- This is displayed only in the desktop version -->
+            <div class="policycloud-account-title">
+                <h2>
+                    <?php
+                    echo ($token->info->title ?? '') . ' ' . ($token->info->name ?? '') . ' ' . ($token->info->surname ?? '');
+                    ?>
+                </h2>
+                <div>
+                    <?php
+                    echo ($token->info->organization ?? '');
+                    ?>
+                </div>
             </div>
-            <div id="tab2" class="tab-content">
-                <button class="accordion">Algorithms</button>
-                <div class="panel">
-                    <table style="width: 100%;">
-                        <tbody>
-                            <tr>
-                                <th>Asset Name</th>
-                                <th>Version</th>
-                                <th>Size</th>
-                                <th>Modified on</th>
-                                <th>Action</th>
-                            </tr>
-                            <tr>
-                                <td>2.0</td>
-                                <td>2.1</td>
-                                <td>2.2</td>
-                                <td>2.2 </td>
-                                <td>
-                                    <a><i class="fas fa-download" aria-hidden="true"></i> </a>
-                                    &nbsp;
-                                    <a class="edit2"><i class="fas fa-pencil-alt"></i></a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Eve</td>
-                                <td>Jackson</td>
-                                <td>94</td>
-                                <td>2.2</td>
-                                <td></td>
-                            </tr>
-                        </tbody>
+            <!--------------------------------------------------->
+            <div>
+                <section class="policycloud-account-overview focused">
+                    <header>
+                        <h3>Overview</h3>
+                    </header>
+                    <table class="statistics">
+                        <tr>
+                            <td>
+                                <div class="assets-figure"><?php echo count($descriptions ?? []) ?></div>
+                                <div class="assets-caption">Assets uploaded</div>
+                            </td>
+                            <td>
+                                <div class="views-figure">
+                                    <?php
+                                    echo array_sum(array_map(function ($description) {
+                                        return $description['metadata']['views'];
+                                    }, $descriptions ?? []));
+                                    ?>
+                                </div>
+                                <div class="views-caption">Total views</div>
+                            </td>
+                        </tr>
                     </table>
-                </div>
-                <button class="accordion">Tools</button>
-                <div class="panel">
-                    <br>
-                    <iframe width="420" height="345" src="https://www.youtube.com/embed/tgbNymZ7vqY">
-                    </iframe>
-                </div>
-                <button class="accordion">Datasets</button>
-                <div class="panel">
-                    <br>
-                    <iframe width="420" height="345" src="https://www.youtube.com/embed/tgbNymZ7vqY">
-                    </iframe>
-                </div>
-                <button class="accordion">Project's Outcomes</button>
-                <div class="panel">
-                    <br>
-                </div>
-                <button class="accordion">Webinars</button>
-                <div class="panel">
-                    <br>
-                </div>
-                <button class="accordion">Tutorials</button>
-                <div class="panel">
-                    <br>
-                </div>
+                    <header>
+                        <h3>Details</h3>
+                        <button>Edit</button>
+                    </header>
+                    <!-- TODO @alexandrosraikos: Add user editing form. -->
+                    <table class="information">
+                        <tr>
+                            <td>
+                                Username:
+                            </td>
+                            <td>
+                                <?php
+                                echo ($token->username ?? '-') . (($token->account->verified != 1) ? ' (Unverified)' : "");
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Password:
+                            </td>
+                            <td>*****************</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Role:
+                            </td>
+                            <td><?php echo $token->account->role; ?></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Full name:
+                            </td>
+                            <td>
+                                <?php
+                                echo ($token->info->title ?? '') . ' ' . ($token->info->name ?? '') . ' ' . ($token->info->surname ?? '');
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Gender:
+                            </td>
+                            <td>
+                                <?php
+                                echo ($token->info->gender ?? '-');
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Organization:
+                            </td>
+                            <td>
+                                <?php
+                                echo ($token->info->organization ?? '-');
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                E-mail:
+                            </td>
+                            <td>
+                                <?php
+                                if (!empty($token->info->email)) {
+                                    echo ($token->info->email) . (($token->profile_parameters->public_email == 0) ? ' (Private)' : ' (Public)');
+                                } else echo '-';
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Phone number:
+                            </td>
+                            <td>
+                                <?php
+                                if (!empty($token->info->phone)) {
+                                    echo ($token->info->phone) . (($token->profile_parameters->public_phone == 0) ? ' (Private)' : ' (Public)');
+                                } else echo '-';
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Website:
+                            </td>
+                            <td>
+                                <?php
+                                echo ($token->info->webpage ?? '-');
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Member since:
+                            </td>
+                            <td>
+                                <?php
+                                echo date('d/m/y', strtotime($token->account->registration_datetime))
+                                ?>
+                            </td>
+                        </tr>
+                    </table>
+                </section>
+                <section class="policycloud-account-assets">
+                    <header>
+                        <h3>Assets</h3>
+                        <a id="policycloud-upload" href="" title="Create a new asset"><img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/plus.svg') ?>" />Create new asset</a>
+                    </header>
+                    <div id="policycloud-account-asset-collection-filters">
+                        <?php
+                        $collections = array_unique(array_map(function ($description) {
+                            return $description['info']['type'];
+                        }, $descriptions ?? []));
+                        foreach ($collections as $collection) {
+                        ?>
+                            <button data-type-filter="<?php echo $collection ?>"><?php echo $collection ?></button>
+                        <?php
+                        }
+                        ?>
+                    </div>
+                    <ul id="policycloud-account-assets-list">
+                        <?php
+                        if (!empty($descriptions)) {
+                            foreach ($descriptions as $description) {
+                        ?>
+                                <li class="<?php echo $description['info']['type'] ?> visible">
+                                    <a href="<?php echo $args['description_page'] . "?did=" . $description['id'] ?>">
+                                        <div class="thumbnail" style="background-image:url(<?php echo get_site_url(null, '/wp-content/plugins/policycloud-marketplace/public/assets/img/placeholder.jpg') ?>)">
+                                        </div>
+                                        <div class="description">
+                                            <h4><?php echo $description['info']['title'] ?></h4>
+                                            <div class="date">Uploaded: <?php echo date('d/m/y H:i:s', strtotime($description['metadata']['uploadDate'])) ?></div>
+                                            <div class="excerpt"><?php echo $description['info']['short_desc'] ?></div>
+                                        </div>
+                                    </a>
+                                </li>
+                            <?php
+                            }
+                        } else {
+                            ?>
+                            <p class="policycloud-account-notice">Upload your first asset to get started.</p>
+                        <?php
+                        }
+                        ?>
+                    </ul>
+                </section>
+                <section class="policycloud-account-likes">
+                    <header>
+                        <h3>Likes</h3>
+                    </header>
+                    <p>Coming soon!</p>
+                </section>
             </div>
-            <div id="tab3" class="tab-content">
-                <h2>Randall Graves</h2>
-            </div>
-        </div> <!-- END tabs-content -->
-    </div> <!-- END tabs -->
+        </div>
     </div>
 <?php
         }

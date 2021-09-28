@@ -35,7 +35,7 @@ function get_descriptions(array $args)
         'metadata.contact' => $args['contact'] ?? null,
         'metadata.description.in' => $args['description'] ?? $args['search'] ?? null,
         'metadata.fieldOfUse' => $args['field_of_use'] ?? null,
-        'info.provider' => $args['provider'] ?? null,
+        'metadata.provider' => $args['provider'] ?? null,
         'info.uploadDate.gte' => $args['upload_date_gte'] ?? null,
         'info.uploadDate.lte' => $args['upload_date_lte'] ?? null,
         'info.last_updated_by' => $args['last_updated_by'] ?? null,
@@ -92,6 +92,12 @@ function get_descriptions(array $args)
 
             // Append descriptions
             $descriptions += (array) json_decode(curl_exec($curl), true);
+        }
+    }
+
+    if (!empty($descriptions['_status'])) {
+        if ($descriptions['_status'] == "unsuccessful") {
+            throw new Exception("No descriptions were found.");
         }
     }
 

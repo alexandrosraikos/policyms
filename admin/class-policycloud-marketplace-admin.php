@@ -156,6 +156,9 @@ class PolicyCloud_Marketplace_Admin
 			'section_two'
 		);
 
+		// TODO @alexandrosraikos: Add creation page selector.
+		// TODO @alexandrosraikos: Update all selectors to use page id instead of raw link.
+
 		add_settings_section(
 		  'section_three',
 		  'Content Settings',

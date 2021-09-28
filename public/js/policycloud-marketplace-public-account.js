@@ -1,53 +1,71 @@
 (function ($) {
   "use strict";
   $(document).ready(function () {
-    $("#pform input")
-      .not("#submit1")
-      .keydown(function (event) {
-        if (event.keyCode == 13) {
-          event.preventDefault();
-          return false;
-        }
-      });
-    $("#edit1").click(function () {
-      /*  $("#descs").addClass("hidden");*/
-      /*$("#descs").html('<input type="text" id="descasset" value="' + $('#descs').text() + '">');*/
-      $("#descs").html(
-        '<textarea id="w3review" name="w3review" rows="4" cols="50" >' +
-          $("#descs").text() +
-          " </textarea>"
-      );
-      //$("#descs").html('<textarea id="story"  placeholder="' + $('#descs').text() + '" value="' + $('#descs').text() + '" rows="5" cols="33"> </textarea>');
-      $("#edit1").remove();
-      $("#pguest").removeClass("hidden");
-      //$('#submit1').removeClass('hidden');
-      // $('#edit1').addClass('hidden');
-    });
-    // Show the first tab and hide the rest
-    $("#tabs2-nav li:first-child").addClass("active");
-    $(".tab-content").hide();
-    $(".tab-content:first").show();
+    // Navigation
+    $("button#policycloud-account-overview").click(function (e) {
+      e.preventDefault();
+      $(
+        "section.policycloud-account-overview, section.policycloud-account-likes, section.policycloud-account-assets"
+      ).removeClass("focused");
+      $("section.policycloud-account-overview").addClass("focused");
 
-    // Click function
-    $("#tabs2-nav li").click(function () {
-      $("#tabs2-nav li").removeClass("active");
+      $(
+        "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-likes"
+      ).removeClass("active");
       $(this).addClass("active");
-      $(".tab-content").hide();
+    });
+    $("button#policycloud-account-assets").click(function (e) {
+      e.preventDefault();
+      $(
+        "section.policycloud-account-overview, section.policycloud-account-likes, section.policycloud-account-assets"
+      ).removeClass("focused");
+      $("section.policycloud-account-assets").addClass("focused");
 
-      var activeTab = $(this).find("a").attr("href");
-      $(activeTab).fadeIn();
-      return false;
+      $(
+        "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-likes"
+      ).removeClass("active");
+      $(this).addClass("active");
+    });
+    $("button#policycloud-account-likes").click(function (e) {
+      e.preventDefault();
+      $(
+        "section.policycloud-account-overview, section.policycloud-account-likes, section.policycloud-account-assets"
+      ).removeClass("focused");
+      $("section.policycloud-account-likes").addClass("focused");
+
+      $(
+        "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-likes"
+      ).removeClass("active");
+      $(this).addClass("active");
     });
 
-    /*accordion */
-    $(".accordion").on("click", function () {
+    // Asset collection filters
+    $("#policycloud-account-asset-collection-filters button").click(function (
+      e
+    ) {
+      e.preventDefault();
       $(this).toggleClass("active");
 
-      var panel = this.nextElementSibling;
-      if (panel.style.maxHeight) {
-        panel.style.maxHeight = null;
-      } else {
-        panel.style.maxHeight = panel.scrollHeight + "px";
+      // Set all active filters.
+      var buttons = $("#policycloud-account-asset-collection-filters button");
+      buttons.each(function (i, v) {
+        if ($(v).hasClass("active")) {
+          $(
+            "#policycloud-account-assets-list li." + $(v).data("type-filter")
+          ).addClass("visible");
+        } else {
+          $(
+            "#policycloud-account-assets-list li." + $(v).data("type-filter")
+          ).removeClass("visible");
+        }
+      });
+
+      // Show all if no filters.
+      if (
+        $("#policycloud-account-asset-collection-filters button.active")
+          .length == 0
+      ) {
+        $("#policycloud-account-assets-list li").addClass("visible");
       }
     });
   });
