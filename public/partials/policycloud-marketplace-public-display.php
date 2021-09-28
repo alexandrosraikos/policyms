@@ -603,20 +603,30 @@ function read_multiple_html($description_objects, $args)
             <!--------------------------------------------------->
             <div id="policycloud-account-hyperlinks">
                 <?php
+                if ($token->profile_parameters->public_email && !empty($token->info->email)) {
                 ?>
-                <a title="Send an email" href="mailto:<?php echo sanitize_email($token->info->email ?? '') ?>"><img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/email.svg') ?>" /></a>
+                    <a title="Send an email" href="mailto:<?php echo sanitize_email($token->info->email ?? '') ?>"><img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/email.svg') ?>" /></a>
                 <?php
+                }
+                if (!empty($token->info->webpage)) {
                 ?>
-                <!-- TODO @alexandrosraikos: Add phone number button. -->
-                <!-- TODO @alexandrosraikos: Conditionalize these fields using "public_". -->
-                <a title="Visit the official webpage" href="<?php echo esc_url($token->info->webpage ?? '') ?>"><img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/globe.svg') ?>" /></a>
+                    <!-- TODO @alexandrosraikos: Conditionalize these fields using "public_". -->
+                    <a title="Visit the official webpage" href="<?php echo esc_url($token->info->webpage ?? '') ?>"><img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/globe.svg') ?>" /></a>
                 <?php
+                }
+                if ($token->profile_parameters->public_phone && !empty($token->info->phone)) {
+                ?>
+                    <a title="Call" href="tel:<?php echo ($token->info->phone ?? '') ?>"><img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/phone.svg') ?>" /></a>
+                <?php
+                }
                 ?>
             </div>
             <nav>
                 <button id="policycloud-account-overview" class="active">Overview</button>
                 <button id="policycloud-account-assets">Assets</button>
                 <button id="policycloud-account-likes">Likes</button>
+                <button id="policycloud-account-details">Account Details</button>
+                <button class="policycloud-logout">Log Out</button>
             </nav>
         </div>
         <div id="policycloud-account-content">
@@ -654,109 +664,6 @@ function read_multiple_html($description_objects, $args)
                                     ?>
                                 </div>
                                 <div class="views-caption">Total views</div>
-                            </td>
-                        </tr>
-                    </table>
-                    <header>
-                        <h3>Details</h3>
-                        <button>Edit</button>
-                    </header>
-                    <!-- TODO @alexandrosraikos: Add user editing form. -->
-                    <table class="information">
-                        <tr>
-                            <td>
-                                Username:
-                            </td>
-                            <td>
-                                <?php
-                                echo ($token->username ?? '-') . (($token->account->verified != 1) ? ' (Unverified)' : "");
-                                ?>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Password:
-                            </td>
-                            <td>*****************</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Role:
-                            </td>
-                            <td><?php echo $token->account->role; ?></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Full name:
-                            </td>
-                            <td>
-                                <?php
-                                echo ($token->info->title ?? '') . ' ' . ($token->info->name ?? '') . ' ' . ($token->info->surname ?? '');
-                                ?>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Gender:
-                            </td>
-                            <td>
-                                <?php
-                                echo ($token->info->gender ?? '-');
-                                ?>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Organization:
-                            </td>
-                            <td>
-                                <?php
-                                echo ($token->info->organization ?? '-');
-                                ?>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                E-mail:
-                            </td>
-                            <td>
-                                <?php
-                                if (!empty($token->info->email)) {
-                                    echo ($token->info->email) . (($token->profile_parameters->public_email == 0) ? ' (Private)' : ' (Public)');
-                                } else echo '-';
-                                ?>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Phone number:
-                            </td>
-                            <td>
-                                <?php
-                                if (!empty($token->info->phone)) {
-                                    echo ($token->info->phone) . (($token->profile_parameters->public_phone == 0) ? ' (Private)' : ' (Public)');
-                                } else echo '-';
-                                ?>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Website:
-                            </td>
-                            <td>
-                                <?php
-                                echo ($token->info->webpage ?? '-');
-                                ?>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Member since:
-                            </td>
-                            <td>
-                                <?php
-                                echo date('d/m/y', strtotime($token->account->registration_datetime))
-                                ?>
                             </td>
                         </tr>
                     </table>
@@ -809,6 +716,111 @@ function read_multiple_html($description_objects, $args)
                         <h3>Likes</h3>
                     </header>
                     <p>Coming soon!</p>
+                </section>
+                <section class="policycloud-account-details">
+                    <header>
+                        <h3>Details</h3>
+                        <button>Edit</button>
+                    </header>
+                    <!-- TODO @alexandrosraikos: Add user editing form. -->
+                    <table class="information">
+                        <tr>
+                            <td>
+                                Username
+                            </td>
+                            <td>
+                                <?php
+                                echo ($token->username ?? '-') . (($token->account->verified != 1) ? ' (Unverified)' : "");
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Password
+                            </td>
+                            <td>*****************</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Role
+                            </td>
+                            <td><?php echo $token->account->role; ?></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Full name
+                            </td>
+                            <td>
+                                <?php
+                                echo ($token->info->title ?? '') . ' ' . ($token->info->name ?? '') . ' ' . ($token->info->surname ?? '');
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Gender
+                            </td>
+                            <td>
+                                <?php
+                                echo ($token->info->gender ?? '-');
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Organization
+                            </td>
+                            <td>
+                                <?php
+                                echo ($token->info->organization ?? '-');
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                E-mail
+                            </td>
+                            <td>
+                                <?php
+                                if (!empty($token->info->email)) {
+                                    echo ($token->info->email) . (($token->profile_parameters->public_email == 0) ? ' (Private)' : ' (Public)');
+                                } else echo '-';
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Phone number
+                            </td>
+                            <td>
+                                <?php
+                                if (!empty($token->info->phone)) {
+                                    echo ($token->info->phone) . (($token->profile_parameters->public_phone == 0) ? ' (Private)' : ' (Public)');
+                                } else echo '-';
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Website
+                            </td>
+                            <td>
+                                <?php
+                                echo ($token->info->webpage ?? '-');
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Member since
+                            </td>
+                            <td>
+                                <?php
+                                echo date('d/m/y', strtotime($token->account->registration_datetime))
+                                ?>
+                            </td>
+                        </tr>
+                    </table>
                 </section>
             </div>
         </div>

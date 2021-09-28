@@ -955,7 +955,7 @@ p {
 
 #policycloud-account-sidebar > img {
   width: 90%;
-  max-width: 796px;
+  max-width: 256px;
   margin: 10px auto;
 }
 
@@ -983,7 +983,7 @@ p {
 }
 
 #policycloud-account-sidebar > nav {
-  margin-top: 20px;
+  margin-top: 30px;
 }
 
 #policycloud-account-sidebar > nav button {
@@ -1016,6 +1016,10 @@ p {
 #policycloud-account-sidebar > nav button.active {
   background-color: rgba(0, 0, 0, 0.05);
   transition: all 0.1s ease-in-out;
+}
+
+#policycloud-account-sidebar > nav button.policycloud-logout {
+  color: rgba(185, 16, 16, 0.842);
 }
 
 #policycloud-account-content {
@@ -1066,7 +1070,7 @@ p {
 #policycloud-account-content section header h3,
 #policycloud-account-content section h3 {
   font-weight: bold;
-  font-size: 85% !important;
+  font-size: 110% !important;
 }
 
 #policycloud-account-content section header a,
@@ -1109,7 +1113,10 @@ p {
 
 section.policycloud-account-overview table,
 section.policycloud-account-overview tr,
-section.policycloud-account-overview td {
+section.policycloud-account-overview td,
+section.policycloud-account-details table,
+section.policycloud-account-details tr,
+section.policycloud-account-details td {
   border: none;
 }
 section.policycloud-account-overview table.statistics {
@@ -1122,13 +1129,13 @@ section.policycloud-account-overview table .views-figure {
   font-weight: bold;
 }
 
-section.policycloud-account-overview table.information {
+section.policycloud-account-details table.information {
   margin-top: 20px;
   font-size: 80%;
 }
 
-section.policycloud-account-overview table.information tr > td:first-of-type {
-  max-width: 60px;
+section.policycloud-account-details table.information tr > td:first-of-type {
+  max-width: 80px;
   font-weight: bold;
 }
 
@@ -1316,5 +1323,9 @@ section.policycloud-account-assets
     flex: unset;
     height: 200px;
     margin-bottom: 25px;
+  }
+
+  section.policycloud-account-details table.information tr > td:first-of-type {
+    max-width: 50%;
   }
 }

@@ -5,36 +5,48 @@
     $("button#policycloud-account-overview").click(function (e) {
       e.preventDefault();
       $(
-        "section.policycloud-account-overview, section.policycloud-account-likes, section.policycloud-account-assets"
+        "section.policycloud-account-overview, section.policycloud-account-likes, section.policycloud-account-assets, section.policycloud-account-details"
       ).removeClass("focused");
       $("section.policycloud-account-overview").addClass("focused");
 
       $(
-        "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-likes"
+        "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-likes, button#policycloud-account-details"
       ).removeClass("active");
       $(this).addClass("active");
     });
     $("button#policycloud-account-assets").click(function (e) {
       e.preventDefault();
       $(
-        "section.policycloud-account-overview, section.policycloud-account-likes, section.policycloud-account-assets"
+        "section.policycloud-account-overview, section.policycloud-account-likes, section.policycloud-account-assets, section.policycloud-account-details"
       ).removeClass("focused");
       $("section.policycloud-account-assets").addClass("focused");
 
       $(
-        "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-likes"
+        "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-likes, button#policycloud-account-details"
       ).removeClass("active");
       $(this).addClass("active");
     });
     $("button#policycloud-account-likes").click(function (e) {
       e.preventDefault();
       $(
-        "section.policycloud-account-overview, section.policycloud-account-likes, section.policycloud-account-assets"
+        "section.policycloud-account-overview, section.policycloud-account-likes, section.policycloud-account-assets, section.policycloud-account-details"
       ).removeClass("focused");
       $("section.policycloud-account-likes").addClass("focused");
 
       $(
-        "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-likes"
+        "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-likes, button#policycloud-account-details"
+      ).removeClass("active");
+      $(this).addClass("active");
+    });
+    $("button#policycloud-account-details").click(function (e) {
+      e.preventDefault();
+      $(
+        "section.policycloud-account-overview, section.policycloud-account-likes, section.policycloud-account-assets, section.policycloud-account-details"
+      ).removeClass("focused");
+      $("section.policycloud-account-details").addClass("focused");
+
+      $(
+        "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-likes, button#policycloud-account-details"
       ).removeClass("active");
       $(this).addClass("active");
     });
