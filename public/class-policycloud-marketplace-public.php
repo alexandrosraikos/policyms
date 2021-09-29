@@ -80,7 +80,7 @@ class PolicyCloud_Marketplace_Public
 		wp_enqueue_script("policycloud-marketplace-logout", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-logout.js', array('jquery'), $this->version, false);
 
 		// Content related scripts.
-		wp_register_script("upload_ste", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-create.js', array('jquery'), $this->version, false);
+		wp_register_script("policycloud-marketplace-create-description", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-create.js', array('jquery'), $this->version, false);
 		wp_register_script("policycloud-marketplace-read-single", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-single.js', array('jquery'), $this->version, false);
 		wp_register_script("policycloud-marketplace-account", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account.js', array('jquery'), $this->version, false);
 	}
@@ -282,7 +282,7 @@ class PolicyCloud_Marketplace_Public
 	 * @uses	PolicyCloud_Marketplace_Public::description_editing()
 	 * @since	1.0.0
 	 */
-	public function description_editing_handler()
+	public function description_edit_handler()
 	{
 		// TODO @alexandrosraikos: Create AJAX script for description object editing.
 
@@ -313,7 +313,7 @@ class PolicyCloud_Marketplace_Public
 	 * @uses	PolicyCloud_Marketplace_Public::description_creation()
 	 * @since	1.0.0
 	 */
-	public function description_creation_handler()
+	public function create_description_handler()
 	{
 		// TODO @alexandrosraikos: Create AJAX script for description object creation.
 
@@ -325,7 +325,7 @@ class PolicyCloud_Marketplace_Public
 		// Attempt to edit the description using POST data.
 		try {
 			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
-			description_creation($_POST);
+			create_description($_POST);
 			die(json_encode([
 				'status' => 'success'
 			]));
@@ -344,7 +344,6 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public static function create_object()
 	{
-		wp_enqueue_script("upload_ste");
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
 		try {
@@ -355,7 +354,8 @@ class PolicyCloud_Marketplace_Public
 			$error = $e->getMessage();
 		}
 
-		wp_localize_script('upload_ste', 'ajax_prop', array(
+		wp_enqueue_script("policycloud-marketplace-create-description");
+		wp_localize_script('policycloud-marketplace-create-description', 'ajax_properties_description_creation', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce('ajax_policycloud_description_creation_verification'),
 		));
@@ -430,9 +430,10 @@ class PolicyCloud_Marketplace_Public
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 		wp_enqueue_script('policycloud-marketplace-read-single');
-		wp_localize_script('policycloud-marketplace-read-single', 'ajax_properties_editing', array(
+		wp_localize_script('policycloud-marketplace-read-single', 'ajax_properties_description_editing', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce('ajax_policycloud_description_editing_verification'),
+			'description_id' => $_GET['did']
 		));
 
 		read_single_html($description, [

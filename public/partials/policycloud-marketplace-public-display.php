@@ -315,7 +315,7 @@ function read_multiple_html($description_objects, $args)
             }
         ?>
             <section style="width: 1349px; left: 0px;">
-                <form id="pform">
+                <form id="policycloud-marketplace-description-edit">
                     <div class="parent">
                         <?php //only login user can see this 
                         if ($isuserlogin) { ?>
@@ -478,7 +478,7 @@ function read_multiple_html($description_objects, $args)
     <div class="row justify-content-center">
         <div class="col-11 col-sm-10 col-md-10 col-lg-6 col-xl-5 text-center p-0 mt-3 mb-2">
             <div class="card px-0 pt-4 pb-0 mt-3 mb-3">
-                <form id="msform">
+                <form id="policycloud-marketplace-description-create">
                     <h2 id="heading">Upload your Project</h2>
                     <p>Fill all form field to go to next step</p>
                     <!-- progressbar -->
@@ -736,164 +736,164 @@ function read_multiple_html($description_objects, $args)
                         <button id="policycloud-marketplace-account-edit-toggle">Edit</button>
                     </header>
                     <form id="policycloud-marketplace-account-edit" action="">
-                    <table class="information">
-                        <tr>
-                            <td>
-                                Username
-                            </td>
-                            <td>
-                                <span class="folding visible">
-                                <?php
-                                echo ($token->username ?? '-') . (($token->account->verified != 1) ? ' (Unverified)' : "");
-                                ?>
-                                </span>
-                                <input class="folding" type="text" name="policycloud-marketplace-username" placeholder="<?php
-                                echo ($token->username ?? '-');
-                                ?>"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Password
-                            </td>
-                            <td>
-                                <span class="folding visible">*****************</span>
-                                <input class="folding" type="password" name="policycloud-marketplace-password" placeholder="Enter your new password here"/>
-                                <input class="folding" type="password" name="policycloud-marketplace-password-confirm" placeholder="Confirm new password here"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Role
-                            </td>
-                            <td>
-                                <span class="folding visible">
-                                <?php echo ($token->account->role == 'admin') ? 'Administrator' : 'User'; ?>
-                                </span>
-                                <select name="policycloud-marketplace-role" class="folding">
-                                    <option value="admin" <?php echo ($token->account->role == 'admin' ? 'selected' : '') ?>>Administrator</option>
-                                    <option value="user"  <?php echo ($token->account->role == 'user' ? 'selected' : '') ?>>User</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Full name
-                            </td>
-                            <td>
-                                <span class="folding visible">
-                                <?php
-                                echo ($token->info->title ?? '') . ' ' . ($token->info->name ?? '') . ' ' . ($token->info->surname ?? '');
-                                ?>
-                                </span>
-                                <input class="folding" type="text" name="policycloud-marketplace-title" placeholder="Title (<?php
-                                echo ($token->info->title ?? ''); ?>)"/>
-                                <input class="folding" type="text" name="policycloud-marketplace-name" placeholder="Name (<?php
-                                echo ($token->info->name ?? ''); ?>)"/>
-                                <input class="folding" type="text" name="policycloud-marketplace-surname" placeholder="Surname (<?php
-                                echo ($token->info->surname ?? ''); ?>)"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Gender
-                            </td>
-                            <td>
-                                <span class="folding visible">
-                                <?php
-                                echo ($token->info->gender ?? '-');
-                                ?>
-                                </span>
-                                <select name="policycloud-marketplace-gender" class="folding">
-                                    <option value="male" <?php echo ($token->info->gender == 'male' ? 'selected' : '') ?>>Male</option>
-                                    <option value="female"  <?php echo ($token->info->gender == 'female' ? 'selected' : '') ?>>Female</option>
-                                    <option value="other"  <?php echo ($token->info->gender == 'other' ? 'selected' : '') ?>>Other</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Organization
-                            </td>
-                            <td>
-                                <span class="folding visible">
-                                <?php
-                                echo ($token->info->organization ?? '-');
-                                ?>
-                                </span>
-                                <input class="folding" type="text" name="policycloud-marketplace-organization" placeholder="<?php
-                                echo ($token->info->organization ?? ''); ?>"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                E-mail
-                            </td>
-                            <td>
-                                <span class="folding visible">
-                                <?php
-                                if (!empty($token->info->email)) {
-                                    echo ($token->info->email) . (($token->profile_parameters->public_email == 0) ? ' (Private)' : ' (Public)');
-                                } else echo '-';
-                                ?>
-                                </span>
-                                <input class="folding" type="text" name="policycloud-marketplace-email" placeholder="<?php
-                                echo ($token->info->email ?? 'Enter your email address here'); ?>"/>
-                                <label for="policycloud-marketplace-email" class="folding">Changing this setting will require a verification of the new e-mail address.</label>
-                                <select name="policycloud-marketplace-public-email" class="folding">
-                                    <option value="1" <?php echo ($token->profile_parameters->public_email == 1 ? 'selected' : '') ?>>Public</option>
-                                    <option value="0" <?php echo ($token->profile_parameters->public_email == 0 ? 'selected' : '') ?>>Private</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Phone number
-                            </td>
-                            <td>
-                                <span class="folding visible">
-                                <?php
-                                if (!empty($token->info->phone)) {
-                                    echo ($token->info->phone) . (($token->profile_parameters->public_phone == 0) ? ' (Private)' : ' (Public)');
-                                } else echo '-';
-                                ?>
-                                </span>
-                                <input class="folding" type="text" name="policycloud-marketplace-phone" placeholder="<?php
-                                echo (empty($token->info->phone) ? 'Enter your phone number here' : $token->info->phone); ?>"/>
-                                <select name="policycloud-marketplace-public-phone" class="folding">
-                                    <option value="1" <?php echo ($token->profile_parameters->public_phone == 1 ? 'selected' : '') ?>>Public</option>
-                                    <option value="0" <?php echo ($token->profile_parameters->public_phone == 0 ? 'selected' : '') ?>>Private</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Website
-                            </td>
-                            <td>
-                                <span class="folding visible">
-                                <?php
-                                echo ($token->info->webpage ?? '-');
-                                ?>
-                                </span>
-                                <input class="folding" type="text" name="policycloud-marketplace-webpage" placeholder="<?php
-                                echo ($token->info->webpage ?? 'https://www.example.org/'); ?>"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Member since
-                            </td>
-                            <td>
-                                <?php
-                                echo date('d/m/y', strtotime($token->account->registration_datetime))
-                                ?>
-                            </td>
-                        </tr>
-                    </table>
-                    <div class="folding error"></div>
-                    <button type="submit" class="folding">Submit</button>
-                            </form>
+                        <table class="information">
+                            <tr>
+                                <td>
+                                    Username
+                                </td>
+                                <td>
+                                    <span class="folding visible">
+                                        <?php
+                                        echo ($token->username ?? '-') . (($token->account->verified != 1) ? ' (Unverified)' : "");
+                                        ?>
+                                    </span>
+                                    <input class="folding" type="text" name="policycloud-marketplace-username" placeholder="<?php
+                                                                                                                            echo ($token->username ?? '-');
+                                                                                                                            ?>" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Password
+                                </td>
+                                <td>
+                                    <span class="folding visible">*****************</span>
+                                    <input class="folding" type="password" name="policycloud-marketplace-password" placeholder="Enter your new password here" />
+                                    <input class="folding" type="password" name="policycloud-marketplace-password-confirm" placeholder="Confirm new password here" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Role
+                                </td>
+                                <td>
+                                    <span class="folding visible">
+                                        <?php echo ($token->account->role == 'admin') ? 'Administrator' : 'User'; ?>
+                                    </span>
+                                    <select name="policycloud-marketplace-role" class="folding">
+                                        <option value="admin" <?php echo ($token->account->role == 'admin' ? 'selected' : '') ?>>Administrator</option>
+                                        <option value="user" <?php echo ($token->account->role == 'user' ? 'selected' : '') ?>>User</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Full name
+                                </td>
+                                <td>
+                                    <span class="folding visible">
+                                        <?php
+                                        echo ($token->info->title ?? '') . ' ' . ($token->info->name ?? '') . ' ' . ($token->info->surname ?? '');
+                                        ?>
+                                    </span>
+                                    <input class="folding" type="text" name="policycloud-marketplace-title" placeholder="Title (<?php
+                                                                                                                                echo ($token->info->title ?? ''); ?>)" />
+                                    <input class="folding" type="text" name="policycloud-marketplace-name" placeholder="Name (<?php
+                                                                                                                                echo ($token->info->name ?? ''); ?>)" />
+                                    <input class="folding" type="text" name="policycloud-marketplace-surname" placeholder="Surname (<?php
+                                                                                                                                    echo ($token->info->surname ?? ''); ?>)" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Gender
+                                </td>
+                                <td>
+                                    <span class="folding visible">
+                                        <?php
+                                        echo ($token->info->gender ?? '-');
+                                        ?>
+                                    </span>
+                                    <select name="policycloud-marketplace-gender" class="folding">
+                                        <option value="male" <?php echo ($token->info->gender == 'male' ? 'selected' : '') ?>>Male</option>
+                                        <option value="female" <?php echo ($token->info->gender == 'female' ? 'selected' : '') ?>>Female</option>
+                                        <option value="other" <?php echo ($token->info->gender == 'other' ? 'selected' : '') ?>>Other</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Organization
+                                </td>
+                                <td>
+                                    <span class="folding visible">
+                                        <?php
+                                        echo ($token->info->organization ?? '-');
+                                        ?>
+                                    </span>
+                                    <input class="folding" type="text" name="policycloud-marketplace-organization" placeholder="<?php
+                                                                                                                                echo ($token->info->organization ?? ''); ?>" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    E-mail
+                                </td>
+                                <td>
+                                    <span class="folding visible">
+                                        <?php
+                                        if (!empty($token->info->email)) {
+                                            echo ($token->info->email) . (($token->profile_parameters->public_email == 0) ? ' (Private)' : ' (Public)');
+                                        } else echo '-';
+                                        ?>
+                                    </span>
+                                    <input class="folding" type="text" name="policycloud-marketplace-email" placeholder="<?php
+                                                                                                                            echo ($token->info->email ?? 'Enter your email address here'); ?>" />
+                                    <label for="policycloud-marketplace-email" class="folding">Changing this setting will require a verification of the new e-mail address.</label>
+                                    <select name="policycloud-marketplace-public-email" class="folding">
+                                        <option value="1" <?php echo ($token->profile_parameters->public_email == 1 ? 'selected' : '') ?>>Public</option>
+                                        <option value="0" <?php echo ($token->profile_parameters->public_email == 0 ? 'selected' : '') ?>>Private</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Phone number
+                                </td>
+                                <td>
+                                    <span class="folding visible">
+                                        <?php
+                                        if (!empty($token->info->phone)) {
+                                            echo ($token->info->phone) . (($token->profile_parameters->public_phone == 0) ? ' (Private)' : ' (Public)');
+                                        } else echo '-';
+                                        ?>
+                                    </span>
+                                    <input class="folding" type="text" name="policycloud-marketplace-phone" placeholder="<?php
+                                                                                                                            echo (empty($token->info->phone) ? 'Enter your phone number here' : $token->info->phone); ?>" />
+                                    <select name="policycloud-marketplace-public-phone" class="folding">
+                                        <option value="1" <?php echo ($token->profile_parameters->public_phone == 1 ? 'selected' : '') ?>>Public</option>
+                                        <option value="0" <?php echo ($token->profile_parameters->public_phone == 0 ? 'selected' : '') ?>>Private</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Website
+                                </td>
+                                <td>
+                                    <span class="folding visible">
+                                        <?php
+                                        echo ($token->info->webpage ?? '-');
+                                        ?>
+                                    </span>
+                                    <input class="folding" type="text" name="policycloud-marketplace-webpage" placeholder="<?php
+                                                                                                                            echo ($token->info->webpage ?? 'https://www.example.org/'); ?>" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Member since
+                                </td>
+                                <td>
+                                    <?php
+                                    echo date('d/m/y', strtotime($token->account->registration_datetime))
+                                    ?>
+                                </td>
+                            </tr>
+                        </table>
+                        <div class="folding error"></div>
+                        <button type="submit" class="folding">Submit</button>
+                    </form>
                 </section>
             </div>
         </div>

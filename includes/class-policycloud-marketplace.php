@@ -193,10 +193,10 @@ class PolicyCloud_Marketplace {
 
 		// -- CRUD operations on database.
 		$this->loader->add_action('init', $plugin_public, 'add_content_shortcodes');
-		$this->loader->add_action('wp_ajax_description_editing', $plugin_public, 'description_editing_handler');
-		$this->loader->add_action('wp_ajax_nopriv_description_editing', $plugin_public, 'description_editing_handler');
-		$this->loader->add_action('wp_ajax_description_creation', $plugin_public, 'description_creation_handler');
-		$this->loader->add_action('wp_ajax_nopriv_description_creation', $plugin_public, 'description_creation_handler');
+		$this->loader->add_action('wp_ajax_description_edit', $plugin_public, 'description_edit_handler');
+		$this->loader->add_action('wp_ajax_nopriv_description_edit', $plugin_public, 'description_edit_handler');
+		$this->loader->add_action('wp_ajax_policycloud_marketplace_description_create', $plugin_public, 'create_description_handler');
+		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_description_create', $plugin_public, 'create_description_handler');
 		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_edit', $plugin_public, 'account_edit_handler');
 		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_edit', $plugin_public, 'account_edit_handler');
 	}

@@ -214,7 +214,7 @@ function description_editing($updated)
  * @uses	PolicyCloud_Marketplace_Public::retrieve_token()
  * @since	1.0.0
  */
-function description_creation($new)
+function create_description($new)
 {
     // Retrieve credentials.
     $options = get_option('policycloud_marketplace_plugin_settings');

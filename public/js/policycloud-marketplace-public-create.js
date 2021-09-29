@@ -75,8 +75,51 @@
       $(".progress-bar").css("width", percent + "%");
     }
 
-    $(".submit").click(function () {
-      return false;
+    /*
+      ------------------------
+      AJAX Description Creation
+      ------------------------
+    */
+
+    $("#policycloud-marketplace-description-create").submit((e) => {
+      e.preventDefault();
+      $(
+        "#policycloud-marketplace-description-create input[type=submit]"
+      ).addClass("loading");
+
+      // Perform AJAX request.
+      // TODO @alexandrosraikos: Add description creation form fields for processing.
+      $.ajax({
+        url: ajax_properties_description_creation.ajax_url,
+        type: "post",
+        data: {
+          action: "policycloud_marketplace_description_create",
+          nonce: ajax_properties_description_creation.nonce,
+          username: $("input[name=username]").val(),
+        },
+
+        // Handle response.
+        complete: function (response) {
+          var response_data = JSON.parse(response.responseText);
+          if (response_data != null) {
+            if (response_data.status === "failure") {
+              $(".error").html(response_data.data);
+            } else if (response_data.status === "success") {
+              // TODO @alexandrosraikos: Redirect to account assets page.
+              window.location.reload();
+            }
+          }
+          if (response.status != 200) {
+            $(".error").html(
+              "HTTP Error " + response.status + ": " + response.statusText
+            );
+          }
+          $(
+            "#policycloud-marketplace-description-creation input[type=submit]"
+          ).removeClass("loading");
+        },
+        dataType: "json",
+      });
     });
   });
 })(jQuery);
