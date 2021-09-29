@@ -27,22 +27,22 @@ function get_descriptions(array $args)
     // "gte"/"lte" are range selectors in HTML.
 
     $filters = '?' . http_build_query([
-        'metadata.owner' => $args['owner'] ?? null,
-        'metadata.title' => $args['title'] ?? $args['search'] ?? null,
-        // 'metadata.type.in' => implode(',', ((array) $args['type']) ?? []),
-        'metadata.subtype' => $args['subtype'] ?? null,
-        'metadata.comments.in' => $args['comments'] ?? null,
-        'metadata.contact' => $args['contact'] ?? null,
-        'metadata.description.in' => $args['description'] ?? $args['search'] ?? null,
-        'metadata.fieldOfUse' => $args['field_of_use'] ?? null,
+        'info.owner' => $args['owner'] ?? null,
+        'info.title' => $args['title'] ?? $args['search'] ?? null,
+        'info.type.in' =>  (empty($args['type'])) ? null : implode(',', ($args['type'] ?? [])),
+        'info.subtype' => $args['subtype'] ?? null,
+        'info.comments.in' => $args['comments'] ?? null,
+        'info.contact' => $args['contact'] ?? null,
+        'info.description.in' => $args['description'] ?? $args['search'] ?? null,
+        'info.fieldOfUse' => $args['field_of_use'] ?? null,
         'metadata.provider' => $args['provider'] ?? null,
-        'info.uploadDate.gte' => $args['upload_date_gte'] ?? null,
-        'info.uploadDate.lte' => $args['upload_date_lte'] ?? null,
-        'info.last_updated_by' => $args['last_updated_by'] ?? null,
-        'info.views.gte' => $args['views_gte'] ?? null,
-        'info.views.lte' => $args['views_lte'] ?? null,
-        'info.updateDate.gte' => $args['update_date_gte'] ?? null,
-        'info.updateDate.lte' => $args['update_date_lte'] ?? null
+        'metadata.uploadDate.gte' => $args['upload_date_gte'] ?? null,
+        'metadata.uploadDate.lte' => $args['upload_date_lte'] ?? null,
+        'metadata.last_updated_by' => $args['last_updated_by'] ?? null,
+        'metadata.views.gte' => $args['views_gte'] ?? null,
+        'metadata.views.lte' => $args['views_lte'] ?? null,
+        'metadata.updateDate.gte' => $args['update_date_gte'] ?? null,
+        'metadata.updateDate.lte' => $args['update_date_lte'] ?? null
     ]);
 
     $curl = curl_init();
@@ -134,7 +134,7 @@ function get_specific_description(string $did, string $token = null)
         CURLOPT_TIMEOUT => 0,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_CUSTOMREQUEST => 'GET',
         CURLOPT_HTTPHEADER => ['Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null)]
     ));
 

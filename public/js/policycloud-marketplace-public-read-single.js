@@ -9,42 +9,39 @@
           return false;
         }
       });
+    /* range filter   */
+
+    $(document).on("input change", "#pcslider", function () {
+      $("#pcslider_value").html($(this).val());
+    });
+
     /*add toggle input*/
     /* $(document).on("click", ".edit2", function(){
        $(this).parents("tr").find("td:not(:last-child)").each(function(){
          $(this).attr("contenteditable","true");
        });		
      });*/
-    $(document).on("click", ".edit2", function () {
-      $(this)
-        .parents("tr")
-        .find("td:not(:last-child)")
-        .each(function () {
-          $(this).html(
-            '<input type="text" size ="1" value="' + $(this).text() + '">'
-          );
-        });
+    /* $(document).on("click", ".edit2", function () {
+      $(this).parents("tr").find("td:not(:last-child)").each(function () {
+        $(this).html('<input type="text" size ="1" value="' + $(this).text() + '">');
+      });
       $(this).parents("tr").find(".add, .edit2").toggle();
       $(".add-new").attr("disabled", "disabled");
     });
     /*second row*/
-    $(document).on("click", ".edit3", function () {
-      $(this)
-        .parents("tr")
-        .find("td:not(:last-child)")
-        .each(function () {
-          $(this).html(
-            '<input type="text" size ="1" value="' + $(this).text() + '" >'
-          );
-        });
-      $(this).parents("tr").find(".add, .edit3").toggle();
-      $(".add-new").attr("disabled", "disabled");
-    });
+    /* $(document).on("click", ".edit2", function () {
+        $('#pctablename').html('<input type="text" size ="1" value="' + $('#pctablename').text() + '" >');
+      });
+    
     /*  add and remove forms       */
     $("#edit1").click(function () {
-      $(".edit2").trigger("click");
-      $(".edit3").trigger("click");
-
+      // $(".edit2").trigger("click");
+      // $(".edit3").trigger("click");
+      $("#pctablename").html(
+        '<input type="text" size ="1" value="' +
+          $("#pctablename").text() +
+          '" >'
+      );
       $("#description-title").html(
         '<input type="text" name ="dtitle" class="h2title" value="' +
           $("#description-title").text() +
@@ -56,12 +53,12 @@
       //$('$dstitle').html('<input type="text" id="titleasset" value="' + $('#description-title').text() + '">');
       //$('#dstitle').removeClass('hidden');
       $("#descp").html(
-        '<textarea id="descp1" name="w3review" rows="4" cols="50" >' +
+        '<textarea id="descp1" name="w3review" rows="4" cols="20" >' +
           $("#descp").text() +
           " </textarea>"
       );
       $("#descs").html(
-        '<textarea id="descs1" name="w3review" rows="4" cols="50" >' +
+        '<textarea id="descs1" name="w3review" rows="4" cols="20" >' +
           $("#descs").text() +
           " </textarea>"
       );

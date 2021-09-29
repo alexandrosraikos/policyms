@@ -407,7 +407,27 @@ TODO @elefkour: Rename generic selectors.
   cursor: pointer;
   outline: none;
 }
+/*option for user labe*/
+.pcowneroption {
+  color: white;
+  font-size: 18px;
+  width: 100%;
+  text-align: center;
+}
+.pcdate {
+}
+/*check box*/
+.checkbox {
+}
 
+.pccheckbox {
+  cursor: pointer;
+  padding: 6px 8px 6px 16px;
+  color: white;
+}
+.pccheckbox :hover {
+  color: #4682b4;
+}
 /* On mouse-over */
 .sidenav a:hover,
 .dropdown-btn1:hover {
@@ -462,6 +482,7 @@ ul.sidenav li a {
   display: block;
   color: white;
   padding: 8px 16px;
+  background-color: #4682b4;
   text-decoration: none;
 }
 
@@ -611,10 +632,10 @@ img {
   text-transform: uppercase;
 }
 
-/* .category__01 {
-  background-color: #cccccc;
-  background-color: #50c6db;
-} */
+.category__01 {
+  /*background-color: #cccccc;*/
+  /*background-color: #50c6db;*/
+}
 .category__01_plaisio {
   background-color: #006489;
 }
@@ -686,6 +707,7 @@ img {
   font-size: 16px;
   cursor: pointer;
 }
+/*range inputs */
 
 /** UPLOAD FORM **/
 
@@ -712,14 +734,14 @@ p {
   font-weight: normal;
 }
 
-#policycloud-marketplace-description-create {
+#msform {
   width: 500px;
   margin: 50px auto;
   text-align: center;
   position: relative;
 }
 
-#policycloud-marketplace-description-create fieldset {
+#msform fieldset {
   background: white;
   border: 0 none;
   border-radius: 3px;
@@ -737,12 +759,12 @@ p {
   text-align: left;
 }
 
-#policycloud-marketplace-description-create fieldset:not(:first-of-type) {
+#msform fieldset:not(:first-of-type) {
   display: none;
 }
 
-#policycloud-marketplace-description-create input,
-#policycloud-marketplace-description-create textarea {
+#msform input,
+#msform textarea {
   padding: 8px 15px 8px 15px;
   border: 1px solid #ccc;
   border-radius: 0px;
@@ -757,8 +779,8 @@ p {
   letter-spacing: 1px;
 }
 
-#policycloud-marketplace-description-create input:focus,
-#policycloud-marketplace-description-create textarea:focus {
+#msform input:focus,
+#msform textarea:focus {
   -moz-box-shadow: none !important;
   -webkit-box-shadow: none !important;
   box-shadow: none !important;
@@ -766,7 +788,7 @@ p {
   outline-width: 0;
 }
 
-#policycloud-marketplace-description-create .action-button {
+#msform .action-button {
   width: 100px;
   background: #4966cb;
   font-weight: bold;
@@ -779,12 +801,12 @@ p {
   float: right;
 }
 
-#policycloud-marketplace-description-create .action-button:hover,
-#policycloud-marketplace-description-create .action-button:focus {
+#msform .action-button:hover,
+#msform .action-button:focus {
   background-color: #4966cb;
 }
 
-#policycloud-marketplace-description-create .action-button-previous {
+#msform .action-button-previous {
   width: 100px;
   background: #616161;
   font-weight: bold;
@@ -797,8 +819,8 @@ p {
   float: right;
 }
 
-#policycloud-marketplace-description-create .action-button-previous:hover,
-#policycloud-marketplace-description-create .action-button-previous:focus {
+#msform .action-button-previous:hover,
+#msform .action-button-previous:focus {
   background-color: #000000;
 }
 

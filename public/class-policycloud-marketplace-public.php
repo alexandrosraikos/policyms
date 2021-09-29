@@ -377,15 +377,6 @@ class PolicyCloud_Marketplace_Public
 		try {
 			// Retrieve all public descriptions based on GET parameter filtering.
 			$descriptions = get_descriptions($_GET);
-
-			// Get specific description data from the list for authorized users.
-			$token = retrieve_token();
-			if (!empty($token)) {
-				$descriptions = array_map(function ($public_description) use ($token) {
-					return get_specific_description($token, $public_description['id']);
-				}, $descriptions);
-				$authenticated = true;
-			} else $authenticated = false;
 		} catch (Exception $e) {
 			$error = $e->getMessage();
 		}
