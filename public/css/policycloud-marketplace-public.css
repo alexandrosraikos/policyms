@@ -1305,6 +1305,25 @@ section.policycloud-account-details
 
 section.policycloud-account-details
   #policycloud-marketplace-account-edit
+  .error {
+  margin: 10px;
+  width: 100%;
+  padding: 10px 15px;
+  font-size: 80% !important;
+  font-weight: bold !important;
+  background-color: darksalmon;
+  border-radius: 8px;
+  display: none;
+}
+
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
+  .error.visible {
+  display: block;
+}
+
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
   button {
   font-weight: bold;
   background-color: #000000;
@@ -1314,7 +1333,7 @@ section.policycloud-account-details
   text-decoration: none;
   font-size: 80% !important;
   border: none;
-  margin: 10px auto;
+  margin: 15px auto;
   transition: all 0.2s ease-in-out;
 }
 

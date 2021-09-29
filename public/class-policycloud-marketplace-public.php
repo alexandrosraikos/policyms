@@ -139,7 +139,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public function user_registration_handler()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
 
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_registration')) {
@@ -473,6 +473,10 @@ class PolicyCloud_Marketplace_Public
 		$options = get_option('policycloud_marketplace_plugin_settings');
 
 		wp_enqueue_script('policycloud-marketplace-account');
+		wp_localize_script('policycloud-marketplace-account', 'ajax_properties_account_editing', array(
+			'ajax_url' => admin_url('admin-ajax.php'),
+			'nonce' => wp_create_nonce('ajax_policycloud_account_editing_verification'),
+		));
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 		user_account_html($token['decoded'] ?? false, $descriptions ?? null, [
 			"error" => $error ?? '',
@@ -480,5 +484,34 @@ class PolicyCloud_Marketplace_Public
 			"registration_page" => $options['registration_page'] ?? '',
 			"description_page" => $options['description_page']
 		]);
+	}
+
+	/**
+	 * Handle user account editing AJAX requests.
+	 *
+	 * @uses 	PolicyCloud_Marketplace_Public::user_registration()
+	 * @since	1.0.0
+	 */
+	public function account_edit_handler()
+	{
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
+
+		// Verify WordPress generated nonce.
+		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_account_editing_verification')) {
+			die("Unverified request to edit account.");
+		}
+
+		// Attempt to register the user using POST data.
+		try {
+			die(json_encode([
+				'status' => 'success',
+				'data' => account_edit($_POST)
+			]));
+		} catch (Exception $e) {
+			die(json_encode([
+				'status' => 'failure',
+				'data' => $e->getMessage()
+			]));
+		}
 	}
 }

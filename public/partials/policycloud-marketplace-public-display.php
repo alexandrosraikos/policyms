@@ -610,7 +610,6 @@ function read_multiple_html($description_objects, $args)
                 }
                 if (!empty($token->info->webpage)) {
                 ?>
-                    <!-- TODO @alexandrosraikos: Conditionalize these fields using "public_". -->
                     <a title="Visit the official webpage" href="<?php echo esc_url($token->info->webpage ?? '') ?>"><img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/globe.svg') ?>" /></a>
                 <?php
                 }
@@ -736,7 +735,6 @@ function read_multiple_html($description_objects, $args)
                         <h3>Details</h3>
                         <button id="policycloud-marketplace-account-edit-toggle">Edit</button>
                     </header>
-                    <!-- TODO @alexandrosraikos: Add user editing form. -->
                     <form id="policycloud-marketplace-account-edit" action="">
                     <table class="information">
                         <tr>
@@ -761,7 +759,7 @@ function read_multiple_html($description_objects, $args)
                             <td>
                                 <span class="folding visible">*****************</span>
                                 <input class="folding" type="password" name="policycloud-marketplace-password" placeholder="Enter your new password here"/>
-                                <input class="folding" type="password" name="policycloud-marketplace-confirm-password" placeholder="Confirm new password here"/>
+                                <input class="folding" type="password" name="policycloud-marketplace-password-confirm" placeholder="Confirm new password here"/>
                             </td>
                         </tr>
                         <tr>
@@ -893,6 +891,7 @@ function read_multiple_html($description_objects, $args)
                             </td>
                         </tr>
                     </table>
+                    <div class="folding error"></div>
                     <button type="submit" class="folding">Submit</button>
                             </form>
                 </section>

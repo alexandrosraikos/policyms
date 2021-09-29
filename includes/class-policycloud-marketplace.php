@@ -197,6 +197,8 @@ class PolicyCloud_Marketplace {
 		$this->loader->add_action('wp_ajax_nopriv_description_editing', $plugin_public, 'description_editing_handler');
 		$this->loader->add_action('wp_ajax_description_creation', $plugin_public, 'description_creation_handler');
 		$this->loader->add_action('wp_ajax_nopriv_description_creation', $plugin_public, 'description_creation_handler');
+		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_edit', $plugin_public, 'account_edit_handler');
+		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_edit', $plugin_public, 'account_edit_handler');
 	}
 
 	/**
