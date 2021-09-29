@@ -1119,12 +1119,12 @@ section.policycloud-account-details tr,
 section.policycloud-account-details td {
   border: none;
 }
+
 section.policycloud-account-overview table.statistics {
   margin-bottom: 20px;
 }
 
-section.policycloud-account-overview table .assets-figure,
-section.policycloud-account-overview table .views-figure {
+section.policycloud-account-overview table .large-figure {
   font-size: 150%;
   font-weight: bold;
 }
@@ -1265,6 +1265,79 @@ section.policycloud-account-assets
   opacity: 0.9;
 }
 
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
+  .folding {
+  display: none;
+}
+
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
+  .folding.visible {
+  display: block;
+  animation: sweep-in 0.3s ease-in-out;
+}
+
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
+  td:first-of-type {
+  min-width: 100px;
+}
+
+section.policycloud-account-details #policycloud-marketplace-account-edit input,
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
+  select {
+  padding: 5px;
+  min-width: 100%;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  border: 1px solid rgba(140, 140, 140, 0.2);
+  box-sizing: border-box;
+}
+
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
+  label {
+  font-size: 80%;
+  opacity: 0.8;
+}
+
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
+  button {
+  font-weight: bold;
+  background-color: #000000;
+  color: white;
+  border-radius: 10px;
+  padding: 5px 10px;
+  text-decoration: none;
+  font-size: 80% !important;
+  border: none;
+  margin: 10px auto;
+  transition: all 0.2s ease-in-out;
+}
+
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
+  button:hover {
+  transform: scale(0.98);
+  cursor: pointer;
+  text-decoration: none;
+  opacity: 0.9;
+  transition: all 0.2s ease-in-out;
+}
+
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
+  button:active {
+  transform: scale(0.97);
+  cursor: pointer;
+  text-decoration: none;
+  opacity: 0.8;
+  transition: all 0.1s ease-in-out;
+}
+
 @keyframes sweep-in {
   from {
     opacity: 0;
@@ -1325,7 +1398,19 @@ section.policycloud-account-assets
     margin-bottom: 25px;
   }
 
-  section.policycloud-account-details table.information tr > td:first-of-type {
-    max-width: 50%;
+  section.policycloud-account-details
+    #policycloud-marketplace-account-edit
+    input,
+  section.policycloud-account-details
+    #policycloud-marketplace-account-edit
+    select {
+    max-width: 50vw;
+    max-width: 50vw;
+  }
+
+  section.policycloud-account-details
+    #policycloud-marketplace-account-edit
+    td:first-of-type {
+    min-width: 110px;
   }
 }
