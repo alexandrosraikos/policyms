@@ -178,7 +178,9 @@ class PolicyCloud_Marketplace {
 
 		// TODO @alexandrosraikos: Fix login for non WP logged in users.
 		$this->loader->add_action('wp_ajax_policycloud_marketplace_registration', $plugin_public, 'user_registration_handler');
+		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_registration', $plugin_public, 'user_registration_handler');
 		$this->loader->add_action('wp_ajax_policycloud_marketplace_login', $plugin_public, 'user_login_handler');
+		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_login', $plugin_public, 'user_login_handler');
 		$this->loader->add_action('init', $plugin_public, 'add_authentication_shortcodes');
 
 		// TODO @alexandrosraikos: Coordinate email verification shortcode sequence.
@@ -192,7 +194,9 @@ class PolicyCloud_Marketplace {
 		// -- CRUD operations on database.
 		$this->loader->add_action('init', $plugin_public, 'add_content_shortcodes');
 		$this->loader->add_action('wp_ajax_description_editing', $plugin_public, 'description_editing_handler');
+		$this->loader->add_action('wp_ajax_nopriv_description_editing', $plugin_public, 'description_editing_handler');
 		$this->loader->add_action('wp_ajax_description_creation', $plugin_public, 'description_creation_handler');
+		$this->loader->add_action('wp_ajax_nopriv_description_creation', $plugin_public, 'description_creation_handler');
 	}
 
 	/**

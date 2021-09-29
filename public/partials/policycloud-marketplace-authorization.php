@@ -138,8 +138,8 @@ function user_login($data)
 {
     // Check submitted log in information.
     if (
-        empty($data['username']) ||
-        empty($data['password'])
+        empty($data['policycloud_marketplace_username']) ||
+        empty($data['policycloud_marketplace_password'])
     ) throw new Exception('Please fill in all required fields.');
 
     $options = get_option('policycloud_marketplace_plugin_settings');
@@ -156,7 +156,10 @@ function user_login($data)
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS => json_encode($data),
+        CURLOPT_POSTFIELDS => json_encode([
+            'username' => $data['policycloud_marketplace_username'],
+            'password' => $data['policycloud_marketplace_password'],
+        ]),
         CURLOPT_HTTPHEADER => ['Content-Type: application/json']
     ]);
     $response = json_decode(curl_exec($curl), true);

@@ -150,15 +150,15 @@ function login_form_html()
                             <div class="input-group-prepend">
                                 <span class="input-group-text"> <i class="fa fa-user"></i> </span>
                             </div>
-                            <input required name="username" class="form-control" placeholder="Username" id="username" type="text">
+                            <input required name="policycloud-marketplace-username" class="form-control" placeholder="Username" id="username" type="text">
                         </div>
                         <div class="form-group input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
                             </div>
-                            <input required name="password" class="form-control" placeholder="Password" type="password">
+                            <input required name="policycloud-marketplace-password" class="form-control" placeholder="Password" type="password">
                         </div>
-                        <button type="submit" class="btn btn-primary btn-block submit-login"> Log In </button>
+                        <button type="submit" class="btn btn-primary btn-block"> Log In </button>
                     </div> <!-- form-group// -->
                     <div class="login-error">
                         <p class="text-center">

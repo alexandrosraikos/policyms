@@ -17,8 +17,12 @@
         data: {
           action: "policycloud_marketplace_login",
           nonce: ajax_prop.nonce,
-          username: $("input[name=username]").val(),
-          password: $("input[name=password]").val(),
+          policycloud_marketplace_username: $(
+            "input[name=policycloud-marketplace-username]"
+          ).val(),
+          policycloud_marketplace_password: $(
+            "input[name=policycloud-marketplace-password]"
+          ).val(),
         },
 
         // Handle response.
