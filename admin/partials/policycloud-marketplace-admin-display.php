@@ -74,6 +74,42 @@ function policycloud_marketplace_plugin_login_page_selector()
 <?php
 }
 
+function policycloud_marketplace_plugin_registration_page_selector()
+{
+    $options = get_option('policycloud_marketplace_plugin_settings');
+    $pages = get_pages([
+        'post_status' => 'publish'
+    ]);
+?>
+    <select name="policycloud_marketplace_plugin_settings[registration_page]">
+        <?php
+        foreach ($pages as $page) {
+            echo '<option value="' . get_page_link($page->ID) . '" '.($options['registration_page']==get_page_link($page->ID) ? 'selected' : '').'>' . $page->post_title . '</option>';
+        }
+        ?>
+    </select>
+    <p>Select the registration page where the "Register" menu item should redirect.</p>
+<?php
+}
+
+function policycloud_marketplace_plugin_account_page_selector()
+{
+    $options = get_option('policycloud_marketplace_plugin_settings');
+    $pages = get_pages([
+        'post_status' => 'publish'
+    ]);
+?>
+    <select name="policycloud_marketplace_plugin_settings[account_page]">
+        <?php
+        foreach ($pages as $page) {
+            echo '<option value="' . get_page_link($page->ID) . '" '.($options['account_page']==get_page_link($page->ID) ? 'selected' : '').'>' . $page->post_title . '</option>';
+        }
+        ?>
+    </select>
+    <p>Select the account page where the "My Account" menu item should redirect.</p>
+<?php
+}
+
 function policycloud_marketplace_plugin_menu_selector()
 {
     $options = get_option('policycloud_marketplace_plugin_settings');

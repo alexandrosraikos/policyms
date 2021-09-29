@@ -15,7 +15,7 @@
         url: ajax_prop.ajax_url,
         type: "post",
         data: {
-          action: "registration",
+          action: "policycloud_marketplace_registration",
           nonce: ajax_prop.nonce,
           username: $("input[name=username]").val(),
           password: $("input[name=password]").val(),

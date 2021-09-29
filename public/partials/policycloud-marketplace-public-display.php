@@ -150,15 +150,15 @@ function login_form_html()
                             <div class="input-group-prepend">
                                 <span class="input-group-text"> <i class="fa fa-user"></i> </span>
                             </div>
-                            <input required name="username" class="form-control" placeholder="Username" id="username" type="text">
+                            <input required name="policycloud-marketplace-username" class="form-control" placeholder="Username" id="username" type="text">
                         </div>
                         <div class="form-group input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
                             </div>
-                            <input required name="password" class="form-control" placeholder="Password" type="password">
+                            <input required name="policycloud-marketplace-password" class="form-control" placeholder="Password" type="password">
                         </div>
-                        <button type="submit" class="btn btn-primary btn-block submit-login"> Log In </button>
+                        <button type="submit" class="btn btn-primary btn-block"> Log In </button>
                     </div> <!-- form-group// -->
                     <div class="login-error">
                         <p class="text-center">
@@ -294,7 +294,7 @@ function read_multiple_html($description_objects, $args)
 
         if (empty($description_object)) {
 
-        // TODO @elefkour: Show empty description_object error.
+            // TODO @elefkour: Show empty description_object error.
 
         } else {
             if (empty($description['info']['title'])) {
@@ -413,7 +413,7 @@ function read_multiple_html($description_objects, $args)
                                 <span class="card-link" style="color:gray;font-size:12px;">
                                     <?php //if ($isuserlogin) echo '<i class="far fa-user"></i> University of Nicosia '.$descritption[info][owner].'|';
                                     ?> <i class="far fa-eye"></i> <?php //echo $description['metadata']['views']; 
-                                                                ?>
+                                                                    ?>
                                     100 | <i class="far fa-calendar-alt"></i>
                                     <?php // echo $description[info][updateDate];
                                     ?>
@@ -563,4 +563,341 @@ function read_multiple_html($description_objects, $args)
 </div>
 <?php
     }
+
+
+    /**
+     * Display the account page HTML for authenticated users.
+     *
+     * @since    1.0.0
+     */
+    function user_account_html($token, array $descriptions = null, array $args)
+    {
+        if (empty($token)) {
+            if (!empty($args['error'])) {
+                if (!empty($args['login_page']) || !empty($args['registration_page'])) {
+                    echo  '<div class="policycloud-error policycloud-account-error">
+                    You are not logged in, please <a href="' . $args['login_page'] . '">log in</a> to your account. Don\'t have an account yet? You can <a href="' . $args['registration_page'] . '">register</a> here.';
+                } else {
+                    echo  '<div class="policycloud-error policycloud-account-error">
+                    An error occured: ' . $args['error'] . '</div>';
+                }
+            }
+        } else {
 ?>
+    <div id="policycloud-account">
+        <div id="policycloud-account-sidebar">
+            <img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/user.svg') ?>" />
+            <!-- This is displayed only in the mobile version -->
+            <div class="policycloud-account-title">
+                <h2>
+                    <?php
+                    echo ($token->info->title ?? '') . ' ' . ($token->info->name ?? '') . ' ' . ($token->info->surname ?? '');
+                    ?>
+                </h2>
+                <div>
+                    <?php
+                    echo ($token->info->organization ?? '');
+                    ?>
+                </div>
+            </div>
+            <!--------------------------------------------------->
+            <div id="policycloud-account-hyperlinks">
+                <?php
+                if ($token->profile_parameters->public_email && !empty($token->info->email)) {
+                ?>
+                    <a title="Send an email" href="mailto:<?php echo sanitize_email($token->info->email ?? '') ?>"><img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/email.svg') ?>" /></a>
+                <?php
+                }
+                if (!empty($token->info->webpage)) {
+                ?>
+                    <a title="Visit the official webpage" href="<?php echo esc_url($token->info->webpage ?? '') ?>"><img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/globe.svg') ?>" /></a>
+                <?php
+                }
+                if ($token->profile_parameters->public_phone && !empty($token->info->phone)) {
+                ?>
+                    <a title="Call" href="tel:<?php echo ($token->info->phone ?? '') ?>"><img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/phone.svg') ?>" /></a>
+                <?php
+                }
+                ?>
+            </div>
+            <nav>
+                <button id="policycloud-account-overview" class="active">Overview</button>
+                <button id="policycloud-account-assets">Assets</button>
+                <button id="policycloud-account-likes">Likes</button>
+                <button id="policycloud-account-details">Account Details</button>
+                <button class="policycloud-logout">Log Out</button>
+            </nav>
+        </div>
+        <div id="policycloud-account-content">
+            <!-- This is displayed only in the desktop version -->
+            <div class="policycloud-account-title">
+                <h2>
+                    <?php
+                    echo ($token->info->title ?? '') . ' ' . ($token->info->name ?? '') . ' ' . ($token->info->surname ?? '');
+                    ?>
+                </h2>
+                <div>
+                    <?php
+                    echo ($token->info->organization ?? '');
+                    ?>
+                </div>
+            </div>
+            <!--------------------------------------------------->
+            <div>
+                <section class="policycloud-account-overview focused">
+                    <header>
+                        <h3>Overview</h3>
+                    </header>
+                    <table class="statistics">
+                        <tr>
+                            <td>
+                                <div class="large-figure"><?php echo count($descriptions ?? []) ?></div>
+                                <div class="assets-caption">Assets uploaded</div>
+                            </td>
+                            <td>
+                                <div class="large-figure"><?php echo '0' ?></div>
+                                <div>Likes</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="large-figure">
+                                    <?php
+                                    echo array_sum(array_map(function ($description) {
+                                        return $description['metadata']['views'];
+                                    }, $descriptions ?? []));
+                                    ?>
+                                </div>
+                                <div>Total views</div>
+                            </td>
+                            <td>
+                                <div class="large-figure">
+                                    <?php
+                                    echo '0';
+                                    ?>
+                                </div>
+                                <div>Total downloads</div>
+                            </td>
+                        </tr>
+                    </table>
+                </section>
+                <section class="policycloud-account-assets">
+                    <header>
+                        <h3>Assets</h3>
+                        <a id="policycloud-upload" href="" title="Create a new asset"><img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/plus.svg') ?>" />Create new asset</a>
+                    </header>
+                    <div id="policycloud-account-asset-collection-filters">
+                        <?php
+                        $collections = array_unique(array_map(function ($description) {
+                            return $description['info']['type'];
+                        }, $descriptions ?? []));
+                        foreach ($collections as $collection) {
+                        ?>
+                            <button data-type-filter="<?php echo $collection ?>"><?php echo $collection ?></button>
+                        <?php
+                        }
+                        ?>
+                    </div>
+                    <ul id="policycloud-account-assets-list">
+                        <?php
+                        if (!empty($descriptions)) {
+                            foreach ($descriptions as $description) {
+                        ?>
+                                <li class="<?php echo $description['info']['type'] ?> visible">
+                                    <a href="<?php echo $args['description_page'] . "?did=" . $description['id'] ?>">
+                                        <div class="thumbnail" style="background-image:url(<?php echo get_site_url(null, '/wp-content/plugins/policycloud-marketplace/public/assets/img/placeholder.jpg') ?>)">
+                                        </div>
+                                        <div class="description">
+                                            <h4><?php echo $description['info']['title'] ?></h4>
+                                            <div class="date">Uploaded: <?php echo date('d/m/y H:i:s', strtotime($description['metadata']['uploadDate'])) ?></div>
+                                            <div class="excerpt"><?php echo $description['info']['short_desc'] ?></div>
+                                        </div>
+                                    </a>
+                                </li>
+                            <?php
+                            }
+                        } else {
+                            ?>
+                            <p class="policycloud-account-notice">Upload your first asset to get started.</p>
+                        <?php
+                        }
+                        ?>
+                    </ul>
+                </section>
+                <section class="policycloud-account-likes">
+                    <header>
+                        <h3>Likes</h3>
+                    </header>
+                    <p>Coming soon!</p>
+                </section>
+                <section class="policycloud-account-details">
+                    <header>
+                        <h3>Details</h3>
+                        <button id="policycloud-marketplace-account-edit-toggle">Edit</button>
+                    </header>
+                    <form id="policycloud-marketplace-account-edit" action="">
+                    <table class="information">
+                        <tr>
+                            <td>
+                                Username
+                            </td>
+                            <td>
+                                <span class="folding visible">
+                                <?php
+                                echo ($token->username ?? '-') . (($token->account->verified != 1) ? ' (Unverified)' : "");
+                                ?>
+                                </span>
+                                <input class="folding" type="text" name="policycloud-marketplace-username" placeholder="<?php
+                                echo ($token->username ?? '-');
+                                ?>"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Password
+                            </td>
+                            <td>
+                                <span class="folding visible">*****************</span>
+                                <input class="folding" type="password" name="policycloud-marketplace-password" placeholder="Enter your new password here"/>
+                                <input class="folding" type="password" name="policycloud-marketplace-password-confirm" placeholder="Confirm new password here"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Role
+                            </td>
+                            <td>
+                                <span class="folding visible">
+                                <?php echo ($token->account->role == 'admin') ? 'Administrator' : 'User'; ?>
+                                </span>
+                                <select name="policycloud-marketplace-role" class="folding">
+                                    <option value="admin" <?php echo ($token->account->role == 'admin' ? 'selected' : '') ?>>Administrator</option>
+                                    <option value="user"  <?php echo ($token->account->role == 'user' ? 'selected' : '') ?>>User</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Full name
+                            </td>
+                            <td>
+                                <span class="folding visible">
+                                <?php
+                                echo ($token->info->title ?? '') . ' ' . ($token->info->name ?? '') . ' ' . ($token->info->surname ?? '');
+                                ?>
+                                </span>
+                                <input class="folding" type="text" name="policycloud-marketplace-title" placeholder="Title (<?php
+                                echo ($token->info->title ?? ''); ?>)"/>
+                                <input class="folding" type="text" name="policycloud-marketplace-name" placeholder="Name (<?php
+                                echo ($token->info->name ?? ''); ?>)"/>
+                                <input class="folding" type="text" name="policycloud-marketplace-surname" placeholder="Surname (<?php
+                                echo ($token->info->surname ?? ''); ?>)"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Gender
+                            </td>
+                            <td>
+                                <span class="folding visible">
+                                <?php
+                                echo ($token->info->gender ?? '-');
+                                ?>
+                                </span>
+                                <select name="policycloud-marketplace-gender" class="folding">
+                                    <option value="male" <?php echo ($token->info->gender == 'male' ? 'selected' : '') ?>>Male</option>
+                                    <option value="female"  <?php echo ($token->info->gender == 'female' ? 'selected' : '') ?>>Female</option>
+                                    <option value="other"  <?php echo ($token->info->gender == 'other' ? 'selected' : '') ?>>Other</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Organization
+                            </td>
+                            <td>
+                                <span class="folding visible">
+                                <?php
+                                echo ($token->info->organization ?? '-');
+                                ?>
+                                </span>
+                                <input class="folding" type="text" name="policycloud-marketplace-organization" placeholder="<?php
+                                echo ($token->info->organization ?? ''); ?>"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                E-mail
+                            </td>
+                            <td>
+                                <span class="folding visible">
+                                <?php
+                                if (!empty($token->info->email)) {
+                                    echo ($token->info->email) . (($token->profile_parameters->public_email == 0) ? ' (Private)' : ' (Public)');
+                                } else echo '-';
+                                ?>
+                                </span>
+                                <input class="folding" type="text" name="policycloud-marketplace-email" placeholder="<?php
+                                echo ($token->info->email ?? 'Enter your email address here'); ?>"/>
+                                <label for="policycloud-marketplace-email" class="folding">Changing this setting will require a verification of the new e-mail address.</label>
+                                <select name="policycloud-marketplace-public-email" class="folding">
+                                    <option value="1" <?php echo ($token->profile_parameters->public_email == 1 ? 'selected' : '') ?>>Public</option>
+                                    <option value="0" <?php echo ($token->profile_parameters->public_email == 0 ? 'selected' : '') ?>>Private</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Phone number
+                            </td>
+                            <td>
+                                <span class="folding visible">
+                                <?php
+                                if (!empty($token->info->phone)) {
+                                    echo ($token->info->phone) . (($token->profile_parameters->public_phone == 0) ? ' (Private)' : ' (Public)');
+                                } else echo '-';
+                                ?>
+                                </span>
+                                <input class="folding" type="text" name="policycloud-marketplace-phone" placeholder="<?php
+                                echo (empty($token->info->phone) ? 'Enter your phone number here' : $token->info->phone); ?>"/>
+                                <select name="policycloud-marketplace-public-phone" class="folding">
+                                    <option value="1" <?php echo ($token->profile_parameters->public_phone == 1 ? 'selected' : '') ?>>Public</option>
+                                    <option value="0" <?php echo ($token->profile_parameters->public_phone == 0 ? 'selected' : '') ?>>Private</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Website
+                            </td>
+                            <td>
+                                <span class="folding visible">
+                                <?php
+                                echo ($token->info->webpage ?? '-');
+                                ?>
+                                </span>
+                                <input class="folding" type="text" name="policycloud-marketplace-webpage" placeholder="<?php
+                                echo ($token->info->webpage ?? 'https://www.example.org/'); ?>"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Member since
+                            </td>
+                            <td>
+                                <?php
+                                echo date('d/m/y', strtotime($token->account->registration_datetime))
+                                ?>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="folding error"></div>
+                    <button type="submit" class="folding">Submit</button>
+                            </form>
+                </section>
+            </div>
+        </div>
+    </div>
+<?php
+        }
+    }

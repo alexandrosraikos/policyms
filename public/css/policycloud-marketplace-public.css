@@ -611,10 +611,10 @@ img {
   text-transform: uppercase;
 }
 
-.category__01 {
-  /*background-color: #cccccc;*/
-  /*background-color: #50c6db;*/
-}
+/* .category__01 {
+  background-color: #cccccc;
+  background-color: #50c6db;
+} */
 .category__01_plaisio {
   background-color: #006489;
 }
@@ -922,4 +922,514 @@ p {
 * {
   margin: 0;
   padding: 0;
+}
+
+/*
+*
+* My Account
+* ---------------------
+*
+* These are the styles for the 
+* [policycloud-marketplace-account] shortcode.
+*
+*/
+
+#policycloud-account {
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+  justify-content: center;
+  padding: 0;
+  height: auto;
+}
+
+#policycloud-account-sidebar {
+  flex: 0 0 30%;
+  padding: 20px;
+  border-right: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+#policycloud-account-sidebar > .policycloud-account-title {
+  display: none;
+}
+
+#policycloud-account-sidebar > img {
+  width: 90%;
+  max-width: 256px;
+  margin: 10px auto;
+}
+
+#policycloud-account-sidebar > #policycloud-account-hyperlinks {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+#policycloud-account-sidebar > #policycloud-account-hyperlinks a {
+  display: block;
+  padding: 5px 8px;
+  transition: all 0.2s ease-in-out;
+}
+
+#policycloud-account-sidebar > #policycloud-account-hyperlinks a:hover {
+  transform: scale(0.95);
+  opacity: 0.7;
+  transition: all 0.2s ease-in-out;
+}
+
+#policycloud-account-sidebar > #policycloud-account-hyperlinks img {
+  max-width: 32px;
+}
+
+#policycloud-account-sidebar > nav {
+  margin-top: 30px;
+}
+
+#policycloud-account-sidebar > nav button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background-color: transparent;
+  padding: 10px 0 10px 8px;
+  margin: 3px 0;
+  color: inherit;
+  border: none;
+  border-radius: 8px;
+  text-transform: none;
+  transition: all 0.2s ease-in-out;
+}
+
+#policycloud-account-sidebar > nav button:hover {
+  transform: scale(0.98);
+  background-color: rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+}
+
+#policycloud-account-sidebar > nav button:active {
+  transform: scale(0.96);
+  background-color: rgba(0, 0, 0, 0.1);
+  transition: all 0.1s ease-in-out;
+}
+
+#policycloud-account-sidebar > nav button.active {
+  background-color: rgba(0, 0, 0, 0.05);
+  transition: all 0.1s ease-in-out;
+}
+
+#policycloud-account-sidebar > nav button.policycloud-logout {
+  color: rgba(185, 16, 16, 0.842);
+}
+
+#policycloud-account-content {
+  flex: 1;
+  margin: 20px;
+}
+
+#policycloud-account-content .policycloud-account-title {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+  padding-bottom: 15px;
+  margin-left: -20px;
+  padding-left: 20px;
+}
+
+.policycloud-account-title h2 {
+  font-weight: bold;
+}
+
+.policycloud-account-title div {
+  font-size: 80%;
+  opacity: 0.8;
+}
+
+#policycloud-account-content section {
+  display: none;
+  max-height: 0px;
+  margin: 0;
+  padding: 0;
+}
+
+#policycloud-account-content section.focused {
+  display: block;
+  max-height: 1000vh;
+  opacity: 0;
+  margin: 20px 0;
+  padding: 0;
+  transform: translateY(-10px);
+  animation: sweep-in 0.3s ease-in-out forwards;
+}
+
+#policycloud-account-content section header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 20px 0;
+}
+
+#policycloud-account-content section header h3,
+#policycloud-account-content section h3 {
+  font-weight: bold;
+  font-size: 110% !important;
+}
+
+#policycloud-account-content section header a,
+#policycloud-account-content section header button {
+  font-weight: bold;
+  background-color: #000000;
+  color: white;
+  border-radius: 10px;
+  padding: 5px 10px;
+  text-decoration: none;
+  font-size: 80% !important;
+  border: none;
+  transition: all 0.2s ease-in-out;
+}
+
+#policycloud-account-content section header a:hover,
+#policycloud-account-content section header button:hover {
+  transform: scale(0.98);
+  cursor: pointer;
+  text-decoration: none;
+  opacity: 0.9;
+  transition: all 0.2s ease-in-out;
+}
+
+#policycloud-account-content section header a:active,
+#policycloud-account-content section header button:active {
+  transform: scale(0.97);
+  cursor: pointer;
+  text-decoration: none;
+  opacity: 0.8;
+  transition: all 0.1s ease-in-out;
+}
+
+#policycloud-account-content section header a img,
+#policycloud-account-content section header button img {
+  max-width: 15px;
+  margin: -3px 5px 0 0;
+  display: inline-block;
+}
+
+section.policycloud-account-overview table,
+section.policycloud-account-overview tr,
+section.policycloud-account-overview td,
+section.policycloud-account-details table,
+section.policycloud-account-details tr,
+section.policycloud-account-details td {
+  border: none;
+}
+
+section.policycloud-account-overview table.statistics {
+  margin-bottom: 20px;
+}
+
+section.policycloud-account-overview table .large-figure {
+  font-size: 150%;
+  font-weight: bold;
+}
+
+section.policycloud-account-details table.information {
+  margin-top: 20px;
+  font-size: 80%;
+}
+
+section.policycloud-account-details table.information tr > td:first-of-type {
+  max-width: 80px;
+  font-weight: bold;
+}
+
+section.policycloud-account-assets
+  #policycloud-account-asset-collection-filters {
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 15px;
+}
+
+section.policycloud-account-assets
+  #policycloud-account-asset-collection-filters
+  button {
+  padding: 4px 8px;
+  margin: 0 5px 5px 0;
+  background: transparent;
+  font-size: 75%;
+  border: 2px solid rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  text-transform: unset;
+  transition: all 0.2s ease-in-out;
+}
+
+section.policycloud-account-assets
+  #policycloud-account-asset-collection-filters
+  button:hover {
+  text-decoration: none;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.2);
+  opacity: 0.9;
+  transform: scale(0.99);
+  transition: all 0.2s ease-in-out;
+}
+
+section.policycloud-account-assets
+  #policycloud-account-asset-collection-filters
+  button:active {
+  text-decoration: none;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.3);
+  opacity: 0.8;
+  transform: scale(0.97);
+  transition: all 0.1s ease-in-out;
+}
+
+section.policycloud-account-assets
+  #policycloud-account-asset-collection-filters
+  button.active {
+  text-decoration: none;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.3);
+  transition: all 0.1s ease-in-out;
+}
+
+section.policycloud-account-assets #policycloud-account-assets-list {
+  padding: 0 10px 0 0;
+  margin: 0;
+  max-height: 600px;
+  overflow-y: scroll;
+}
+
+section.policycloud-account-assets #policycloud-account-assets-list li {
+  display: none;
+  max-height: 0;
+  overflow: hidden;
+}
+
+section.policycloud-account-assets #policycloud-account-assets-list li.visible {
+  display: block;
+  max-height: 1000vh;
+  margin: 10px 0;
+  animation: sweep-in 0.3s ease-in-out forwards;
+}
+
+section.policycloud-account-assets #policycloud-account-assets-list li a {
+  text-decoration: none;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  transition: all 0.2s ease-in-out;
+}
+
+section.policycloud-account-assets #policycloud-account-assets-list li a:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transform: scale(0.99);
+  opacity: 0.9;
+  transition: all 0.2s ease-in-out;
+}
+
+section.policycloud-account-assets
+  #policycloud-account-assets-list
+  li
+  .thumbnail {
+  flex: 0 0 25%;
+  width: 100%;
+  height: 150px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 6px;
+}
+
+section.policycloud-account-assets
+  #policycloud-account-assets-list
+  li
+  .description {
+  margin-left: 10px;
+}
+
+section.policycloud-account-assets
+  #policycloud-account-assets-list
+  li
+  .description
+  .date {
+  font-size: 60%;
+  opacity: 0.7;
+}
+
+section.policycloud-account-assets
+  #policycloud-account-assets-list
+  li
+  .description
+  .excerpt {
+  font-size: 80%;
+  opacity: 0.9;
+}
+
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
+  .folding {
+  display: none;
+}
+
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
+  .folding.visible {
+  display: block;
+  animation: sweep-in 0.3s ease-in-out;
+}
+
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
+  td:first-of-type {
+  min-width: 100px;
+}
+
+section.policycloud-account-details #policycloud-marketplace-account-edit input,
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
+  select {
+  padding: 5px;
+  min-width: 100%;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  border: 1px solid rgba(140, 140, 140, 0.2);
+  box-sizing: border-box;
+}
+
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
+  label {
+  font-size: 80%;
+  opacity: 0.8;
+}
+
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
+  .error {
+  margin: 10px;
+  width: 100%;
+  padding: 10px 15px;
+  font-size: 80% !important;
+  font-weight: bold !important;
+  background-color: darksalmon;
+  border-radius: 8px;
+  display: none;
+}
+
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
+  .error.visible {
+  display: block;
+}
+
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
+  button {
+  font-weight: bold;
+  background-color: #000000;
+  color: white;
+  border-radius: 10px;
+  padding: 5px 10px;
+  text-decoration: none;
+  font-size: 80% !important;
+  border: none;
+  margin: 15px auto;
+  transition: all 0.2s ease-in-out;
+}
+
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
+  button:hover {
+  transform: scale(0.98);
+  cursor: pointer;
+  text-decoration: none;
+  opacity: 0.9;
+  transition: all 0.2s ease-in-out;
+}
+
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
+  button:active {
+  transform: scale(0.97);
+  cursor: pointer;
+  text-decoration: none;
+  opacity: 0.8;
+  transition: all 0.1s ease-in-out;
+}
+
+@keyframes sweep-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media screen and (max-width: 650px) {
+  #policycloud-account-content > .policycloud-account-title {
+    display: none;
+  }
+
+  #policycloud-account {
+    flex-direction: column;
+  }
+
+  #policycloud-account-sidebar {
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+    padding: 0 10px 10px 10px;
+  }
+
+  #policycloud-account-sidebar > img {
+    max-width: 128px;
+  }
+
+  #policycloud-account-sidebar > .policycloud-account-title {
+    display: block;
+    text-align: center;
+  }
+
+  #policycloud-account-content {
+    padding: 0 10px;
+    margin: 0;
+  }
+
+  section.policycloud-account-assets #policycloud-account-assets-list {
+    padding: 0;
+    margin: 0;
+    max-height: unset;
+    overflow-y: visible;
+  }
+
+  section.policycloud-account-assets #policycloud-account-assets-list li a {
+    flex-direction: column;
+  }
+
+  section.policycloud-account-assets
+    #policycloud-account-assets-list
+    li
+    .thumbnail {
+    flex: unset;
+    height: 200px;
+    margin-bottom: 25px;
+  }
+
+  section.policycloud-account-details
+    #policycloud-marketplace-account-edit
+    input,
+  section.policycloud-account-details
+    #policycloud-marketplace-account-edit
+    select {
+    max-width: 50vw;
+    max-width: 50vw;
+  }
+
+  section.policycloud-account-details
+    #policycloud-marketplace-account-edit
+    td:first-of-type {
+    min-width: 110px;
+  }
 }

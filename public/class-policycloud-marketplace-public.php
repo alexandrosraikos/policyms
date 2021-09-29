@@ -82,6 +82,7 @@ class PolicyCloud_Marketplace_Public
 		// Content related scripts.
 		wp_register_script("upload_ste", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-create.js', array('jquery'), $this->version, false);
 		wp_register_script("policycloud-marketplace-read-single", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-single.js', array('jquery'), $this->version, false);
+		wp_register_script("policycloud-marketplace-account", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account.js', array('jquery'), $this->version, false);
 	}
 
 	/**
@@ -138,7 +139,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public function user_registration_handler()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
 
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_registration')) {
@@ -235,15 +236,17 @@ class PolicyCloud_Marketplace_Public
 
 		// Retrieve credentials.
 		$options = get_option('policycloud_marketplace_plugin_settings');
-		if (empty($options['selected_menu']) || empty($options['login_page'])) return $items;
+		if (empty($options['selected_menu']) || empty($options['login_page']) || empty($options['account_page']) || empty($options['registration_page'])) return $items;
 
 		// Add conditional menu item.
 		if ($args->theme_location == $options['selected_menu']) {
 			try {
 				if (!empty(retrieve_token())) {
-					$link = '<a class="menu-link elementor-item policycloud-logout">Log out</a>';
+					$link = '<a class="menu-link elementor-item" href="' . $options['account_page'] . '">My Account</a>';
+					$link .= '<a class="menu-link elementor-item policycloud-logout">Log out</a>';
 				} else {
 					$link = '<a class="menu-link elementor-item" href="' . $options['login_page'] . '">Log In</a>';
+					$link .= '<a class="menu-link elementor-item" href="' . $options['registration_page'] . '">Register</a>';
 				}
 			} catch (\Exception $e) {
 				$link = '<a class="menu-link elementor-item" href="' . $options['login_page'] . '">Log In</a>';
@@ -414,12 +417,12 @@ class PolicyCloud_Marketplace_Public
 
 		try {
 			// Get specific Description data for authorized users.
-			$token = retrieve_token();
+			$token = retrieve_token(true);
 			if (!empty($token)) {
 				$description = get_specific_description($_GET['did'], $token['encoded']);
 
 				// Specify Description ownership.
-				$owner = ($description['info']['provider'] == $token['decoded']['info']['username']);
+				$owner = ($description['info']['provider'] == $token['decoded']->username);
 			} else $description = get_specific_description($_GET['did']);
 		} catch (Exception $e) {
 			$error = $e->getMessage();
@@ -440,7 +443,7 @@ class PolicyCloud_Marketplace_Public
 	}
 
 	/**
-	 * Display account page for authenticated users.
+	 * Display the account page for authenticated users.
 	 *
 	 * @since    1.0.0
 	 */
@@ -456,18 +459,59 @@ class PolicyCloud_Marketplace_Public
 
 				// Specify Description ownership.
 				$descriptions = get_descriptions([
-					'owner' => $token['decoded']['info']['username']
+					'provider' => $token['decoded']->username
 				]);
+			}
+			else {
+				$error = "not-logged-in";
 			}
 		} catch (Exception $e) {
 			$error = $e->getMessage();
 		}
 
+		// Retrieve credentials.
+		$options = get_option('policycloud_marketplace_plugin_settings');
 
-		// TODO @alexandrosraikos: Add my account page HTML.
+		wp_enqueue_script('policycloud-marketplace-account');
+		wp_localize_script('policycloud-marketplace-account', 'ajax_properties_account_editing', array(
+			'ajax_url' => admin_url('admin-ajax.php'),
+			'nonce' => wp_create_nonce('ajax_policycloud_account_editing_verification'),
+		));
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		// user_account_html($token, $descriptions, [
-		// 	"error" => $error ?? '',
-		// ]);
+		user_account_html($token['decoded'] ?? false, $descriptions ?? null, [
+			"error" => $error ?? '',
+			"login_page" => $options['login_page'] ?? '',
+			"registration_page" => $options['registration_page'] ?? '',
+			"description_page" => $options['description_page']
+		]);
+	}
+
+	/**
+	 * Handle user account editing AJAX requests.
+	 *
+	 * @uses 	PolicyCloud_Marketplace_Public::user_registration()
+	 * @since	1.0.0
+	 */
+	public function account_edit_handler()
+	{
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
+
+		// Verify WordPress generated nonce.
+		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_account_editing_verification')) {
+			die("Unverified request to edit account.");
+		}
+
+		// Attempt to register the user using POST data.
+		try {
+			die(json_encode([
+				'status' => 'success',
+				'data' => account_edit($_POST)
+			]));
+		} catch (Exception $e) {
+			die(json_encode([
+				'status' => 'failure',
+				'data' => $e->getMessage()
+			]));
+		}
 	}
 }
