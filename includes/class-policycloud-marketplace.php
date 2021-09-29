@@ -182,8 +182,7 @@ class PolicyCloud_Marketplace {
 		$this->loader->add_action('wp_ajax_policycloud_marketplace_login', $plugin_public, 'user_login_handler');
 		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_login', $plugin_public, 'user_login_handler');
 		$this->loader->add_action('init', $plugin_public, 'add_authentication_shortcodes');
-
-		// TODO @alexandrosraikos: Coordinate email verification shortcode sequence.
+		
 		// TODO @alexandrosraikos: Coordinate password reset shortcode sequence.
 		// TODO @alexandrosraikos: Support "admin" role.
 		// TODO @alexandrosraikos: Add origin header in API calls.

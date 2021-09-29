@@ -22,7 +22,7 @@ function marketplace_username_exists($hostname, $username)
     // Request username availability status.
     $curl = curl_init();
     curl_setopt_array($curl, [
-        CURLOPT_URL => 'https://' . $hostname . '/username/availability',
+        CURLOPT_URL => 'https://' . $hostname . '/accounts/username_availability',
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => '',
         CURLOPT_MAXREDIRS => 10,
@@ -41,6 +41,8 @@ function marketplace_username_exists($hostname, $username)
     return ($response['_status'] ?? '') == 'successful';
 }
 
+// TODO @alexandrosraikos: Create email verification API call.
+
 /**
  * Enact user registration using the Marketplace API.
  * For more information concerning the schema of the registration data, please visit:
@@ -52,7 +54,6 @@ function marketplace_username_exists($hostname, $username)
  */
 function user_registration($data)
 {
-
     // Information validation checks and errors.
     if (
         empty($data['username']) ||
@@ -68,10 +69,10 @@ function user_registration($data)
     if (!filter_var($data["email"], FILTER_VALIDATE_EMAIL)) throw new Exception("Please enter a valid email");
     if ($data['password'] !== $data['password_confirm']) throw new Exception('Password and password confirmation should match!');
     if (
-        !empty(preg_match('@[A-Z]@', $data['password'])) ||
-        !empty(preg_match('@[a-z]@', $data['password'])) ||
-        !empty(preg_match('@[0-9]@', $data['password'])) ||
-        !empty(preg_match('@[^\w]@', $data['password'])) ||
+        !empty(preg_match('@[A-Z]@', $data['password'])) &&
+        !empty(preg_match('@[a-z]@', $data['password'])) &&
+        !empty(preg_match('@[0-9]@', $data['password'])) &&
+        !empty(preg_match('@[^\w]@', $data['password'])) &&
         strlen($data['password']) < 8
     ) throw new Exception('Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character.');
     if ($data['username'] <= 2) throw new Exception("Username must be at least 2 chars");
@@ -86,7 +87,7 @@ function user_registration($data)
     // Contact Marketplace registration API.
     $curl = curl_init();
     curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/registration/users',
+        CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/accounts/users/registration',
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => '',
         CURLOPT_MAXREDIRS => 10,
@@ -119,6 +120,7 @@ function user_registration($data)
     elseif ($response['_status'] == 'successful') {
         try {
             // Encrypt token using the same key and return.
+            // TODO @alexandrosraikos: Create verification email sender with verification code on account $_GET.
             return openssl_encrypt(json_encode($data), "AES-128-ECB", $options['jwt_key']);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
@@ -150,7 +152,7 @@ function user_login($data)
     // Contact Marketplace login API endpoint.
     $curl = curl_init();
     curl_setopt_array($curl, [
-        CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/authorization/users',
+        CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/accounts/users/authorization',
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => '',
         CURLOPT_MAXREDIRS => 10,
@@ -235,6 +237,7 @@ function account_edit($data)
 {
 
     // TODO @alexandrosraikos: Update with new API endpoint and $data fields.
+    // NOTICE: Send only edited fields.
 
     // Information validation checks and errors.
     if (
@@ -269,7 +272,7 @@ function account_edit($data)
     // Contact Marketplace registration API.
     $curl = curl_init();
     curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/registration/users',
+        CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/accounts/users/settings',
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => '',
         CURLOPT_MAXREDIRS => 10,

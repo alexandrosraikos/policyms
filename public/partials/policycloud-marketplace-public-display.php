@@ -742,14 +742,11 @@ function read_multiple_html($description_objects, $args)
                                     Username
                                 </td>
                                 <td>
-                                    <span class="folding visible">
+                                    <span>
                                         <?php
                                         echo ($token->username ?? '-') . (($token->account->verified != 1) ? ' (Unverified)' : "");
                                         ?>
                                     </span>
-                                    <input class="folding" type="text" name="policycloud-marketplace-username" placeholder="<?php
-                                                                                                                            echo ($token->username ?? '-');
-                                                                                                                            ?>" />
                                 </td>
                             </tr>
                             <tr>
@@ -767,13 +764,9 @@ function read_multiple_html($description_objects, $args)
                                     Role
                                 </td>
                                 <td>
-                                    <span class="folding visible">
+                                    <span>
                                         <?php echo ($token->account->role == 'admin') ? 'Administrator' : 'User'; ?>
                                     </span>
-                                    <select name="policycloud-marketplace-role" class="folding">
-                                        <option value="admin" <?php echo ($token->account->role == 'admin' ? 'selected' : '') ?>>Administrator</option>
-                                        <option value="user" <?php echo ($token->account->role == 'user' ? 'selected' : '') ?>>User</option>
-                                    </select>
                                 </td>
                             </tr>
                             <tr>
@@ -821,12 +814,14 @@ function read_multiple_html($description_objects, $args)
                                         echo ($token->info->organization ?? '-');
                                         ?>
                                     </span>
-                                    <input class="folding" type="text" name="policycloud-marketplace-organization" placeholder="<?php
-                                                                                                                                echo ($token->info->organization ?? ''); ?>" />
+                                    <input class="folding" type="text" name="policycloud-marketplace-organization" placeholder="<?php echo ($token->info->organization ?? ''); ?>" />
                                 </td>
                             </tr>
                             <tr>
                                 <td>
+                                    <?php
+                                    // TODO @alexandrosraikos: Add verified email address field ($token->verified == 1 ?) and resend button.
+                                    ?>
                                     E-mail
                                 </td>
                                 <td>
@@ -837,8 +832,7 @@ function read_multiple_html($description_objects, $args)
                                         } else echo '-';
                                         ?>
                                     </span>
-                                    <input class="folding" type="text" name="policycloud-marketplace-email" placeholder="<?php
-                                                                                                                            echo ($token->info->email ?? 'Enter your email address here'); ?>" />
+                                    <input class="folding" type="text" name="policycloud-marketplace-email" placeholder="<?php echo ($token->info->email ?? 'Enter your email address here'); ?>" />
                                     <label for="policycloud-marketplace-email" class="folding">Changing this setting will require a verification of the new e-mail address.</label>
                                     <select name="policycloud-marketplace-public-email" class="folding">
                                         <option value="1" <?php echo ($token->profile_parameters->public_email == 1 ? 'selected' : '') ?>>Public</option>

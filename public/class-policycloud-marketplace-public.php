@@ -139,7 +139,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public function user_registration_handler()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
 
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_registration')) {
@@ -150,7 +150,7 @@ class PolicyCloud_Marketplace_Public
 		try {
 			die(json_encode([
 				'status' => 'success',
-				'data' => user_registration($_POST)
+				'data' => user_registration($_POST),
 			]));
 		} catch (Exception $e) {
 			die(json_encode([
