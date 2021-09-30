@@ -763,7 +763,7 @@ function user_account_html($token, array $descriptions = null, array $args)
                     <section class="policycloud-account-assets">
                         <header>
                             <h3>Assets</h3>
-                            <a id="policycloud-upload" href="" title="Create a new asset"><img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/plus.svg') ?>" />Create new asset</a>
+                            <a id="policycloud-upload" href="<?php echo $args['upload_page'] ?>" title="Create a new asset"><img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/plus.svg') ?>" />Create new asset</a>
                         </header>
                         <div id="policycloud-account-asset-collection-filters">
                             <?php

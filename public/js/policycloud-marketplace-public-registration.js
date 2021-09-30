@@ -6,6 +6,7 @@
       $(".registration-error").html("You are already logged in.");
     }
 
+    console.log(ajax_prop.redirect_page);
     $("#policycloud-registration").submit((e) => {
       e.preventDefault();
       $(".submit-registration").addClass("loading");

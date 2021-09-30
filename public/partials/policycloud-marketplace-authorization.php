@@ -41,8 +41,6 @@ function marketplace_username_exists($hostname, $username)
     return ($response['_status'] ?? '') == 'successful';
 }
 
-// TODO @alexandrosraikos: Create email verification API call.
-
 /**
  * Enact user registration using the Marketplace API.
  * For more information concerning the schema of the registration data, please visit:
@@ -119,13 +117,17 @@ function user_registration($data)
     if (!isset($response)) throw new Exception("Unable to reach the Marketplace server.");
     elseif ($response['_status'] == 'successful') {
         try {
-            // TODO @alexandrosraikos: Create verification email sender with verification code on account $_GET.
             // Encrypt token using the same key and return.
             if (empty($options['jwt_key'])) throw new Exception("No PolicyCloud Marketplace API key was defined in WordPress settings.");
             else {
+                // Decode token and send verification email.
+                $decoded_token = JWT::decode($response['token'], $options['jwt_key'], array('HS256'));
+                if ($decoded_token->account->verified !== '1') {
+                    user_email_verification_resend($decoded_token->account->verified,$decoded_token->account->email);
+                }
                 return openssl_encrypt($response['token'], "AES-128-ECB", $options['jwt_key']);
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new Exception($e->getMessage());
         }
     } elseif ($response['_status'] == 'unsuccessful') throw new Exception($response['message']);

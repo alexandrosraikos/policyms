@@ -109,9 +109,11 @@ class PolicyCloud_Marketplace_Public
 		wp_enqueue_script("policycloud-marketplace-registration");
 
 		// Check for existing token.
-		// TODO: TEST.
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
 		try {
+			// Retrieve credentials.
+			$options = get_option('policycloud_marketplace_plugin_settings');
+			if (empty($options['account_page'])) throw new Exception("There is no account page set in the PolicyCloud Marketplace settings, please contact your administrator.");
 			if (retrieve_token()) {
 				wp_localize_script('policycloud-marketplace-registration', 'ajax_prop', array(
 					'error' => 'existing-token'
@@ -124,7 +126,8 @@ class PolicyCloud_Marketplace_Public
 		wp_localize_script('policycloud-marketplace-registration', 'ajax_prop', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce('ajax_registration'),
-			'error' => $errorMessage ?? ''
+			'error' => $errorMessage ?? '',
+			'redirect_page' => $options['account_page'] ?? ''
 		));
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
@@ -205,7 +208,6 @@ class PolicyCloud_Marketplace_Public
 		wp_enqueue_script("policycloud-marketplace-login");
 
 		// Check for existing token.
-		// TODO: TEST.
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
 		try {
 			if (retrieve_token()) {
@@ -318,8 +320,6 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public function description_edit_handler()
 	{
-		// TODO @alexandrosraikos: Create AJAX script for description object editing.
-
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_description_editing_verification')) {
 			die("Unverified request to edit description object.");
@@ -349,8 +349,6 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public function create_description_handler()
 	{
-		// TODO @alexandrosraikos: Create AJAX script for description object creation.
-
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_description_creation_verification')) {
 			die("Unverified request to create description object.");
@@ -381,6 +379,7 @@ class PolicyCloud_Marketplace_Public
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
 		try {
+
 			// Get specific Description data for authorized users.
 			$token = retrieve_token();
 			if (empty($token)) $error = "You need to be logged in to create a Description Object.";
@@ -391,7 +390,7 @@ class PolicyCloud_Marketplace_Public
 		wp_enqueue_script("policycloud-marketplace-create-description");
 		wp_localize_script('policycloud-marketplace-create-description', 'ajax_properties_description_creation', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
-			'nonce' => wp_create_nonce('ajax_policycloud_description_creation_verification'),
+			'nonce' => wp_create_nonce('ajax_policycloud_description_creation_verification')
 		));
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
@@ -521,10 +520,11 @@ class PolicyCloud_Marketplace_Public
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 		user_account_html($token['decoded'] ?? false, $descriptions ?? null, [
 			"error" => $error ?? '',
-			"notice" => $notice ?? 'TEST!',
+			"notice" => $notice ?? '',
 			"login_page" => $options['login_page'] ?? '',
 			"registration_page" => $options['registration_page'] ?? '',
-			"description_page" => $options['description_page']
+			"description_page" => $options['description_page'] ?? '',
+			"upload_page" => $options['upload_page'] ?? ''
 		]);
 	}
 

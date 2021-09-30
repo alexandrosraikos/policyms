@@ -76,17 +76,20 @@ class PolicyCloud_Marketplace_Admin
 	}
 
 	function policycloud_marketplace_validate_plugin_settings( $input ) {
-		$output['jwt_key']      = sanitize_text_field( $input['jwt_key'] );
+		$output['jwt_key'] = sanitize_text_field( $input['jwt_key'] );
 		$output['marketplace_host'] = sanitize_text_field( $input['marketplace_host']);
 		$output['login_page'] = esc_url($input['login_page']);
 		$output['registration_page'] = esc_url($input['registration_page']);
 		$output['account_page'] = esc_url($input['account_page']);
 		$output['selected_menu'] = sanitize_text_field($input['selected_menu']);
 		$output['description_page'] = esc_url($input['description_page']);
+		$output['upload_page'] = esc_url($input['upload_page']);
 		return $output;
 	}
 
 	function register_settings() {
+
+		// TODO @alexandrosraikos: Update all selectors to use page id instead of raw link.
 		
 		register_setting(
 		  'policycloud_marketplace_plugin_settings',
@@ -156,9 +159,6 @@ class PolicyCloud_Marketplace_Admin
 			'section_two'
 		);
 
-		// TODO @alexandrosraikos: Add creation page selector.
-		// TODO @alexandrosraikos: Update all selectors to use page id instead of raw link.
-
 		add_settings_section(
 		  'section_three',
 		  'Content Settings',
@@ -170,6 +170,14 @@ class PolicyCloud_Marketplace_Admin
 			'description_page',
 			'Redirect to single Description page',
 			'policycloud_marketplace_plugin_description_page_selector',
+			'policycloud_marketplace_plugin',
+			'section_three'
+		);
+
+		add_settings_field(
+			'upload_page',
+			'Redirect to Description upload',
+			'policycloud_marketplace_plugin_upload_page_selector',
 			'policycloud_marketplace_plugin',
 			'section_three'
 		);

@@ -80,7 +80,6 @@
       AJAX Description Creation
       ------------------------
     */
-
     $("#policycloud-marketplace-description-create").submit((e) => {
       e.preventDefault();
       $(

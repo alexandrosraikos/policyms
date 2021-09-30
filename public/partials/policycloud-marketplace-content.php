@@ -169,6 +169,8 @@ function description_editing($updated)
     $options = get_option('policycloud_marketplace_plugin_settings');
     if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
 
+    // TODO @alexandrosraikos: Match data fields and test functionality.
+
     // TODO @alexandrosraikos: Include uploaded files. (hint: after creating the HTML form)
 
     try {
@@ -227,6 +229,8 @@ function create_description($new)
     try {
 
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
+        
+        // TODO @alexandrosraikos: Match data fields and test functionality.
 
         // TODO @alexandrosraikos: Include uploaded files. (hint: after creating the HTML form)
 

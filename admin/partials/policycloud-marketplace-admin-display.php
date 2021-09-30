@@ -148,3 +148,21 @@ function policycloud_marketplace_plugin_description_page_selector()
     <p>Select the page where you've inserted the <em>[policycloud-marketplace-read-single]</em> shortcode.</p>
 <?php
 }
+
+function policycloud_marketplace_plugin_upload_page_selector()
+{
+    $options = get_option('policycloud_marketplace_plugin_settings');
+    $pages = get_pages([
+        'post_status' => 'publish'
+    ]);
+?>
+    <select name="policycloud_marketplace_plugin_settings[upload_page]">
+        <?php
+        foreach ($pages as $page) {
+            echo '<option value="' . get_page_link($page->ID) . '" '.($options['upload_page']==get_page_link($page->ID) ? 'selected' : '').'>' . $page->post_title . '</option>';
+        }
+        ?>
+    </select>
+    <p>Select the page where you've inserted the <em>[policycloud-marketplace-create-object]</em> shortcode.</p>
+<?php
+}
