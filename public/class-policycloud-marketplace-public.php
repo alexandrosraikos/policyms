@@ -491,6 +491,9 @@ class PolicyCloud_Marketplace_Public
 				if (!empty($_GET['verification-code'])) {
 					if ($_GET['verification-code'] == $token['decoded']->account->verified) {
 						$verified_token = verify_user($_GET['verification-code']);
+						if (!empty($verified_token)) {
+							$notice = "Your email address was successfully verified.";
+						}
 					} else if ($token['decoded']->account->verified == 1) {
 						throw new Exception("This account is already verified.");
 					}

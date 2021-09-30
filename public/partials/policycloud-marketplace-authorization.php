@@ -253,7 +253,7 @@ function user_email_verification_resend(string $verification_code, string $email
         if (!wp_mail(
             $email,
             'Verify your PolicyCloud Marketplace account',
-            "You are receiving this email because a new PolicyCloud Marketplace account was created with this address. If that was you, please click this link to verify your email address: " . $options['account_page'] . "?verification-code=" . $verification_code,
+            "You are receiving this email because a new PolicyCloud Marketplace account was created with this address. If that was you, please click this link to verify your email address: " . $options['account_page'] . "#details?verification-code=" . $verification_code,
             ['From: PolicyCloud Marketplace <noreply@'.$host.'>']
         )) {
             throw new Exception("The email couldn't be delivered, please contact the server administrator.");
