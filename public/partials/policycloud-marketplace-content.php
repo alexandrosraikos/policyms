@@ -7,6 +7,10 @@
  * https://documenter.getpostman.com/view/16776360/TzsZs8kn#6c8e45e3-5be6-4c10-82a6-7d698b092e9e
  *
  * @param	array $args An array of arguments to filter the search.
+ * @throws  Exception If there is no PolicyCloud API hostname defined in the settings.
+ * @throws  Exception If there was a connection error.
+ * @throws  ErrorException If no descriptions were found for the assigned arguments.
+ * 
  * @since    1.0.0
  */
 function get_descriptions(array $args)
@@ -97,7 +101,7 @@ function get_descriptions(array $args)
 
     if (!empty($descriptions['_status'])) {
         if ($descriptions['_status'] == "unsuccessful") {
-            throw new Exception("No descriptions were found.");
+            throw new ErrorException("No descriptions were found.");
         }
     }
 

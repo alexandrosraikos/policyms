@@ -160,6 +160,40 @@ class PolicyCloud_Marketplace_Public
 		}
 	}
 
+	/**
+	 * Handle user verification email AJAX requests.
+	 *
+	 * @uses 	user_email_verification_resend()
+	 * @since	1.0.0
+	 */
+	public function user_email_verification_resend_handler()
+	{
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
+
+		// Verify WordPress generated nonce.
+		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_account_editing_verification')) {
+			die(json_encode([
+				'status' => 'failure',
+				'data' => "Unverified request to verify user email."
+			]));
+		}
+
+		try {
+			$token = retrieve_token(true);
+			if (!empty($token)) {
+				user_email_verification_resend($token['decoded']->account->verified ?? '', $token['decoded']->info->email ?? '');
+				die(json_encode([
+					'status' => 'success',
+				]));
+			} else throw new Exception("User token not found.");
+		} catch (Exception $e) {
+			die(json_encode([
+				'status' => 'failure',
+				'data' => $e->getMessage()
+			]));
+		}
+	}
+
 
 	/**
 	 * Register the shortcode for user login.
@@ -377,6 +411,8 @@ class PolicyCloud_Marketplace_Public
 		try {
 			// Retrieve all public descriptions based on GET parameter filtering.
 			$descriptions = get_descriptions($_GET);
+		} catch (ErrorException $e) {
+			$notice = $e->getMessage();
 		} catch (Exception $e) {
 			$error = $e->getMessage();
 		}
@@ -389,10 +425,13 @@ class PolicyCloud_Marketplace_Public
 		wp_enqueue_script("policycloud-marketplace-read-multiple", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-multiple.js', array('jquery'));
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 
+
+		// TODO @elefkour: handle 'notice' arg.
 		read_multiple_html($descriptions, [
 			"authenticated" => $authenticated ?? false,
 			"description_url" => $options['description_page'],
-			"error" => $error ?? null
+			"error" => $error ?? null,
+			"notice" => $notice ?? null
 		]);
 	}
 
@@ -449,14 +488,23 @@ class PolicyCloud_Marketplace_Public
 			if (!empty($token)) {
 				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
 
+				// Check for verification email.
+				if (!empty($_GET['verification-code'])) {
+					if ($_GET['verification-code'] == $token['decoded']->account->verified) {
+						$verified_token = verify_user($_GET['verification-code']);
+					} else if ($token['decoded']->account->verified == 1) {
+						throw new Exception("This account is already verified.");
+					}
+				}
+
 				// Specify Description ownership.
 				$descriptions = get_descriptions([
 					'provider' => $token['decoded']->username
 				]);
-			}
-			else {
+			} else {
 				$error = "not-logged-in";
 			}
+		} catch (ErrorException $e) {
 		} catch (Exception $e) {
 			$error = $e->getMessage();
 		}
@@ -468,10 +516,12 @@ class PolicyCloud_Marketplace_Public
 		wp_localize_script('policycloud-marketplace-account', 'ajax_properties_account_editing', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce('ajax_policycloud_account_editing_verification'),
+			'verified_token' => $verified_token ?? null,
 		));
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 		user_account_html($token['decoded'] ?? false, $descriptions ?? null, [
 			"error" => $error ?? '',
+			"notice" => $notice ?? 'TEST!',
 			"login_page" => $options['login_page'] ?? '',
 			"registration_page" => $options['registration_page'] ?? '',
 			"description_page" => $options['description_page']

@@ -188,5 +188,76 @@
         dataType: "json",
       });
     });
+
+    // Verification email resend.
+    $(
+      "button#policycloud-marketplace-resend-verification-email, a#policycloud-marketplace-resend-verification-email"
+    ).click((e) => {
+      e.preventDefault();
+      $(this).addClass("disabled");
+
+      // Perform AJAX request.
+      $.ajax({
+        url: ajax_properties_account_editing.ajax_url,
+        type: "post",
+        data: {
+          action: "policycloud_marketplace_user_email_verification_resend",
+          nonce: ajax_properties_account_editing.nonce,
+        },
+
+        // Handle response.
+        complete: function (response) {
+          try {
+            var response_data = JSON.parse(response.responseText);
+            if (response_data != null) {
+              if (response_data.status === "failure") {
+                alert(response_data.data);
+                $("#policycloud-marketplace-account-edit .error").html(
+                  response_data.data
+                );
+                $(
+                  "#policycloud-marketplace-account-edit button[type=submit]"
+                ).removeClass("disabled");
+              } else if (response_data.status === "success") {
+                alert(
+                  "Successfully sent a verification email. If you still haven't received it, please check your spam inbox as well."
+                );
+              }
+            }
+            if (response.status != 200) {
+              alert(
+                "HTTP Error " + response.status + ": " + response.statusText
+              );
+              $(
+                "#policycloud-marketplace-account-edit button[type=submit]"
+              ).removeClass("disabled");
+            }
+          } catch (objError) {
+            alert("Invalid response: " + response.responseText);
+            $(
+              "#policycloud-marketplace-account-edit button[type=submit]"
+            ).removeClass("disabled");
+          }
+        },
+        dataType: "json",
+      });
+    });
+
+    // Store newly verified token
+    if (ajax_properties_account_editing.verified_token) {
+      // Set 30 day cookie.
+      let date = new Date();
+      date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
+      const expires = "expires=" + date.toUTCString();
+      document.cookie =
+        "ppmapi-token=" +
+        ajax_properties_account_editing.verified_token +
+        "; " +
+        expires;
+
+      // Redirect to same page without the verification parameter.
+      window.location.replace(location.pathname);
+      window.location.replace(location.pathname);
+    }
   });
 })(jQuery);

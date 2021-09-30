@@ -119,9 +119,12 @@ function user_registration($data)
     if (!isset($response)) throw new Exception("Unable to reach the Marketplace server.");
     elseif ($response['_status'] == 'successful') {
         try {
-            // Encrypt token using the same key and return.
             // TODO @alexandrosraikos: Create verification email sender with verification code on account $_GET.
-            return openssl_encrypt(json_encode($data), "AES-128-ECB", $options['jwt_key']);
+            // Encrypt token using the same key and return.
+            if (empty($options['jwt_key'])) throw new Exception("No PolicyCloud Marketplace API key was defined in WordPress settings.");
+            else {
+                return openssl_encrypt($response['token'], "AES-128-ECB", $options['jwt_key']);
+            }
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -175,7 +178,10 @@ function user_login($data)
     } elseif ($response['_status'] == 'successful') {
         try {
             // Encrypt token using the same key and return.
-            return openssl_encrypt($response['token'], "AES-128-ECB", $options['jwt_key']);
+            if (empty($options['jwt_key'])) throw new Exception("No PolicyCloud Marketplace API key was defined in WordPress settings.");
+            else {
+                return openssl_encrypt($response['token'], "AES-128-ECB", $options['jwt_key']);
+            }
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -222,6 +228,89 @@ function retrieve_token(bool $decode = false)
             'decoded' => $decoded_token
         ] : $token;
     } else return false;
+}
+
+/**
+ * 
+ * Send an account verification email to the user.
+ * 
+ * @param string $verification_code The verification code of the user.
+ * @param string $email The user's email address.
+ * 
+ * @throws Exception If the email cannot be sent.
+ * @throws Exception If the verification code is empty.
+ * 
+ * @since 1.0.0
+ */
+function user_email_verification_resend(string $verification_code, string $email)
+{
+    $options = get_option('policycloud_marketplace_plugin_settings');
+    if (empty($options['account_page'])) throw new Exception("No PolicyCloud Marketplace account page defined in WordPress settings.");
+    if (!empty($verification_code)) {
+        $host = parse_url(get_site_url())['host'];
+        if (!wp_mail(
+            $email,
+            'Verify your PolicyCloud Marketplace account',
+            "You are receiving this email because a new PolicyCloud Marketplace account was created with this address. If that was you, please click this link to verify your email address: " . $options['account_page'] . "?verification-code=" . $verification_code,
+            ['From: PolicyCloud Marketplace <noreply@'.$host.'>']
+        )) {
+            throw new Exception("The email couldn't be delivered, please contact the server administrator.");
+        }
+    } else {
+        throw new Exception("The verification code was not found.");
+    }
+}
+
+/**
+ * 
+ * Verifies the user with the PolicyCloud Marketplace API.
+ * 
+ * For more information on the interface used, refer to the documentation here:
+ * https://documenter.getpostman.com/view/16776360/TzsZs8kn#d83c1527-9597-4d80-a6ab-6cbe89ab13f8
+ * 
+ * @param string $verification_code The user's verification code.
+ * 
+ * @throws Exception If the PolicyCloud Marketplace API host is not defined in the WordPress Settings.
+ * @throws Exception If the verification code is empty.
+ * 
+ * @since 1.0.0
+ */
+function verify_user(string $verification_code) {
+
+    // Retrieve API credentials.
+    $options = get_option('policycloud_marketplace_plugin_settings');
+    if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
+
+    // Contact Marketplace registration API.
+    $curl = curl_init();
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/accounts/users/verification/'.$verification_code,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'GET',
+        CURLOPT_HTTPHEADER => array('Content-Type: application/json')
+    ));
+    $response = json_decode(curl_exec($curl), true);
+    curl_close($curl);
+
+    // Return encypted token.
+    if (!isset($response)) {
+        throw new Exception("Unable to reach the Marketplace server.");
+    } elseif ($response['_status'] == 'successful') {
+        try {
+            // Encrypt token using the same key and return.
+            if (empty($options['jwt_key'])) throw new Exception("No PolicyCloud Marketplace API key was defined in WordPress settings.");
+            else {
+                return openssl_encrypt($response['token'], "AES-128-ECB", $options['jwt_key']);
+            }
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
+        }
+    } elseif ($response['_status'] == 'unsuccessful') throw new Exception($response['message']);
 }
 
 /**

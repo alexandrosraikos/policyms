@@ -13,8 +13,6 @@
  */
 ?>
 
-<!-- This file should primarily consist of HTML with a little bit of PHP. -->
-
 <?php
 
 function registration_form_html()
@@ -521,7 +519,7 @@ function read_single_html($description_object, $args)
 function create_object_html(string $error = null)
 {
     // TODO @elefkour: Fix icons.
-    
+
     if (empty($args['authenticated'])) {
         echo '<div class="error-msg1"><i class="fa fa-times-circle"></i>You have to login first.</div>';
     } else {
@@ -618,25 +616,50 @@ function create_object_html(string $error = null)
     }
 }
 
+/**
+ * 
+ * Prints an error or notice box with a close button.
+ * The close button is handled @see policycloud-marketplace-public.js
+ * 
+ * @param string $message The message to be shown.
+ * @param bool $dismissable Whether the alert is dismissable or not.
+ * @param string $type The type of message, a 'notice' or an 'error'.
+ * 
+ * @since 1.0.0
+ */
+function show_alert(string $message, bool $dismissable = false, string $type = 'error') {
+    echo  '<div class="policycloud-marketplace-'.$type.' '.($dismissable ? 'dismissable' : '').'"><span>'.$message.'</span></div>';
+}
+
 
 /**
  * Display the account page HTML for authenticated users.
  *
- * @since    1.0.0
+ * @param   $token The decoded user token.
+ * @param   array $descriptions The relevant Descriptions from the PolicyCloud Marketplace API.
+ * @param   array $args An array of arguments.
+ * 
+ * @uses    show_alert()
+ * @since   1.0.0
  */
 function user_account_html($token, array $descriptions = null, array $args)
 {
     if (empty($token)) {
-        if (!empty($args['error'])) {
-            if (!empty($args['login_page']) || !empty($args['registration_page'])) {
-                echo  '<div class="policycloud-error policycloud-account-error">
-                    You are not logged in, please <a href="' . $args['login_page'] . '">log in</a> to your account. Don\'t have an account yet? You can <a href="' . $args['registration_page'] . '">register</a> here.';
-            } else {
-                echo  '<div class="policycloud-error policycloud-account-error">
-                    An error occured: ' . $args['error'] . '</div>';
-            }
+        if (!empty($args['login_page']) || !empty($args['registration_page'])) {
+            show_alert('You are not logged in, please <a href="' . $args['login_page'] . '">log in</a> to your account. Don\'t have an account yet? You can <a href="' . $args['registration_page'] . '">register</a> here.');
+        } else {
+            show_alert('An error occured: ' . $args['error']);
         }
     } else {
+        if(!empty($args['error'])) {
+            show_alert($args['error']);
+        }
+        if(!empty($args['notice'])) {
+            show_alert($args['notice'], true, 'notice');
+        }
+        if($token->account->verified !== '1') {
+            show_alert('Your account is still unverified, please check your email inbox or spam folder for a verification email. You can <a id="policycloud-marketplace-resend-verification-email">resend</a> it if you can\'t find it.');
+        }
     ?>
         <div id="policycloud-account">
             <div id="policycloud-account-sidebar">
@@ -800,7 +823,7 @@ function user_account_html($token, array $descriptions = null, array $args)
                                     <td>
                                         <span>
                                             <?php
-                                            echo ($token->username ?? '-') . (($token->account->verified != 1) ? ' (Unverified)' : "");
+                                            echo ($token->username ?? '-');
                                             ?>
                                         </span>
                                     </td>
@@ -872,17 +895,21 @@ function user_account_html($token, array $descriptions = null, array $args)
                                 </tr>
                                 <tr>
                                     <td>
-                                        <?php
-                                        // TODO @alexandrosraikos: Add verified email address field ($token->verified == 1 ?) and resend button.
-                                        ?>
                                         E-mail
                                     </td>
                                     <td>
                                         <span class="folding visible">
                                             <?php
-                                            if (!empty($token->info->email)) {
-                                                echo ($token->info->email) . (($token->profile_parameters->public_email == 0) ? ' (Private)' : ' (Public)');
-                                            } else echo '-';
+                                            echo ($token->info->email ?? '-');
+                                            if ($token->account->verified != '1') {
+                                                ?>
+                                                <span class="unverified">(Unverified)</span>
+                                                <button id="policycloud-marketplace-resend-verification-email">Resend verification email</button>
+                                                <?php
+						                    print_r($token);
+                                            } else {
+                                                echo ($token->profile_parameters->public_email == 0) ? ' (Private)' : ' (Public)';
+                                            }
                                             ?>
                                         </span>
                                         <input class="folding" type="text" name="policycloud-marketplace-email" placeholder="<?php echo ($token->info->email ?? 'Enter your email address here'); ?>" />

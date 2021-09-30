@@ -956,6 +956,60 @@ p {
 *
 */
 
+.policycloud-marketplace-error.seen,
+.policycloud-marketplace-notice.seen {
+  display: none;
+}
+
+.policycloud-marketplace-error {
+  width: 100%;
+  max-width: 100%;
+  font-weight: bold;
+  background-color: salmon;
+  color: darkred;
+  text-align: center;
+  margin: 25px auto;
+  border-radius: 8px;
+  padding: 10px 15px;
+  position: relative;
+}
+
+.policycloud-marketplace-notice {
+  width: 100%;
+  max-width: 100%;
+  font-weight: bold;
+  background-color: lightblue;
+  text-align: center;
+  margin: 25px auto;
+  border-radius: 8px;
+  padding: 10px 15px;
+  position: relative;
+}
+
+.policycloud-marketplace-alert-close {
+  border: none;
+  background: red !important;
+  position: absolute;
+  border-radius: 10px;
+  display: inline-block;
+  height: 32px;
+  font-size: 60%;
+  font-weight: bold;
+  padding: 0 8px;
+  top: -15px;
+  color: white !important;
+  right: -20px;
+}
+
+.policycloud-marketplace-alert-close div {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: black;
+  height: 5px;
+}
+
 #policycloud-account {
   display: flex;
   width: 100%;
@@ -1377,6 +1431,37 @@ section.policycloud-account-details
   text-decoration: none;
   opacity: 0.8;
   transition: all 0.1s ease-in-out;
+}
+
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
+  .unverified {
+  font-weight: bold;
+  color: darkred;
+}
+
+section.policycloud-account-details
+  #policycloud-marketplace-account-edit
+  button#policycloud-marketplace-resend-verification-email {
+  color: inherit;
+  background: none;
+  padding: 0;
+  margin: 0 5px;
+  font-size: 100%;
+  text-decoration: underline;
+}
+
+button#policycloud-marketplace-resend-verification-email.disabled,
+a#policycloud-marketplace-resend-verification-email.disabled {
+  opacity: 0.8;
+}
+
+button#policycloud-marketplace-resend-verification-email.disabled:hover,
+a#policycloud-marketplace-resend-verification-email.disabled:hover {
+  opacity: 0.8;
+  cursor: not-allowed;
+  text-decoration: none;
+  pointer-events: none;
 }
 
 @keyframes sweep-in {
