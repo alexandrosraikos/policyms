@@ -171,7 +171,6 @@ function login_form_html()
 
     <?php
 }
-
 function read_multiple_html($description_objects, $args)
 {
     /** 
@@ -212,17 +211,17 @@ function read_multiple_html($description_objects, $args)
             </button>
             <div class="dropdown-container">
                 <form id="checkbox1" action="">
-                    <input type="checkbox" id="vehicle1" name="type" value="algorithms">
+                    <input type="checkbox" id="vehicle1" name="type[]" value="algorithms">
                     <label class="pccheckbox" for="vehicle1"> Algorithms </label> <br>
-                    <input type="checkbox" id="vehicle2" name="type" value="tools">
+                    <input type="checkbox" id="vehicle2" name="type[]" value="tools">
                     <label class="pccheckbox" for="vehicle2"> Tools</label> <br>
-                    <input type="checkbox" id="vehicle3" name="type" value="datasets">
+                    <input type="checkbox" id="vehicle3" name="type[]" value="datasets">
                     <label class="pccheckbox" for="vehicle3"> Datasets </label> <br>
-                    <input type="checkbox" id="vehicle4" name="type" value="outcomes">
+                    <input type="checkbox" id="vehicle4" name="type[]" value="outcomes">
                     <label class="pccheckbox" for="vehicle4"> Project's Outcomes</label> <br>
-                    <input type="checkbox" id="vehicle5" name="type" value="webinars">
+                    <input type="checkbox" id="vehicle5" name="type[]" value="webinars">
                     <label class="pccheckbox" for="vehicle5"> Webinars</label> <br>
-                    <input type="checkbox" id="vehicle6" name="type" value="tutorials">
+                    <input type="checkbox" id="vehicle6" name="type[]" value="tutorials">
                     <label class="pccheckbox" for="vehicle6"> tutorias</label> <br>
 
 
@@ -234,11 +233,11 @@ function read_multiple_html($description_objects, $args)
             <div class="dropdown-container">
                 <br>
 
-                <input type="checkbox" id="owner1" name="owner" value="university1">
+                <input type="checkbox" id="owner1" name="owner[]" value="university1">
                 <label class="pccheckbox" for="owner1"> University 1</label> <br>
-                <input type="checkbox" id="owner2" name="owner" value="university2">
+                <input type="checkbox" id="owner2" name="owner[]" value="university2">
                 <label class="pccheckbox" for="owner2"> University 2</label> <br>
-                <input type="checkbox" id="owner3" name="owner" value="university3">
+                <input type="checkbox" id="owner3" name="owner[]" value="university3">
                 <label class="pccheckbox" for="owner3"> University 3</label>
 
                 </form>
@@ -261,25 +260,16 @@ function read_multiple_html($description_objects, $args)
             </div>
             <br>
             <a>Filter by Views</a>
+            
+            <div id="slider-container"></div>
+<p>
+
+<div id="slider-range"></div>
             <div class="range-wrap">
                 <div class="range-value" id="rangeV"></div>
                 <input id="range" type="range" min="200" max="800" value="200" step="1">
             </div>
-            <script>
-                const
-                    range = document.getElementById('range'),
-                    rangeV = document.getElementById('rangeV'),
-                    setValue = () => {
-                        const
-                            newValue = Number((range.value - range.min) * 100 / (range.max - range.min)),
-                            newPosition = 10 - (newValue * 0.2);
-                        rangeV.innerHTML = `<span>${range.value}</span>`;
-                        rangeV.style.left = `calc(${newValue}% + (${newPosition}px))`;
-                    };
-                document.addEventListener("DOMContentLoaded", setValue);
-                range.addEventListener('input', setValue);
-            </script>
-            <br>
+          
 
             <a>Choose Dates</a> <input type="date" class="pocdate" id="datemin" name="datemin" min="2000-01-02">
 
@@ -334,8 +324,13 @@ function read_multiple_html($description_objects, $args)
 
 function read_single_html($description_object, $args)
 {
-    // TODO @elefkour: Show $description_object['metadata']['approved'] if $is_owner.
-    // TODO @elefkour: Remove comments, use PHP.
+    // TODO @elefkour: Remove comments, use PHP - check IFs for empty fields.
+
+    //echo 'Hello ' . htmlspecialchars($_GET["did"]) . '!';
+ // echo $args['description'];
+  //$description[]=$args['description_object'];
+  //echo ($description_object->info->collection[$_GET["did"]]);
+ //$description[]=get_specific_description($_GET["did"]);
 
     $ownerbutton = true;
     $isuserlogin = true;
@@ -380,11 +375,12 @@ function read_single_html($description_object, $args)
                                                         <th>Modified on</th>
                                                         <th>Action</th>
                                                     </tr>
-                                                    <?php //foreach ($description['assets']['files'] as $file) { 
+                                                    <?php if (!empty($description_object)) {
+                                                    foreach ($description_object['assets']['files'] as $file) { 
                                                     ?>
                                                     <tr>
 
-                                                        <td id="pctablename"><?php // echo $file['filename']; 
+                                                        <td class="pctablename"><?php echo $file['filename']; 
                                                                                 ?>2.0</td>
                                                         <td><?php //echo $file['version'];
                                                             ?>2.1</td>
@@ -393,13 +389,14 @@ function read_single_html($description_object, $args)
                                                         <td><?php //echo $file['updateDate'];
                                                             ?>2.2 </td>
                                                         <td>
-                                                            <a><?php //echo $file['download'];
-                                                                ?><i class="fas fa-download" aria-hidden="true"></i> </a>
+                                                            <a><?php echo $file['downloads'];
+                                                                ?> <i class="fas fa-download" aria-hidden="true"></i> </a>
                                                             &nbsp;
                                                             <a class="edit2"><i class="fas fa-pencil-alt"></i></a>
                                                         </td>
                                                     </tr>
-                                                    <?php //}
+                                                    <?php }
+                                                    }
                                                     ?>
 
                                                 </tbody>
@@ -443,26 +440,32 @@ function read_single_html($description_object, $args)
                     } ?>
                     <div class="column">
                         <div class="main-display">
-                            <h2 id="description-title" class="h2title"> <?php //echo $description_object['info']['title'];
-                                                                        ?>Deep Learning</h2>
+                            <h2 id="description-title" class="h2title"> <?php if (!empty($description_object['info']['title'])) {
+                             echo $description_object['info']['title'];
+                                         }             ?></h2>
                             <span class="card-link" style="color:gray;font-size:12px;">
-                                <?php //if ($isuserlogin) echo '<i class="far fa-user"></i> University of Nicosia '.$descritption[info][owner].'|';
+                                <?php if ($isuserlogin)
+                                if (!empty($description_object['info']['owner']))
+                                 echo '<i class="far fa-user"></i> '. $description_object['info']['owner'].'|';
                                 ?> <i class="far fa-eye"></i> <?php //echo $description_object['metadata']['views']; 
                                                                 ?>
                                 100 | <i class="far fa-calendar-alt"></i>
-                                <?php // echo $description_object['metadata']['updateDate'];
+                                <?php if (!empty( $description_object['metadata']['uploadDate']))
+                                echo  $description_object['metadata']['uploadDate'];
                                 ?>
-                                2.23.2021 | <i class="fa fa-download">
+                                | <i class="fa fa-download">
                                     <?php //echo $description_object['metadata']['downloads']'
                                     ?> 20</i></span>
-                            <h6><b>Algorithms <?php //echo $description_object['collection'];
+                            <h6><b><?php if (!empty( $description_object['info']['type']))
+                            print ucfirst($description_object['info']['type']);
                                                 ?>
                                     <?php if (!empty($description_object['info']['fieldOfUse'])) {
-                                        echo  '</b>|<b>' . $description_object['info']['fieldOfUse'] . '</b>';
+                                          '</b>|<b>' . $description_object['info']['fieldOfUse'] . '</b>';
                                     }
                                     if (!empty($description['info']['subtype'])) {
+                                        echo $description_object['info']['subtype'];
                                         echo  '</b>|<b>' . $description_object['info']['subtype'] . '</b>';
-                                    } ?>
+                                     } ?>
                                     <b></b> </h6>
                             <a style="color:blue;font-size:15px;"> <i class="fas fa-envelope"></i> example@gmail.com</a>
                             <br>
@@ -470,18 +473,19 @@ function read_single_html($description_object, $args)
                         <?php
                         if ($isuserlogin) {
                             if ($ownerbutton) { ?>
-                                <p id="descp"><?php //echo description_object[info][description];
-                                                ?>
-                                    I am text block. Click edit button to change this text. Lor
-                                    em ipsum dolor sit amet, consectetur adipiscing elit. Ut elit te
-                                    llus, luctus nec ullamcorper mattis, pulvinar dapibus leo</p>
+                                <p id="descp"><?php   if (!empty($description_object['info']['description']))
+                                {
+                                    echo $description_object['info']['description'];
+                                }?> </p>
+                                       
                             <?php
                             } else { ?>
 
-                                <p id="descp"><?php //echo description[info][description]; 
-                                                ?> I am text block. Click edit button to change this text. Lor
-                                    em ipsum dolor sit amet, consectetur adipiscing elit. Ut elit te
-                                    llus, luctus nec ullamcorper mattis, pulvinar dapibus leo.</p>
+                                <p id="descp"><?php
+                                if (!empty($description_object['info']['description']))
+                                {
+                                    echo $description_object['info']['description'];
+                                }?> </p>
                             <?php  }
                         } else { ?>
 
@@ -501,9 +505,14 @@ function read_single_html($description_object, $args)
                 <button id="edit1">Edit</button>
                 <br>
                 <?php if ($description_object['metadata']['approved'] == 1) { ?>
+                    <br>
+                  
+                    <span id="policy-cloud-approve" style="width:100px;height:40px;"> approved <img id="policy-cloud-approve-img" style="width:50px;height:40px;"src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/check.png') ?>" /> </h6></span>
+<br>
                     <img id="pcapproved" src="http://localhost/marketplace/approved.jpg" style="width:100px;height:50px;">
                 <?php
                 } else { ?>
+                <div style="width:150px;height:50px;">pending</div>
                     <img id="pcpending" src="http://localhost/marketplace/pending.jpg" style="width:100px;height:50px;">
             <?php    }
             } ?>
@@ -514,6 +523,7 @@ function read_single_html($description_object, $args)
     <?php
     }
 }
+
 
 
 function create_object_html(string $error = null)

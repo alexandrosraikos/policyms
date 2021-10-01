@@ -37,11 +37,13 @@
     $("#edit1").click(function () {
       // $(".edit2").trigger("click");
       // $(".edit3").trigger("click");
-      $("#pctablename").html(
+      $(".pctablename").html(
         '<input type="text" size ="1" value="' +
-          $("#pctablename").text() +
+          $(".pctablename").text() +
           '" >'
       );
+
+      //description edits
       $("#description-title").html(
         '<input type="text" name ="dtitle" class="h2title" value="' +
           $("#description-title").text() +

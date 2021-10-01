@@ -946,6 +946,14 @@ p {
   padding: 0;
 }
 
+/*image approve css */
+.policy-cloud-approve {
+  display: inline !important;
+}
+.policy-cloud-approve-img {
+  display: inline !important;
+}
+
 /*
 *
 * My Account
