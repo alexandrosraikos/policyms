@@ -260,16 +260,16 @@ function read_multiple_html($description_objects, $args)
             </div>
             <br>
             <a>Filter by Views</a>
-            
-            <div id="slider-container"></div>
-<p>
 
-<div id="slider-range"></div>
+            <div id="slider-container"></div>
+            <p>
+
+            <div id="slider-range"></div>
             <div class="range-wrap">
                 <div class="range-value" id="rangeV"></div>
                 <input id="range" type="range" min="200" max="800" value="200" step="1">
             </div>
-          
+
 
             <a>Choose Dates</a> <input type="date" class="pocdate" id="datemin" name="datemin" min="2000-01-02">
 
@@ -327,10 +327,10 @@ function read_single_html($description_object, $args)
     // TODO @elefkour: Remove comments, use PHP - check IFs for empty fields.
 
     //echo 'Hello ' . htmlspecialchars($_GET["did"]) . '!';
- // echo $args['description'];
-  //$description[]=$args['description_object'];
-  //echo ($description_object->info->collection[$_GET["did"]]);
- //$description[]=get_specific_description($_GET["did"]);
+    // echo $args['description'];
+    //$description[]=$args['description_object'];
+    //echo ($description_object->info->collection[$_GET["did"]]);
+    //$description[]=get_specific_description($_GET["did"]);
 
     $ownerbutton = true;
     $isuserlogin = true;
@@ -376,25 +376,25 @@ function read_single_html($description_object, $args)
                                                         <th>Action</th>
                                                     </tr>
                                                     <?php if (!empty($description_object)) {
-                                                    foreach ($description_object['assets']['files'] as $file) { 
+                                                        foreach ($description_object['assets']['files'] as $file) {
                                                     ?>
-                                                    <tr>
+                                                            <tr>
 
-                                                        <td class="pctablename"><?php echo $file['filename']; 
-                                                                                ?>2.0</td>
-                                                        <td><?php //echo $file['version'];
-                                                            ?>2.1</td>
-                                                        <td><?php //echo $file['size'];
-                                                            ?>2.2</td>
-                                                        <td><?php //echo $file['updateDate'];
-                                                            ?>2.2 </td>
-                                                        <td>
-                                                            <a><?php echo $file['downloads'];
-                                                                ?> <i class="fas fa-download" aria-hidden="true"></i> </a>
-                                                            &nbsp;
-                                                            <a class="edit2"><i class="fas fa-pencil-alt"></i></a>
-                                                        </td>
-                                                    </tr>
+                                                                <td class="pctablename"><?php echo $file['filename'];
+                                                                                        ?>2.0</td>
+                                                                <td><?php //echo $file['version'];
+                                                                    ?>2.1</td>
+                                                                <td><?php //echo $file['size'];
+                                                                    ?>2.2</td>
+                                                                <td><?php //echo $file['updateDate'];
+                                                                    ?>2.2 </td>
+                                                                <td>
+                                                                    <a><?php echo $file['downloads'];
+                                                                        ?> <i class="fas fa-download" aria-hidden="true"></i> </a>
+                                                                    &nbsp;
+                                                                    <a class="edit2"><i class="fas fa-pencil-alt"></i></a>
+                                                                </td>
+                                                            </tr>
                                                     <?php }
                                                     }
                                                     ?>
@@ -441,31 +441,31 @@ function read_single_html($description_object, $args)
                     <div class="column">
                         <div class="main-display">
                             <h2 id="description-title" class="h2title"> <?php if (!empty($description_object['info']['title'])) {
-                             echo $description_object['info']['title'];
-                                         }             ?></h2>
+                                                                            echo $description_object['info']['title'];
+                                                                        }             ?></h2>
                             <span class="card-link" style="color:gray;font-size:12px;">
                                 <?php if ($isuserlogin)
-                                if (!empty($description_object['info']['owner']))
-                                 echo '<i class="far fa-user"></i> '. $description_object['info']['owner'].'|';
+                                    if (!empty($description_object['info']['owner']))
+                                        echo '<i class="far fa-user"></i> ' . $description_object['info']['owner'] . '|';
                                 ?> <i class="far fa-eye"></i> <?php //echo $description_object['metadata']['views']; 
                                                                 ?>
                                 100 | <i class="far fa-calendar-alt"></i>
-                                <?php if (!empty( $description_object['metadata']['uploadDate']))
-                                echo  $description_object['metadata']['uploadDate'];
+                                <?php if (!empty($description_object['metadata']['uploadDate']))
+                                    echo  $description_object['metadata']['uploadDate'];
                                 ?>
                                 | <i class="fa fa-download">
                                     <?php //echo $description_object['metadata']['downloads']'
                                     ?> 20</i></span>
-                            <h6><b><?php if (!empty( $description_object['info']['type']))
-                            print ucfirst($description_object['info']['type']);
-                                                ?>
+                            <h6><b><?php if (!empty($description_object['info']['type']))
+                                        print ucfirst($description_object['info']['type']);
+                                    ?>
                                     <?php if (!empty($description_object['info']['fieldOfUse'])) {
-                                          '</b>|<b>' . $description_object['info']['fieldOfUse'] . '</b>';
+                                        '</b>|<b>' . $description_object['info']['fieldOfUse'] . '</b>';
                                     }
                                     if (!empty($description['info']['subtype'])) {
                                         echo $description_object['info']['subtype'];
                                         echo  '</b>|<b>' . $description_object['info']['subtype'] . '</b>';
-                                     } ?>
+                                    } ?>
                                     <b></b> </h6>
                             <a style="color:blue;font-size:15px;"> <i class="fas fa-envelope"></i> example@gmail.com</a>
                             <br>
@@ -473,19 +473,17 @@ function read_single_html($description_object, $args)
                         <?php
                         if ($isuserlogin) {
                             if ($ownerbutton) { ?>
-                                <p id="descp"><?php   if (!empty($description_object['info']['description']))
-                                {
-                                    echo $description_object['info']['description'];
-                                }?> </p>
-                                       
+                                <p id="descp"><?php if (!empty($description_object['info']['description'])) {
+                                                    echo $description_object['info']['description'];
+                                                } ?> </p>
+
                             <?php
                             } else { ?>
 
                                 <p id="descp"><?php
-                                if (!empty($description_object['info']['description']))
-                                {
-                                    echo $description_object['info']['description'];
-                                }?> </p>
+                                                if (!empty($description_object['info']['description'])) {
+                                                    echo $description_object['info']['description'];
+                                                } ?> </p>
                             <?php  }
                         } else { ?>
 
@@ -506,13 +504,13 @@ function read_single_html($description_object, $args)
                 <br>
                 <?php if ($description_object['metadata']['approved'] == 1) { ?>
                     <br>
-                  
-                    <span id="policy-cloud-approve" style="width:100px;height:40px;"> approved <img id="policy-cloud-approve-img" style="width:50px;height:40px;"src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/check.png') ?>" /> </h6></span>
-<br>
+
+                    <span id="policy-cloud-approve" style="width:100px;height:40px;"> approved <img id="policy-cloud-approve-img" style="width:50px;height:40px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/check.png') ?>" /> </h6></span>
+                    <br>
                     <img id="pcapproved" src="http://localhost/marketplace/approved.jpg" style="width:100px;height:50px;">
                 <?php
                 } else { ?>
-                <div style="width:150px;height:50px;">pending</div>
+                    <div style="width:150px;height:50px;">pending</div>
                     <img id="pcpending" src="http://localhost/marketplace/pending.jpg" style="width:100px;height:50px;">
             <?php    }
             } ?>
@@ -530,8 +528,8 @@ function create_object_html(string $error = null)
 {
     // TODO @elefkour: Fix icons.
 
-    if (empty($args['authenticated'])) {
-        echo '<div class="error-msg1"><i class="fa fa-times-circle"></i>You have to login first.</div>';
+    if (!empty($error)) {
+        show_alert($error);
     } else {
     ?>
         <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
@@ -539,11 +537,12 @@ function create_object_html(string $error = null)
             <div class="row justify-content-center">
                 <div class="col-11 col-sm-10 col-md-10 col-lg-6 col-xl-5 text-center p-0 mt-3 mb-2">
                     <div class="card px-0 pt-4 pb-0 mt-3 mb-3">
-                        <form id="msform">
+                        <form id="policycloud-marketplace-description-create">
                             <h2 id="heading">Upload your Project</h2>
                             <p>Fill all form field to go to next step</p>
                             <!-- progressbar -->
                             <ul id="progressbar">
+                                <?php // TODO @elekfour: Required title, type, description, owner ?>
                                 <li class="active" id="account"><strong>Asset name,category and description </strong></li>
                                 <li id="personal"><strong>Field of use and Author Comment</strong></li>
                                 <li id="payment"><strong>Images and Files</strong></li>
@@ -561,7 +560,9 @@ function create_object_html(string $error = null)
                                         <div class="col-5">
                                             <h2 class="steps">Step 1 - 4</h2>
                                         </div>
-                                    </div> <label class="fieldlabels">Asset Name: *</label> <input type="text" name="aname" placeholder="Asset name" /> <label class="fieldlabels"></label> <input id='usernameid' type="hidden" value='12345' /><label class="fieldlabels">Category: *</label> <input type="text" name="acat" placeholder="Category" /> <label class="fieldlabels">Owner: *</label> <input type="owner" name="owner" placeholder="Owner" /> <label class="fieldlabels">Description: *</label><textarea name="editor1"></textarea>
+                                    </div> <label class="fieldlabels">Title: *</label> <input type="text" name="title" placeholder="Title" /> <label class="fieldlabels"></label> <input id='usernameid' type="hidden" value='12345' />
+                                    <?php // TODO @elefkour: Dropdown (fixed values, will include PHP values later). ?>
+                                    <label class="fieldlabels">Type: *</label> <input type="text" name="type" placeholder="Type" /> <label class="fieldlabels">Sub-type: *</label> <input type="text" name="subtype" placeholder="Sub-type" /> <label class="fieldlabels">Owner: *</label> <input type="owner" name="owner" placeholder="Owner" /> <label class="fieldlabels">Description: *</label><textarea name="description" form="policycloud-marketplace-description-create"></textarea>
                                 </div> <input type="button" name="next" class="next action-button" value="Next" />
                             </fieldset>
                             <fieldset>
@@ -573,12 +574,12 @@ function create_object_html(string $error = null)
                                         <div class="col-5">
                                             <h2 class="steps">Step 2 - 4</h2>
                                         </div>
-                                    </div> <label class="fieldlabels">Field of Use: *</label> <input type="text" name="fieldOfUse" placeholder="Key Words" /> <label class="fieldlabels">Creator Comments</label><textarea name="comment"></textarea>
-                                    <script>
-                                        CKEDITOR.replace('comment');
-                                    </script>
+                                    </div> <label class="fieldlabels">Field of Use: *</label> <input type="text" name="field-of-use" placeholder="Key Words" /> <label class="fieldlabels">Creator Comments</label><textarea name="comment"></textarea>
                                 </div> <input type="button" name="next" class="next action-button" value="Next" /> <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
                             </fieldset>
+                            <?php
+                            // TODO @elefkour: Remove file upload pane. 
+                            ?>
                             <fieldset>
                                 <div class="form-card">
                                     <div class="row">
@@ -588,34 +589,10 @@ function create_object_html(string $error = null)
                                         <div class="col-5">
                                             <h2 class="steps">Step 3 - 4</h2>
                                         </div>
-                                    </div> <label class="fieldlabels">Upload Your Photo:</label> <input type="file" name="pic" accept="image/*"> <label class="fieldlabels">Upload Signature Photo:</label> <input type="file" name="pic" accept="image/*">
-                                    <label class="fieldlabels">Upload your Files:</label> <input type="file" name="file_upl" id="file_upl">
-                                    <label class="fieldlabels"><b>Or</b> create your file:</label><textarea name="code"></textarea>
-                                    <script>
-                                        CKEDITOR.replace('code');
-                                    </script>
-                                </div> <input type="button" name="next" class="next action-button" value="Submit" /> <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
-                            </fieldset>
-                            <fieldset>
-                                <div class="form-card">
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <h2 class="fs-title">Finish:</h2>
-                                        </div>
-                                        <div class="col-5">
-                                            <h2 class="steps">Step 4 - 4</h2>
-                                        </div>
-                                    </div> <br><br>
-                                    <h2 class="purple-text text-center"><strong>SUCCESS !</strong></h2> <br>
-                                    <div class="row justify-content-center">
-                                        <div class="col-3"> <img src="https://i.imgur.com/GwStPmg.png" class="fit-image"> </div>
-                                    </div> <br><br>
-                                    <div class="row justify-content-center">
-                                        <div class="col-7 text-center">
-                                            <h5 class="purple-text text-center">You Have Successfully Uploaded Your Asset</h5>
-                                        </div>
                                     </div>
                                 </div>
+                            <div class="folding error"></div>
+                            <input type="submit" class="action-button" value="Submit" /> <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
                             </fieldset>
                         </form>
                     </div>
@@ -637,8 +614,9 @@ function create_object_html(string $error = null)
  * 
  * @since 1.0.0
  */
-function show_alert(string $message, bool $dismissable = false, string $type = 'error') {
-    echo  '<div class="policycloud-marketplace-'.$type.' '.($dismissable ? 'dismissable' : '').'"><span>'.$message.'</span></div>';
+function show_alert(string $message, bool $dismissable = false, string $type = 'error')
+{
+    echo  '<div class="policycloud-marketplace-' . $type . ' ' . ($dismissable ? 'dismissable' : '') . '"><span>' . $message . '</span></div>';
 }
 
 
@@ -661,13 +639,13 @@ function user_account_html($token, array $descriptions = null, array $args)
             show_alert('An error occured: ' . $args['error']);
         }
     } else {
-        if(!empty($args['error'])) {
+        if (!empty($args['error'])) {
             show_alert($args['error']);
         }
-        if(!empty($args['notice'])) {
+        if (!empty($args['notice'])) {
             show_alert($args['notice'], true, 'notice');
         }
-        if($token->account->verified !== '1') {
+        if ($token->account->verified !== '1') {
             show_alert('Your account is still unverified, please check your email inbox or spam folder for a verification email. You can <a id="policycloud-marketplace-resend-verification-email">resend</a> it if you can\'t find it.');
         }
     ?>
@@ -912,11 +890,11 @@ function user_account_html($token, array $descriptions = null, array $args)
                                             <?php
                                             echo ($token->info->email ?? '-');
                                             if ($token->account->verified != '1') {
-                                                ?>
+                                            ?>
                                                 <span class="unverified">(Unverified)</span>
                                                 <button id="policycloud-marketplace-resend-verification-email">Resend verification email</button>
-                                                <?php
-						                    print_r($token);
+                                            <?php
+                                                print_r($token);
                                             } else {
                                                 echo ($token->profile_parameters->public_email == 0) ? ' (Private)' : ' (Public)';
                                             }

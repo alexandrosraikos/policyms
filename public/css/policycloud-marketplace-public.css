@@ -734,14 +734,14 @@ p {
   font-weight: normal;
 }
 
-#msform {
+#policycloud-marketplace-description-create {
   width: 500px;
   margin: 50px auto;
   text-align: center;
   position: relative;
 }
 
-#msform fieldset {
+#policycloud-marketplace-description-create fieldset {
   background: white;
   border: 0 none;
   border-radius: 3px;
@@ -759,12 +759,12 @@ p {
   text-align: left;
 }
 
-#msform fieldset:not(:first-of-type) {
+#policycloud-marketplace-description-create fieldset:not(:first-of-type) {
   display: none;
 }
 
-#msform input,
-#msform textarea {
+#policycloud-marketplace-description-create input,
+#policycloud-marketplace-description-create textarea {
   padding: 8px 15px 8px 15px;
   border: 1px solid #ccc;
   border-radius: 0px;
@@ -779,8 +779,8 @@ p {
   letter-spacing: 1px;
 }
 
-#msform input:focus,
-#msform textarea:focus {
+#policycloud-marketplace-description-create input:focus,
+#policycloud-marketplace-description-create textarea:focus {
   -moz-box-shadow: none !important;
   -webkit-box-shadow: none !important;
   box-shadow: none !important;
@@ -788,7 +788,7 @@ p {
   outline-width: 0;
 }
 
-#msform .action-button {
+#policycloud-marketplace-description-create .action-button {
   width: 100px;
   background: #4966cb;
   font-weight: bold;
@@ -801,12 +801,12 @@ p {
   float: right;
 }
 
-#msform .action-button:hover,
-#msform .action-button:focus {
+#policycloud-marketplace-description-create .action-button:hover,
+#policycloud-marketplace-description-create .action-button:focus {
   background-color: #4966cb;
 }
 
-#msform .action-button-previous {
+#policycloud-marketplace-description-create .action-button-previous {
   width: 100px;
   background: #616161;
   font-weight: bold;
@@ -819,8 +819,8 @@ p {
   float: right;
 }
 
-#msform .action-button-previous:hover,
-#msform .action-button-previous:focus {
+#policycloud-marketplace-description-create .action-button-previous:hover,
+#policycloud-marketplace-description-create .action-button-previous:focus {
   background-color: #000000;
 }
 
@@ -1351,13 +1351,15 @@ section.policycloud-account-assets
 
 section.policycloud-account-details
   #policycloud-marketplace-account-edit
-  .folding {
+  .folding,
+#policycloud-marketplace-description-create .folding {
   display: none;
 }
 
 section.policycloud-account-details
   #policycloud-marketplace-account-edit
-  .folding.visible {
+  .folding.visible,
+#policycloud-marketplace-description-create .folding.visible {
   display: block;
   animation: sweep-in 0.3s ease-in-out;
 }

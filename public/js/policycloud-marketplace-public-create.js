@@ -87,35 +87,58 @@
       ).addClass("loading");
 
       // Perform AJAX request.
-      // TODO @alexandrosraikos: Add description creation form fields for processing.
       $.ajax({
         url: ajax_properties_description_creation.ajax_url,
         type: "post",
         data: {
           action: "policycloud_marketplace_description_create",
           nonce: ajax_properties_description_creation.nonce,
-          username: $("input[name=username]").val(),
+          title: $("input[name=title]").val(),
+          type: $("input[name=type]").val(),
+          subtype: $("input[name=subtype]").val(),
+          owner: $("input[name=owner]").val(),
+          description: $("textarea[name=description]").val(),
+          field_of_use: $("input[name=field-of-use]").val(),
+          comment: $("input[name=comment]").val(),
         },
 
         // Handle response.
         complete: function (response) {
-          var response_data = JSON.parse(response.responseText);
-          if (response_data != null) {
-            if (response_data.status === "failure") {
-              $(".error").html(response_data.data);
-            } else if (response_data.status === "success") {
-              // TODO @alexandrosraikos: Redirect to account assets page.
-              window.location.reload();
+          try {
+            var response_data = JSON.parse(response.responseText);
+            if (response_data != null) {
+              if (response_data.status === "success") {
+                window.location.replace(
+                  ajax_properties_description_creation.account_page
+                );
+              } else {
+                $("#policycloud-marketplace-description-create .error").html(
+                  response_data.data
+                );
+                $(
+                  "#policycloud-marketplace-description-create .error"
+                ).addClass("visible");
+              }
             }
-          }
-          if (response.status != 200) {
-            $(".error").html(
-              "HTTP Error " + response.status + ": " + response.statusText
+            if (response.status != 200) {
+              $("#policycloud-marketplace-description-create .error").html(
+                "HTTP Error " + response.status + ": " + response.statusText
+              );
+              $("#policycloud-marketplace-description-create .error").addClass(
+                "visible"
+              );
+            }
+            $(
+              "#policycloud-marketplace-description-create input[type=submit]"
+            ).removeClass("loading");
+          } catch (objError) {
+            $("#policycloud-marketplace-description-create .error").html(
+              "Invalid response: " + response.responseText
+            );
+            $("#policycloud-marketplace-description-create .error").addClass(
+              "visible"
             );
           }
-          $(
-            "#policycloud-marketplace-description-creation input[type=submit]"
-          ).removeClass("loading");
         },
         dataType: "json",
       });

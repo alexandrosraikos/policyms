@@ -33,7 +33,7 @@ function get_descriptions(array $args)
     $filters = '?' . http_build_query([
         'info.owner' => $args['owner'] ?? null,
         'info.title' => $args['title'] ?? $args['search'] ?? null,
-        'info.type.in' =>  (empty($args['type'])) ? null : implode(',', ($args['type'] ?? [])),
+        'info.type.in' => (empty($args['type'])) ? null : implode(',', ($args['type'] ?? [])),
         'info.subtype' => $args['subtype'] ?? null,
         'info.comments.in' => $args['comments'] ?? null,
         'info.contact' => $args['contact'] ?? null,
@@ -227,12 +227,7 @@ function create_description($new)
     if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
 
     try {
-
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
-        
-        // TODO @alexandrosraikos: Match data fields and test functionality.
-
-        // TODO @alexandrosraikos: Include uploaded files. (hint: after creating the HTML form)
+        require_once plugin_dir_path(dirname(__FILE__)) . 'partials/policycloud-marketplace-authorization.php';
 
         // Check authorization status
         $token = retrieve_token();
@@ -241,27 +236,43 @@ function create_description($new)
             // Contact Marketplace API endpoint.
             $curl = curl_init();
 
+            $data = json_encode([
+                'title' => $new['title'],
+                'type' => $new['type'],
+                'subtype' => $new['subtype'] ?? '',
+                'owner' => $new['owner'],
+                'description' => $new['description'],
+                'fieldOfUse' => [
+                    $new['field_of_use'] ?? ''
+                ],
+                'comments' => $new['comment'] ?? '',
+            ]);
+
             curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/descriptions/' . $new['collection'],
-                CURLOPT_RETURNTRANSFER => false,
+                CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/descriptions/' . $new['type'],
+                CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
                 CURLOPT_TIMEOUT => 0,
                 CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_HTTPHEADER => ['x-access-token: ' . $token]
+                CURLOPT_POSTFIELDS => $data,
+                CURLOPT_HTTPHEADER => array('Content-Type: application/json', 'x-access-token: ' . $token)
             ));
 
-            if (!curl_exec($curl)) {
-                throw new Exception("There an API error while creating the Description.");
-            }
+            $response = json_decode(curl_exec($curl), true);
 
             // Handle errors.
             if (!empty(curl_error($curl))) throw new Exception("There was a connection error while creating the Description.");
 
-            // Close session.
             curl_close($curl);
+
+            // Check response and return encypted token.
+            if (!isset($response)) throw new Exception("Unable to reach the Marketplace server.");
+            elseif ($response['_status'] == 'successful') {
+                return $response['id'];
+            } elseif ($response['_status'] != 'successful') throw new Exception($response['message']);
         } else throw new Exception("You need to be logged in in order to create a new object.");
     } catch (Exception $e) {
         throw $e;

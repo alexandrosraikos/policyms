@@ -357,10 +357,14 @@ class PolicyCloud_Marketplace_Public
 		// Attempt to edit the description using POST data.
 		try {
 			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
-			create_description($_POST);
-			die(json_encode([
-				'status' => 'success'
-			]));
+
+			if(!empty($_POST['title']) && !empty($_POST['type']) && !empty($_POST['owner']) && !empty($_POST['description'])) {
+				die(json_encode([
+					'status' => 'success',
+					'id' => create_description($_POST)
+				]));
+			} else throw new Exception("Please fill in all the required fields.");
+
 		} catch (Exception $e) {
 			die(json_encode([
 				'status' => 'failure',
@@ -378,8 +382,8 @@ class PolicyCloud_Marketplace_Public
 	{
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
-		try {
 
+		try {
 			// Get specific Description data for authorized users.
 			$token = retrieve_token();
 			if (empty($token)) $error = "You need to be logged in to create a Description Object.";
@@ -387,10 +391,15 @@ class PolicyCloud_Marketplace_Public
 			$error = $e->getMessage();
 		}
 
+		// Retrieve description page URL.
+		$options = get_option('policycloud_marketplace_plugin_settings');
+		if (empty($options['account_page'])) $error = "You have not set an account page in your PolicyCloud Marketplace settings.";
+
 		wp_enqueue_script("policycloud-marketplace-create-description");
 		wp_localize_script('policycloud-marketplace-create-description', 'ajax_properties_description_creation', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
-			'nonce' => wp_create_nonce('ajax_policycloud_description_creation_verification')
+			'nonce' => wp_create_nonce('ajax_policycloud_description_creation_verification'),
+			'account_page' => $options['account_page']
 		));
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
@@ -500,6 +509,7 @@ class PolicyCloud_Marketplace_Public
 				}
 
 				// Specify Description ownership.
+				// TODO @alexandrosraikos: Change endpoint @vkoukos (for unapproved descs)
 				$descriptions = get_descriptions([
 					'provider' => $token['decoded']->username
 				]);
