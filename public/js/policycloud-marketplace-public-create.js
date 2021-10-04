@@ -3,21 +3,27 @@
   $(document).ready(function () {
     var current_fs, next_fs, previous_fs; //fieldsets
     var opacity;
-    var current = 1;
+    var current = 1; 
     var steps = $("fieldset").length;
-
+var reqem=1;
     setProgressBar(current);
-
+   
     $(".next").click(function () {
+      if($('.required').length && $('.required').val().length){
+     
       current_fs = $(this).parent();
       next_fs = $(this).parent().next();
-
+     
       //Add Class Active
       $("#progressbar li").eq($("fieldset").index(next_fs)).addClass("active");
 
       //show the next fieldset
       next_fs.show();
       //hide the current fieldset with style
+      }
+      else{
+        alert("you have to fill all the required fills");
+      }
       current_fs.animate(
         { opacity: 0 },
         {
@@ -36,7 +42,7 @@
       );
       setProgressBar(++current);
     });
-
+  
     $(".previous").click(function () {
       current_fs = $(this).parent();
       previous_fs = $(this).parent().prev();
@@ -74,7 +80,8 @@
       percent = percent.toFixed();
       $(".progress-bar").css("width", percent + "%");
     }
-
+  
+  
     /*
       ------------------------
       AJAX Description Creation

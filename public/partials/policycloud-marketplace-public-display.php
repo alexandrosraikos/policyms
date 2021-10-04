@@ -21,6 +21,7 @@ function registration_form_html()
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" type="text/css" media="all" />
     <!------ Include the above in your HEAD tag ---------->
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
@@ -202,7 +203,7 @@ function read_multiple_html($description_objects, $args)
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
         <ul class="sidenav">
-            <a>Filter by</a>
+            <a style="pointer-events: none; cursor: default;">Filter by</a>
             <form action="" method="get">
                 <input type="text" style="width:100%;" name="search" placeholder="Search..">
             </form>
@@ -258,20 +259,14 @@ function read_multiple_html($description_objects, $args)
                     <!-- Dynamic Fields go here -->
                 </div>
             </div>
+
+            <a style="pointer-events: none; cursor: default;"> Filter by Views</a>
+
+            <input type="range" style="color:white;" id="slider" value="50" min="1" max="100" step="1" />
+            <br />
+            <span style="color:white;" id="slider_value"></span>
             <br>
-            <a>Filter by Views</a>
-
-            <div id="slider-container"></div>
-            <p>
-
-            <div id="slider-range"></div>
-            <div class="range-wrap">
-                <div class="range-value" id="rangeV"></div>
-                <input id="range" type="range" min="200" max="800" value="200" step="1">
-            </div>
-
-
-            <a>Choose Dates</a> <input type="date" class="pocdate" id="datemin" name="datemin" min="2000-01-02">
+            <a style="pointer-events: none; cursor: default;">Choose Dates</a> <input type="date" class="pocdate" id="datemin" name="datemin" min="2000-01-02">
 
             <input type="date" class="pocdate" id="datemax" name="datemax" max="1979-12-31">
             </div>
@@ -302,14 +297,17 @@ function read_multiple_html($description_objects, $args)
                             <div class="card-content">
                                 <p class="category1 category__01_plaisio"> <?php echo  $description['collection']; ?></p>
                                 <br>
-                                <span style="color:gray;font-size:12px;"> <i class="far fa-eye"></i> 100 | <i class="far fa-calendar-alt"></i> 2.23.2021</span>
+
+                                <span style="color:gray;font-size:12px;"> <i><img class="policy-cloud-eye-img" style="color:gray;width:15px;height:22px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/eye.svg') ?>" /> </i> 100 | <i><img class="policy-cloud-eye-img" style="color:gray;width:15px;height:12px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/calendar.svg') ?>" /></i> 2.23.2021</span>
                                 <h1 class="title1"> <b><?php echo  $description['info']['title']; ?></b></h1>
                                 <p class="h6"> <?php echo $description['info']['short_desc']; ?></p>
                             </div><!-- .card-content -->
                             <footer class="footer1">
                                 <div class="post-meta1">
-                                    <span class="views1"><i class="fas fa-folder-open"></i> <a href="#"> <?php echo  $description['collection']; ?></a></span>
-                                    <span class="views1"><i class="fas fa-user"></i> <a href="#"> University of Nicosia</a></span>
+
+                                    <span class="views1"><span class="policy-cloud-approve-img-i" style="color:gray;font-size:12px;height:12px;"><img class="policy-cloud-approve-img" style="width:10px;height:10px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/folder.svg') ?>" /> <a style="height:8px;" href="#"> <?php echo  $description['collection']; ?></a> </span>
+                                        <span class="policy-cloud-approve-img-i" style="color:gray;font-size:12px;height:12px;"><img class="policy-cloud-approve-img" style="width:10px;height:10px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/user.svg') ?>" /> <a style="height:8px;" href="#"> <?php echo  $description['info']['owner']; ?></a> </span> </span>
+
                                 </div>
                             </footer>
                         </article>
@@ -333,7 +331,7 @@ function read_single_html($description_object, $args)
     //$description[]=get_specific_description($_GET["did"]);
 
     $ownerbutton = true;
-    $isuserlogin = true;
+    $isuserlogin = false;;
 
     if (!empty($args['is_owner'])) {
         $ownerbutton = true;
@@ -458,34 +456,33 @@ function read_single_html($description_object, $args)
                                     ?> 20</i></span>
                             <h6><b><?php if (!empty($description_object['info']['type']))
                                         print ucfirst($description_object['info']['type']);
-                                    ?>
-                                    <?php if (!empty($description_object['info']['fieldOfUse'])) {
-                                        '</b>|<b>' . $description_object['info']['fieldOfUse'] . '</b>';
-                                    }
-                                    if (!empty($description['info']['subtype'])) {
-                                        echo $description_object['info']['subtype'];
+
+
+                                    if ($description['info']['subtype'] = !"") {
                                         echo  '</b>|<b>' . $description_object['info']['subtype'] . '</b>';
-                                    } ?>
+                                    }
+                                    ?>
+                                    <br /><?php
+                                            if (!empty($description_object['info']['fieldOfUse'])) {
+                                                foreach ($description_object['info']['fieldOfUse'] as $fieldofuse) {
+                                                    echo '</b>|<b>' . $fieldofuse . '</b>';
+                                                }
+                                            }
+                                            ?>
+
                                     <b></b> </h6>
                             <a style="color:blue;font-size:15px;"> <i class="fas fa-envelope"></i> example@gmail.com</a>
                             <br>
                         </div>
                         <?php
-                        if ($isuserlogin) {
-                            if ($ownerbutton) { ?>
-                                <p id="descp"><?php if (!empty($description_object['info']['description'])) {
-                                                    echo $description_object['info']['description'];
-                                                } ?> </p>
+                        if ($isuserlogin) { ?>
 
-                            <?php
-                            } else { ?>
+                            <p id="descp"><?php
+                                            if (!empty($description_object['info']['description'])) {
+                                                echo $description_object['info']['description'];
+                                            } ?> </p>
 
-                                <p id="descp"><?php
-                                                if (!empty($description_object['info']['description'])) {
-                                                    echo $description_object['info']['description'];
-                                                } ?> </p>
-                            <?php  }
-                        } else { ?>
+                         <?php   } else { ?>
 
                             <p id="descs"><?php //echo description[info][short_desc];
                                             ?>I am text block. Click edit button to change this text. Lor
@@ -495,23 +492,26 @@ function read_single_html($description_object, $args)
                         ?>
 
                         <div id="pguest" class="hidden">
-                            <input id="submit1" type="submit" value="Submit">
+                            <input id="submit1" type="submit" value="Submit"> <a style="color:red;" href="#" id="pcdelete"><b>X</b> Cancel</a>
                             <br>
+
                         </div>
             </form>
             <?php if ($ownerbutton) { ?>
-                <button id="edit1">Edit</button>
+                <a href="#" id="edit1">Edit</a>
                 <br>
                 <?php if ($description_object['metadata']['approved'] == 1) { ?>
-                    <br>
-
-                    <span id="policy-cloud-approve" style="width:100px;height:40px;"> approved <img id="policy-cloud-approve-img" style="width:50px;height:40px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/check.png') ?>" /> </h6></span>
-                    <br>
-                    <img id="pcapproved" src="http://localhost/marketplace/approved.jpg" style="width:100px;height:50px;">
+                    <ul id="policy-cloud-icons">
+                        <li>approved</li>
+                        <li> <img id="policy-cloud-approve-img" style="width:20px;height:15px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/check.svg') ?>" /></li>
+                    </ul>
                 <?php
                 } else { ?>
-                    <div style="width:150px;height:50px;">pending</div>
-                    <img id="pcpending" src="http://localhost/marketplace/pending.jpg" style="width:100px;height:50px;">
+                    <ul id="policy-cloud-icons">
+                        <li>Pending</li>
+                        <li> <img id="policy-cloud-approve-img" style="width:20px;height:15px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/pending.drawio.svg') ?>" /></li>
+                    </ul>
+
             <?php    }
             } ?>
             </div>
@@ -527,6 +527,7 @@ function read_single_html($description_object, $args)
 function create_object_html(string $error = null)
 {
     // TODO @elefkour: Fix icons.
+    //i did it
 
     if (!empty($error)) {
         show_alert($error);
@@ -542,11 +543,11 @@ function create_object_html(string $error = null)
                             <p>Fill all form field to go to next step</p>
                             <!-- progressbar -->
                             <ul id="progressbar">
-                                <?php // TODO @elekfour: Required title, type, description, owner ?>
-                                <li class="active" id="account"><strong>Asset name,category and description </strong></li>
-                                <li id="personal"><strong>Field of use and Author Comment</strong></li>
-                                <li id="payment"><strong>Images and Files</strong></li>
-                                <li id="confirm"><strong>Finish</strong></li>
+                                <?php // TODO @elekfour: Required title, type, description, owner 
+                                ?>
+                                <li class="active" id="account"><img style="color:gray;height:22px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/lock.drawio.svg') ?>" /><strong>Asset name,category and description </strong></li>
+                                <li id="personal"><img style="color:gray;height:22px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/user.drawio.svg') ?>" /><strong>Field of use and Author Comment</strong></li>
+                                <li id="confirm"><img style="color:gray;height:22px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/check.drawio.svg') ?>" /><strong>Finish</strong></li>
                             </ul>
                             <div class="progress">
                                 <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
@@ -560,9 +561,10 @@ function create_object_html(string $error = null)
                                         <div class="col-5">
                                             <h2 class="steps">Step 1 - 4</h2>
                                         </div>
-                                    </div> <label class="fieldlabels">Title: *</label> <input type="text" name="title" placeholder="Title" /> <label class="fieldlabels"></label> <input id='usernameid' type="hidden" value='12345' />
-                                    <?php // TODO @elefkour: Dropdown (fixed values, will include PHP values later). ?>
-                                    <label class="fieldlabels">Type: *</label> <input type="text" name="type" placeholder="Type" /> <label class="fieldlabels">Sub-type: *</label> <input type="text" name="subtype" placeholder="Sub-type" /> <label class="fieldlabels">Owner: *</label> <input type="owner" name="owner" placeholder="Owner" /> <label class="fieldlabels">Description: *</label><textarea name="description" form="policycloud-marketplace-description-create"></textarea>
+                                    </div> <label class="fieldlabels">Title: *</label> <input id="title" class="required" type="text" name="title" placeholder="Title" required> <label class="fieldlabels"></label> <input id='usernameid' type="hidden" value='12345' />
+                                    <?php // TODO @elefkour: Dropdown (fixed values, will include PHP values later). 
+                                    ?>
+                                    <label class="fieldlabels">Type: *</label> <input class="required" type="text" name="type" placeholder="Type" /> <label class="fieldlabels">Sub-type: *</label> <input class="required" type="text" id="subtype" name="subtype" placeholder="Sub-type" /> <label class="fieldlabels">Owner: *</label> <input class="required" type="owner" id="owner" name="owner" placeholder="Owner" /> <label class="fieldlabels">Description: *</label><textarea class="required" name="description" form="policycloud-marketplace-description-create"></textarea>
                                 </div> <input type="button" name="next" class="next action-button" value="Next" />
                             </fieldset>
                             <fieldset>
@@ -574,26 +576,15 @@ function create_object_html(string $error = null)
                                         <div class="col-5">
                                             <h2 class="steps">Step 2 - 4</h2>
                                         </div>
-                                    </div> <label class="fieldlabels">Field of Use: *</label> <input type="text" name="field-of-use" placeholder="Key Words" /> <label class="fieldlabels">Creator Comments</label><textarea name="comment"></textarea>
-                                </div> <input type="button" name="next" class="next action-button" value="Next" /> <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
+                                    </div> <label class="fieldlabels">Field of Use: *</label> <input class="required" type="text" name="field-of-use" placeholder="Key Words" /> <label class="fieldlabels">Creator Comments</label><textarea name="comment"></textarea>
+                                </div>
+                                <div class="folding error"></div>
+                                <input type="submit" class="action-button" value="Submit" /> <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
                             </fieldset>
                             <?php
                             // TODO @elefkour: Remove file upload pane. 
                             ?>
-                            <fieldset>
-                                <div class="form-card">
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <h2 class="fs-title">Files Upload:</h2>
-                                        </div>
-                                        <div class="col-5">
-                                            <h2 class="steps">Step 3 - 4</h2>
-                                        </div>
-                                    </div>
-                                </div>
-                            <div class="folding error"></div>
-                            <input type="submit" class="action-button" value="Submit" /> <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
-                            </fieldset>
+
                         </form>
                     </div>
                 </div>

@@ -1,16 +1,19 @@
 (function ($) {
   "use strict";
-
+ /*slider */
+ $(document).on('input change', '#slider', function() {
+  $('#slider_value').html( $(this).val() );
+});
+  /*checkbox */
   $(function () {
     $(".checkbox").on("change", function () {
       $("#checkbox1").submit();
     });
   });
-  /*slider */
-  $("#slider-range").slider("values", 0, lowerValue);
-  $("#slider-range").slider("values", 1, upperValue);
-  $("#slider-range").slider("refresh");
+ 
+    
   $(document).ready(() => {
+
     /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
     $(".dropdown-btn1").on("click", function () {
       $(this).toggleClass("active");

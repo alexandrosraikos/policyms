@@ -359,13 +359,13 @@ ul#tabs-nav li.active {
 }
 .h2title {
   color: #000000;
-  font-size: 65px;
+  font-size: 40px;
   font-weight: 600;
   text-shadow: 4px 0px 3px rgb(0 0 0 / 30%);
 }
 input[name="dtitle"] {
   color: #000000;
-  font-size: 65px;
+  font-size: 40px;
   font-weight: 600;
   text-shadow: 4px 0px 3px rgb(0 0 0 / 30%);
 }
@@ -406,6 +406,26 @@ TODO @elefkour: Rename generic selectors.
   text-align: left;
   cursor: pointer;
   outline: none;
+}
+/*policycloudtitleviews*/
+.policycloudtitleviews{
+  font-size: 20px !important;
+  color:white !important;
+}
+/*icon setings */
+ul#policy-cloud-icons li {
+  display:inline-block !important;
+}
+ul#policy-cloud-icons-discover li {
+  margin-left: 0.5rem !important;
+  display:inline-block !important;
+  
+}
+
+.li1 {
+  
+  background:url('https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/User_font_awesome.svg/512px-User_font_awesome.svg.png') 50% 50% no-repeat no-repeat;
+  padding-left: 5px;
 }
 /*option for user labe*/
 .pcowneroption {
@@ -663,7 +683,28 @@ img {
   margin-left: 0.5rem;
 }
 .views1 {
+  font-style:inherit;
+  margin-top: 0.5rem;
+  display:inline-block !important;
   margin-left: 0.5rem;
+}
+.views1 .policy-cloud-approve-img-i{
+  float: none;
+}
+.views1 policy-cloud-approve-img{
+  margin-top: 0.5rem;
+  float:none;
+ position:absolute !important;
+  margin-left: 0.5rem;
+
+  display:inline-block !important;
+}
+.policy-cloud-eye-img{
+  filter: grayscale(100%); 
+
+
+
+  display:inline-block !important;
 }
 /*koubia */
 .myinp {
@@ -876,25 +917,24 @@ p {
 }
 
 #progressbar #account:before {
-  font-family: FontAwesome;
-  content: "\f13e";
+  
+ 
 }
 
 #progressbar #personal:before {
-  font-family: FontAwesome;
-  content: "\f007";
+ 
 }
 
 #progressbar #payment:before {
-  font-family: FontAwesome;
-  content: "\f030";
+ 
 }
 
 #progressbar #confirm:before {
-  font-family: FontAwesome;
-  content: "\f00c";
+  fill: gray;
 }
-
+#progressbar #confirm .img:before {
+  fill: gray;
+}
 #progressbar li:before {
   width: 50px;
   height: 50px;
@@ -947,11 +987,11 @@ p {
 }
 
 /*image approve css */
-.policy-cloud-approve {
-  display: inline !important;
+.img policy-cloud-approve {
+  display: inline-block !important;
 }
 .policy-cloud-approve-img {
-  display: inline !important;
+  display: inline-block !important;
 }
 
 /*
