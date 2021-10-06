@@ -15,113 +15,117 @@
 
 <?php
 
-function registration_form_html()
+
+/**
+ * Print the account registration form.
+ * 
+ * @param   string $authentication_url The url that redirects to the log in page.
+ * @param   string $error_message Any potential error message to be displayed.
+ *
+ * @since    1.0.0
+ */
+function account_registration_html($authentication_url, $error_message = '')
 {
+    if (!empty($error_message)) {
+        show_alert($error_message);
+    } else {
 ?>
-    <div class="policycloud-marketplace">
-        <form id="policycloud-registration" action="">
-            <fieldset name="account-credentials">
-                <h2>Account credentials</h2>
-                <p>The following information is required for authentication purposes.</p>
-                <label for="username">Username</label>
-                <input required name="username" placeholder="e.x. johndoe" type="text" />
-                <label for="password">Password</label>
-                <input required name="password" placeholder="Insert your password" type="password" />
-                <label for="password-confirm">Confirm password</label>
-                <input required name="password-confirm" placeholder="Insert your password again" type="password" />
-            </fieldset>
-            <fieldset name="account-details">
-                <h2>Account details</h2>
-                <p>Fill in the following fields with your personal details. This information will be used to personalize your experience within the marketplace platform and showcase your profile to other visitors.</p>
-                <label for="title">Title</label>
-                <select name="title" required>
-                    <option value="Mr.">Mr.</option>
-                    <option value="Ms.">Ms.</option>
-                    <option value="Mrs.">Mrs.</option>
-                    <option value="Dr.">Dr.</option>
-                    <option value="Prof.">Prof.</option>
-                    <option value="Sir">Sir</option>
-                    <option value="Miss">Miss</option>
-                    <option value="Mx.">Mx.</option>
-                    <option value="-" selected>None</option>
-                </select>
-                <label for="name">First name</label>
-                <input required name="name" placeholder="Insert your first name" type="text" />
-                <label for="surname">Last name</label>
-                <input required name="surname" placeholder="Insert your last name" type="text" />
-                <label for="organization">Organization</label>
-                <input required name="organization" placeholder="Insert your organization" type="text" />
-                <label for="gender">Gender</label>
-                <select name="gender" required>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Transgender">Transgender</option>
-                    <option value="Genderqueer">Genderqueer</option>
-                    <option value="Questioning">Questioning</option>
-                    <option value="-" selected>Prefer not to say</option>
-                </select>
-            </fieldset>
-            <fieldset name="account-contact">
-                <h2>Account contact details</h2>
-                <p>Fill in your contact information here. This information will be used to validate your new account, as well as optionally make them available to other logged in Marketplace visitors. These details by default remain private.</p>
-                <label for="email">E-mail address</label>
-                <input type="email" name="email" placeholder="e.x. johndoe@example.org" required />
-                <label for="phone">Phone number (Optional)</label>
-                <input type="tel" name="phone" placeholder="e.x. +30 6999123456" />
-            </fieldset>
-            <button type="submit" class="action">Create account</button>
-            <p>Already have an account? Please <a href="">Log in</a>.</p>
-        </form>
-    </div>
-<?php
-}
-
-
-function login_form_html()
-{
-
-?>
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <!------ Include the above in your HEAD tag ---------->
-
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
-
-    <!------ Include the above in your HEAD tag ---------->
-    <div class="container">
-        <div class="card bg-light">
-            <article class="card-body mx-auto" style="max-width: 400px;">
-                <h4 class="card-title mt-3 text-center">Log In</h4>
-                <form id="policycloud-login" action="">
-                    <div class="form-row">
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-user"></i> </span>
-                            </div>
-                            <input required name="policycloud-marketplace-username" class="form-control" placeholder="Username" id="username" type="text">
-                        </div>
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
-                            </div>
-                            <input required name="policycloud-marketplace-password" class="form-control" placeholder="Password" type="password">
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block"> Log In </button>
-                    </div> <!-- form-group// -->
-                    <div class="login-error">
-                        <p class="text-center">
-                            <a href="">Forgot password</a>
-                        </p>
-                    </div>
+        <div class="policycloud-marketplace">
+            <form id="policycloud-registration" action="">
+                <fieldset name="account-credentials">
+                    <h2>Account credentials</h2>
+                    <p>The following information is required for authentication purposes.</p>
+                    <label for="username">Username *</label>
+                    <input required name="username" placeholder="e.x. johndoe" type="text" />
+                    <label for="password">Password *</label>
+                    <input required name="password" placeholder="Insert your password" type="password" />
+                    <label for="password-confirm">Confirm password *</label>
+                    <input required name="password-confirm" placeholder="Insert your password again" type="password" />
+                </fieldset>
+                <fieldset name="account-details">
+                    <h2>Account details</h2>
+                    <p>Fill in the following fields with your personal details. This information will be used to personalize your experience within the marketplace platform and showcase your profile to other visitors. Fields marked with (*) are required for registration.</p>
+                    <label for="title">Title</label>
+                    <select name="title" required>
+                        <option value="Mr.">Mr.</option>
+                        <option value="Ms.">Ms.</option>
+                        <option value="Mrs.">Mrs.</option>
+                        <option value="Dr.">Dr.</option>
+                        <option value="Prof.">Prof.</option>
+                        <option value="Sir">Sir</option>
+                        <option value="Miss">Miss</option>
+                        <option value="Mx.">Mx.</option>
+                        <option value="" selected>None</option>
+                    </select>
+                    <label for="name">First name *</label>
+                    <input required name="name" placeholder="Insert your first name" type="text" />
+                    <label for="surname">Last name *</label>
+                    <input required name="surname" placeholder="Insert your last name" type="text" />
+                    <label for="organization">Organization</label>
+                    <input required name="organization" placeholder="Insert your organization" type="text" />
+                    <label for="gender">Gender</label>
+                    <select name="gender" required>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="transgender">Transgender</option>
+                        <option value="genderqueer">Genderqueer</option>
+                        <option value="questioning">Questioning</option>
+                        <option value="-" selected>Prefer not to say</option>
+                    </select>
+                </fieldset>
+                <fieldset name="account-contact">
+                    <h2>Account contact details</h2>
+                    <p>Fill in your contact information here. This information will be used to validate your new account, as well as optionally make them available to other logged in Marketplace visitors. Fields marked with (*) are required for registration. These details by default remain private. </p>
+                    <label for="email">E-mail address *</label>
+                    <input type="email" name="email" placeholder="e.x. johndoe@example.org" required />
+                    <label for="phone">Phone number</label>
+                    <input type="tel" name="phone" placeholder="e.x. +30 6999123456" />
+                </fieldset>
+                <div class="error"></div>
+                <button type="submit" class="action ">Create account</button>
+                <p>Already have an account? Please <a href="<?php echo $authentication_url ?>">Log in</a>.</p>
+            </form>
         </div>
-        </form>
-        </article>
-    </div>
-    </div>
-
     <?php
+    }
 }
+
+
+
+
+/**
+ * Print the account authentication form.
+ * 
+ * @param   string $registration_url The url that redirects to the registration page.
+ * @param   string $error_message Any potential error message to be displayed.
+ *
+ * @since    1.0.0
+ */
+function account_authentication_html($registration_url, $error_message = '')
+{
+    if (!empty($error_message)) {
+        show_alert($error_message);
+    } else {
+    ?>
+        <div class="policycloud-marketplace">
+            <form id="policycloud-authentication" action="">
+                <fieldset name="account-credentials">
+                    <h2>Insert your credentials</h2>
+                    <p>The following information is required to log you in.</p>
+                    <label for="username">Username *</label>
+                    <input required name="username" placeholder="e.x. johndoe" type="text" />
+                    <label for="password">Password *</label>
+                    <input required name="password" placeholder="Insert your password" type="password" />
+                </fieldset>
+                <div class="error"></div>
+                <button type="submit" class="action">Log in</button>
+                <p>Don't have an account yet? You can <a href="<?php echo $registration_url ?>">register</a> now to obtain full access to the Marketplace.</p>
+            </form>
+        </div>
+    <?php
+    }
+}
+
 function read_multiple_html($description_objects, $args)
 {
     /** 

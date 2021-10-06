@@ -33,21 +33,6 @@
   color: #fff;
 }
 
-.registration-error,
-.login-error {
-  color: red;
-  text-align: center;
-  font-weight: bold;
-  margin: 20px 0;
-}
-
-.submit-registration.loading,
-.submit-login.loading {
-  opacity: 0.7;
-  cursor: wait;
-  pointer-events: none;
-}
-
 .fa-user-o {
   margin-left: 300px;
 }
@@ -1011,7 +996,7 @@ p {
   all: initial;
 }
 
-/* Links & Buttons */
+/* Links & buttons */
 
 .policycloud-marketplace a {
   display: inline !important;
@@ -1045,6 +1030,20 @@ p {
   transition: all 0.2s ease-in-out;
 }
 
+.registration-error,
+.login-error {
+  color: red;
+  text-align: center;
+  font-weight: bold;
+  margin: 20px 0;
+}
+
+.policycloud-marketplace button.action.loading {
+  opacity: 0.7;
+  cursor: wait;
+  pointer-events: none;
+}
+
 /* Forms */
 
 .policycloud-marketplace form *:not(button) {
@@ -1073,6 +1072,7 @@ p {
 
 .policycloud-marketplace form fieldset p {
   text-align: left;
+  max-width: 100%;
   color: var(--policycloud-text-color);
 }
 
@@ -1101,6 +1101,16 @@ p {
   background-color: #ececec;
 }
 
+.policycloud-marketplace form .error {
+  width: 100%;
+  max-width: 100%;
+  font-weight: bold;
+  color: darkred;
+  text-align: center;
+  margin: 25px auto;
+  border-radius: 8px;
+}
+
 .policycloud-marketplace form button[type="submit"] {
   display: block;
   margin: 0 auto;
@@ -1109,19 +1119,12 @@ p {
 .policycloud-marketplace form p {
   text-align: center;
   font-size: 14px;
-  margin: 20px 0;
+  margin: 20px auto;
+  max-width: 60%;
   color: var(--policycloud-text-color-secondary);
 }
 
-/*
-*
-* My Account
-* ---------------------
-*
-* These are the styles for the 
-* [policycloud-marketplace-account] shortcode.
-*
-*/
+/* Errors & notices */
 
 .policycloud-marketplace-error.seen,
 .policycloud-marketplace-notice.seen {
@@ -1176,6 +1179,16 @@ p {
   background-color: black;
   height: 5px;
 }
+
+/*
+*
+* My Account
+* ---------------------
+*
+* These are the styles for the 
+* [policycloud-marketplace-account] shortcode.
+*
+*/
 
 #policycloud-account {
   display: flex;

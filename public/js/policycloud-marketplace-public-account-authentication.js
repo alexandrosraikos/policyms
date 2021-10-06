@@ -1,28 +1,19 @@
 (function ($) {
   "use strict";
   $(document).ready(() => {
-    // Display pre-existing token error.
-    if (ajax_prop.error === "existing-token") {
-      $(".login-error").html("You are already logged in.");
-    }
-
-    $("#policycloud-login").submit((e) => {
+    $("#policycloud-authentication").submit((e) => {
       e.preventDefault();
-      $(".submit-login").addClass("loading");
+      $("#policycloud-authentication button[type=submit]").addClass("loading");
 
       // Perform AJAX request.
       $.ajax({
-        url: ajax_prop.ajax_url,
+        url: ajax_properties_account_authentication.ajax_url,
         type: "post",
         data: {
-          action: "policycloud_marketplace_login",
-          nonce: ajax_prop.nonce,
-          policycloud_marketplace_username: $(
-            "input[name=policycloud-marketplace-username]"
-          ).val(),
-          policycloud_marketplace_password: $(
-            "input[name=policycloud-marketplace-password]"
-          ).val(),
+          action: "policycloud_marketplace_account_authentication",
+          nonce: ajax_properties_account_authentication.nonce,
+          username: $("input[name=username]").val(),
+          password: $("input[name=password]").val(),
         },
 
         // Handle response.
@@ -30,7 +21,7 @@
           var response_data = JSON.parse(response.responseText);
           if (response_data != null) {
             if (response_data.status === "failure") {
-              $(".login-error").html(response_data.data);
+              $("#policycloud-authentication .error").html(response_data.data);
             } else if (response_data.status === "success") {
               // Set 30 day cookie.
               let date = new Date();
@@ -41,9 +32,13 @@
               window.location.href = "/";
             }
           } else {
-            $(".login-error").html("There was an internal error.");
+            $("#policycloud-authentication .error").html(
+              "There was an internal error."
+            );
           }
-          $(".submit-login").removeClass("loading");
+          $("#policycloud-authentication button[type=submit]").removeClass(
+            "loading"
+          );
         },
         dataType: "json",
       });
