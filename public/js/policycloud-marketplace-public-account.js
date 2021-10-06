@@ -2,64 +2,28 @@
   "use strict";
   $(document).ready(function () {
     // Navigation
-    $("button#policycloud-account-overview").click(function (e) {
+    $(
+      "button#policycloud-account-overview, button#policycloud-account-objects, button#policycloud-account-reviews, button#policycloud-account-information"
+    ).click(function (e) {
       e.preventDefault();
       $(
-        "section.policycloud-account-overview, section.policycloud-account-likes, section.policycloud-account-assets, section.policycloud-account-details"
+        "section.policycloud-account-overview, section.policycloud-account-reviews, section.policycloud-account-objects, section.policycloud-account-information"
       ).removeClass("focused");
-      $("section.policycloud-account-overview").addClass("focused");
+      $("section." + $(this).attr("id")).addClass("focused");
 
       $(
-        "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-likes, button#policycloud-account-details"
+        "button#policycloud-account-overview, button#policycloud-account-objects, button#policycloud-account-reviews, button#policycloud-account-information"
       ).removeClass("active");
       $(this).addClass("active");
-      window.location.hash = "";
-    });
-    $("button#policycloud-account-assets").click(function (e) {
-      e.preventDefault();
-      $(
-        "section.policycloud-account-overview, section.policycloud-account-likes, section.policycloud-account-assets, section.policycloud-account-details"
-      ).removeClass("focused");
-      $("section.policycloud-account-assets").addClass("focused");
-
-      $(
-        "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-likes, button#policycloud-account-details"
-      ).removeClass("active");
-      $(this).addClass("active");
-      window.location.hash = "assets";
-    });
-    $("button#policycloud-account-likes").click(function (e) {
-      e.preventDefault();
-      $(
-        "section.policycloud-account-overview, section.policycloud-account-likes, section.policycloud-account-assets, section.policycloud-account-details"
-      ).removeClass("focused");
-      $("section.policycloud-account-likes").addClass("focused");
-
-      $(
-        "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-likes, button#policycloud-account-details"
-      ).removeClass("active");
-      $(this).addClass("active");
-      window.location.hash = "likes";
-    });
-    $("button#policycloud-account-details").click(function (e) {
-      e.preventDefault();
-      $(
-        "section.policycloud-account-overview, section.policycloud-account-likes, section.policycloud-account-assets, section.policycloud-account-details"
-      ).removeClass("focused");
-      $("section.policycloud-account-details").addClass("focused");
-
-      $(
-        "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-likes, button#policycloud-account-details"
-      ).removeClass("active");
-      $(this).addClass("active");
-      window.location.hash = "details";
+      var hashPrepare = $(this).attr("id").split("-");
+      window.location.hash = "#" + hashPrepare[hashPrepare.length - 1];
     });
 
     // Check for existing hash
     if (
-      window.location.hash == "#assets" ||
-      window.location.hash == "#likes" ||
-      window.location.hash == "#details"
+      window.location.hash == "#objects" ||
+      window.location.hash == "#reviews" ||
+      window.location.hash == "#information"
     ) {
       $("button#policycloud-account-" + window.location.hash.substr(1)).trigger(
         "click"
@@ -100,10 +64,10 @@
     $("#policycloud-marketplace-account-edit-toggle").click(function (e) {
       e.preventDefault();
       $(".folding").toggleClass("visible");
-      if ($(this).html() === "Edit") {
-        $(this).html("Cancel");
+      if ($(this).html().includes("Edit")) {
+        $(this).html('<span class="fas fa-times"></span> Cancel');
       } else {
-        $(this).html("Edit");
+        $(this).html('<span class="fas fa-pen"></span> Edit');
       }
       $("#policycloud-marketplace-account-edit .error").removeClass("visible");
     });
@@ -256,7 +220,6 @@
         expires;
 
       // Redirect to same page without the verification parameter.
-      window.location.replace(location.pathname);
       window.location.replace(location.pathname);
     }
   });

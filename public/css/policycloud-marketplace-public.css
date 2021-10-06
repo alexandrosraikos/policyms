@@ -1371,9 +1371,9 @@ p {
 section.policycloud-account-overview table,
 section.policycloud-account-overview tr,
 section.policycloud-account-overview td,
-section.policycloud-account-details table,
-section.policycloud-account-details tr,
-section.policycloud-account-details td {
+section.policycloud-account-information table,
+section.policycloud-account-information tr,
+section.policycloud-account-information td {
   border: none;
 }
 
@@ -1386,24 +1386,27 @@ section.policycloud-account-overview table .large-figure {
   font-weight: bold;
 }
 
-section.policycloud-account-details table.information {
+section.policycloud-account-information table.information {
   margin-top: 20px;
   font-size: 80%;
 }
 
-section.policycloud-account-details table.information tr > td:first-of-type {
+section.policycloud-account-information
+  table.information
+  tr
+  > td:first-of-type {
   max-width: 80px;
   font-weight: bold;
 }
 
-section.policycloud-account-assets
+section.policycloud-account-objects
   #policycloud-account-asset-collection-filters {
   margin-bottom: 20px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   padding-bottom: 15px;
 }
 
-section.policycloud-account-assets
+section.policycloud-account-objects
   #policycloud-account-asset-collection-filters
   button {
   padding: 4px 8px;
@@ -1418,7 +1421,7 @@ section.policycloud-account-assets
   transition: all 0.2s ease-in-out;
 }
 
-section.policycloud-account-assets
+section.policycloud-account-objects
   #policycloud-account-asset-collection-filters
   button:hover {
   text-decoration: none;
@@ -1429,7 +1432,7 @@ section.policycloud-account-assets
   transition: all 0.2s ease-in-out;
 }
 
-section.policycloud-account-assets
+section.policycloud-account-objects
   #policycloud-account-asset-collection-filters
   button:active {
   text-decoration: none;
@@ -1440,7 +1443,7 @@ section.policycloud-account-assets
   transition: all 0.1s ease-in-out;
 }
 
-section.policycloud-account-assets
+section.policycloud-account-objects
   #policycloud-account-asset-collection-filters
   button.active {
   text-decoration: none;
@@ -1449,27 +1452,29 @@ section.policycloud-account-assets
   transition: all 0.1s ease-in-out;
 }
 
-section.policycloud-account-assets #policycloud-account-assets-list {
+section.policycloud-account-objects #policycloud-account-objects-list {
   padding: 0 10px 0 0;
   margin: 0;
   max-height: 600px;
   overflow-y: scroll;
 }
 
-section.policycloud-account-assets #policycloud-account-assets-list li {
+section.policycloud-account-objects #policycloud-account-objects-list li {
   display: none;
   max-height: 0;
   overflow: hidden;
 }
 
-section.policycloud-account-assets #policycloud-account-assets-list li.visible {
+section.policycloud-account-objects
+  #policycloud-account-objects-list
+  li.visible {
   display: block;
   max-height: 1000vh;
   margin: 10px 0;
   animation: sweep-in 0.3s ease-in-out forwards;
 }
 
-section.policycloud-account-assets #policycloud-account-assets-list li a {
+section.policycloud-account-objects #policycloud-account-objects-list li a {
   text-decoration: none;
   border-radius: 10px;
   padding: 10px;
@@ -1477,7 +1482,10 @@ section.policycloud-account-assets #policycloud-account-assets-list li a {
   transition: all 0.2s ease-in-out;
 }
 
-section.policycloud-account-assets #policycloud-account-assets-list li a:hover {
+section.policycloud-account-objects
+  #policycloud-account-objects-list
+  li
+  a:hover {
   background-color: rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transform: scale(0.99);
@@ -1485,8 +1493,8 @@ section.policycloud-account-assets #policycloud-account-assets-list li a:hover {
   transition: all 0.2s ease-in-out;
 }
 
-section.policycloud-account-assets
-  #policycloud-account-assets-list
+section.policycloud-account-objects
+  #policycloud-account-objects-list
   li
   .thumbnail {
   flex: 0 0 25%;
@@ -1497,15 +1505,15 @@ section.policycloud-account-assets
   border-radius: 6px;
 }
 
-section.policycloud-account-assets
-  #policycloud-account-assets-list
+section.policycloud-account-objects
+  #policycloud-account-objects-list
   li
   .description {
   margin-left: 10px;
 }
 
-section.policycloud-account-assets
-  #policycloud-account-assets-list
+section.policycloud-account-objects
+  #policycloud-account-objects-list
   li
   .description
   .date {
@@ -1513,8 +1521,8 @@ section.policycloud-account-assets
   opacity: 0.7;
 }
 
-section.policycloud-account-assets
-  #policycloud-account-assets-list
+section.policycloud-account-objects
+  #policycloud-account-objects-list
   li
   .description
   .excerpt {
@@ -1522,14 +1530,14 @@ section.policycloud-account-assets
   opacity: 0.9;
 }
 
-section.policycloud-account-details
+section.policycloud-account-information
   #policycloud-marketplace-account-edit
   .folding,
 #policycloud-marketplace-description-create .folding {
   display: none;
 }
 
-section.policycloud-account-details
+section.policycloud-account-information
   #policycloud-marketplace-account-edit
   .folding.visible,
 #policycloud-marketplace-description-create .folding.visible {
@@ -1537,14 +1545,16 @@ section.policycloud-account-details
   animation: sweep-in 0.3s ease-in-out;
 }
 
-section.policycloud-account-details
+section.policycloud-account-information
   #policycloud-marketplace-account-edit
   td:first-of-type {
   min-width: 100px;
 }
 
-section.policycloud-account-details #policycloud-marketplace-account-edit input,
-section.policycloud-account-details
+section.policycloud-account-information
+  #policycloud-marketplace-account-edit
+  input,
+section.policycloud-account-information
   #policycloud-marketplace-account-edit
   select {
   padding: 5px;
@@ -1555,14 +1565,14 @@ section.policycloud-account-details
   box-sizing: border-box;
 }
 
-section.policycloud-account-details
+section.policycloud-account-information
   #policycloud-marketplace-account-edit
   label {
   font-size: 80%;
   opacity: 0.8;
 }
 
-section.policycloud-account-details
+section.policycloud-account-information
   #policycloud-marketplace-account-edit
   .error {
   margin: 10px;
@@ -1575,13 +1585,13 @@ section.policycloud-account-details
   display: none;
 }
 
-section.policycloud-account-details
+section.policycloud-account-information
   #policycloud-marketplace-account-edit
   .error.visible {
   display: block;
 }
 
-section.policycloud-account-details
+section.policycloud-account-information
   #policycloud-marketplace-account-edit
   button {
   font-weight: bold;
@@ -1596,7 +1606,7 @@ section.policycloud-account-details
   transition: all 0.2s ease-in-out;
 }
 
-section.policycloud-account-details
+section.policycloud-account-information
   #policycloud-marketplace-account-edit
   button:hover {
   transform: scale(0.98);
@@ -1606,7 +1616,7 @@ section.policycloud-account-details
   transition: all 0.2s ease-in-out;
 }
 
-section.policycloud-account-details
+section.policycloud-account-information
   #policycloud-marketplace-account-edit
   button:active {
   transform: scale(0.97);
@@ -1616,14 +1626,14 @@ section.policycloud-account-details
   transition: all 0.1s ease-in-out;
 }
 
-section.policycloud-account-details
+section.policycloud-account-information
   #policycloud-marketplace-account-edit
   .unverified {
   font-weight: bold;
   color: darkred;
 }
 
-section.policycloud-account-details
+section.policycloud-account-information
   #policycloud-marketplace-account-edit
   button#policycloud-marketplace-resend-verification-email {
   color: inherit;
@@ -1687,19 +1697,19 @@ a#policycloud-marketplace-resend-verification-email.disabled:hover {
     margin: 0;
   }
 
-  section.policycloud-account-assets #policycloud-account-assets-list {
+  section.policycloud-account-objects #policycloud-account-objects-list {
     padding: 0;
     margin: 0;
     max-height: unset;
     overflow-y: visible;
   }
 
-  section.policycloud-account-assets #policycloud-account-assets-list li a {
+  section.policycloud-account-objects #policycloud-account-objects-list li a {
     flex-direction: column;
   }
 
-  section.policycloud-account-assets
-    #policycloud-account-assets-list
+  section.policycloud-account-objects
+    #policycloud-account-objects-list
     li
     .thumbnail {
     flex: unset;
@@ -1707,17 +1717,17 @@ a#policycloud-marketplace-resend-verification-email.disabled:hover {
     margin-bottom: 25px;
   }
 
-  section.policycloud-account-details
+  section.policycloud-account-information
     #policycloud-marketplace-account-edit
     input,
-  section.policycloud-account-details
+  section.policycloud-account-information
     #policycloud-marketplace-account-edit
     select {
     max-width: 50vw;
     max-width: 50vw;
   }
 
-  section.policycloud-account-details
+  section.policycloud-account-information
     #policycloud-marketplace-account-edit
     td:first-of-type {
     min-width: 110px;

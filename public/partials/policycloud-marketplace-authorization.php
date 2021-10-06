@@ -211,6 +211,7 @@ function retrieve_token(bool $decode = false)
     if (!empty($_COOKIE['ppmapi-token'])) {
 
         // Decrypt token.
+        // TODO @alexandrosraikos Use different encryption key (@see admin options page too).
         $token = openssl_decrypt($_COOKIE['ppmapi-token'], "AES-128-ECB", $options['jwt_key']);
         if (empty($token)) throw new Exception("Decryption was unsuccessful.");
 

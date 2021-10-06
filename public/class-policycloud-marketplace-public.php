@@ -307,7 +307,7 @@ class PolicyCloud_Marketplace_Public
 		add_shortcode('policycloud-marketplace-create-object', 'PolicyCloud_Marketplace_Public::object_creation_shortcode');
 
 		// Account page shortcode.
-		add_shortcode('policycloud-marketplace-account', 'PolicyCloud_Marketplace_Public::user_account');
+		add_shortcode('policycloud-marketplace-account', 'PolicyCloud_Marketplace_Public::account_shortcode');
 	}
 
 	/**
@@ -484,7 +484,7 @@ class PolicyCloud_Marketplace_Public
 	 *
 	 * @since    1.0.0
 	 */
-	public static function user_account()
+	public static function account_shortcode()
 	{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
 
@@ -507,7 +507,6 @@ class PolicyCloud_Marketplace_Public
 				}
 
 				// Specify Description ownership.
-				// TODO @alexandrosraikos: Change endpoint @vkoukos (for unapproved descs)
 				$descriptions = get_descriptions([
 					'provider' => $token['decoded']->username
 				]);
@@ -529,7 +528,7 @@ class PolicyCloud_Marketplace_Public
 			'verified_token' => $verified_token ?? null,
 		));
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		user_account_html($token['decoded'] ?? false, $descriptions ?? null, [
+		account_html($token['decoded'] ?? false, $descriptions ?? null, [
 			"error" => $error ?? '',
 			"notice" => $notice ?? '',
 			"login_page" => $options['login_page'] ?? '',

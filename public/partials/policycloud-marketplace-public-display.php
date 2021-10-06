@@ -55,7 +55,7 @@ function account_registration_html($authentication_url, $error_message = '')
                         <option value="Sir">Sir</option>
                         <option value="Miss">Miss</option>
                         <option value="Mx.">Mx.</option>
-                        <option value="" selected>None</option>
+                        <option value="-" selected>None</option>
                     </select>
                     <label for="name">First name *</label>
                     <input required name="name" placeholder="Insert your first name" type="text" />
@@ -488,7 +488,7 @@ function object_creation_html(string $error = null)
             <form id="policycloud-object-create" action="">
                 <fieldset name="basic-information">
                     <h2>Basic information</h2>
-                    <p>To create a new Marketplace object, the following fields represent  basic information that will be visible to others.</p>
+                    <p>To create a new Marketplace object, the following fields represent basic information that will be visible to others.</p>
                     <label for="title">Title *</label>
                     <input required name="title" placeholder="Insert a title" type="text" />
                     <label for="type">Primary collection type *</label>
@@ -564,7 +564,7 @@ function show_alert(string $message, bool $dismissable = false, string $type = '
  * @uses    show_alert()
  * @since   1.0.0
  */
-function user_account_html($token, array $descriptions = null, array $args)
+function account_html($token, array $descriptions = null, array $args)
 {
 
     // TODO @alexandrosraikos: Update strings & titles.
@@ -624,9 +624,9 @@ function user_account_html($token, array $descriptions = null, array $args)
                 </div>
                 <nav>
                     <button id="policycloud-account-overview" class="active">Overview</button>
-                    <button id="policycloud-account-assets">Assets</button>
-                    <button id="policycloud-account-likes">Likes</button>
-                    <button id="policycloud-account-details">Account Details</button>
+                    <button id="policycloud-account-objects">Objects</button>
+                    <button id="policycloud-account-reviews">Reviews</button>
+                    <button id="policycloud-account-information">Information</button>
                     <button class="policycloud-logout">Log Out</button>
                 </nav>
             </div>
@@ -685,10 +685,10 @@ function user_account_html($token, array $descriptions = null, array $args)
                             </tr>
                         </table>
                     </section>
-                    <section class="policycloud-account-assets">
+                    <section class="policycloud-account-objects">
                         <header>
-                            <h3>Assets</h3>
-                            <a id="policycloud-upload" href="<?php echo $args['upload_page'] ?>" title="Create a new asset"><img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/plus.svg') ?>" />Create new asset</a>
+                            <h3>Objects</h3>
+                            <a id="policycloud-upload" href="<?php echo $args['upload_page'] ?>" title="Create a new object"><span class="fas fa-plus"></span> Create new object</a>
                         </header>
                         <div id="policycloud-account-asset-collection-filters">
                             <?php
@@ -702,7 +702,7 @@ function user_account_html($token, array $descriptions = null, array $args)
                             }
                             ?>
                         </div>
-                        <ul id="policycloud-account-assets-list">
+                        <ul id="policycloud-account-objects-list">
                             <?php
                             if (!empty($descriptions)) {
                                 foreach ($descriptions as $description) {
@@ -728,16 +728,16 @@ function user_account_html($token, array $descriptions = null, array $args)
                             ?>
                         </ul>
                     </section>
-                    <section class="policycloud-account-likes">
+                    <section class="policycloud-account-reviews">
                         <header>
-                            <h3>Likes</h3>
+                            <h3>Reviews</h3>
                         </header>
                         <p>Coming soon!</p>
                     </section>
-                    <section class="policycloud-account-details">
+                    <section class="policycloud-account-information">
                         <header>
-                            <h3>Details</h3>
-                            <button id="policycloud-marketplace-account-edit-toggle">Edit</button>
+                            <h3>Information</h3>
+                            <button id="policycloud-marketplace-account-edit-toggle"><span class="fas fa-pen"></span> Edit</button>
                         </header>
                         <form id="policycloud-marketplace-account-edit" action="">
                             <table class="information">
@@ -783,7 +783,17 @@ function user_account_html($token, array $descriptions = null, array $args)
                                             echo ($token->info->title ?? '') . ' ' . ($token->info->name ?? '') . ' ' . ($token->info->surname ?? '');
                                             ?>
                                         </span>
-                                        <input class="folding" type="text" name="policycloud-marketplace-title" placeholder="Title (<?php echo ($token->info->title ?? ''); ?>)" />
+                                        <select class="folding" name="policycloud-marketplace-title">
+                                            <option value="Mr." <?php echo ($token->info->title == 'Mr.' ? 'selected' : '') ?>>Mr.</option>
+                                            <option value="Ms." <?php echo ($token->info->title == 'Ms.' ? 'selected' : '') ?>>Ms.</option>
+                                            <option value="Mrs." <?php echo ($token->info->title == 'Mrs.' ? 'selected' : '') ?>>Mrs.</option>
+                                            <option value="Dr." <?php echo ($token->info->title == 'Dr.' ? 'selected' : '') ?>>Dr.</option>
+                                            <option value="Prof." <?php echo ($token->info->title == 'Prof.' ? 'selected' : '') ?>>Prof.</option>
+                                            <option value="Sir" <?php echo ($token->info->title == 'Sir' ? 'selected' : '') ?>>Sir</option>
+                                            <option value="Miss" <?php echo ($token->info->title == 'Miss' ? 'selected' : '') ?>>Miss</option>
+                                            <option value="Mx." <?php echo ($token->info->title == 'Mx.' ? 'selected' : '') ?>>Mx.</option>
+                                            <option value="-" <?php echo ($token->info->title == '-' ? 'selected' : '') ?>>None</option>
+                                        </select>
                                         <input class="folding" type="text" name="policycloud-marketplace-name" placeholder="Name (<?php echo ($token->info->name ?? ''); ?>)" />
                                         <input class="folding" type="text" name="policycloud-marketplace-surname" placeholder="Surname (<?php echo ($token->info->surname ?? ''); ?>)" />
                                     </td>
@@ -801,7 +811,10 @@ function user_account_html($token, array $descriptions = null, array $args)
                                         <select name="policycloud-marketplace-gender" class="folding">
                                             <option value="male" <?php echo ($token->info->gender == 'male' ? 'selected' : '') ?>>Male</option>
                                             <option value="female" <?php echo ($token->info->gender == 'female' ? 'selected' : '') ?>>Female</option>
-                                            <option value="other" <?php echo ($token->info->gender == 'other' ? 'selected' : '') ?>>Other</option>
+                                            <option value="transgender" <?php echo ($token->info->gender == 'transgender' ? 'selected' : '') ?>>Transgender</option>
+                                            <option value="genderqueer" <?php echo ($token->info->gender == 'genderqueer' ? 'selected' : '') ?>>Genderqueer</option>
+                                            <option value="questioning" <?php echo ($token->info->gender == 'questioning' ? 'selected' : '') ?>>Questioning</option>
+                                            <option value="-" <?php echo ($token->info->gender == '-' ? 'selected' : '') ?>>Prefer not to say</option>
                                         </select>
                                     </td>
                                 </tr>
