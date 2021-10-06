@@ -55,7 +55,7 @@ class PolicyCloud_Marketplace_Public
 	}
 
 	public function enqueue_head_scripts() {
-		echo '<script>FontAwesomeConfig = { autoA11y: true }</script><script src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"></script>';
+		echo '<script>FontAwesomeConfig = { autoA11y: true }</script><script src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>';
 	}
 
 	/**
