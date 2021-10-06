@@ -33,21 +33,6 @@
   color: #fff;
 }
 
-.registration-error,
-.login-error {
-  color: red;
-  text-align: center;
-  font-weight: bold;
-  margin: 20px 0;
-}
-
-.submit-registration.loading,
-.submit-login.loading {
-  opacity: 0.7;
-  cursor: wait;
-  pointer-events: none;
-}
-
 .fa-user-o {
   margin-left: 300px;
 }
@@ -408,23 +393,22 @@ TODO @elefkour: Rename generic selectors.
   outline: none;
 }
 /*policycloudtitleviews*/
-.policycloudtitleviews{
+.policycloudtitleviews {
   font-size: 20px !important;
-  color:white !important;
+  color: white !important;
 }
 /*icon setings */
 ul#policy-cloud-icons li {
-  display:inline-block !important;
+  display: inline-block !important;
 }
 ul#policy-cloud-icons-discover li {
   margin-left: 0.5rem !important;
-  display:inline-block !important;
-  
+  display: inline-block !important;
 }
 
 .li1 {
-  
-  background:url('https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/User_font_awesome.svg/512px-User_font_awesome.svg.png') 50% 50% no-repeat no-repeat;
+  background: url("https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/User_font_awesome.svg/512px-User_font_awesome.svg.png")
+    50% 50% no-repeat no-repeat;
   padding-left: 5px;
 }
 /*option for user labe*/
@@ -683,28 +667,26 @@ img {
   margin-left: 0.5rem;
 }
 .views1 {
-  font-style:inherit;
+  font-style: inherit;
   margin-top: 0.5rem;
-  display:inline-block !important;
+  display: inline-block !important;
   margin-left: 0.5rem;
 }
-.views1 .policy-cloud-approve-img-i{
+.views1 .policy-cloud-approve-img-i {
   float: none;
 }
-.views1 policy-cloud-approve-img{
+.views1 policy-cloud-approve-img {
   margin-top: 0.5rem;
-  float:none;
- position:absolute !important;
+  float: none;
+  position: absolute !important;
   margin-left: 0.5rem;
 
-  display:inline-block !important;
+  display: inline-block !important;
 }
-.policy-cloud-eye-img{
-  filter: grayscale(100%); 
+.policy-cloud-eye-img {
+  filter: grayscale(100%);
 
-
-
-  display:inline-block !important;
+  display: inline-block !important;
 }
 /*koubia */
 .myinp {
@@ -917,16 +899,12 @@ p {
 }
 
 #progressbar #account:before {
-  
- 
 }
 
 #progressbar #personal:before {
- 
 }
 
 #progressbar #payment:before {
- 
 }
 
 #progressbar #confirm:before {
@@ -996,13 +974,158 @@ p {
 
 /*
 *
-* My Account
+* Generic
 * ---------------------
 *
-* These are the styles for the 
-* [policycloud-marketplace-account] shortcode.
+* These are the styles for generic shortcode elements
 *
 */
+
+:root {
+  --policycloud-text-color: #111111;
+  --policycloud-text-color-secondary: #464646;
+  --policycloud-text-color-invert: #f0f0f0;
+  --policycloud-text-color-invert-secondary: #c2c2c2;
+  --policycloud-highlight-color-dark: #03204a;
+  --policycloud-highlight-color-mid: #005cf9;
+  --policycloud-highlight-color-light: #00bdf5;
+  --policycloud-border-color-light: rgba(0, 0, 0, 0.1);
+}
+
+.policycloud-marketplace * {
+  all: initial;
+}
+
+/* Links & buttons */
+
+.policycloud-marketplace a {
+  display: inline !important;
+  font-size: inherit;
+  font-weight: bold;
+  color: var(--policycloud-text-color);
+  transition: color 0.2s ease-in-out;
+}
+
+.policycloud-marketplace a:hover {
+  display: inline;
+  color: var(--policycloud-highlight-color-mid);
+  transition: color 0.2s ease-in-out;
+}
+
+.policycloud-marketplace button.action {
+  padding: 7px 15px;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+  background: #ececec !important;
+  color: var(--policycloud-text-color) !important;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.policycloud-marketplace button.action:hover {
+  cursor: pointer;
+  background-color: var(--policycloud-highlight-color-dark) !important;
+  color: var(--policycloud-text-color-invert) !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.registration-error,
+.login-error {
+  color: red;
+  text-align: center;
+  font-weight: bold;
+  margin: 20px 0;
+}
+
+.policycloud-marketplace button.action.loading {
+  opacity: 0.7;
+  cursor: wait;
+  pointer-events: none;
+}
+
+/* Forms */
+
+.policycloud-marketplace form *:not(button, svg) {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.policycloud-marketplace
+  form
+  fieldset:not(.policycloud-marketplace form fieldset:last-of-type) {
+  border-bottom: 1px solid var(--policycloud-border-color-light);
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+}
+
+.policycloud-marketplace form fieldset:last-of-type {
+  margin-bottom: 20px;
+}
+
+.policycloud-marketplace form fieldset h2 {
+  font-weight: bold;
+  font-size: 125%;
+}
+
+.policycloud-marketplace form fieldset p {
+  text-align: left;
+  max-width: 100%;
+  color: var(--policycloud-text-color);
+}
+
+.policycloud-marketplace form label {
+  display: block;
+  float: left;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 10px 0 5px 0;
+  padding: 0;
+}
+
+.policycloud-marketplace form input,
+.policycloud-marketplace form textarea,
+.policycloud-marketplace form select {
+  display: block;
+  font-size: 16px;
+  padding: 10px;
+  margin: 0 0 10px 0;
+  background-color: #ffffff;
+  border: 1px double #222222 !important;
+  border-radius: 10px;
+}
+
+.policycloud-marketplace form select:hover {
+  cursor: pointer;
+  background-color: #ececec;
+}
+
+.policycloud-marketplace form .error {
+  width: 100%;
+  max-width: 100%;
+  font-weight: bold;
+  color: darkred;
+  text-align: center;
+  margin: 25px auto;
+  border-radius: 8px;
+}
+
+.policycloud-marketplace form button[type="submit"] {
+  display: block;
+  margin: 0 auto;
+}
+
+.policycloud-marketplace form p {
+  text-align: center;
+  font-size: 14px;
+  margin: 20px auto;
+  max-width: 60%;
+  color: var(--policycloud-text-color-secondary);
+}
+
+/* Errors & notices */
 
 .policycloud-marketplace-error.seen,
 .policycloud-marketplace-notice.seen {
@@ -1057,6 +1180,16 @@ p {
   background-color: black;
   height: 5px;
 }
+
+/*
+*
+* My Account
+* ---------------------
+*
+* These are the styles for the 
+* [policycloud-marketplace-account] shortcode.
+*
+*/
 
 #policycloud-account {
   display: flex;

@@ -54,6 +54,10 @@ class PolicyCloud_Marketplace_Public
 		$this->version = $version;
 	}
 
+	public function enqueue_head_scripts() {
+		echo '<script>FontAwesomeConfig = { autoA11y: true }</script><script src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>';
+	}
+
 	/**
 	 * Register the stylesheets for the public-facing side of the site.
 	 *
@@ -75,12 +79,11 @@ class PolicyCloud_Marketplace_Public
 		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public.js', array('jquery'), $this->version, false);
 
 		// Authorization related scripts.
-		wp_register_script("policycloud-marketplace-registration", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-registration.js', array('jquery'), $this->version, false);
-		wp_register_script("policycloud-marketplace-login", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-login.js', array('jquery'), $this->version, false);
-		wp_enqueue_script("policycloud-marketplace-logout", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-logout.js', array('jquery'), $this->version, false);
+		wp_register_script("policycloud-marketplace-account-registration", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-registration.js', array('jquery'), $this->version, false);
+		wp_register_script("policycloud-marketplace-account-authentication", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-authentication.js', array('jquery'), $this->version, false);
 
 		// Content related scripts.
-		wp_register_script("policycloud-marketplace-create-description", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-create.js', array('jquery'), $this->version, false);
+		wp_register_script("policycloud-marketplace-object-create", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-object-create.js', array('jquery'), $this->version, false);
 		wp_register_script("policycloud-marketplace-read-single", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-single.js', array('jquery'), $this->version, false);
 		wp_register_script("policycloud-marketplace-account", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account.js', array('jquery'), $this->version, false);
 	}
@@ -93,10 +96,10 @@ class PolicyCloud_Marketplace_Public
 	public function add_authentication_shortcodes()
 	{
 		// Registration sequence.
-		add_shortcode('policycloud-marketplace-registration', 'PolicyCloud_Marketplace_Public::registration_shortcode');
+		add_shortcode('policycloud-marketplace-registration', 'PolicyCloud_Marketplace_Public::account_registration_shortcode');
 
 		// Log in sequence.
-		add_shortcode('policycloud-marketplace-login', 'PolicyCloud_Marketplace_Public::login_shortcode');
+		add_shortcode('policycloud-marketplace-login', 'PolicyCloud_Marketplace_Public::account_authentication_shortcode');
 	}
 
 	/**
@@ -104,9 +107,8 @@ class PolicyCloud_Marketplace_Public
 	 *
 	 * @since    1.0.0
 	 */
-	public static function registration_shortcode()
+	public static function account_registration_shortcode()
 	{
-		wp_enqueue_script("policycloud-marketplace-registration");
 
 		// Check for existing token.
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
@@ -114,33 +116,32 @@ class PolicyCloud_Marketplace_Public
 			// Retrieve credentials.
 			$options = get_option('policycloud_marketplace_plugin_settings');
 			if (empty($options['account_page'])) throw new Exception("There is no account page set in the PolicyCloud Marketplace settings, please contact your administrator.");
+			if (empty($options['login_page'])) throw new Exception("There is no log in page set in the PolicyCloud Marketplace settings, please contact your administrator.");
 			if (retrieve_token()) {
-				wp_localize_script('policycloud-marketplace-registration', 'ajax_prop', array(
-					'error' => 'existing-token'
-				));
+				$error_message = 'You are already logged in.';
 			}
 		} catch (\Exception $e) {
-			$errorMessage =  $e->getMessage();
+			$error_message =  $e->getMessage();
 		}
 
-		wp_localize_script('policycloud-marketplace-registration', 'ajax_prop', array(
+		wp_enqueue_script("policycloud-marketplace-account-registration");
+		wp_localize_script('policycloud-marketplace-account-registration', 'ajax_properties_account_registration', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce('ajax_registration'),
-			'error' => $errorMessage ?? '',
-			'redirect_page' => $options['account_page'] ?? ''
+			'redirect_page' => $options['account_page']
 		));
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		registration_form_html();
+		account_registration_html($options['login_page'], $error_message ?? '');
 	}
 
 	/**
 	 * Handle user registration AJAX requests.
 	 *
-	 * @uses 	PolicyCloud_Marketplace_Public::user_registration()
+	 * @uses 	PolicyCloud_Marketplace_Public::account_registration()
 	 * @since	1.0.0
 	 */
-	public function user_registration_handler()
+	public function account_registration_handler()
 	{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
 
@@ -153,7 +154,7 @@ class PolicyCloud_Marketplace_Public
 		try {
 			die(json_encode([
 				'status' => 'success',
-				'data' => user_registration($_POST),
+				'data' => account_registration($_POST),
 			]));
 		} catch (Exception $e) {
 			die(json_encode([
@@ -167,6 +168,7 @@ class PolicyCloud_Marketplace_Public
 	 * Handle user verification email AJAX requests.
 	 *
 	 * @uses 	user_email_verification_resend()
+	 * 
 	 * @since	1.0.0
 	 */
 	public function user_email_verification_resend_handler()
@@ -199,44 +201,40 @@ class PolicyCloud_Marketplace_Public
 
 
 	/**
-	 * Register the shortcode for user login.
+	 * Register the shortcode for account authentication.
 	 *
 	 * @since    1.0.0
 	 */
-	public static function login_shortcode()
+	public static function account_authentication_shortcode()
 	{
-		wp_enqueue_script("policycloud-marketplace-login");
 
 		// Check for existing token.
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
 		try {
 			if (retrieve_token()) {
-				wp_localize_script('policycloud-marketplace-login', 'ajax_prop', array(
-					'error' => 'existing-token'
-				));
+				$error_message = 'You are already logged in.';
 			}
 		} catch (\Exception $e) {
-			$errorMessage =  $e->getMessage();
+			$error_message =  $e->getMessage();
 		}
 
-		wp_enqueue_script('policycloud-marketplace-login');
-		wp_localize_script('policycloud-marketplace-login', 'ajax_prop', array(
+		wp_enqueue_script("policycloud-marketplace-account-authentication");
+		wp_localize_script('policycloud-marketplace-account-authentication', 'ajax_properties_account_authentication', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
-			'nonce' => wp_create_nonce('ajax_login'),
-			'error' => $errorMessage ?? ''
+			'nonce' => wp_create_nonce('ajax_login')
 		));
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		login_form_html();
+		account_authentication_html($error_message ?? '');
 	}
 
 	/**
 	 * Handle user login AJAX requests.
 	 *
-	 * @uses	PolicyCloud_Marketplace_Public::user_login()
+	 * @uses	PolicyCloud_Marketplace_Public::account_authentication()
 	 * @since	1.0.0
 	 */
-	public function user_login_handler()
+	public function account_authentication_handler()
 	{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
 
@@ -249,7 +247,7 @@ class PolicyCloud_Marketplace_Public
 		try {
 			die(json_encode([
 				'status' => 'success',
-				'data' => user_login($_POST)
+				'data' => account_authentication($_POST)
 			]));
 		} catch (Exception $e) {
 			die(json_encode([
@@ -306,7 +304,7 @@ class PolicyCloud_Marketplace_Public
 		add_shortcode('policycloud-marketplace-read-single', 'PolicyCloud_Marketplace_Public::read_single_object');
 
 		// Create object sequence.
-		add_shortcode('policycloud-marketplace-create-object', 'PolicyCloud_Marketplace_Public::create_object');
+		add_shortcode('policycloud-marketplace-create-object', 'PolicyCloud_Marketplace_Public::object_creation_shortcode');
 
 		// Account page shortcode.
 		add_shortcode('policycloud-marketplace-account', 'PolicyCloud_Marketplace_Public::user_account');
@@ -347,7 +345,7 @@ class PolicyCloud_Marketplace_Public
 	 * @uses	PolicyCloud_Marketplace_Public::description_creation()
 	 * @since	1.0.0
 	 */
-	public function create_description_handler()
+	public function object_creation_handler()
 	{
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_description_creation_verification')) {
@@ -378,7 +376,7 @@ class PolicyCloud_Marketplace_Public
 	 *
 	 * @since    1.0.0
 	 */
-	public static function create_object()
+	public static function object_creation_shortcode()
 	{
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
@@ -386,24 +384,24 @@ class PolicyCloud_Marketplace_Public
 		try {
 			// Get specific Description data for authorized users.
 			$token = retrieve_token();
-			if (empty($token)) $error = "You need to be logged in to create a Description Object.";
+			if (empty($token)) $error_message = "You need to be logged in to create a Description Object.";
 		} catch (Exception $e) {
-			$error = $e->getMessage();
+			$error_message = $e->getMessage();
 		}
 
 		// Retrieve description page URL.
 		$options = get_option('policycloud_marketplace_plugin_settings');
-		if (empty($options['account_page'])) $error = "You have not set an account page in your PolicyCloud Marketplace settings.";
+		if (empty($options['account_page'])) $error_message = "You have not set an account page in your PolicyCloud Marketplace settings.";
 
-		wp_enqueue_script("policycloud-marketplace-create-description");
-		wp_localize_script('policycloud-marketplace-create-description', 'ajax_properties_description_creation', array(
+		wp_enqueue_script("policycloud-marketplace-object-create");
+		wp_localize_script('policycloud-marketplace-object-create', 'ajax_properties_object_creation', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce('ajax_policycloud_description_creation_verification'),
 			'account_page' => $options['account_page']
 		));
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		create_object_html($error ?? '');
+		object_creation_html($error_message ?? '');
 	}
 
 	/**
@@ -544,7 +542,7 @@ class PolicyCloud_Marketplace_Public
 	/**
 	 * Handle user account editing AJAX requests.
 	 *
-	 * @uses 	PolicyCloud_Marketplace_Public::user_registration()
+	 * @uses 	PolicyCloud_Marketplace_Public::account_registration()
 	 * @since	1.0.0
 	 */
 	public function account_edit_handler()

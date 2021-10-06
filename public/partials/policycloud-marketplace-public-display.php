@@ -15,163 +15,117 @@
 
 <?php
 
-function registration_form_html()
+
+/**
+ * Print the account registration form.
+ * 
+ * @param   string $authentication_url The url that redirects to the log in page.
+ * @param   string $error_message Any potential error message to be displayed.
+ *
+ * @since    1.0.0
+ */
+function account_registration_html($authentication_url, $error_message = '')
 {
+    if (!empty($error_message)) {
+        show_alert($error_message);
+    } else {
 ?>
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" type="text/css" media="all" />
-    <!------ Include the above in your HEAD tag ---------->
-
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
-
-    <!------ Include the above in your HEAD tag ---------->
-    <div class="container">
-        <div class="card bg-light">
-            <article class="card-body mx-auto" style="max-width: 400px;">
-                <h4 class="card-title mt-3 text-center">Create Account</h4>
-                <p class="text-center">Get started with your free account</p>
-                <form id="policycloud-registration" action="">
-                    <div class="form-row">
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-user"></i> </span>
-                            </div>
-                            <input required name="username" class="form-control" placeholder="username" id="username" type="text">
-                        </div> <!-- form-group// -->
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-user"></i> </span>
-                            </div>
-                            <input required name="name" class="form-control" placeholder="name" id="name" type="text">
-                        </div> <!-- form-group// -->
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-user"></i> </span>
-                            </div>
-                            <input required name="surname" class="form-control" placeholder="surname" type="text">
-                        </div> <!-- form-group// -->
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-envelope"></i> </span>
-                            </div>
-                            <input required name="email" class="form-control" placeholder="Email address" type="email">
-                        </div> <!-- form-group// -->
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-phone"></i> </span>
-                            </div>
-
-                            <input required name="phone" class="form-control" placeholder="phone" type="text">
-                        </div> <!-- form-group// -->
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-building"></i> </span>
-                            </div>
-
-                            <input required name="organization" class="form-control" placeholder="organization" type="text">
-                        </div> <!-- form-group// -->
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-building"></i> </span>
-                            </div>
-                            <select required name="title" class="form-control">
-                                <option selected="">Title</option>
-                                <option>Mr</option>
-                                <option>Mrs</option>
-                                <option>Doc</option>
-                                <option>Prof</option>
-                            </select>
-                        </div> <!-- form-group end.// -->
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fas fa-genderless"></i> </span>
-                            </div>
-                            <select required name="gender" class="form-control">
-                                <option selected="">Gender</option>
-                                <option>Male</option>
-                                <option>Female</option>
-                            </select>
-                        </div> <!-- form-group// -->
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
-                            </div>
-                            <input required name="password" class="form-control" placeholder="Create password" type="password">
-                        </div> <!-- form-group// -->
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
-                            </div>
-                            <input required name="password-confirm" class="form-control" placeholder="Repeat password" type="password">
-                        </div> <!-- form-group// -->
-                        <div class="form-group">
-
-                            <button type="submit" class="btn btn-primary btn-block submit-registration"> Create Account </button>
-                        </div> <!-- form-group// -->
-                        <div class="registration-error">
-
-                        </div>
-                    </div>
-                    <p class="text-center">Have an account? <a href="">Log In</a> </p>
-                </form>
-            </article>
-        </div> <!-- card.// -->
-
-    </div>
-
-<?php
-}
-
-
-function login_form_html()
-{
-
-?>
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <!------ Include the above in your HEAD tag ---------->
-
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
-
-    <!------ Include the above in your HEAD tag ---------->
-    <div class="container">
-        <div class="card bg-light">
-            <article class="card-body mx-auto" style="max-width: 400px;">
-                <h4 class="card-title mt-3 text-center">Log In</h4>
-                <form id="policycloud-login" action="">
-                    <div class="form-row">
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-user"></i> </span>
-                            </div>
-                            <input required name="policycloud-marketplace-username" class="form-control" placeholder="Username" id="username" type="text">
-                        </div>
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
-                            </div>
-                            <input required name="policycloud-marketplace-password" class="form-control" placeholder="Password" type="password">
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block"> Log In </button>
-                    </div> <!-- form-group// -->
-                    <div class="login-error">
-                        <p class="text-center">
-                            <a href="">Forgot password</a>
-                        </p>
-                    </div>
+        <div class="policycloud-marketplace">
+            <form id="policycloud-registration" action="">
+                <fieldset name="account-credentials">
+                    <h2>Account credentials</h2>
+                    <p>The following information is required for authentication purposes.</p>
+                    <label for="username">Username *</label>
+                    <input required name="username" placeholder="e.x. johndoe" type="text" />
+                    <label for="password">Password *</label>
+                    <input required name="password" placeholder="Insert your password" type="password" />
+                    <label for="password-confirm">Confirm password *</label>
+                    <input required name="password-confirm" placeholder="Insert your password again" type="password" />
+                </fieldset>
+                <fieldset name="account-details">
+                    <h2>Account details</h2>
+                    <p>Fill in the following fields with your personal details. This information will be used to personalize your experience within the marketplace platform and showcase your profile to other visitors. Fields marked with (*) are required for registration.</p>
+                    <label for="title">Title</label>
+                    <select name="title" required>
+                        <option value="Mr.">Mr.</option>
+                        <option value="Ms.">Ms.</option>
+                        <option value="Mrs.">Mrs.</option>
+                        <option value="Dr.">Dr.</option>
+                        <option value="Prof.">Prof.</option>
+                        <option value="Sir">Sir</option>
+                        <option value="Miss">Miss</option>
+                        <option value="Mx.">Mx.</option>
+                        <option value="" selected>None</option>
+                    </select>
+                    <label for="name">First name *</label>
+                    <input required name="name" placeholder="Insert your first name" type="text" />
+                    <label for="surname">Last name *</label>
+                    <input required name="surname" placeholder="Insert your last name" type="text" />
+                    <label for="organization">Organization</label>
+                    <input required name="organization" placeholder="Insert your organization" type="text" />
+                    <label for="gender">Gender</label>
+                    <select name="gender" required>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="transgender">Transgender</option>
+                        <option value="genderqueer">Genderqueer</option>
+                        <option value="questioning">Questioning</option>
+                        <option value="-" selected>Prefer not to say</option>
+                    </select>
+                </fieldset>
+                <fieldset name="account-contact">
+                    <h2>Account contact details</h2>
+                    <p>Fill in your contact information here. This information will be used to validate your new account, as well as optionally make them available to other logged in Marketplace visitors. Fields marked with (*) are required for registration. These details by default remain private. </p>
+                    <label for="email">E-mail address *</label>
+                    <input type="email" name="email" placeholder="e.x. johndoe@example.org" required />
+                    <label for="phone">Phone number</label>
+                    <input type="tel" name="phone" placeholder="e.x. +30 6999123456" />
+                </fieldset>
+                <div class="error"></div>
+                <button type="submit" class="action ">Create account</button>
+                <p>Already have an account? Please <a href="<?php echo $authentication_url ?>">Log in</a>.</p>
+            </form>
         </div>
-        </form>
-        </article>
-    </div>
-    </div>
-
     <?php
+    }
 }
+
+
+
+
+/**
+ * Print the account authentication form.
+ * 
+ * @param   string $registration_url The url that redirects to the registration page.
+ * @param   string $error_message Any potential error message to be displayed.
+ *
+ * @since    1.0.0
+ */
+function account_authentication_html($registration_url, $error_message = '')
+{
+    if (!empty($error_message)) {
+        show_alert($error_message);
+    } else {
+    ?>
+        <div class="policycloud-marketplace">
+            <form id="policycloud-authentication" action="">
+                <fieldset name="account-credentials">
+                    <h2>Insert your credentials</h2>
+                    <p>The following information is required to log you in.</p>
+                    <label for="username">Username *</label>
+                    <input required name="username" placeholder="e.x. johndoe" type="text" />
+                    <label for="password">Password *</label>
+                    <input required name="password" placeholder="Insert your password" type="password" />
+                </fieldset>
+                <div class="error"></div>
+                <button type="submit" class="action">Log in</button>
+                <p>Don't have an account yet? You can <a href="<?php echo $registration_url ?>">register</a> now to obtain full access to the Marketplace.</p>
+            </form>
+        </div>
+    <?php
+    }
+}
+
 function read_multiple_html($description_objects, $args)
 {
     /** 
@@ -482,7 +436,7 @@ function read_single_html($description_object, $args)
                                                 echo $description_object['info']['description'];
                                             } ?> </p>
 
-                         <?php   } else { ?>
+                        <?php   } else { ?>
 
                             <p id="descs"><?php //echo description[info][short_desc];
                                             ?>I am text block. Click edit button to change this text. Lor
@@ -524,71 +478,60 @@ function read_single_html($description_object, $args)
 
 
 
-function create_object_html(string $error = null)
+function object_creation_html(string $error = null)
 {
-    // TODO @elefkour: Fix icons.
-    //i did it
-
     if (!empty($error)) {
         show_alert($error);
     } else {
     ?>
-        <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
-        <div class="container-fluid">
-            <div class="row justify-content-center">
-                <div class="col-11 col-sm-10 col-md-10 col-lg-6 col-xl-5 text-center p-0 mt-3 mb-2">
-                    <div class="card px-0 pt-4 pb-0 mt-3 mb-3">
-                        <form id="policycloud-marketplace-description-create">
-                            <h2 id="heading">Upload your Project</h2>
-                            <p>Fill all form field to go to next step</p>
-                            <!-- progressbar -->
-                            <ul id="progressbar">
-                                <?php // TODO @elekfour: Required title, type, description, owner 
-                                ?>
-                                <li class="active" id="account"><img style="color:gray;height:22px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/lock.drawio.svg') ?>" /><strong>Asset name,category and description </strong></li>
-                                <li id="personal"><img style="color:gray;height:22px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/user.drawio.svg') ?>" /><strong>Field of use and Author Comment</strong></li>
-                                <li id="confirm"><img style="color:gray;height:22px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/check.drawio.svg') ?>" /><strong>Finish</strong></li>
-                            </ul>
-                            <div class="progress">
-                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div> <br> <!-- fieldsets -->
-                            <fieldset>
-                                <div class="form-card">
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <h2 class="fs-title">Asset name,category and description:</h2>
-                                        </div>
-                                        <div class="col-5">
-                                            <h2 class="steps">Step 1 - 4</h2>
-                                        </div>
-                                    </div> <label class="fieldlabels">Title: *</label> <input id="title" class="required" type="text" name="title" placeholder="Title" required> <label class="fieldlabels"></label> <input id='usernameid' type="hidden" value='12345' />
-                                    <?php // TODO @elefkour: Dropdown (fixed values, will include PHP values later). 
-                                    ?>
-                                    <label class="fieldlabels">Type: *</label> <input class="required" type="text" name="type" placeholder="Type" /> <label class="fieldlabels">Sub-type: *</label> <input class="required" type="text" id="subtype" name="subtype" placeholder="Sub-type" /> <label class="fieldlabels">Owner: *</label> <input class="required" type="owner" id="owner" name="owner" placeholder="Owner" /> <label class="fieldlabels">Description: *</label><textarea class="required" name="description" form="policycloud-marketplace-description-create"></textarea>
-                                </div> <input type="button" name="next" class="next action-button" value="Next" />
-                            </fieldset>
-                            <fieldset>
-                                <div class="form-card">
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <h2 class="fs-title">Asset private Information:</h2>
-                                        </div>
-                                        <div class="col-5">
-                                            <h2 class="steps">Step 2 - 4</h2>
-                                        </div>
-                                    </div> <label class="fieldlabels">Field of Use: *</label> <input class="required" type="text" name="field-of-use" placeholder="Key Words" /> <label class="fieldlabels">Creator Comments</label><textarea name="comment"></textarea>
-                                </div>
-                                <div class="folding error"></div>
-                                <input type="submit" class="action-button" value="Submit" /> <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
-                            </fieldset>
-                            <?php
-                            // TODO @elefkour: Remove file upload pane. 
-                            ?>
-
-                        </form>
-                    </div>
-                </div>
-            </div>
+        <div class="policycloud-marketplace">
+            <form id="policycloud-object-create" action="">
+                <fieldset name="basic-information">
+                    <h2>Basic information</h2>
+                    <p>To create a new Marketplace object, the following fields represent  basic information that will be visible to others.</p>
+                    <label for="title">Title *</label>
+                    <input required name="title" placeholder="Insert a title" type="text" />
+                    <label for="type">Primary collection type *</label>
+                    <select name="type" required>
+                        <option value="algorithms" selected>Algorithms</option>
+                        <option value="tools">Tools</option>
+                        <option value="policies">Policies</option>
+                        <option value="datasets">Datasets</option>
+                        <option value="webinars">Webinars</option>
+                        <option value="tutorials">Tutorials</option>
+                        <option value="documents">Documents</option>
+                        <option value="externals">Externals</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <label for="subtype">Secondary collection type</label>
+                    <select name="subtype">
+                        <option value="" selected>-</option>
+                        <option value="algorithms">Algorithms</option>
+                        <option value="tools">Tools</option>
+                        <option value="policies">Policies</option>
+                        <option value="datasets">Datasets</option>
+                        <option value="webinars">Webinars</option>
+                        <option value="tutorials">Tutorials</option>
+                        <option value="documents">Documents</option>
+                        <option value="externals">Externals</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <label for="owner">Legal owner *</label>
+                    <input required name="owner" placeholder="Insert the legal owner of the object" type="text" />
+                    <label for="description">Description *</label>
+                    <textarea name="description" placeholder="Insert a detailed description" style="resize:vertical"></textarea>
+                </fieldset>
+                <fieldset name="internal-information">
+                    <h2>Internal information</h2>
+                    <p>You can include internal private comments and the object's field of use for management purposes. These fields are optional.</p>
+                    <label for="field-of-use">Fields of usage</label>
+                    <textarea name="field-of-use" placeholder="Separate multiple fields of usage using a comma (lorem, ipsum, etc.)"></textarea>
+                    <label for="comments">Comments</label>
+                    <textarea name="comments" placeholder="Insert any additional comments"></textarea>
+                </fieldset>
+                <div class="error"></div>
+                <button type="submit" class="action ">Create object</button>
+            </form>
         </div>
     <?php
     }
@@ -623,6 +566,9 @@ function show_alert(string $message, bool $dismissable = false, string $type = '
  */
 function user_account_html($token, array $descriptions = null, array $args)
 {
+
+    // TODO @alexandrosraikos: Update strings & titles.
+
     if (empty($token)) {
         if (!empty($args['login_page']) || !empty($args['registration_page'])) {
             show_alert('You are not logged in, please <a href="' . $args['login_page'] . '">log in</a> to your account. Don\'t have an account yet? You can <a href="' . $args['registration_page'] . '">register</a> here.');
