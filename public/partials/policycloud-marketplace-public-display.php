@@ -18,111 +18,61 @@
 function registration_form_html()
 {
 ?>
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" type="text/css" media="all" />
-    <!------ Include the above in your HEAD tag ---------->
-
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
-
-    <!------ Include the above in your HEAD tag ---------->
-    <div class="container">
-        <div class="card bg-light">
-            <article class="card-body mx-auto" style="max-width: 400px;">
-                <h4 class="card-title mt-3 text-center">Create Account</h4>
-                <p class="text-center">Get started with your free account</p>
-                <form id="policycloud-registration" action="">
-                    <div class="form-row">
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-user"></i> </span>
-                            </div>
-                            <input required name="username" class="form-control" placeholder="username" id="username" type="text">
-                        </div> <!-- form-group// -->
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-user"></i> </span>
-                            </div>
-                            <input required name="name" class="form-control" placeholder="name" id="name" type="text">
-                        </div> <!-- form-group// -->
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-user"></i> </span>
-                            </div>
-                            <input required name="surname" class="form-control" placeholder="surname" type="text">
-                        </div> <!-- form-group// -->
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-envelope"></i> </span>
-                            </div>
-                            <input required name="email" class="form-control" placeholder="Email address" type="email">
-                        </div> <!-- form-group// -->
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-phone"></i> </span>
-                            </div>
-
-                            <input required name="phone" class="form-control" placeholder="phone" type="text">
-                        </div> <!-- form-group// -->
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-building"></i> </span>
-                            </div>
-
-                            <input required name="organization" class="form-control" placeholder="organization" type="text">
-                        </div> <!-- form-group// -->
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-building"></i> </span>
-                            </div>
-                            <select required name="title" class="form-control">
-                                <option selected="">Title</option>
-                                <option>Mr</option>
-                                <option>Mrs</option>
-                                <option>Doc</option>
-                                <option>Prof</option>
-                            </select>
-                        </div> <!-- form-group end.// -->
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fas fa-genderless"></i> </span>
-                            </div>
-                            <select required name="gender" class="form-control">
-                                <option selected="">Gender</option>
-                                <option>Male</option>
-                                <option>Female</option>
-                            </select>
-                        </div> <!-- form-group// -->
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
-                            </div>
-                            <input required name="password" class="form-control" placeholder="Create password" type="password">
-                        </div> <!-- form-group// -->
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
-                            </div>
-                            <input required name="password-confirm" class="form-control" placeholder="Repeat password" type="password">
-                        </div> <!-- form-group// -->
-                        <div class="form-group">
-
-                            <button type="submit" class="btn btn-primary btn-block submit-registration"> Create Account </button>
-                        </div> <!-- form-group// -->
-                        <div class="registration-error">
-
-                        </div>
-                    </div>
-                    <p class="text-center">Have an account? <a href="">Log In</a> </p>
-                </form>
-            </article>
-        </div> <!-- card.// -->
-
+    <div class="policycloud-marketplace">
+        <form id="policycloud-registration" action="">
+            <fieldset name="account-credentials">
+                <h2>Account credentials</h2>
+                <p>The following information is required for authentication purposes.</p>
+                <label for="username">Username</label>
+                <input required name="username" placeholder="e.x. johndoe" type="text" />
+                <label for="password">Password</label>
+                <input required name="password" placeholder="Insert your password" type="password" />
+                <label for="password-confirm">Confirm password</label>
+                <input required name="password-confirm" placeholder="Insert your password again" type="password" />
+            </fieldset>
+            <fieldset name="account-details">
+                <h2>Account details</h2>
+                <p>Fill in the following fields with your personal details. This information will be used to personalize your experience within the marketplace platform and showcase your profile to other visitors.</p>
+                <label for="title">Title</label>
+                <select name="title" required>
+                    <option value="Mr.">Mr.</option>
+                    <option value="Ms.">Ms.</option>
+                    <option value="Mrs.">Mrs.</option>
+                    <option value="Dr.">Dr.</option>
+                    <option value="Prof.">Prof.</option>
+                    <option value="Sir">Sir</option>
+                    <option value="Miss">Miss</option>
+                    <option value="Mx.">Mx.</option>
+                    <option value="-" selected>None</option>
+                </select>
+                <label for="name">First name</label>
+                <input required name="name" placeholder="Insert your first name" type="text" />
+                <label for="surname">Last name</label>
+                <input required name="surname" placeholder="Insert your last name" type="text" />
+                <label for="organization">Organization</label>
+                <input required name="organization" placeholder="Insert your organization" type="text" />
+                <label for="gender">Gender</label>
+                <select name="gender" required>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Transgender">Transgender</option>
+                    <option value="Genderqueer">Genderqueer</option>
+                    <option value="Questioning">Questioning</option>
+                    <option value="-" selected>Prefer not to say</option>
+                </select>
+            </fieldset>
+            <fieldset name="account-contact">
+                <h2>Account contact details</h2>
+                <p>Fill in your contact information here. This information will be used to validate your new account, as well as optionally make them available to other logged in Marketplace visitors. These details by default remain private.</p>
+                <label for="email">E-mail address</label>
+                <input type="email" name="email" placeholder="e.x. johndoe@example.org" required />
+                <label for="phone">Phone number (Optional)</label>
+                <input type="tel" name="phone" placeholder="e.x. +30 6999123456" />
+            </fieldset>
+            <button type="submit" class="action">Create account</button>
+            <p>Already have an account? Please <a href="">Log in</a>.</p>
+        </form>
     </div>
-
 <?php
 }
 
@@ -482,7 +432,7 @@ function read_single_html($description_object, $args)
                                                 echo $description_object['info']['description'];
                                             } ?> </p>
 
-                         <?php   } else { ?>
+                        <?php   } else { ?>
 
                             <p id="descs"><?php //echo description[info][short_desc];
                                             ?>I am text block. Click edit button to change this text. Lor
