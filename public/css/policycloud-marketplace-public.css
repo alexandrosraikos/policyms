@@ -1046,7 +1046,7 @@ p {
 
 /* Forms */
 
-.policycloud-marketplace form *:not(button) {
+.policycloud-marketplace form *:not(button, svg) {
   display: block;
   margin: 0 auto;
   width: 100%;

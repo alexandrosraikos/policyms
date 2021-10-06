@@ -54,6 +54,10 @@ class PolicyCloud_Marketplace_Public
 		$this->version = $version;
 	}
 
+	public function enqueue_head_scripts() {
+		echo '<script>FontAwesomeConfig = { autoA11y: true }</script><script src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"></script>';
+	}
+
 	/**
 	 * Register the stylesheets for the public-facing side of the site.
 	 *
