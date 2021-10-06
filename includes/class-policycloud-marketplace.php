@@ -195,8 +195,8 @@ class PolicyCloud_Marketplace {
 		$this->loader->add_action('init', $plugin_public, 'add_content_shortcodes');
 		$this->loader->add_action('wp_ajax_description_edit', $plugin_public, 'description_edit_handler');
 		$this->loader->add_action('wp_ajax_nopriv_description_edit', $plugin_public, 'description_edit_handler');
-		$this->loader->add_action('wp_ajax_policycloud_marketplace_description_create', $plugin_public, 'create_description_handler');
-		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_description_create', $plugin_public, 'create_description_handler');
+		$this->loader->add_action('wp_ajax_policycloud_marketplace_object_creation', $plugin_public, 'object_creation_handler');
+		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_object_creation', $plugin_public, 'object_creation_handler');
 		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_edit', $plugin_public, 'account_edit_handler');
 		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_edit', $plugin_public, 'account_edit_handler');
 	}

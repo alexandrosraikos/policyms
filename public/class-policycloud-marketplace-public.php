@@ -77,10 +77,9 @@ class PolicyCloud_Marketplace_Public
 		// Authorization related scripts.
 		wp_register_script("policycloud-marketplace-account-registration", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-registration.js', array('jquery'), $this->version, false);
 		wp_register_script("policycloud-marketplace-account-authentication", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-authentication.js', array('jquery'), $this->version, false);
-		wp_enqueue_script("policycloud-marketplace-logout", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-logout.js', array('jquery'), $this->version, false);
 
 		// Content related scripts.
-		wp_register_script("policycloud-marketplace-create-description", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-create.js', array('jquery'), $this->version, false);
+		wp_register_script("policycloud-marketplace-object-create", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-object-create.js', array('jquery'), $this->version, false);
 		wp_register_script("policycloud-marketplace-read-single", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-single.js', array('jquery'), $this->version, false);
 		wp_register_script("policycloud-marketplace-account", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account.js', array('jquery'), $this->version, false);
 	}
@@ -301,7 +300,7 @@ class PolicyCloud_Marketplace_Public
 		add_shortcode('policycloud-marketplace-read-single', 'PolicyCloud_Marketplace_Public::read_single_object');
 
 		// Create object sequence.
-		add_shortcode('policycloud-marketplace-create-object', 'PolicyCloud_Marketplace_Public::create_object');
+		add_shortcode('policycloud-marketplace-create-object', 'PolicyCloud_Marketplace_Public::object_creation_shortcode');
 
 		// Account page shortcode.
 		add_shortcode('policycloud-marketplace-account', 'PolicyCloud_Marketplace_Public::user_account');
@@ -342,7 +341,7 @@ class PolicyCloud_Marketplace_Public
 	 * @uses	PolicyCloud_Marketplace_Public::description_creation()
 	 * @since	1.0.0
 	 */
-	public function create_description_handler()
+	public function object_creation_handler()
 	{
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_description_creation_verification')) {
@@ -373,7 +372,7 @@ class PolicyCloud_Marketplace_Public
 	 *
 	 * @since    1.0.0
 	 */
-	public static function create_object()
+	public static function object_creation_shortcode()
 	{
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
@@ -381,24 +380,24 @@ class PolicyCloud_Marketplace_Public
 		try {
 			// Get specific Description data for authorized users.
 			$token = retrieve_token();
-			if (empty($token)) $error = "You need to be logged in to create a Description Object.";
+			if (empty($token)) $error_message = "You need to be logged in to create a Description Object.";
 		} catch (Exception $e) {
-			$error = $e->getMessage();
+			$error_message = $e->getMessage();
 		}
 
 		// Retrieve description page URL.
 		$options = get_option('policycloud_marketplace_plugin_settings');
-		if (empty($options['account_page'])) $error = "You have not set an account page in your PolicyCloud Marketplace settings.";
+		if (empty($options['account_page'])) $error_message = "You have not set an account page in your PolicyCloud Marketplace settings.";
 
-		wp_enqueue_script("policycloud-marketplace-create-description");
-		wp_localize_script('policycloud-marketplace-create-description', 'ajax_properties_description_creation', array(
+		wp_enqueue_script("policycloud-marketplace-object-create");
+		wp_localize_script('policycloud-marketplace-object-create', 'ajax_properties_object_creation', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce('ajax_policycloud_description_creation_verification'),
 			'account_page' => $options['account_page']
 		));
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		create_object_html($error ?? '');
+		object_creation_html($error_message ?? '');
 	}
 
 	/**

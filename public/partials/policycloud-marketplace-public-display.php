@@ -478,71 +478,60 @@ function read_single_html($description_object, $args)
 
 
 
-function create_object_html(string $error = null)
+function object_creation_html(string $error = null)
 {
-    // TODO @elefkour: Fix icons.
-    //i did it
-
     if (!empty($error)) {
         show_alert($error);
     } else {
     ?>
-        <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
-        <div class="container-fluid">
-            <div class="row justify-content-center">
-                <div class="col-11 col-sm-10 col-md-10 col-lg-6 col-xl-5 text-center p-0 mt-3 mb-2">
-                    <div class="card px-0 pt-4 pb-0 mt-3 mb-3">
-                        <form id="policycloud-marketplace-description-create">
-                            <h2 id="heading">Upload your Project</h2>
-                            <p>Fill all form field to go to next step</p>
-                            <!-- progressbar -->
-                            <ul id="progressbar">
-                                <?php // TODO @elekfour: Required title, type, description, owner 
-                                ?>
-                                <li class="active" id="account"><img style="color:gray;height:22px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/lock.drawio.svg') ?>" /><strong>Asset name,category and description </strong></li>
-                                <li id="personal"><img style="color:gray;height:22px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/user.drawio.svg') ?>" /><strong>Field of use and Author Comment</strong></li>
-                                <li id="confirm"><img style="color:gray;height:22px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/check.drawio.svg') ?>" /><strong>Finish</strong></li>
-                            </ul>
-                            <div class="progress">
-                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div> <br> <!-- fieldsets -->
-                            <fieldset>
-                                <div class="form-card">
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <h2 class="fs-title">Asset name,category and description:</h2>
-                                        </div>
-                                        <div class="col-5">
-                                            <h2 class="steps">Step 1 - 4</h2>
-                                        </div>
-                                    </div> <label class="fieldlabels">Title: *</label> <input id="title" class="required" type="text" name="title" placeholder="Title" required> <label class="fieldlabels"></label> <input id='usernameid' type="hidden" value='12345' />
-                                    <?php // TODO @elefkour: Dropdown (fixed values, will include PHP values later). 
-                                    ?>
-                                    <label class="fieldlabels">Type: *</label> <input class="required" type="text" name="type" placeholder="Type" /> <label class="fieldlabels">Sub-type: *</label> <input class="required" type="text" id="subtype" name="subtype" placeholder="Sub-type" /> <label class="fieldlabels">Owner: *</label> <input class="required" type="owner" id="owner" name="owner" placeholder="Owner" /> <label class="fieldlabels">Description: *</label><textarea class="required" name="description" form="policycloud-marketplace-description-create"></textarea>
-                                </div> <input type="button" name="next" class="next action-button" value="Next" />
-                            </fieldset>
-                            <fieldset>
-                                <div class="form-card">
-                                    <div class="row">
-                                        <div class="col-7">
-                                            <h2 class="fs-title">Asset private Information:</h2>
-                                        </div>
-                                        <div class="col-5">
-                                            <h2 class="steps">Step 2 - 4</h2>
-                                        </div>
-                                    </div> <label class="fieldlabels">Field of Use: *</label> <input class="required" type="text" name="field-of-use" placeholder="Key Words" /> <label class="fieldlabels">Creator Comments</label><textarea name="comment"></textarea>
-                                </div>
-                                <div class="folding error"></div>
-                                <input type="submit" class="action-button" value="Submit" /> <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
-                            </fieldset>
-                            <?php
-                            // TODO @elefkour: Remove file upload pane. 
-                            ?>
-
-                        </form>
-                    </div>
-                </div>
-            </div>
+        <div class="policycloud-marketplace">
+            <form id="policycloud-object-create" action="">
+                <fieldset name="basic-information">
+                    <h2>Basic information</h2>
+                    <p>To create a new Marketplace object, the following fields represent  basic information that will be visible to others.</p>
+                    <label for="title">Title *</label>
+                    <input required name="title" placeholder="Insert a title" type="text" />
+                    <label for="type">Primary collection type *</label>
+                    <select name="type" required>
+                        <option value="algorithms" selected>Algorithms</option>
+                        <option value="tools">Tools</option>
+                        <option value="policies">Policies</option>
+                        <option value="datasets">Datasets</option>
+                        <option value="webinars">Webinars</option>
+                        <option value="tutorials">Tutorials</option>
+                        <option value="documents">Documents</option>
+                        <option value="externals">Externals</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <label for="subtype">Secondary collection type</label>
+                    <select name="subtype">
+                        <option value="" selected>-</option>
+                        <option value="algorithms">Algorithms</option>
+                        <option value="tools">Tools</option>
+                        <option value="policies">Policies</option>
+                        <option value="datasets">Datasets</option>
+                        <option value="webinars">Webinars</option>
+                        <option value="tutorials">Tutorials</option>
+                        <option value="documents">Documents</option>
+                        <option value="externals">Externals</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <label for="owner">Legal owner *</label>
+                    <input required name="owner" placeholder="Insert the legal owner of the object" type="text" />
+                    <label for="description">Description *</label>
+                    <textarea name="description" placeholder="Insert a detailed description" style="resize:vertical"></textarea>
+                </fieldset>
+                <fieldset name="internal-information">
+                    <h2>Internal information</h2>
+                    <p>You can include internal private comments and the object's field of use for management purposes. These fields are optional.</p>
+                    <label for="field-of-use">Fields of usage</label>
+                    <textarea name="field-of-use" placeholder="Separate multiple fields of usage using a comma (lorem, ipsum, etc.)"></textarea>
+                    <label for="comments">Comments</label>
+                    <textarea name="comments" placeholder="Insert any additional comments"></textarea>
+                </fieldset>
+                <div class="error"></div>
+                <button type="submit" class="action ">Create object</button>
+            </form>
         </div>
     <?php
     }
@@ -577,6 +566,9 @@ function show_alert(string $message, bool $dismissable = false, string $type = '
  */
 function user_account_html($token, array $descriptions = null, array $args)
 {
+
+    // TODO @alexandrosraikos: Update strings & titles.
+
     if (empty($token)) {
         if (!empty($args['login_page']) || !empty($args['registration_page'])) {
             show_alert('You are not logged in, please <a href="' . $args['login_page'] . '">log in</a> to your account. Don\'t have an account yet? You can <a href="' . $args['registration_page'] . '">register</a> here.');
