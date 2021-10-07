@@ -90,7 +90,7 @@ class PolicyCloud_Marketplace_Admin
 
 	function register_settings() {
 
-		// TODO @alexandrosraikos: Update all selectors to use page id instead of raw link.
+		// TODO (consideration): Update all selectors to use page id instead of raw link.
 		
 		register_setting(
 		  'policycloud_marketplace_plugin_settings',

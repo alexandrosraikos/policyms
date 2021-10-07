@@ -55,6 +55,9 @@ function marketplace_username_exists($hostname, $username)
  */
 function account_registration($data)
 {
+    // TODO @alexandrosraikos: Add x-more-time:1 header.
+    // TODO @alexandrosraikos: Handle about & socials fields.
+
     // Information validation checks and errors.
     if (
         empty($data['username']) ||
@@ -150,6 +153,9 @@ function account_registration($data)
  */
 function account_authentication($data)
 {
+    // TODO @alexandrosraikos: Handle email address as credential.
+    // TODO @alexandrosraikos: Add x-more-time:1 header.
+
     // Check submitted log in information.
     if (
         empty($data['username']) ||
@@ -287,6 +293,8 @@ function user_email_verification_resend(string $verification_code, string $email
  */
 function verify_user(string $verification_code) {
 
+    // TODO @alexandrosraikos: Add x-more-time:1 header.
+
     // Retrieve API credentials.
     $options = get_option('policycloud_marketplace_plugin_settings');
     if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
@@ -334,9 +342,8 @@ function verify_user(string $verification_code) {
  */
 function account_edit($data)
 {
-
-    // TODO @alexandrosraikos: Update with new API endpoint and $data fields.
-    // NOTICE: Send only edited fields.
+    // TODO @alexandrosraikos: Add x-more-time:1 header.
+    // TODO @alexandrosraikos: Update with new API endpoint and $data fields. (send only edited fields)
 
     // Information validation checks and errors.
     if (

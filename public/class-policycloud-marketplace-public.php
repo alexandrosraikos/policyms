@@ -322,6 +322,8 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public function description_edit_handler()
 	{
+		// TODO @alexandrosraikos: Edit other descriptions when token is admin.
+
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_description_editing_verification')) {
 			die("Unverified request to edit description object.");
@@ -436,7 +438,6 @@ class PolicyCloud_Marketplace_Public
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 
 
-		// TODO @elefkour: handle 'notice' arg.
 		read_multiple_html($descriptions, [
 			"authenticated" => $authenticated ?? false,
 			"description_url" => $options['description_page'],
@@ -491,6 +492,9 @@ class PolicyCloud_Marketplace_Public
 	public static function account_shortcode()
 	{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
+
+		// TODO @alexandrosraikos: Support viewing other users with GET.
+		// TODO @alexandrosraikos: Edit other users when token is admin.
 
 		try {
 			// Get specific Description data for authorized users.

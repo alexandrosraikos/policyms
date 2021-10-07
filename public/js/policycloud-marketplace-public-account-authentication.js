@@ -4,7 +4,7 @@
     $("#policycloud-authentication").submit((e) => {
       e.preventDefault();
       $("#policycloud-authentication button[type=submit]").addClass("loading");
-
+      // TODO @alexandrosraikos: Handle user email as credential.
       // Perform AJAX request.
       $.ajax({
         url: ajax_properties_account_authentication.ajax_url,

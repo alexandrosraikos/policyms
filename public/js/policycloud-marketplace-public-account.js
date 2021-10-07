@@ -82,6 +82,7 @@
       );
 
       // Perform AJAX request.
+      // TODO @alexandrosraikos: Handle about & social fields.
       $.ajax({
         url: ajax_properties_account_editing.ajax_url,
         type: "post",

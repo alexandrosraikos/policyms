@@ -29,6 +29,8 @@ function account_registration_html($authentication_url, $logged_in)
     if ($logged_in) {
         show_alert("You're already logged in.", false, 'notice');
     } else {
+        // TODO @alexandrosraikos: Highlight email as an account credential.
+        // TODO @alexandrosraikos: Add about & social fields.
 ?>
         <div class="policycloud-marketplace">
             <form id="policycloud-registration" action="">
@@ -105,6 +107,7 @@ function account_registration_html($authentication_url, $logged_in)
 function account_authentication_html($registration_url, $logged_in)
 {
     if (!$logged_in) {
+        // TODO @alexandrosraikos: Add email as an account credential.
     ?>
         <div class="policycloud-marketplace">
             <form id="policycloud-authentication" action="">
@@ -522,6 +525,8 @@ function object_creation_html(string $error = null)
     if (!empty($error)) {
         show_alert($error);
     } else {
+        // TODO @alexandrosraikos: Move Fields of use outside of internal information.
+        // TODO @alexandrosraikos: Write subtype as a custom text field.
     ?>
         <div class="policycloud-marketplace">
             <form id="policycloud-object-create" action="">
@@ -644,6 +649,11 @@ function time_elapsed_string($datetime, $full = false) {
  */
 function account_html($token, array $descriptions = null, array $args)
 {
+    // TODO @alexandrosraikos: Rename objects to assets.
+    // TODO @alexandrosraikos: Add about & social fields to overview.
+    // TODO @alexandrosraikos: Add about & social fields to information.
+    // TODO @alexandrosraikos: Add about & social fields to editing.
+
     if (empty($token)) {
         if (!empty($args['login_page']) || !empty($args['registration_page'])) {
             show_alert('You are not logged in, please <a href="' . $args['login_page'] . '">log in</a> to your account. Don\'t have an account yet? You can <a href="' . $args['registration_page'] . '">register</a> here.');
