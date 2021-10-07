@@ -77,6 +77,7 @@ class PolicyCloud_Marketplace_Admin
 
 	function policycloud_marketplace_validate_plugin_settings( $input ) {
 		$output['jwt_key'] = sanitize_text_field( $input['jwt_key'] );
+		$output['encryption_key'] = sanitize_text_field( $input['encryption_key'] );
 		$output['marketplace_host'] = sanitize_text_field( $input['marketplace_host']);
 		$output['login_page'] = esc_url($input['login_page']);
 		$output['registration_page'] = esc_url($input['registration_page']);
@@ -116,6 +117,14 @@ class PolicyCloud_Marketplace_Admin
 		  'jwt_key',
 		  'Marketplace Key',
 		  'policycloud_marketplace_plugin_jwt_key',
+		  'policycloud_marketplace_plugin',
+		  'section_one'
+		);
+
+		add_settings_field(
+		  'encryption_key',
+		  'Encryption Key',
+		  'policycloud_marketplace_plugin_encryption_key',
 		  'policycloud_marketplace_plugin',
 		  'section_one'
 		);

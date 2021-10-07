@@ -126,7 +126,8 @@ function account_registration($data)
                 if ($decoded_token->account->verified !== '1') {
                     user_email_verification_resend($decoded_token->account->verified,$decoded_token->account->email);
                 }
-                return openssl_encrypt($response['token'], "AES-128-ECB", $options['jwt_key']);
+                if (empty($options['encryption_key'])) throw new Exception("No PolicyCloud Marketplace encryption key was defined in WordPress settings.");
+                return openssl_encrypt($response['token'], "AES-128-ECB", $options['encryption_key']);
             }
         } catch (\Exception $e) {
             throw new Exception($e->getMessage());
@@ -184,9 +185,9 @@ function account_authentication($data)
     } elseif ($response['_status'] == 'successful') {
         try {
             // Encrypt token using the same key and return.
-            if (empty($options['jwt_key'])) throw new Exception("No PolicyCloud Marketplace API key was defined in WordPress settings.");
+                if (empty($options['encryption_key'])) throw new Exception("No PolicyCloud Marketplace encryption key was defined in WordPress settings.");
             else {
-                return openssl_encrypt($response['token'], "AES-128-ECB", $options['jwt_key']);
+                return openssl_encrypt($response['token'], "AES-128-ECB", $options['encryption_key']);
             }
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
@@ -211,8 +212,8 @@ function retrieve_token(bool $decode = false)
     if (!empty($_COOKIE['ppmapi-token'])) {
 
         // Decrypt token.
-        // TODO @alexandrosraikos Use different encryption key (@see admin options page too).
-        $token = openssl_decrypt($_COOKIE['ppmapi-token'], "AES-128-ECB", $options['jwt_key']);
+        if (empty($options['encryption_key'])) throw new Exception("No PolicyCloud Marketplace encryption key was defined in WordPress settings.");
+        $token = openssl_decrypt($_COOKIE['ppmapi-token'], "AES-128-ECB", $options['encryption_key']);
         if (empty($token)) throw new Exception("Decryption was unsuccessful.");
 
         // Validate token age, signature and content.
@@ -310,9 +311,9 @@ function verify_user(string $verification_code) {
     } elseif ($response['_status'] == 'successful') {
         try {
             // Encrypt token using the same key and return.
-            if (empty($options['jwt_key'])) throw new Exception("No PolicyCloud Marketplace API key was defined in WordPress settings.");
+                if (empty($options['encryption_key'])) throw new Exception("No PolicyCloud Marketplace encryption key was defined in WordPress settings.");
             else {
-                return openssl_encrypt($response['token'], "AES-128-ECB", $options['jwt_key']);
+                return openssl_encrypt($response['token'], "AES-128-ECB", $options['encryption_key']);
             }
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
@@ -401,7 +402,8 @@ function account_edit($data)
     elseif ($response['_status'] == 'successful') {
         try {
             // Encrypt token using the same key and return.
-            return openssl_encrypt(json_encode($data), "AES-128-ECB", $options['jwt_key']);
+                if (empty($options['encryption_key'])) throw new Exception("No PolicyCloud Marketplace encryption key was defined in WordPress settings.");
+            return openssl_encrypt(json_encode($data), "AES-128-ECB", $options['encryption_key']);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
