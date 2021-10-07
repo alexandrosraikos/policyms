@@ -118,7 +118,7 @@ class PolicyCloud_Marketplace_Public
 			if (empty($options['account_page'])) throw new Exception("There is no account page set in the PolicyCloud Marketplace settings, please contact your administrator.");
 			if (empty($options['login_page'])) throw new Exception("There is no log in page set in the PolicyCloud Marketplace settings, please contact your administrator.");
 			if (retrieve_token()) {
-				$error_message = 'You are already logged in.';
+				$logged_in = true;
 			}
 		} catch (\Exception $e) {
 			$error_message =  $e->getMessage();
@@ -132,7 +132,7 @@ class PolicyCloud_Marketplace_Public
 		));
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		account_registration_html($options['login_page'], $error_message ?? '');
+		account_registration_html($options['login_page'], $logged_in ?? false);
 	}
 
 	/**
@@ -216,7 +216,7 @@ class PolicyCloud_Marketplace_Public
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
 		try {
 			if (retrieve_token()) {
-				$error_message = 'You are already logged in.';
+				$logged_in = true;
 			}
 		} catch (\Exception $e) {
 			$error_message =  $e->getMessage();
@@ -229,7 +229,7 @@ class PolicyCloud_Marketplace_Public
 		));
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		account_authentication_html($options['registration_page'],$error_message ?? '');
+		account_authentication_html($options['registration_page'], $logged_in ?? false);
 	}
 
 	/**

@@ -24,10 +24,10 @@
  *
  * @since    1.0.0
  */
-function account_registration_html($authentication_url, $error_message = '')
+function account_registration_html($authentication_url, $logged_in)
 {
-    if (!empty($error_message)) {
-        show_alert($error_message);
+    if ($logged_in) {
+        show_alert("You're already logged in.", false, 'notice');
     } else {
 ?>
         <div class="policycloud-marketplace">
@@ -97,15 +97,14 @@ function account_registration_html($authentication_url, $error_message = '')
  * Print the account authentication form.
  * 
  * @param   string $registration_url The url that redirects to the registration page.
+ * @param   bool $logged_in Whether the viewer is already logged in.
  * @param   string $error_message Any potential error message to be displayed.
  *
  * @since    1.0.0
  */
-function account_authentication_html($registration_url, $error_message = '')
+function account_authentication_html($registration_url, $logged_in)
 {
-    if (!empty($error_message)) {
-        show_alert($error_message);
-    } else {
+    if (!$logged_in) {
     ?>
         <div class="policycloud-marketplace">
             <form id="policycloud-authentication" action="">
@@ -123,6 +122,9 @@ function account_authentication_html($registration_url, $error_message = '')
             </form>
         </div>
     <?php
+    }
+    else {
+        show_alert("You're already logged in.", false, 'notice');
     }
 }
 

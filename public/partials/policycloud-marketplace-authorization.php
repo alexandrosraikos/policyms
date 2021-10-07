@@ -222,13 +222,15 @@ function retrieve_token(bool $decode = false)
         } catch (InvalidArgumentException $e) {
             throw new Exception($e->getMessage());
         } catch (UnexpectedValueException $e) {
-            throw new Exception($e->getMessage());
+            if (empty($options['encryption_key'])) throw new Exception("No PolicyCloud Marketplace log in page was defined in WordPress settings.");
+            throw new Exception('Your session is invalid, please <a href="'.$options['login_page'].'">log in</a> again to continue.');
         } catch (SignatureInvalidException $e) {
             throw new Exception($e->getMessage());
         } catch (BeforeValidException $e) {
             throw new Exception($e->getMessage());
-        } catch (ExpiredException $e) {
-            throw new Exception($e->getMessage());
+        } catch (ExpiredException $e) {        
+            if (empty($options['encryption_key'])) throw new Exception("No PolicyCloud Marketplace log in page was defined in WordPress settings.");
+            throw new Exception('Your session has expired, please <a href="'.$options['login_page'].'">log in</a> again to continue.');
         }
 
         return ($decode) ? [
