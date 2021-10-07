@@ -33,6 +33,21 @@
   color: #fff;
 }
 
+.registration-error,
+.login-error {
+  color: red;
+  text-align: center;
+  font-weight: bold;
+  margin: 20px 0;
+}
+
+.submit-registration.loading,
+.submit-login.loading {
+  opacity: 0.7;
+  cursor: wait;
+  pointer-events: none;
+}
+
 .fa-user-o {
   margin-left: 300px;
 }
@@ -159,6 +174,8 @@ input[type="text"] {
   top: 9;
   left: 0;
   background-color: #000080;
+  max-height: calc(100vh - 9rem);
+  overflow-y: auto;
   overflow-x: hidden;
 }
 
@@ -683,9 +700,42 @@ img {
 
   display: inline-block !important;
 }
+input#mindate {
+  display: block;
+  float: left;
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+  padding: 4px;
+  width: 40px;
+  height: 20px;
+  line-height: 20px;
+  border-width: 1px;
+  border-style: solid;
+  outline: 0;
+  text-align: center;
+  vertical-align: text-bottom;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+input#datemin {
+  margin: auto;
+}
+input#datemax {
+  margin: auto;
+}
+#date-center {
+  width: 80%;
+  margin: auto;
+}
 .policy-cloud-eye-img {
-  filter: grayscale(100%);
-
+  display: inline-block !important;
+}
+.policy-cloud-approve {
   display: inline-block !important;
 }
 /*koubia */
@@ -756,7 +806,20 @@ p {
   color: #4966cb;
   font-weight: normal;
 }
-
+select#type.type-create {
+  padding: 8px 15px 8px 15px;
+  border: 1px solid #ccc;
+  border-radius: 0px;
+  margin-bottom: 25px;
+  margin-top: 2px;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: montserrat;
+  color: #2c3e50;
+  background-color: #eceff1;
+  font-size: 16px;
+  letter-spacing: 1px;
+}
 #policycloud-marketplace-description-create {
   width: 500px;
   margin: 50px auto;

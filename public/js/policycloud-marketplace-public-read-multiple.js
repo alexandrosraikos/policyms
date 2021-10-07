@@ -1,19 +1,23 @@
 (function ($) {
   "use strict";
- /*slider */
- $(document).on('input change', '#slider', function() {
-  $('#slider_value').html( $(this).val() );
-});
-  /*checkbox */
+  /*slider */
+  $(document).on("input change", "#slider", function () {
+    $("#slider_value").html($(this).val());
+    $("#mindate").val($(this).val());
+  });
+  $(document).on("input change", "#mindate", function () {
+    $("#slider_value").html($(this).val());
+    $("#slider").val($(this).val());
+  });
+  /*checkbox 
   $(function () {
     $(".checkbox").on("change", function () {
       $("#checkbox1").submit();
     });
   });
- 
-    
+  
+    */
   $(document).ready(() => {
-
     /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
     $(".dropdown-btn1").on("click", function () {
       $(this).toggleClass("active");
@@ -57,5 +61,6 @@
   });
   $(document).on("input change", "#pcslider", function () {
     $("#pcslider_value").html($(this).val());
+    $("#mindate").val($(this).val());
   });
 })(jQuery);

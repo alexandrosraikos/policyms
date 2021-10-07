@@ -161,9 +161,9 @@ function read_multiple_html($description_objects, $args)
             <form action="" method="get">
                 <input type="text" style="width:100%;" name="search" placeholder="Search..">
             </form>
-            <button class="dropdown-btn1">Asset Types
+            <a class="dropdown-btn1">Asset Types
                 <i class="fa fa-caret-down"></i>
-            </button>
+            </a>
             <div class="dropdown-container">
                 <form id="checkbox1" action="">
                     <input type="checkbox" id="vehicle1" name="type[]" value="algorithms">
@@ -172,19 +172,26 @@ function read_multiple_html($description_objects, $args)
                     <label class="pccheckbox" for="vehicle2"> Tools</label> <br>
                     <input type="checkbox" id="vehicle3" name="type[]" value="datasets">
                     <label class="pccheckbox" for="vehicle3"> Datasets </label> <br>
-                    <input type="checkbox" id="vehicle4" name="type[]" value="outcomes">
-                    <label class="pccheckbox" for="vehicle4"> Project's Outcomes</label> <br>
+                    <input type="checkbox" id="vehicle4" name="type[]" value="documents">
+                    <label class="pccheckbox" for="vehicle4"> Documents</label> <br>
                     <input type="checkbox" id="vehicle5" name="type[]" value="webinars">
                     <label class="pccheckbox" for="vehicle5"> Webinars</label> <br>
                     <input type="checkbox" id="vehicle6" name="type[]" value="tutorials">
-                    <label class="pccheckbox" for="vehicle6"> tutorias</label> <br>
+                    <label class="pccheckbox" for="vehicle6"> Tutorials</label> <br>
+                    <input type="checkbox" id="vehicle6" name="type[]" value="presentations">
+                    <label class="pccheckbox" for="vehicle6"> Presentations</label> <br>
+                    <input type="checkbox" id="vehicle6" name="type[]" value="externals">
+                    <label class="pccheckbox" for="vehicle6"> Externals</label><br>
+                    <input type="checkbox" id="vehicle6" name="type[]" value="other">
+                    <label class="pccheckbox" for="vehicle6"> Other</label> <br>
+                    <br>
 
 
 
             </div>
-            <button class="dropdown-btn1">Filter by Owner
+            <a class="dropdown-btn1">Filter by Owner
                 <i class="fa fa-caret-down"></i>
-            </button>
+            </a>
             <div class="dropdown-container">
                 <br>
 
@@ -199,14 +206,15 @@ function read_multiple_html($description_objects, $args)
 
             </div>
 
-            <button class="dropdown-btn1">Advanced search
+            <a class="dropdown-btn1">Advanced search
                 <i class="fa fa-caret-down"></i>
-            </button>
+            </a>
             <div class="dropdown-container">
+                <span style="color:white;">Choose a name and his value </span>
                 <div class="col-1">
                     <div class="form" action="">
                         <input type="text" class="myinp" placeholder="Add Key"> <input class="myinp" type="text" placeholder="Value">
-                        <button class="btn btn-primary add_field_button"><i class="fa fa-plus"></i> Add More</button>
+                        <button class="btn btn-primary add_field_button"><i>+</i> Add More</button>
                     </div>
                 </div>
                 <div class="input_fields_wrap">
@@ -215,14 +223,24 @@ function read_multiple_html($description_objects, $args)
             </div>
 
             <a style="pointer-events: none; cursor: default;"> Filter by Views</a>
-
-            <input type="range" style="color:white;" id="slider" value="50" min="1" max="100" step="1" />
-            <br />
             <span style="color:white;" id="slider_value"></span>
-            <br>
-            <a style="pointer-events: none; cursor: default;">Choose Dates</a> <input type="date" class="pocdate" id="datemin" name="datemin" min="2000-01-02">
+            <input type="range" style="color:white;" id="slider" value="50" min="1" max="100" step="1" />
+            <input type="text" name="mindate" id="mindate" value="1">
+            <br />
 
-            <input type="date" class="pocdate" id="datemax" name="datemax" max="1979-12-31">
+            <br>
+            <a style="pointer-events: none; cursor: default;">Choose Dates</a>
+            <div id="date-center">
+
+                <input type="date" class="pocdate" id="datemin" name="datemin" min="2000-01-02">
+
+                <input type="date" class="pocdate" id="datemax" name="datemax" max="1979-12-31">
+                <br />
+                <br />
+                <input type="submit" style="background-color:white;color:black;" value="submit">
+
+            </div>
+
             </div>
         </ul>
 
@@ -395,19 +413,38 @@ function read_single_html($description_object, $args)
                             <h2 id="description-title" class="h2title"> <?php if (!empty($description_object['info']['title'])) {
                                                                             echo $description_object['info']['title'];
                                                                         }             ?></h2>
-                            <span class="card-link" style="color:gray;font-size:12px;">
+                            <span class="card-link" style="font-size:12px;">
                                 <?php if ($isuserlogin)
                                     if (!empty($description_object['info']['owner']))
-                                        echo '<i class="far fa-user"></i> ' . $description_object['info']['owner'] . '|';
-                                ?> <i class="far fa-eye"></i> <?php //echo $description_object['metadata']['views']; 
-                                                                ?>
-                                100 | <i class="far fa-calendar-alt"></i>
-                                <?php if (!empty($description_object['metadata']['uploadDate']))
-                                    echo  $description_object['metadata']['uploadDate'];
-                                ?>
-                                | <i class="fa fa-download">
-                                    <?php //echo $description_object['metadata']['downloads']'
-                                    ?> 20</i></span>
+                                        echo '<i >'; ?>
+                                <img class="policy-cloud-eye-img" style="width:20px;height:15px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/user.svg') ?>" />
+                                <?php echo '</i> ' . $description_object['info']['owner'] . '|';
+                                ?> <i> <img class="policy-cloud-eye-img" style="width:20px;height:15px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/eye.svg') ?>" /></i> <?php //echo $description_object['metadata']['views']; 
+                                                                                                                                                                                                                                ?>
+
+                                100 |
+                                <?php if (!empty($description_object['metadata']['uploadDate'])) ?>
+                                <i> <img class="policy-cloud-eye-img" style="width:20px;height:15px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/calendar.svg') ?>" />
+
+                                    <?php echo  $description_object['metadata']['uploadDate'];
+                                    echo "</i>";
+                                    ?>
+                                    | <i class="fa fa-download">
+                                        <?php //echo $description_object['metadata']['downloads']'
+                                        ?> 20</i>
+                                    <?php if ($ownerbutton) {
+                                        if ($description_object['metadata']['approved'] == 1) { ?>
+                                            <i>approved <img class="policy-cloud-eye-img" style="width:20px;height:15px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/check.svg') ?>" /></i>
+                                        <?php
+                                        } else { ?>
+
+
+                                            <i> pending<img id="policy-cloud-eye-img" style="width:20px;height:15px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/pending.drawio.svg') ?>" /></i>
+
+
+                                    <?php    }
+                                    } ?>
+                            </span>
                             <h6><b><?php if (!empty($description_object['info']['type']))
                                         print ucfirst($description_object['info']['type']);
 
