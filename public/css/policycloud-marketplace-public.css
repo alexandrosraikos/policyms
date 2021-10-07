@@ -992,10 +992,6 @@ p {
   --policycloud-border-color-light: rgba(0, 0, 0, 0.1);
 }
 
-.policycloud-marketplace * {
-  all: initial;
-}
-
 /* Links & buttons */
 
 .policycloud-marketplace a {
@@ -1030,23 +1026,75 @@ p {
   transition: all 0.2s ease-in-out;
 }
 
-.registration-error,
-.login-error {
-  color: red;
-  text-align: center;
-  font-weight: bold;
-  margin: 20px 0;
-}
-
 .policycloud-marketplace button.action.loading {
   opacity: 0.7;
   cursor: wait;
   pointer-events: none;
 }
 
+.policycloud-marketplace button.tactile {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background-color: transparent !important;
+  padding: 10px 0 10px 8px;
+  margin: 3px 0;
+  color: inherit !important;
+  border: none;
+  border-radius: 8px;
+  text-transform: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.policycloud-marketplace button.tactile:hover {
+  transform: scale(0.98);
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+}
+
+.policycloud-marketplace button.tactile.active,
+.policycloud-marketplace button.tactile:active {
+  transform: scale(0.96);
+  background-color: rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.1s ease-in-out;
+}
+
+.policycloud-marketplace button.outlined {
+  padding: 4px 8px;
+  margin: 0 5px 5px 0;
+  background: transparent !important;
+  font-size: 100%;
+  border: 2px solid rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit !important;
+  text-transform: unset;
+  transition: all 0.2s ease-in-out;
+}
+
+.policycloud-marketplace button.outlined:hover {
+  text-decoration: none;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.15) !important;
+  opacity: 0.9;
+  transform: scale(0.99);
+  transition: all 0.2s ease-in-out;
+}
+
+.policycloud-marketplace button.outlined.active,
+.policycloud-marketplace button.outlined:active {
+  text-decoration: none;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.25) !important;
+  opacity: 0.8;
+  transform: scale(0.97);
+  transition: all 0.1s ease-in-out;
+}
+
 /* Forms */
 
-.policycloud-marketplace form *:not(button, svg) {
+.policycloud-marketplace form *:not(button, svg, table, tbody, tr, td) {
   display: block;
   margin: 0 auto;
   width: 100%;
@@ -1191,6 +1239,8 @@ p {
 *
 */
 
+/* Generic layout */
+
 #policycloud-account {
   display: flex;
   width: 100%;
@@ -1245,29 +1295,7 @@ p {
 
 #policycloud-account-sidebar > nav button {
   display: block;
-  width: 100%;
   text-align: left;
-  background-color: transparent;
-  padding: 10px 0 10px 8px;
-  margin: 3px 0;
-  color: inherit;
-  border: none;
-  border-radius: 8px;
-  text-transform: none;
-  transition: all 0.2s ease-in-out;
-}
-
-#policycloud-account-sidebar > nav button:hover {
-  transform: scale(0.98);
-  background-color: rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease-in-out;
-  text-decoration: none;
-}
-
-#policycloud-account-sidebar > nav button:active {
-  transform: scale(0.96);
-  background-color: rgba(0, 0, 0, 0.1);
-  transition: all 0.1s ease-in-out;
 }
 
 #policycloud-account-sidebar > nav button.active {
@@ -1368,6 +1396,8 @@ p {
   display: inline-block;
 }
 
+/* Overview tab */
+
 section.policycloud-account-overview table,
 section.policycloud-account-overview tr,
 section.policycloud-account-overview td,
@@ -1386,70 +1416,28 @@ section.policycloud-account-overview table .large-figure {
   font-weight: bold;
 }
 
-section.policycloud-account-information table.information {
-  margin-top: 20px;
-  font-size: 80%;
-}
+/* Objects tab */
 
-section.policycloud-account-information
-  table.information
-  tr
-  > td:first-of-type {
-  max-width: 80px;
+section.policycloud-account-objects
+  #policycloud-account-object-collection-filters {
+  margin-bottom: 20px;
+  border-top: 1px solid var(--policycloud-border-color-light);
+  border-bottom: 1px solid var(--policycloud-border-color-light);
+  padding: 15px 0;
+  font-size: 75%;
   font-weight: bold;
 }
 
 section.policycloud-account-objects
-  #policycloud-account-asset-collection-filters {
-  margin-bottom: 20px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  padding-bottom: 15px;
+  #policycloud-account-object-collection-filters
+  div {
+  margin-bottom: 5px;
 }
 
 section.policycloud-account-objects
-  #policycloud-account-asset-collection-filters
+  #policycloud-account-object-collection-filters
   button {
-  padding: 4px 8px;
   margin: 0 5px 5px 0;
-  background: transparent;
-  font-size: 75%;
-  border: 2px solid rgba(0, 0, 0, 0.5);
-  border-radius: 8px;
-  text-decoration: none;
-  color: inherit;
-  text-transform: unset;
-  transition: all 0.2s ease-in-out;
-}
-
-section.policycloud-account-objects
-  #policycloud-account-asset-collection-filters
-  button:hover {
-  text-decoration: none;
-  border: 2px solid rgba(0, 0, 0, 0.3);
-  background-color: rgba(0, 0, 0, 0.2);
-  opacity: 0.9;
-  transform: scale(0.99);
-  transition: all 0.2s ease-in-out;
-}
-
-section.policycloud-account-objects
-  #policycloud-account-asset-collection-filters
-  button:active {
-  text-decoration: none;
-  border: 2px solid rgba(0, 0, 0, 0.3);
-  background-color: rgba(0, 0, 0, 0.3);
-  opacity: 0.8;
-  transform: scale(0.97);
-  transition: all 0.1s ease-in-out;
-}
-
-section.policycloud-account-objects
-  #policycloud-account-asset-collection-filters
-  button.active {
-  text-decoration: none;
-  border: 2px solid rgba(0, 0, 0, 0.3);
-  background-color: rgba(0, 0, 0, 0.3);
-  transition: all 0.1s ease-in-out;
 }
 
 section.policycloud-account-objects #policycloud-account-objects-list {
@@ -1470,15 +1458,16 @@ section.policycloud-account-objects
   li.visible {
   display: block;
   max-height: 1000vh;
-  margin: 10px 0;
+  margin: 5px 0;
+  border-top: 1px solid var(--policycloud-border-color-light);
   animation: sweep-in 0.3s ease-in-out forwards;
 }
 
 section.policycloud-account-objects #policycloud-account-objects-list li a {
   text-decoration: none;
   border-radius: 10px;
-  padding: 10px;
-  display: flex;
+  padding: 10px 0;
+  display: block !important;
   transition: all 0.2s ease-in-out;
 }
 
@@ -1496,38 +1485,23 @@ section.policycloud-account-objects
 section.policycloud-account-objects
   #policycloud-account-objects-list
   li
-  .thumbnail {
-  flex: 0 0 25%;
-  width: 100%;
-  height: 150px;
-  background-size: cover;
-  background-position: center;
-  border-radius: 6px;
-}
-
-section.policycloud-account-objects
-  #policycloud-account-objects-list
-  li
   .description {
   margin-left: 10px;
 }
 
-section.policycloud-account-objects
-  #policycloud-account-objects-list
-  li
-  .description
-  .date {
-  font-size: 60%;
-  opacity: 0.7;
+/* Information tab */
+
+section.policycloud-account-information table.information {
+  margin-top: 20px;
+  font-size: 80%;
 }
 
-section.policycloud-account-objects
-  #policycloud-account-objects-list
-  li
-  .description
-  .excerpt {
-  font-size: 80%;
-  opacity: 0.9;
+section.policycloud-account-information
+  table.information
+  tr
+  > td:first-of-type {
+  max-width: 80px;
+  font-weight: bold;
 }
 
 section.policycloud-account-information

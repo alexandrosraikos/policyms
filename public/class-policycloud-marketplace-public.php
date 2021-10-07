@@ -208,6 +208,10 @@ class PolicyCloud_Marketplace_Public
 	public static function account_authentication_shortcode()
 	{
 
+		$options = get_option('policycloud_marketplace_plugin_settings');
+		if (empty($options['registration_page'])) throw new Exception("There is no log in page set in the PolicyCloud Marketplace settings, please contact your administrator.");
+
+
 		// Check for existing token.
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
 		try {
@@ -225,7 +229,7 @@ class PolicyCloud_Marketplace_Public
 		));
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		account_authentication_html($error_message ?? '');
+		account_authentication_html($options['registration_page'],$error_message ?? '');
 	}
 
 	/**

@@ -566,9 +566,6 @@ function show_alert(string $message, bool $dismissable = false, string $type = '
  */
 function account_html($token, array $descriptions = null, array $args)
 {
-
-    // TODO @alexandrosraikos: Update strings & titles.
-
     if (empty($token)) {
         if (!empty($args['login_page']) || !empty($args['registration_page'])) {
             show_alert('You are not logged in, please <a href="' . $args['login_page'] . '">log in</a> to your account. Don\'t have an account yet? You can <a href="' . $args['registration_page'] . '">register</a> here.');
@@ -586,7 +583,7 @@ function account_html($token, array $descriptions = null, array $args)
             show_alert('Your account is still unverified, please check your email inbox or spam folder for a verification email. You can <a id="policycloud-marketplace-resend-verification-email">resend</a> it if you can\'t find it.');
         }
     ?>
-        <div id="policycloud-account">
+        <div id="policycloud-account" class="policycloud-marketplace">
             <div id="policycloud-account-sidebar">
                 <img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/user.svg') ?>" />
                 <!-- This is displayed only in the mobile version -->
@@ -623,11 +620,11 @@ function account_html($token, array $descriptions = null, array $args)
                     ?>
                 </div>
                 <nav>
-                    <button id="policycloud-account-overview" class="active">Overview</button>
-                    <button id="policycloud-account-objects">Objects</button>
-                    <button id="policycloud-account-reviews">Reviews</button>
-                    <button id="policycloud-account-information">Information</button>
-                    <button class="policycloud-logout">Log Out</button>
+                    <button class="tactile" id="policycloud-account-overview" class="active">Overview</button>
+                    <button class="tactile" id="policycloud-account-objects">Objects</button>
+                    <button class="tactile" id="policycloud-account-reviews">Reviews</button>
+                    <button class="tactile" id="policycloud-account-information">Information</button>
+                    <button class="tactile policycloud-logout">Log Out</button>
                 </nav>
             </div>
             <div id="policycloud-account-content">
@@ -658,7 +655,7 @@ function account_html($token, array $descriptions = null, array $args)
                                 </td>
                                 <td>
                                     <div class="large-figure"><?php echo '0' ?></div>
-                                    <div>Likes</div>
+                                    <div>Reviews</div>
                                 </td>
                             </tr>
                             <tr>
@@ -688,16 +685,19 @@ function account_html($token, array $descriptions = null, array $args)
                     <section class="policycloud-account-objects">
                         <header>
                             <h3>Objects</h3>
-                            <a id="policycloud-upload" href="<?php echo $args['upload_page'] ?>" title="Create a new object"><span class="fas fa-plus"></span> Create new object</a>
+                            <div class="actions">
+                                <a id="policycloud-upload" href="<?php echo $args['upload_page'] ?>" title="Create a new object"><span class="fas fa-plus"></span> Create new object</a>
+                            </div>
                         </header>
-                        <div id="policycloud-account-asset-collection-filters">
+                        <div id="policycloud-account-object-collection-filters">
+                            <div>Filter by type:</div>
                             <?php
                             $collections = array_unique(array_map(function ($description) {
                                 return $description['info']['type'];
                             }, $descriptions ?? []));
                             foreach ($collections as $collection) {
                             ?>
-                                <button data-type-filter="<?php echo $collection ?>"><?php echo $collection ?></button>
+                                <button class="outlined" data-type-filter="<?php echo $collection ?>"><?php echo $collection ?></button>
                             <?php
                             }
                             ?>
@@ -707,16 +707,20 @@ function account_html($token, array $descriptions = null, array $args)
                             if (!empty($descriptions)) {
                                 foreach ($descriptions as $description) {
                             ?>
-                                    <li class="<?php echo $description['info']['type'] ?> visible">
-                                        <a href="<?php echo $args['description_page'] . "?did=" . $description['id'] ?>">
-                                            <div class="thumbnail" style="background-image:url(<?php echo get_site_url(null, '/wp-content/plugins/policycloud-marketplace/public/assets/img/placeholder.jpg') ?>)">
-                                            </div>
-                                            <div class="description">
+                                    <li data-type-filter="<?php echo $description['info']['type'] ?>" class="visible">
+                                        <div class="description">
+                                            <a href="<?php echo $args['description_page'] . "?did=" . $description['id'] ?>">
                                                 <h4><?php echo $description['info']['title'] ?></h4>
-                                                <div class="date">Uploaded: <?php echo date('d/m/y H:i:s', strtotime($description['metadata']['uploadDate'])) ?></div>
-                                                <div class="excerpt"><?php echo $description['info']['short_desc'] ?></div>
+                                            </a>
+                                            <p><?php echo $description['info']['short_desc'] ?></p>
+                                            <div class="metadata">
+                                                <a class="pill"><?php echo $description['info']['type']  ?></a>
+                                                <a class="pill"><?php echo $description['info']['subtype']  ?></a>
+                                                <span><span class="fas fa-star"></span> 4,2 (128 reviews)</span>
+                                                <span>2 assets uploaded</span>
+                                                <span>Last updated: <?php echo date('d/m/y H:i:s', strtotime($description['metadata']['uploadDate'])) ?></span>
                                             </div>
-                                        </a>
+                                        </div>
                                     </li>
                                 <?php
                                 }

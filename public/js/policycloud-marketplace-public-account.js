@@ -31,32 +31,34 @@
     }
 
     // Asset collection filters
-    $("#policycloud-account-asset-collection-filters button").click(function (
+    $("#policycloud-account-object-collection-filters button").click(function (
       e
     ) {
       e.preventDefault();
       $(this).toggleClass("active");
 
-      // Set all active filters.
-      var buttons = $("#policycloud-account-asset-collection-filters button");
-      buttons.each(function (i, v) {
-        if ($(v).hasClass("active")) {
-          $(
-            "#policycloud-account-assets-list li." + $(v).data("type-filter")
-          ).addClass("visible");
-        } else {
-          $(
-            "#policycloud-account-assets-list li." + $(v).data("type-filter")
-          ).removeClass("visible");
-        }
-      });
-
-      // Show all if no filters.
       if (
-        $("#policycloud-account-asset-collection-filters button.active")
-          .length == 0
+        $("#policycloud-account-object-collection-filters button.active")
+          .length > 0
       ) {
-        $("#policycloud-account-assets-list li").addClass("visible");
+        $("#policycloud-account-objects-list li").removeClass("visible");
+
+        // Show all active filters.
+        var buttons = $(
+          "#policycloud-account-object-collection-filters button"
+        );
+        buttons.each(function (i, v) {
+          if ($(v).hasClass("active")) {
+            $(
+              "#policycloud-account-objects-list li[data-type-filter=" +
+                $(v).data("type-filter") +
+                "]"
+            ).addClass("visible");
+          }
+        });
+      } else {
+        // Show all if no filters.
+        $("#policycloud-account-objects-list li").addClass("visible");
       }
     });
 
