@@ -57,6 +57,7 @@ function account_registration($data)
 {
     // TODO @alexandrosraikos: Add x-more-time:1 header.
     // TODO @alexandrosraikos: Handle about & socials fields.
+    // TODO @alexandrosraikos: Handle gender & title checking.
 
     // Information validation checks and errors.
     if (
@@ -343,7 +344,8 @@ function verify_user(string $verification_code) {
 function account_edit($data)
 {
     // TODO @alexandrosraikos: Add x-more-time:1 header.
-    // TODO @alexandrosraikos: Update with new API endpoint and $data fields. (send only edited fields)
+    // TODO @alexandrosraikos: Update with new API endpoint and $data fields. (send all fields)
+    // TODO @alexandrosraikos: Handle gender & title checking.
 
     // Information validation checks and errors.
     if (
