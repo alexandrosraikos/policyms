@@ -594,6 +594,45 @@ function show_alert(string $message, bool $dismissable = false, string $type = '
 
 
 /**
+ * 
+ * Formats a datetime string to show time passed since.
+ * 
+ * @param string $datetime The string depicting the date time information.
+ * @param bool $full Display the full elapsed time since the specified date.
+ * 
+ * @since 1.0.0 
+ */
+function time_elapsed_string($datetime, $full = false) {
+    $now = new DateTime;
+    $ago = new DateTime($datetime);
+    $diff = $now->diff($ago);
+
+    $diff->w = floor($diff->d / 7);
+    $diff->d -= $diff->w * 7;
+
+    $string = array(
+        'y' => 'year',
+        'm' => 'month',
+        'w' => 'week',
+        'd' => 'day',
+        'h' => 'hour',
+        'i' => 'minute',
+        's' => 'second',
+    );
+    foreach ($string as $k => &$v) {
+        if ($diff->$k) {
+            $v = $diff->$k . ' ' . $v . ($diff->$k > 1 ? 's' : '');
+        } else {
+            unset($string[$k]);
+        }
+    }
+
+    if (!$full) $string = array_slice($string, 0, 1);
+    return $string ? implode(', ', $string) . ' ago' : 'just now';
+}
+
+
+/**
  * Display the account page HTML for authenticated users.
  *
  * @param   $token The decoded user token.
@@ -757,7 +796,7 @@ function account_html($token, array $descriptions = null, array $args)
                                                 <a class="pill"><?php echo $description['info']['subtype']  ?></a>
                                                 <span><span class="fas fa-star"></span> 4,2 (128 reviews)</span>
                                                 <span>2 assets uploaded</span>
-                                                <span>Last updated: <?php echo date('d/m/y H:i:s', strtotime($description['metadata']['uploadDate'])) ?></span>
+                                                <span>Last updated  <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($description['metadata']['uploadDate']))) ?></span>
                                             </div>
                                         </div>
                                     </li>
