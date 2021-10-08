@@ -1,8 +1,6 @@
 (function ($) {
   "use strict";
   $(document).ready(function () {
-    // TODO @alexandrosraikos: Handle type-subtype overlap.
-    // TODO @alexandrosraikos: Handle comma-separated field-of-use.
     $(
       "#policycloud-object-create select[name=type], #policycloud-object-create select[name=subtype]"
     ).change(() => {});

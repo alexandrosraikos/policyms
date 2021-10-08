@@ -110,7 +110,6 @@
 
     // Editing submission
     $("#policycloud-marketplace-account-edit").submit((e) => {
-      // TODO @alexandrosraikos: Add image file size check and handler.
       e.preventDefault();
       var formData = new FormData(
         $("#policycloud-marketplace-account-edit")[0]

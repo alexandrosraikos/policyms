@@ -40,16 +40,15 @@
       // $(".edit3").trigger("click");
       $(".pctablename").html(
         '<input type="text" size ="1" value="' +
-        $(".pctablename").text() +
-        '" >'
+          $(".pctablename").text() +
+          '" >'
       );
-
 
       //description edits
       $("#description-title").html(
         '<input type="text" id="dtitle" name ="dtitle" class="h2title" value="' +
-        $("#description-title").text() +
-        '" style="width: 650px; font-size:40px;">'
+          $("#description-title").text() +
+          '" style="width: 650px; font-size:40px;">'
       );
       // $('#description-title').addClass('hidden');
       /*  $("#descs").addClass("hidden");*/
@@ -58,13 +57,13 @@
       //$('#dstitle').removeClass('hidden');
       $("#descp").html(
         '<textarea id="descp1" name="w3review" rows="4" cols="20" >' +
-        $("#descp").text() +
-        " </textarea>"
+          $("#descp").text() +
+          " </textarea>"
       );
       $("#descs").html(
         '<textarea id="descs1" name="w3review" rows="4" cols="20" >' +
-        $("#descs").text() +
-        " </textarea>"
+          $("#descs").text() +
+          " </textarea>"
       );
       //$("#descs").html('<textarea id="story"  placeholder="' + $('#descs').text() + '" value="' + $('#descs').text() + '" rows="5" cols="33"> </textarea>');
       $("#edit1").addClass("hidden");
@@ -89,31 +88,17 @@
     });
     //remove
     $("#pcdelete").click(function () {
-      if ($('#dtitle').length) {
-
-        $("#description-title").html(
-          '<h1>' +
-          $("#dtitle").val() +
-          '</h1>'
-        );
+      if ($("#dtitle").length) {
+        $("#description-title").html("<h1>" + $("#dtitle").val() + "</h1>");
 
         //  $("#description-title").text();
         //$('#dtitle').remove();
-
       }
-      if ($('#descp1').length) {
-        $("#descp").html(
-          '<p>' +
-          $("#descp1").val() +
-          " </p>"
-        );
+      if ($("#descp1").length) {
+        $("#descp").html("<p>" + $("#descp1").val() + " </p>");
       }
-      if ($('#descs1').length) {
-        $("#descs").html(
-          '<p>' +
-          $("#descs1").val() +
-          " </p>"
-        );
+      if ($("#descs1").length) {
+        $("#descs").html("<p>" + $("#descs1").val() + " </p>");
       }
       $("#edit1").removeClass("hidden");
       // $( "<button id='edit1'>Edit</button>" ).insertAfter( "p" );
@@ -156,7 +141,6 @@
       ).addClass("loading");
 
       // Perform AJAX request.
-      // TODO @alexandrosraikos: Add description editing form fields for processing.
       $.ajax({
         url: ajax_properties_description_editing.ajax_url,
         type: "post",

@@ -29,8 +29,7 @@ function account_registration_html($authentication_url, $logged_in)
     if ($logged_in) {
         show_alert("You're already logged in.", false, 'notice');
     } else {
-        // TODO @alexandrosraikos: Add image uploader.
-?>
+        ?>
         <div class="policycloud-marketplace">
             <form id="policycloud-registration" action="">
                 <fieldset name="account-credentials">
@@ -536,6 +535,7 @@ function object_creation_html(string $error = null)
         show_alert($error);
     } else {
         // TODO @alexandrosraikos: Move Fields of use outside of internal information.
+        // TODO @alexandrosraikos: Comma-separated fields of use.
         // TODO @alexandrosraikos: Write subtype as a custom text field.
     ?>
         <div class="policycloud-marketplace">
@@ -660,9 +660,10 @@ function time_elapsed_string($datetime, $full = false)
  */
 function account_html($token, array $descriptions = null, array $args)
 {
-    // TODO @alexandrosraikos: Add about & social fields to overview.
-    // TODO @alexandrosraikos: Add about & social fields to information.
-    // TODO @alexandrosraikos: Add about & social fields to editing.
+    // TODO @alexandrosraikos: Handle email change, password change.
+    // TODO @alexandrosraikos: Add Request data copy button.
+    // TODO @alexandrosraikos: Add delete account button (waiting on @vkoukos).
+    // TODO @alexandrosraikos: Finalize mockup CSS.
 
     if (empty($token)) {
         if (!empty($args['login_page']) || !empty($args['registration_page'])) {
@@ -749,8 +750,7 @@ function account_html($token, array $descriptions = null, array $args)
                             ?>
                                 <ul>
                                     <?php
-                                    // TODO @alexandrosraikos: Update token structure ($token->info->social).
-                                    foreach (['GitHub:https://www.github.com/', 'LinkedIn:https://www.linkedin.com/'] as $link) {
+                                    foreach ($token->info->social as $link) {
                                         echo '<a href="' . explode(':', $link, 2)[1] . '" target="blank">' . explode(':', $link, 2)[0] . '</a>';
                                     }
                                     ?>
@@ -873,8 +873,7 @@ function account_html($token, array $descriptions = null, array $args)
                                     <td>
                                         <span class="folding visible">
                                             <?php
-                                            // TODO @alexandrosraikos: Update token structure ($token->info->social).
-                                            foreach (['GitHub:https://www.github.com/', 'LinkedIn:https://www.linkedin.com/'] as $link) {
+                                            foreach ($token->info->social as $link) {
                                                 echo '<a href="' . explode(':', $link, 2)[1] . '" target="blank">' . explode(':', $link, 2)[0] . '</a><br/>';
                                             }
                                             ?>
@@ -882,15 +881,14 @@ function account_html($token, array $descriptions = null, array $args)
                                         <div class="socials folding">
                                             <div>
                                                     <?php 
-                                                    // TODO @alexandrosraikos: Update token structure ($token->info->social).
-                                                    foreach (['GitHub:https://www.github.com/', 'LinkedIn:https://www.linkedin.com/'] as $key=>$link) {
+                                                    foreach ($token->info->social as $key=>$link) {
                                                         $link_title = explode(':', $link, 2)[0];
                                                         $link_url = explode(':', $link, 2)[1];
                                                     ?>
                                                     <div>
                                                         <input type="text" name="socials-title[]" placeholder="Example" value="<?php echo $link_title ?>" />
                                                         <input type="url" name="socials-url[]" placeholder="https://www.example.org/" value="<?php echo $link_url ?>" />
-                                                        <button class="remove-field" title="Remove this link." <?php if (count(['GitHub:https://www.github.com/', 'LinkedIn:https://www.linkedin.com/']) == 1 ) echo 'disabled' ?>><span class="fas fa-times"></span></button>
+                                                        <button class="remove-field" title="Remove this link." <?php if (count($token->info->social) == 1 ) echo 'disabled' ?>><span class="fas fa-times"></span></button>
                                                 </div>
                                                     <?php
                                                     }

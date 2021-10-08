@@ -30,7 +30,6 @@
 
     // Registration submission
     $("#policycloud-registration").submit((e) => {
-      // TODO @alexandrosraikos: Add image file size check and handler.
       e.preventDefault();
       var formData = new FormData($("#policycloud-registration")[0]);
       formData.append("action", "policycloud_marketplace_account_registration");

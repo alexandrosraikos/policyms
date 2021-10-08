@@ -58,8 +58,6 @@ function marketplace_username_exists($hostname, $username)
  */
 function account_registration($data)
 {
-    // TODO @alexandrosraikos: Use image upload endpoint and data.
-
     // Information validation checks and errors.
     if (
         empty($data['username']) ||
@@ -367,8 +365,6 @@ function verify_user(string $verification_code)
  */
 function account_edit($data, $uid, $token)
 {
-    // TODO @alexandrosraikos: Handle email change, password change.
-
     // Information validation checks and errors.
     if (
         empty($data['email']) ||

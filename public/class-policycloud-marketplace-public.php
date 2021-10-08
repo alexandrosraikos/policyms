@@ -82,6 +82,7 @@ class PolicyCloud_Marketplace_Public
 		wp_register_script("policycloud-marketplace-account-registration", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-registration.js', array('jquery'), $this->version, false);
 		wp_register_script("policycloud-marketplace-account-authentication", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-authentication.js', array('jquery'), $this->version, false);
 		wp_register_script("policycloud-marketplace-account", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account.js', array('jquery'), $this->version, false);
+		// TODO @alexandrosraikos: Create password reset shortcode & functionality.
 
 		// Content related scripts.
 		wp_register_script("policycloud-marketplace-object-create", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-object-create.js', array('jquery'), $this->version, false);
@@ -514,7 +515,7 @@ class PolicyCloud_Marketplace_Public
 					}
 				}
 
-				// TODO @alexandrosraikos Use new endpoint.
+				// TODO @alexandrosraikos Use new endpoint for getting specific user descriptions.
 				// Specify Description ownership.
 				$descriptions = get_descriptions([
 					'provider' => $token['decoded']->username
