@@ -29,8 +29,7 @@ function account_registration_html($authentication_url, $logged_in)
     if ($logged_in) {
         show_alert("You're already logged in.", false, 'notice');
     } else {
-        // TODO @alexandrosraikos: Highlight email as an account credential.
-        // TODO @alexandrosraikos: Add about & social fields.
+        // TODO @alexandrosraikos: Add image uploader.
 ?>
         <div class="policycloud-marketplace">
             <form id="policycloud-registration" action="">
@@ -48,7 +47,7 @@ function account_registration_html($authentication_url, $logged_in)
                     <h2>Account details</h2>
                     <p>Fill in the following fields with your personal details. This information will be used to personalize your experience within the marketplace platform and showcase your profile to other visitors. Fields marked with (*) are required for registration.</p>
                     <label for="title">Title</label>
-                    <select name="title" required>
+                    <select name="title">
                         <option value="Mr.">Mr.</option>
                         <option value="Ms.">Ms.</option>
                         <option value="Mrs.">Mrs.</option>
@@ -64,9 +63,9 @@ function account_registration_html($authentication_url, $logged_in)
                     <label for="surname">Last name *</label>
                     <input required name="surname" placeholder="Insert your last name" type="text" />
                     <label for="organization">Organization</label>
-                    <input required name="organization" placeholder="Insert your organization" type="text" />
+                    <input name="organization" placeholder="Insert your organization" type="text" />
                     <label for="gender">Gender</label>
-                    <select name="gender" required>
+                    <select name="gender">
                         <option value="male">Male</option>
                         <option value="female">Female</option>
                         <option value="transgender">Transgender</option>
@@ -74,10 +73,23 @@ function account_registration_html($authentication_url, $logged_in)
                         <option value="questioning">Questioning</option>
                         <option value="-" selected>Prefer not to say</option>
                     </select>
+                    <label for="about">Summary</label>
+                    <textarea name="about" placeholder="Tell us about yourself" style="resize:vertical"></textarea>
+                    <label for="socials">Related links</label>
+                    <div class="socials">
+                        <div>
+                            <div>
+                                <input type="text" name="socials-title[]" placeholder="Example" />
+                                <input type="url" name="socials-url[]" placeholder="https://www.example.org/" />
+                                <button class="remove-field" title="Remove this link." disabled><span class="fas fa-times"></span></button>
+                            </div>
+                        </div>
+                        <button class="add-field" title="Add another link."><span class="fas fa-plus"></span> Add link</button>
+                    </div>
                 </fieldset>
                 <fieldset name="account-contact">
                     <h2>Account contact details</h2>
-                    <p>Fill in your contact information here. This information will be used to validate your new account, as well as optionally make them available to other logged in Marketplace visitors. Fields marked with (*) are required for registration. These details by default remain private. </p>
+                    <p>Fill in your contact information here. This information will be used to validate your new account, as well as optionally make them available to other logged in Marketplace visitors. Fields marked with (*) are required for registration. These details remain private by default. </p>
                     <label for="email">E-mail address *</label>
                     <input type="email" name="email" placeholder="e.x. johndoe@example.org" required />
                     <label for="phone">Phone number</label>
@@ -125,8 +137,7 @@ function account_authentication_html($registration_url, $logged_in)
             </form>
         </div>
     <?php
-    }
-    else {
+    } else {
         show_alert("You're already logged in.", false, 'notice');
     }
 }
@@ -607,7 +618,8 @@ function show_alert(string $message, bool $dismissable = false, string $type = '
  * 
  * @since 1.0.0 
  */
-function time_elapsed_string($datetime, $full = false) {
+function time_elapsed_string($datetime, $full = false)
+{
     $now = new DateTime;
     $ago = new DateTime($datetime);
     $diff = $now->diff($ago);
@@ -806,7 +818,7 @@ function account_html($token, array $descriptions = null, array $args)
                                                 <a class="pill"><?php echo $description['info']['subtype']  ?></a>
                                                 <span><span class="fas fa-star"></span> 4,2 (128 reviews)</span>
                                                 <span>2 assets uploaded</span>
-                                                <span>Last updated  <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($description['metadata']['uploadDate']))) ?></span>
+                                                <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($description['metadata']['uploadDate']))) ?></span>
                                             </div>
                                         </div>
                                     </li>

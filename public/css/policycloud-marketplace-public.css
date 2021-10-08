@@ -1303,6 +1303,70 @@ select#type.type-create {
 
 /*
 *
+* Registration
+* ---------------------
+*
+* These are the styles for the 
+* [policycloud-marketplace-registration] shortcode.
+*
+*/
+
+#policycloud-registration .socials div div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+#policycloud-registration .socials div div * {
+  display: block;
+  height: auto;
+  max-height: unset;
+  margin: 0 8px 0 0;
+}
+
+#policycloud-registration .socials div button.remove-field,
+#policycloud-registration .socials div button.remove-field * {
+  padding: 0;
+  margin: 0 0 0 3px;
+  border: none;
+  box-sizing: border-box;
+  background: none !important;
+  color: var(--policycloud-text-color) !important;
+  transition: opacity 0.2s ease-in-out;
+}
+
+#policycloud-registration .socials div button.remove-field:hover {
+  opacity: 0.8;
+  transition: opacity 0.2s ease-in-out;
+}
+
+#policycloud-registration .socials div button.remove-field:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transition: opacity 0.2s ease-in-out;
+}
+
+#policycloud-registration .socials > button.add-field {
+  padding: 3px 5px;
+  display: block;
+  height: auto;
+  line-height: normal;
+  background: none !important;
+  color: var(--policycloud-text-color);
+  font-size: 75%;
+  margin: 10px 0;
+  padding: 0;
+  border: none;
+}
+
+#policycloud-registration .socials > button.add-field:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+/*
+*
 * My Account
 * ---------------------
 *

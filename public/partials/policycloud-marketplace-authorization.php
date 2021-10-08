@@ -55,9 +55,7 @@ function marketplace_username_exists($hostname, $username)
  */
 function account_registration($data)
 {
-    // TODO @alexandrosraikos: Add x-more-time:1 header.
-    // TODO @alexandrosraikos: Handle about & socials fields.
-    // TODO @alexandrosraikos: Handle gender & title checking.
+    // TODO @alexandrosraikos: Use image upload endpoint and data.
 
     // Information validation checks and errors.
     if (
@@ -65,12 +63,10 @@ function account_registration($data)
         empty($data['password']) ||
         empty($data['email']) ||
         empty($data['name']) ||
-        empty($data['surname']) ||
-        empty($data['gender']) ||
-        empty($data['organization'])
+        empty($data['surname'])
     ) throw new Exception('Please fill in all the required fields.');
     if (!filter_var($data["email"], FILTER_VALIDATE_EMAIL)) throw new Exception("Please enter a valid email address.");
-    if ($data['password'] !== $data['password_confirm']) throw new Exception('Password and password confirmation should match.');
+    if ($data['password'] !== $data['password-confirm']) throw new Exception('Password and password confirmation should match.');
     if (
         !empty(preg_match('@[A-Z]@', $data['password'])) &&
         !empty(preg_match('@[a-z]@', $data['password'])) &&
@@ -79,6 +75,12 @@ function account_registration($data)
         strlen($data['password']) < 8
     ) throw new Exception('Password should be at least 8 characters and  include at least one uppercase letter, a number, and a special character.');
     if ($data['username'] <= 2) throw new Exception("Username must be at least 2 characters.");
+    if (!empty($data['title'])) {
+        if (!in_array($data['title'], ['Mr.', 'Ms.', 'Mrs.', 'Dr.', 'Prof.', 'Sir', 'Miss', 'Mx.', '-'])) throw new Exception("Please select a valid title.");
+    }
+    if (!empty($data['gender'])) {
+        if (!in_array($data['gender'], ['male','female','transgender','genderqueer','questioning','-'])) throw new Exception("Please select a gender from the list.");
+    }
 
     // Retrieve API credentials.
     $options = get_option('policycloud_marketplace_plugin_settings');
@@ -104,16 +106,20 @@ function account_registration($data)
                 'password' => $data['password']
             ],
             'info' => [
-                'name' => $data['name'] ?? '',
-                'surname' => $data['surname'] ?? '',
+                'name' => $data['name'],
+                'surname' => $data['surname'],
                 'title' => $data['title'] ?? '',
                 'gender' => $data['gender'] ?? '',
                 'organization' => $data['organization'] ?? '',
                 'phone' => $data['phone'] ?? '',
-                'email' => $data['email']
+                'email' => $data['email'],
+                'about' => $data['about'],
+                'social' => array_map(function ($k, $v) use ($data) {
+                    return $v.":".$data['social-url'][$k];
+                }, $data['social-title'] ?? [])
             ]
         ]),
-        CURLOPT_HTTPHEADER => array('Content-Type: application/json')
+        CURLOPT_HTTPHEADER => array('Content-Type: application/json', 'x-more-time: 1')
     ));
     $response = json_decode(curl_exec($curl), true);
     curl_close($curl);
@@ -360,7 +366,7 @@ function account_edit($data)
         empty($data['phone'])
     ) throw new Exception('Please fill all required fields!');
     if (!filter_var($data["email"], FILTER_VALIDATE_EMAIL)) throw new Exception("Please enter a valid email");
-    if ($data['password'] !== $data['password_confirm']) throw new Exception('Password and password confirmation should match!');
+    if ($data['password'] !== $data['password-confirm']) throw new Exception('Password and password confirmation should match!');
     if (
         !empty(preg_match('@[A-Z]@', $data['password'])) ||
         !empty(preg_match('@[a-z]@', $data['password'])) ||

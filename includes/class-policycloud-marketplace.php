@@ -187,7 +187,7 @@ class PolicyCloud_Marketplace
 		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_authentication', $plugin_public, 'account_authentication_handler');
 		$this->loader->add_action('init', $plugin_public, 'add_authentication_shortcodes');
 
-		// TODO @alexandrosraikos: Coordinate password reset shortcode sequence.
+		// TODO @alexandrosraikos: Coordinate password reset shortcode sequence. (Waiting on @vkoukos)
 
 		// Add user access management menu item.
 		$this->loader->add_filter('wp_nav_menu_items', $plugin_public, 'add_conditional_access_menu_item', 10, 2);
