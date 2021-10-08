@@ -1,18 +1,54 @@
 (function ($) {
   "use strict";
   $(document).ready(function () {
+    // Dynamic socials fields
+    $("#policycloud-marketplace-account-edit .socials button.add-field").click(
+      function (e) {
+        e.preventDefault();
+        $(
+          "#policycloud-marketplace-account-edit .socials > div > div:last-of-type"
+        )
+          .clone()
+          .appendTo("#policycloud-marketplace-account-edit .socials > div");
+        $(
+          "#policycloud-marketplace-account-edit .socials button.remove-field"
+        ).prop(
+          "disabled",
+          $(
+            "#policycloud-marketplace-account-edit .socials button.remove-field"
+          ).length === 1
+        );
+      }
+    );
+    $(document).on(
+      "click",
+      "#policycloud-marketplace-account-edit .socials button.remove-field",
+      function (e) {
+        e.preventDefault();
+        $(this).parent().remove();
+        $(
+          "#policycloud-marketplace-account-edit .socials button.remove-field"
+        ).prop(
+          "disabled",
+          $(
+            "#policycloud-marketplace-account-edit .socials button.remove-field"
+          ).length === 1
+        );
+      }
+    );
+
     // Navigation
     $(
-      "button#policycloud-account-overview, button#policycloud-account-objects, button#policycloud-account-reviews, button#policycloud-account-information"
+      "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-reviews, button#policycloud-account-information"
     ).click(function (e) {
       e.preventDefault();
       $(
-        "section.policycloud-account-overview, section.policycloud-account-reviews, section.policycloud-account-objects, section.policycloud-account-information"
+        "section.policycloud-account-overview, section.policycloud-account-reviews, section.policycloud-account-assets, section.policycloud-account-information"
       ).removeClass("focused");
       $("section." + $(this).attr("id")).addClass("focused");
 
       $(
-        "button#policycloud-account-overview, button#policycloud-account-objects, button#policycloud-account-reviews, button#policycloud-account-information"
+        "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-reviews, button#policycloud-account-information"
       ).removeClass("active");
       $(this).addClass("active");
       var hashPrepare = $(this).attr("id").split("-");
@@ -31,26 +67,24 @@
     }
 
     // Asset collection filters
-    $("#policycloud-account-object-collection-filters button").click(function (
+    $("#policycloud-account-asset-collection-filters button").click(function (
       e
     ) {
       e.preventDefault();
       $(this).toggleClass("active");
 
       if (
-        $("#policycloud-account-object-collection-filters button.active")
+        $("#policycloud-account-asset-collection-filters button.active")
           .length > 0
       ) {
-        $("#policycloud-account-objects-list li").removeClass("visible");
+        $("#policycloud-account-assets-list li").removeClass("visible");
 
         // Show all active filters.
-        var buttons = $(
-          "#policycloud-account-object-collection-filters button"
-        );
+        var buttons = $("#policycloud-account-asset-collection-filters button");
         buttons.each(function (i, v) {
           if ($(v).hasClass("active")) {
             $(
-              "#policycloud-account-objects-list li[data-type-filter=" +
+              "#policycloud-account-assets-list li[data-type-filter=" +
                 $(v).data("type-filter") +
                 "]"
             ).addClass("visible");
@@ -58,7 +92,7 @@
         });
       } else {
         // Show all if no filters.
-        $("#policycloud-account-objects-list li").addClass("visible");
+        $("#policycloud-account-assets-list li").addClass("visible");
       }
     });
 
@@ -74,44 +108,28 @@
       $("#policycloud-marketplace-account-edit .error").removeClass("visible");
     });
 
-    // Account editing form.
+    // Editing submission
     $("#policycloud-marketplace-account-edit").submit((e) => {
+      // TODO @alexandrosraikos: Add image file size check and handler.
       e.preventDefault();
+      var formData = new FormData(
+        $("#policycloud-marketplace-account-edit")[0]
+      );
+      formData.append("action", "policycloud_marketplace_account_edit");
+      formData.append("nonce", ajax_properties_account_editing.nonce);
+      formData.append("username", ajax_properties_account_editing.user_id);
+
       $("#policycloud-marketplace-account-edit button[type=submit]").addClass(
         "loading"
       );
 
       // Perform AJAX request.
-      // TODO @alexandrosraikos: Handle about & social fields.
       $.ajax({
         url: ajax_properties_account_editing.ajax_url,
         type: "post",
-        data: {
-          action: "policycloud_marketplace_account_edit",
-          nonce: ajax_properties_account_editing.nonce,
-          username: $("input[name=policycloud-marketplace-username]").val(),
-          password: $("input[name=policycloud-marketplace-password]").val(),
-          password_confirm: $(
-            "input[name=policycloud-marketplace-password-confirm]"
-          ).val(),
-          email: $("input[name=policycloud-marketplace-email]").val(),
-          public_email: $(
-            "input[name=policycloud-marketplace-public-email]"
-          ).val(),
-          name: $("input[name=policycloud-marketplace-name]").val(),
-          surname: $("input[name=policycloud-marketplace-surname]").val(),
-          phone: $("input[name=policycloud-marketplace-phone]").val(),
-          public_phone: $(
-            "input[name=policycloud-marketplace-public-phone]"
-          ).val(),
-          organization: $(
-            "input[name=policycloud-marketplace-organization]"
-          ).val(),
-          title: $("select[name=policycloud-marketplace-title]").val(),
-          gender: $("select[name=policycloud-marketplace-gender]").val(),
-        },
-
-        // Handle response.
+        processData: false,
+        contentType: false,
+        data: formData,
         complete: function (response) {
           try {
             var response_data = JSON.parse(response.responseText);
@@ -129,7 +147,8 @@
                 date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
                 const expires = "expires=" + date.toUTCString();
                 document.cookie =
-                  "ppmapi-token=" + response_data.data + "; " + expires;
+                  "ppmapi-token=" + response_data.data + "; path=/;" + expires;
+                window.location.reload();
               }
             }
             if (response.status != 200) {

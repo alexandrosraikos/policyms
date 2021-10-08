@@ -57,7 +57,7 @@
               const expires = "expires=" + date.toUTCString();
               document.cookie =
                 "ppmapi-token=" + response_data.data + "; " + expires;
-              // window.location.href = "/";
+              window.location.href = "/";
             }
           } else {
             $("#policycloud-registration .error").html(

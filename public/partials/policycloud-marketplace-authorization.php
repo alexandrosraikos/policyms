@@ -35,6 +35,9 @@ function marketplace_username_exists($hostname, $username)
         ],
     ]);
     $response = json_decode(curl_exec($curl), true);
+    if (curl_errno($curl)) {
+        throw new Exception("Unable to reach the Marketplace server. More details: " . curl_error($curl));
+    }
     curl_close($curl);
 
     // Return status.
@@ -79,7 +82,7 @@ function account_registration($data)
         if (!in_array($data['title'], ['Mr.', 'Ms.', 'Mrs.', 'Dr.', 'Prof.', 'Sir', 'Miss', 'Mx.', '-'])) throw new Exception("Please select a valid title.");
     }
     if (!empty($data['gender'])) {
-        if (!in_array($data['gender'], ['male','female','transgender','genderqueer','questioning','-'])) throw new Exception("Please select a gender from the list.");
+        if (!in_array($data['gender'], ['male', 'female', 'transgender', 'genderqueer', 'questioning', '-'])) throw new Exception("Please select a gender from the list.");
     }
 
     // Retrieve API credentials.
@@ -115,17 +118,20 @@ function account_registration($data)
                 'email' => $data['email'],
                 'about' => $data['about'],
                 'social' => array_map(function ($k, $v) use ($data) {
-                    return $v.":".$data['social-url'][$k];
+                    return $v . ":" . $data['social-url'][$k];
                 }, $data['social-title'] ?? [])
             ]
         ]),
         CURLOPT_HTTPHEADER => array('Content-Type: application/json', 'x-more-time: 1')
     ));
     $response = json_decode(curl_exec($curl), true);
+    if (curl_errno($curl)) {
+        throw new Exception("Unable to reach the Marketplace server. More details: " . curl_error($curl));
+    }
     curl_close($curl);
 
     // Check response and return encypted token.
-    if (!isset($response)) throw new Exception("Unable to reach the Marketplace server.");
+    if (!isset($response)) throw new Exception("The Marketplace API response was invalid.");
     elseif ($response['_status'] == 'successful') {
         try {
             // Encrypt token using the same key and return.
@@ -134,7 +140,7 @@ function account_registration($data)
                 // Decode token and send verification email.
                 $decoded_token = JWT::decode($response['token'], $options['jwt_key'], array('HS256'));
                 if ($decoded_token->account->verified !== '1') {
-                    user_email_verification_resend($decoded_token->account->verified,$decoded_token->account->email);
+                    user_email_verification_resend($decoded_token->account->verified, $decoded_token->account->email);
                 }
                 if (empty($options['encryption_key'])) throw new Exception("No PolicyCloud Marketplace encryption key was defined in WordPress settings.");
                 return openssl_encrypt($response['token'], "AES-128-ECB", $options['encryption_key']);
@@ -142,7 +148,7 @@ function account_registration($data)
         } catch (\Exception $e) {
             throw new Exception($e->getMessage());
         }
-    } elseif ($response['_status'] == 'unsuccessful') throw new Exception($response['message']);
+    } else throw new Exception($response['message']);
 }
 
 
@@ -160,8 +166,6 @@ function account_registration($data)
  */
 function account_authentication($data)
 {
-    // TODO @alexandrosraikos: Handle email address as credential.
-    // TODO @alexandrosraikos: Add x-more-time:1 header.
 
     // Check submitted log in information.
     if (
@@ -177,8 +181,7 @@ function account_authentication($data)
             'email' => $data['username-email'],
             'password' => $data['password'],
         ];
-    }
-    else {
+    } else {
         $data = [
             'username' => $data['username-email'],
             'password' => $data['password'],
@@ -197,25 +200,28 @@ function account_authentication($data)
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => 'POST',
         CURLOPT_POSTFIELDS => json_encode($data),
-        CURLOPT_HTTPHEADER => ['Content-Type: application/json']
+        CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'x-more-time: 1']
     ]);
     $response = json_decode(curl_exec($curl), true);
+    if (curl_errno($curl)) {
+        throw new Exception("Unable to reach the Marketplace server. More details: " . curl_error($curl));
+    }
     curl_close($curl);
 
     // Return encypted token.
     if (!isset($response)) {
-        throw new Exception("Unable to reach the Marketplace server.");
+        throw new Exception("The Marketplace API response was invalid.");
     } elseif ($response['_status'] == 'successful') {
         try {
             // Encrypt token using the same key and return.
-                if (empty($options['encryption_key'])) throw new Exception("No PolicyCloud Marketplace encryption key was defined in WordPress settings.");
+            if (empty($options['encryption_key'])) throw new Exception("No PolicyCloud Marketplace encryption key was defined in WordPress settings.");
             else {
                 return openssl_encrypt($response['token'], "AES-128-ECB", $options['encryption_key']);
             }
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
-    } elseif ($response['_status'] == 'unsuccessful') throw new Exception($response['message']);
+    } else throw new Exception($response['message']);
 }
 
 
@@ -246,14 +252,14 @@ function retrieve_token(bool $decode = false)
             throw new Exception($e->getMessage());
         } catch (UnexpectedValueException $e) {
             if (empty($options['encryption_key'])) throw new Exception("No PolicyCloud Marketplace log in page was defined in WordPress settings.");
-            throw new Exception('Your session is invalid, please <a href="'.$options['login_page'].'">log in</a> again to continue.');
+            throw new Exception('Your session is invalid, please <a href="' . $options['login_page'] . '">log in</a> again to continue.');
         } catch (SignatureInvalidException $e) {
             throw new Exception($e->getMessage());
         } catch (BeforeValidException $e) {
             throw new Exception($e->getMessage());
-        } catch (ExpiredException $e) {        
+        } catch (ExpiredException $e) {
             if (empty($options['encryption_key'])) throw new Exception("No PolicyCloud Marketplace log in page was defined in WordPress settings.");
-            throw new Exception('Your session has expired, please <a href="'.$options['login_page'].'">log in</a> again to continue.');
+            throw new Exception('Your session has expired, please <a href="' . $options['login_page'] . '">log in</a> again to continue.');
         }
 
         return ($decode) ? [
@@ -285,7 +291,7 @@ function user_email_verification_resend(string $verification_code, string $email
             $email,
             'Verify your PolicyCloud Marketplace account',
             "You are receiving this email because a new PolicyCloud Marketplace account was created with this address. If that was you, please click this link to verify your email address: " . $options['account_page'] . "#details?verification-code=" . $verification_code,
-            ['From: PolicyCloud Marketplace <noreply@'.$host.'>']
+            ['From: PolicyCloud Marketplace <noreply@' . $host . '>']
         )) {
             throw new Exception("The email couldn't be delivered, please contact the server administrator.");
         }
@@ -308,9 +314,8 @@ function user_email_verification_resend(string $verification_code, string $email
  * 
  * @since 1.0.0
  */
-function verify_user(string $verification_code) {
-
-    // TODO @alexandrosraikos: Add x-more-time:1 header.
+function verify_user(string $verification_code)
+{
 
     // Retrieve API credentials.
     $options = get_option('policycloud_marketplace_plugin_settings');
@@ -319,7 +324,7 @@ function verify_user(string $verification_code) {
     // Contact Marketplace registration API.
     $curl = curl_init();
     curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/accounts/users/verification/'.$verification_code,
+        CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/accounts/users/verification/' . $verification_code,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => '',
         CURLOPT_MAXREDIRS => 10,
@@ -327,25 +332,28 @@ function verify_user(string $verification_code) {
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => 'GET',
-        CURLOPT_HTTPHEADER => array('Content-Type: application/json')
+        CURLOPT_HTTPHEADER => array('Content-Type: application/json', 'x-more-time: 1')
     ));
     $response = json_decode(curl_exec($curl), true);
+    if (curl_errno($curl)) {
+        throw new Exception("Unable to reach the Marketplace server. More details: " . curl_error($curl));
+    }
     curl_close($curl);
 
     // Return encypted token.
     if (!isset($response)) {
-        throw new Exception("Unable to reach the Marketplace server.");
+        throw new Exception("The Marketplace API response was invalid.");
     } elseif ($response['_status'] == 'successful') {
         try {
             // Encrypt token using the same key and return.
-                if (empty($options['encryption_key'])) throw new Exception("No PolicyCloud Marketplace encryption key was defined in WordPress settings.");
+            if (empty($options['encryption_key'])) throw new Exception("No PolicyCloud Marketplace encryption key was defined in WordPress settings.");
             else {
                 return openssl_encrypt($response['token'], "AES-128-ECB", $options['encryption_key']);
             }
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
-    } elseif ($response['_status'] == 'unsuccessful') throw new Exception($response['message']);
+    } else throw new Exception($response['message']);
 }
 
 /**
@@ -357,82 +365,88 @@ function verify_user(string $verification_code) {
  * @usedby PolicyCloud_Marketplace_Public::account_edit_handler()
  * @since	1.0.0
  */
-function account_edit($data)
+function account_edit($data, $uid, $token)
 {
-    // TODO @alexandrosraikos: Add x-more-time:1 header.
-    // TODO @alexandrosraikos: Update with new API endpoint and $data fields. (send all fields)
-    // TODO @alexandrosraikos: Handle gender & title checking.
+    // TODO @alexandrosraikos: Handle email change, password change.
 
     // Information validation checks and errors.
     if (
-        empty($data['username']) ||
-        empty($data['password']) ||
         empty($data['email']) ||
         empty($data['name']) ||
-        empty($data['surname']) ||
-        empty($data['title']) ||
-        empty($data['gender']) ||
-        empty($data['organization']) ||
-        empty($data['phone'])
+        empty($data['surname'])
     ) throw new Exception('Please fill all required fields!');
     if (!filter_var($data["email"], FILTER_VALIDATE_EMAIL)) throw new Exception("Please enter a valid email");
-    if ($data['password'] !== $data['password-confirm']) throw new Exception('Password and password confirmation should match!');
-    if (
-        !empty(preg_match('@[A-Z]@', $data['password'])) ||
-        !empty(preg_match('@[a-z]@', $data['password'])) ||
-        !empty(preg_match('@[0-9]@', $data['password'])) ||
-        !empty(preg_match('@[^\w]@', $data['password'])) ||
-        strlen($data['password']) < 8
-    ) throw new Exception('Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character.');
-    if ($data['username'] <= 2) throw new Exception("Username must be at least 2 chars");
+    if (!empty($data['password'])) {
+        if (!empty($data['password-confirm'])) {
+            if ($data['password'] !== $data['password-confirm']) throw new Exception('Password and password confirmation should match!');
+            if (
+                !empty(preg_match('@[A-Z]@', $data['password'])) ||
+                !empty(preg_match('@[a-z]@', $data['password'])) ||
+                !empty(preg_match('@[0-9]@', $data['password'])) ||
+                !empty(preg_match('@[^\w]@', $data['password'])) ||
+                strlen($data['password']) < 8
+            ) throw new Exception('Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character.');
+        } else throw new Exception("Please fill in the password confirmation when changing your password.");
+    }
+    if (!empty($data['title'])) {
+        if (!in_array($data['title'], ['Mr.', 'Ms.', 'Mrs.', 'Dr.', 'Prof.', 'Sir', 'Miss', 'Mx.', '-'])) throw new Exception("Please select a valid title.");
+    }
+    if (!empty($data['gender'])) {
+        if (!in_array($data['gender'], ['male', 'female', 'transgender', 'genderqueer', 'questioning', '-'])) throw new Exception("Please select a gender from the list.");
+    }
 
     // Retrieve API credentials.
     $options = get_option('policycloud_marketplace_plugin_settings');
     if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
-
-    // Username availability check.
-    if (!marketplace_username_exists($options['marketplace_host'], $data['username'])) throw new Exception("Username already exists.");
-
+    $jsondata = json_encode([
+        'info' => [
+            'name' => $data['name'],
+            'surname' => $data['surname'],
+            'title' => $data['title'],
+            'gender' => $data['gender'],
+            'organization' => $data['organization'],
+            'phone' => $data['phone'],
+            'social' => array_map(function ($k, $v) {
+                return $k . ":" . $v;
+            }, $data['socials-title'] ?? [], $data['socials-url']?? []),
+            'about' => $data['about']
+        ],
+        'profile_parameters' => [
+            'public_email' => intval($data['public-email']),
+            'public_phone' => intval($data['public-phone']),
+        ]
+        ]);
     // Contact Marketplace registration API.
     $curl = curl_init();
     curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/accounts/users/settings',
+        CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/accounts/users/information/' . $uid,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => '',
         CURLOPT_MAXREDIRS => 10,
         CURLOPT_TIMEOUT => 0,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS => json_encode([
-            'username' => $data['username'],
-            'account' => [
-                'password' => $data['password']
-            ],
-            'info' => [
-                'name' => $data['name'],
-                'surname' => $data['surname'],
-                'title' => $data['title'],
-                'gender' => $data['gender'],
-                'organization' => $data['organization'],
-                'phone' => $data['phone'] ?? '',
-                'email' => $data['email']
-            ]
-        ]),
-        CURLOPT_HTTPHEADER => array('Content-Type: application/json')
+        CURLOPT_CUSTOMREQUEST => 'PUT',
+        CURLOPT_POSTFIELDS => $jsondata,
+        CURLOPT_HTTPHEADER => array('Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null), 'x-more-time: 1')
     ));
     $response = json_decode(curl_exec($curl), true);
+    $error = curl_errno($curl);
+    if ($error) {
+        throw new Exception("Unable to reach the Marketplace server. More details: " . curl_error($curl));
+    }
+
     curl_close($curl);
 
     // Check response and return encypted token.
-    if (!isset($response)) throw new Exception("Unable to reach the Marketplace server.");
+    if (!isset($response)) throw new Exception("The Marketplace API response was invalid.");
     elseif ($response['_status'] == 'successful') {
         try {
             // Encrypt token using the same key and return.
-                if (empty($options['encryption_key'])) throw new Exception("No PolicyCloud Marketplace encryption key was defined in WordPress settings.");
-            return openssl_encrypt(json_encode($data), "AES-128-ECB", $options['encryption_key']);
+            if (empty($options['encryption_key'])) throw new Exception("No PolicyCloud Marketplace encryption key was defined in WordPress settings.");
+            return openssl_encrypt($response['token'], "AES-128-ECB", $options['encryption_key']);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
-    } elseif ($response['_status'] == 'unsuccessful') throw new Exception($response['message']);
+    } else throw new Exception($response['message']);
 }

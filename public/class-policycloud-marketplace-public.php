@@ -81,11 +81,11 @@ class PolicyCloud_Marketplace_Public
 		// Authorization related scripts.
 		wp_register_script("policycloud-marketplace-account-registration", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-registration.js', array('jquery'), $this->version, false);
 		wp_register_script("policycloud-marketplace-account-authentication", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-authentication.js', array('jquery'), $this->version, false);
+		wp_register_script("policycloud-marketplace-account", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account.js', array('jquery'), $this->version, false);
 
 		// Content related scripts.
 		wp_register_script("policycloud-marketplace-object-create", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-object-create.js', array('jquery'), $this->version, false);
 		wp_register_script("policycloud-marketplace-read-single", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-single.js', array('jquery'), $this->version, false);
-		wp_register_script("policycloud-marketplace-account", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account.js', array('jquery'), $this->version, false);
 	}
 
 	/**
@@ -514,6 +514,7 @@ class PolicyCloud_Marketplace_Public
 					}
 				}
 
+				// TODO @alexandrosraikos Use new endpoint.
 				// Specify Description ownership.
 				$descriptions = get_descriptions([
 					'provider' => $token['decoded']->username
@@ -534,6 +535,7 @@ class PolicyCloud_Marketplace_Public
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce('ajax_policycloud_account_editing_verification'),
 			'verified_token' => $verified_token ?? null,
+			'user_id' => (empty($token)) ? '' : $token['decoded']->username
 		));
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 		account_html($token['decoded'] ?? false, $descriptions ?? null, [
@@ -561,12 +563,14 @@ class PolicyCloud_Marketplace_Public
 			die("Unverified request to edit account.");
 		}
 
-		// Attempt to register the user using POST data.
 		try {
-			die(json_encode([
-				'status' => 'success',
-				'data' => account_edit($_POST)
-			]));
+			$token = retrieve_token();
+			if (!empty($token)) {
+				die(json_encode([
+					'status' => 'success',
+					'data' => account_edit($_POST, $_POST['username'], $token)
+				]));
+			} else throw new Exception("User token not found.");
 		} catch (Exception $e) {
 			die(json_encode([
 				'status' => 'failure',

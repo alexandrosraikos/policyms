@@ -542,7 +542,7 @@ function object_creation_html(string $error = null)
             <form id="policycloud-object-create" action="">
                 <fieldset name="basic-information">
                     <h2>Basic information</h2>
-                    <p>To create a new Marketplace object, the following fields represent basic information that will be visible to others.</p>
+                    <p>To create a new Marketplace asset, the following fields represent basic information that will be visible to others.</p>
                     <label for="title">Title *</label>
                     <input required name="title" placeholder="Insert a title" type="text" />
                     <label for="type">Primary collection type *</label>
@@ -577,7 +577,7 @@ function object_creation_html(string $error = null)
                 </fieldset>
                 <fieldset name="internal-information">
                     <h2>Internal information</h2>
-                    <p>You can include internal private comments and the object's field of use for management purposes. These fields are optional.</p>
+                    <p>You can include internal private comments and the asset's field of use for management purposes. These fields are optional.</p>
                     <label for="field-of-use">Fields of usage</label>
                     <textarea name="field-of-use" placeholder="Separate multiple fields of usage using a comma (lorem, ipsum, etc.)"></textarea>
                     <label for="comments">Comments</label>
@@ -660,7 +660,6 @@ function time_elapsed_string($datetime, $full = false)
  */
 function account_html($token, array $descriptions = null, array $args)
 {
-    // TODO @alexandrosraikos: Rename objects to assets.
     // TODO @alexandrosraikos: Add about & social fields to overview.
     // TODO @alexandrosraikos: Add about & social fields to information.
     // TODO @alexandrosraikos: Add about & social fields to editing.
@@ -706,11 +705,6 @@ function account_html($token, array $descriptions = null, array $args)
                         <a title="Send an email" href="mailto:<?php echo sanitize_email($token->info->email ?? '') ?>"><img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/email.svg') ?>" /></a>
                     <?php
                     }
-                    if (!empty($token->info->webpage)) {
-                    ?>
-                        <a title="Visit the official webpage" href="<?php echo esc_url($token->info->webpage ?? '') ?>"><img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/globe.svg') ?>" /></a>
-                    <?php
-                    }
                     if ($token->profile_parameters->public_phone && !empty($token->info->phone)) {
                     ?>
                         <a title="Call" href="tel:<?php echo ($token->info->phone ?? '') ?>"><img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/phone.svg') ?>" /></a>
@@ -720,7 +714,7 @@ function account_html($token, array $descriptions = null, array $args)
                 </div>
                 <nav>
                     <button class="tactile" id="policycloud-account-overview" class="active">Overview</button>
-                    <button class="tactile" id="policycloud-account-objects">Objects</button>
+                    <button class="tactile" id="policycloud-account-assets">Assets</button>
                     <button class="tactile" id="policycloud-account-reviews">Reviews</button>
                     <button class="tactile" id="policycloud-account-information">Information</button>
                     <button class="tactile policycloud-logout">Log Out</button>
@@ -746,6 +740,23 @@ function account_html($token, array $descriptions = null, array $args)
                         <header>
                             <h3>Overview</h3>
                         </header>
+                        <div>
+                            <p>
+                                <?php echo $token->info->about ?? '' ?>
+                            </p>
+                            <?php
+                            if (!empty($token->info->social)) {
+                            ?>
+                                <ul>
+                                    <?php
+                                    // TODO @alexandrosraikos: Update token structure ($token->info->social).
+                                    foreach (['GitHub:https://www.github.com/', 'LinkedIn:https://www.linkedin.com/'] as $link) {
+                                        echo '<a href="' . explode(':', $link, 2)[1] . '" target="blank">' . explode(':', $link, 2)[0] . '</a>';
+                                    }
+                                    ?>
+                                </ul>
+                            <?php } ?>
+                        </div>
                         <table class="statistics">
                             <tr>
                                 <td>
@@ -781,14 +792,14 @@ function account_html($token, array $descriptions = null, array $args)
                             </tr>
                         </table>
                     </section>
-                    <section class="policycloud-account-objects">
+                    <section class="policycloud-account-assets">
                         <header>
-                            <h3>Objects</h3>
+                            <h3>Assets</h3>
                             <div class="actions">
-                                <a id="policycloud-upload" href="<?php echo $args['upload_page'] ?>" title="Create a new object"><span class="fas fa-plus"></span> Create new object</a>
+                                <a id="policycloud-upload" href="<?php echo $args['upload_page'] ?>" title="Create a new asset"><span class="fas fa-plus"></span> Create new asset</a>
                             </div>
                         </header>
-                        <div id="policycloud-account-object-collection-filters">
+                        <div id="policycloud-account-asset-collection-filters">
                             <div>Filter by type:</div>
                             <?php
                             $collections = array_unique(array_map(function ($description) {
@@ -801,7 +812,7 @@ function account_html($token, array $descriptions = null, array $args)
                             }
                             ?>
                         </div>
-                        <ul id="policycloud-account-objects-list">
+                        <ul id="policycloud-account-assets-list">
                             <?php
                             if (!empty($descriptions)) {
                                 foreach ($descriptions as $description) {
@@ -846,6 +857,51 @@ function account_html($token, array $descriptions = null, array $args)
                             <table class="information">
                                 <tr>
                                     <td>
+                                        Summary
+                                    </td>
+                                    <td>
+                                        <span class="folding visible">
+                                            <?php echo $token->info->about; ?>
+                                        </span>
+                                        <textarea name="about" class="folding" placeholder="Tell us about yourself" style="resize:vertical"><?php echo $token->info->about ?? ''; ?></textarea>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Related links
+                                    </td>
+                                    <td>
+                                        <span class="folding visible">
+                                            <?php
+                                            // TODO @alexandrosraikos: Update token structure ($token->info->social).
+                                            foreach (['GitHub:https://www.github.com/', 'LinkedIn:https://www.linkedin.com/'] as $link) {
+                                                echo '<a href="' . explode(':', $link, 2)[1] . '" target="blank">' . explode(':', $link, 2)[0] . '</a><br/>';
+                                            }
+                                            ?>
+                                        </span>
+                                        <div class="socials folding">
+                                            <div>
+                                                    <?php 
+                                                    // TODO @alexandrosraikos: Update token structure ($token->info->social).
+                                                    foreach (['GitHub:https://www.github.com/', 'LinkedIn:https://www.linkedin.com/'] as $key=>$link) {
+                                                        $link_title = explode(':', $link, 2)[0];
+                                                        $link_url = explode(':', $link, 2)[1];
+                                                    ?>
+                                                    <div>
+                                                        <input type="text" name="socials-title[]" placeholder="Example" value="<?php echo $link_title ?>" />
+                                                        <input type="url" name="socials-url[]" placeholder="https://www.example.org/" value="<?php echo $link_url ?>" />
+                                                        <button class="remove-field" title="Remove this link." <?php if (count(['GitHub:https://www.github.com/', 'LinkedIn:https://www.linkedin.com/']) == 1 ) echo 'disabled' ?>><span class="fas fa-times"></span></button>
+                                                </div>
+                                                    <?php
+                                                    }
+                                                    ?>
+                                            </div>
+                                            <button class="add-field" title="Add another link."><span class="fas fa-plus"></span> Add link</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
                                         Username
                                     </td>
                                     <td>
@@ -862,8 +918,8 @@ function account_html($token, array $descriptions = null, array $args)
                                     </td>
                                     <td>
                                         <span class="folding visible">*****************</span>
-                                        <input class="folding" type="password" name="policycloud-marketplace-password" placeholder="Enter your new password here" />
-                                        <input class="folding" type="password" name="policycloud-marketplace-password-confirm" placeholder="Confirm new password here" />
+                                        <input class="folding" type="password" name="password" placeholder="Enter your new password here" />
+                                        <input class="folding" type="password" name="password-confirm" placeholder="Confirm new password here" />
                                     </td>
                                 </tr>
                                 <tr>
@@ -886,7 +942,7 @@ function account_html($token, array $descriptions = null, array $args)
                                             echo ($token->info->title ?? '') . ' ' . ($token->info->name ?? '') . ' ' . ($token->info->surname ?? '');
                                             ?>
                                         </span>
-                                        <select class="folding" name="policycloud-marketplace-title">
+                                        <select class="folding" name="title">
                                             <option value="Mr." <?php echo ($token->info->title == 'Mr.' ? 'selected' : '') ?>>Mr.</option>
                                             <option value="Ms." <?php echo ($token->info->title == 'Ms.' ? 'selected' : '') ?>>Ms.</option>
                                             <option value="Mrs." <?php echo ($token->info->title == 'Mrs.' ? 'selected' : '') ?>>Mrs.</option>
@@ -897,8 +953,8 @@ function account_html($token, array $descriptions = null, array $args)
                                             <option value="Mx." <?php echo ($token->info->title == 'Mx.' ? 'selected' : '') ?>>Mx.</option>
                                             <option value="-" <?php echo ($token->info->title == '-' ? 'selected' : '') ?>>None</option>
                                         </select>
-                                        <input class="folding" type="text" name="policycloud-marketplace-name" placeholder="Name (<?php echo ($token->info->name ?? ''); ?>)" />
-                                        <input class="folding" type="text" name="policycloud-marketplace-surname" placeholder="Surname (<?php echo ($token->info->surname ?? ''); ?>)" />
+                                        <input class="folding" type="text" name="name" placeholder="Name" value="<?php echo ($token->info->name ?? ''); ?>" />
+                                        <input class="folding" type="text" name="surname" placeholder="Surname" value="<?php echo ($token->info->surname ?? ''); ?>" />
                                     </td>
                                 </tr>
                                 <tr>
@@ -911,7 +967,7 @@ function account_html($token, array $descriptions = null, array $args)
                                             echo ($token->info->gender ?? '-');
                                             ?>
                                         </span>
-                                        <select name="policycloud-marketplace-gender" class="folding">
+                                        <select name="gender" class="folding">
                                             <option value="male" <?php echo ($token->info->gender == 'male' ? 'selected' : '') ?>>Male</option>
                                             <option value="female" <?php echo ($token->info->gender == 'female' ? 'selected' : '') ?>>Female</option>
                                             <option value="transgender" <?php echo ($token->info->gender == 'transgender' ? 'selected' : '') ?>>Transgender</option>
@@ -931,7 +987,7 @@ function account_html($token, array $descriptions = null, array $args)
                                             echo ($token->info->organization ?? '-');
                                             ?>
                                         </span>
-                                        <input class="folding" type="text" name="policycloud-marketplace-organization" placeholder="<?php echo ($token->info->organization ?? ''); ?>" />
+                                        <input class="folding" type="text" name="organization" value="<?php echo ($token->info->organization ?? ''); ?>" placeholder="Insert your organization here" />
                                     </td>
                                 </tr>
                                 <tr>
@@ -953,9 +1009,9 @@ function account_html($token, array $descriptions = null, array $args)
                                             }
                                             ?>
                                         </span>
-                                        <input class="folding" type="text" name="policycloud-marketplace-email" placeholder="<?php echo ($token->info->email ?? 'Enter your email address here'); ?>" />
-                                        <label for="policycloud-marketplace-email" class="folding">Changing this setting will require a verification of the new e-mail address.</label>
-                                        <select name="policycloud-marketplace-public-email" class="folding">
+                                        <input class="folding" type="email" name="email" value="<?php echo $token->info->email ?>" />
+                                        <label for="email" class="folding">Changing this setting will require a verification of the new e-mail address.</label>
+                                        <select name="public-email" class="folding">
                                             <option value="1" <?php echo ($token->profile_parameters->public_email == 1 ? 'selected' : '') ?>>Public</option>
                                             <option value="0" <?php echo ($token->profile_parameters->public_email == 0 ? 'selected' : '') ?>>Private</option>
                                         </select>
@@ -973,26 +1029,12 @@ function account_html($token, array $descriptions = null, array $args)
                                             } else echo '-';
                                             ?>
                                         </span>
-                                        <input class="folding" type="text" name="policycloud-marketplace-phone" placeholder="<?php
-                                                                                                                                echo (empty($token->info->phone) ? 'Enter your phone number here' : $token->info->phone); ?>" />
-                                        <select name="policycloud-marketplace-public-phone" class="folding">
+                                        <input class="folding" type="text" name="phone" value="<?php
+                                                                                                                                echo (empty($token->info->phone) ? '' : $token->info->phone); ?>" placeholder="Insert your phone number here" />
+                                        <select name="public-phone" class="folding">
                                             <option value="1" <?php echo ($token->profile_parameters->public_phone == 1 ? 'selected' : '') ?>>Public</option>
                                             <option value="0" <?php echo ($token->profile_parameters->public_phone == 0 ? 'selected' : '') ?>>Private</option>
                                         </select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Website
-                                    </td>
-                                    <td>
-                                        <span class="folding visible">
-                                            <?php
-                                            echo ($token->info->webpage ?? '-');
-                                            ?>
-                                        </span>
-                                        <input class="folding" type="text" name="policycloud-marketplace-webpage" placeholder="<?php
-                                                                                                                                echo ($token->info->webpage ?? 'https://www.example.org/'); ?>" />
                                     </td>
                                 </tr>
                                 <tr>
