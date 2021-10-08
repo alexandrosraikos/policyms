@@ -32,8 +32,7 @@
     $("#policycloud-registration").submit((e) => {
       // TODO @alexandrosraikos: Add image file size check and handler.
       e.preventDefault();
-      var form = $("#policycloud-registration")[0];
-      var formData = new FormData(form);
+      var formData = new FormData($("#policycloud-registration")[0]);
       formData.append("action", "policycloud_marketplace_account_registration");
       formData.append("nonce", ajax_properties_account_registration.nonce);
 

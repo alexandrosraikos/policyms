@@ -165,12 +165,25 @@ function account_authentication($data)
 
     // Check submitted log in information.
     if (
-        empty($data['username']) ||
+        empty($data['username-email']) ||
         empty($data['password'])
     ) throw new Exception('Please fill in all required fields.');
 
     $options = get_option('policycloud_marketplace_plugin_settings');
     if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
+
+    if (is_email($data['username-email'])) {
+        $data = [
+            'email' => $data['username-email'],
+            'password' => $data['password'],
+        ];
+    }
+    else {
+        $data = [
+            'username' => $data['username-email'],
+            'password' => $data['password'],
+        ];
+    }
 
     // Contact Marketplace login API endpoint.
     $curl = curl_init();
@@ -183,10 +196,7 @@ function account_authentication($data)
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS => json_encode([
-            'username' => $data['username'],
-            'password' => $data['password'],
-        ]),
+        CURLOPT_POSTFIELDS => json_encode($data),
         CURLOPT_HTTPHEADER => ['Content-Type: application/json']
     ]);
     $response = json_decode(curl_exec($curl), true);

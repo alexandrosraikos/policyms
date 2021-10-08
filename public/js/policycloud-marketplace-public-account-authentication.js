@@ -3,19 +3,22 @@
   $(document).ready(() => {
     $("#policycloud-authentication").submit((e) => {
       e.preventDefault();
+      var formData = new FormData($("#policycloud-authentication")[0]);
+      formData.append(
+        "action",
+        "policycloud_marketplace_account_authentication"
+      );
+      formData.append("nonce", ajax_properties_account_authentication.nonce);
+
       $("#policycloud-authentication button[type=submit]").addClass("loading");
-      // TODO @alexandrosraikos: Handle user email as credential.
+
       // Perform AJAX request.
       $.ajax({
         url: ajax_properties_account_authentication.ajax_url,
         type: "post",
-        data: {
-          action: "policycloud_marketplace_account_authentication",
-          nonce: ajax_properties_account_authentication.nonce,
-          username: $("input[name=username]").val(),
-          password: $("input[name=password]").val(),
-        },
-
+        processData: false,
+        contentType: false,
+        data: formData,
         // Handle response.
         complete: function (response) {
           var response_data = JSON.parse(response.responseText);

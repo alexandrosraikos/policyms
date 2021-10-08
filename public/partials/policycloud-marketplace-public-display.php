@@ -119,15 +119,14 @@ function account_registration_html($authentication_url, $logged_in)
 function account_authentication_html($registration_url, $logged_in)
 {
     if (!$logged_in) {
-        // TODO @alexandrosraikos: Add email as an account credential.
     ?>
         <div class="policycloud-marketplace">
             <form id="policycloud-authentication" action="">
                 <fieldset name="account-credentials">
                     <h2>Insert your credentials</h2>
                     <p>The following information is required to log you in.</p>
-                    <label for="username">Username *</label>
-                    <input required name="username" placeholder="e.x. johndoe" type="text" />
+                    <label for="username">Username or E-mail address *</label>
+                    <input required name="username-email" placeholder="e.x. johndoe / johndoe@example.org" type="text" />
                     <label for="password">Password *</label>
                     <input required name="password" placeholder="Insert your password" type="password" />
                 </fieldset>
