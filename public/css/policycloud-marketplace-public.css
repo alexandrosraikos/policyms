@@ -1053,6 +1053,12 @@ select#type.type-create {
   --policycloud-highlight-color-mid: #005cf9;
   --policycloud-highlight-color-light: #00bdf5;
   --policycloud-border-color-light: rgba(0, 0, 0, 0.1);
+  --policycloud-background-notice: lightblue;
+  --policycloud-background-notice-outline: rgb(52, 111, 131);
+  --policycloud-background-failure: #ffe8e8;
+  --policycloud-background-failure-outline: #7f1010;
+  --policycloud-background-success: #ecffe8;
+  --policycloud-background-success-outline: #3c5e21;
 }
 
 /* Links & buttons */
@@ -1164,9 +1170,19 @@ select#type.type-create {
   border-radius: 100px;
 }
 
+.policycloud-marketplace span.label {
+  background-color: var(--policycloud-background-notice);
+  border-radius: 100px;
+  font-size: 75%;
+  font-weight: 600;
+  display: inline-block !important;
+  padding: 0 10px;
+  border: 1px solid var(--policycloud-background-notice-outline);
+}
+
 /* Forms */
 
-.policycloud-marketplace form *:not(button, svg, table, tbody, tr, td) {
+.policycloud-marketplace form *:not(button, svg, table, tbody, tr, td, span) {
   display: block;
   margin: 0 auto;
   width: 100%;
@@ -1534,6 +1550,23 @@ select#type.type-create {
 
 /* Overview tab */
 
+section.policycloud-account-overview p {
+  font-size: 90%;
+  color: var(--policycloud-text-color-secondary);
+}
+
+section.policycloud-account-overview ul {
+  padding: 0;
+  margin: 0;
+  font-size: 80%;
+  list-style-type: none;
+}
+
+section.policycloud-account-overview ul li {
+  margin-right: 7px;
+  display: inline-block;
+}
+
 section.policycloud-account-overview table,
 section.policycloud-account-overview tr,
 section.policycloud-account-overview td,
@@ -1668,6 +1701,19 @@ section.policycloud-account-information
 
 section.policycloud-account-information
   #policycloud-marketplace-account-edit
+  .critical-action {
+  display: none;
+}
+
+section.policycloud-account-information
+  #policycloud-marketplace-account-edit
+  .critical-action.visible {
+  display: block;
+  animation: sweep-in 0.3s ease-in-out;
+}
+
+section.policycloud-account-information
+  #policycloud-marketplace-account-edit
   .folding.visible,
 #policycloud-marketplace-description-create .folding.visible {
   display: block;
@@ -1734,20 +1780,37 @@ section.policycloud-account-information
 
 section.policycloud-account-information
   #policycloud-marketplace-account-edit
-  .error {
+  div.error,
+section.policycloud-account-information
+  #policycloud-marketplace-account-edit
+  div.notice {
   margin: 10px;
   width: 100%;
   padding: 10px 15px;
   font-size: 80% !important;
   font-weight: bold !important;
-  background-color: darksalmon;
   border-radius: 8px;
   display: none;
 }
 
 section.policycloud-account-information
   #policycloud-marketplace-account-edit
-  .error.visible {
+  div.error {
+  background-color: var(--policycloud-background-failure);
+}
+
+section.policycloud-account-information
+  #policycloud-marketplace-account-edit
+  div.notice {
+  background-color: var(--policycloud-background-notice);
+}
+
+section.policycloud-account-information
+  #policycloud-marketplace-account-edit
+  div.error.visible,
+section.policycloud-account-information
+  #policycloud-marketplace-account-edit
+  div.notice.visible {
   display: block;
 }
 

@@ -1,42 +1,6 @@
 (function ($) {
   "use strict";
   $(document).ready(function () {
-    // Dynamic socials fields
-    $("#policycloud-marketplace-account-edit .socials button.add-field").click(
-      function (e) {
-        e.preventDefault();
-        $(
-          "#policycloud-marketplace-account-edit .socials > div > div:last-of-type"
-        )
-          .clone()
-          .appendTo("#policycloud-marketplace-account-edit .socials > div");
-        $(
-          "#policycloud-marketplace-account-edit .socials button.remove-field"
-        ).prop(
-          "disabled",
-          $(
-            "#policycloud-marketplace-account-edit .socials button.remove-field"
-          ).length === 1
-        );
-      }
-    );
-    $(document).on(
-      "click",
-      "#policycloud-marketplace-account-edit .socials button.remove-field",
-      function (e) {
-        e.preventDefault();
-        $(this).parent().remove();
-        $(
-          "#policycloud-marketplace-account-edit .socials button.remove-field"
-        ).prop(
-          "disabled",
-          $(
-            "#policycloud-marketplace-account-edit .socials button.remove-field"
-          ).length === 1
-        );
-      }
-    );
-
     // Navigation
     $(
       "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-reviews, button#policycloud-account-information"
@@ -106,7 +70,89 @@
         $(this).html('<span class="fas fa-pen"></span> Edit');
       }
       $("#policycloud-marketplace-account-edit .error").removeClass("visible");
+      $("#policycloud-marketplace-account-edit .notice").removeClass("visible");
     });
+
+    // -- Dynamic socials fields
+    $("#policycloud-marketplace-account-edit .socials button.add-field").click(
+      function (e) {
+        e.preventDefault();
+        $(
+          "#policycloud-marketplace-account-edit .socials > div > div:last-of-type"
+        )
+          .clone()
+          .appendTo("#policycloud-marketplace-account-edit .socials > div");
+        $(
+          "#policycloud-marketplace-account-edit .socials button.remove-field"
+        ).prop(
+          "disabled",
+          $(
+            "#policycloud-marketplace-account-edit .socials button.remove-field"
+          ).length === 1
+        );
+      }
+    );
+    $(document).on(
+      "click",
+      "#policycloud-marketplace-account-edit .socials button.remove-field",
+      function (e) {
+        e.preventDefault();
+        $(this).parent().remove();
+        $(
+          "#policycloud-marketplace-account-edit .socials button.remove-field"
+        ).prop(
+          "disabled",
+          $(
+            "#policycloud-marketplace-account-edit .socials button.remove-field"
+          ).length === 1
+        );
+      }
+    );
+
+    // Critical information editing (email, password).
+    var initialEmailAddress = $(
+      "#policycloud-marketplace-account-edit input[name=email]"
+    ).val();
+    $("#policycloud-marketplace-account-edit input[name=email]").on(
+      "change paste keyup",
+      function (e) {
+        if ($(this).val() !== initialEmailAddress) {
+          $("#policycloud-marketplace-account-edit .critical-action").addClass(
+            "visible"
+          );
+          $(
+            "#policycloud-marketplace-account-edit input[name=current-password]"
+          ).prop("required", true);
+        } else {
+          $(
+            "#policycloud-marketplace-account-edit .critical-action"
+          ).removeClass("visible");
+          $(
+            "#policycloud-marketplace-account-edit input[name=current-password]"
+          ).prop("required", false);
+        }
+      }
+    );
+    $("#policycloud-marketplace-account-edit input[name=password]").on(
+      "change paste keyup",
+      function (e) {
+        if ($(this).val() !== "") {
+          $("#policycloud-marketplace-account-edit .critical-action").addClass(
+            "visible"
+          );
+          $(
+            "#policycloud-marketplace-account-edit input[name=current-password]"
+          ).prop("required", true);
+        } else {
+          $(
+            "#policycloud-marketplace-account-edit .critical-action"
+          ).removeClass("visible");
+          $(
+            "#policycloud-marketplace-account-edit input[name=current-password]"
+          ).prop("required", false);
+        }
+      }
+    );
 
     // Editing submission
     $("#policycloud-marketplace-account-edit").submit((e) => {

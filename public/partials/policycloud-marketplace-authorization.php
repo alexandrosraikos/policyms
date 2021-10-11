@@ -360,29 +360,35 @@ function verify_user(string $verification_code)
  * https://documenter.getpostman.com/view/16776360/TzsZs8kn#17a87988-323b-4209-b93c-ea3854616ab3 
  * 
  * @param	array $data The user information to be edited
+ * @param   string $uid The valid username of the user whose information will be edited.
+ * @param   array $token The decoded access token of the requesting user.
  * @usedby PolicyCloud_Marketplace_Public::account_edit_handler()
  * @since	1.0.0
  */
 function account_edit($data, $uid, $token)
 {
+    // Check if editing self.
+    $isself = $token['decoded']->username == $uid;
+
     // Information validation checks and errors.
     if (
         empty($data['email']) ||
         empty($data['name']) ||
         empty($data['surname'])
     ) throw new Exception('Please fill all required fields!');
-    if (!filter_var($data["email"], FILTER_VALIDATE_EMAIL)) throw new Exception("Please enter a valid email");
-    if (!empty($data['password'])) {
+    if (!filter_var($data["email"], FILTER_VALIDATE_EMAIL)) throw new Exception("Please enter a valid email.");
+    if ($isself && !empty($data['password'])) {
         if (!empty($data['password-confirm'])) {
             if ($data['password'] !== $data['password-confirm']) throw new Exception('Password and password confirmation should match!');
             if (
-                !empty(preg_match('@[A-Z]@', $data['password'])) ||
-                !empty(preg_match('@[a-z]@', $data['password'])) ||
-                !empty(preg_match('@[0-9]@', $data['password'])) ||
-                !empty(preg_match('@[^\w]@', $data['password'])) ||
+                !empty(preg_match('@[A-Z]@', $data['password'])) &&
+                !empty(preg_match('@[a-z]@', $data['password'])) &&
+                !empty(preg_match('@[0-9]@', $data['password'])) &&
+                !empty(preg_match('@[^\w]@', $data['password'])) &&
                 strlen($data['password']) < 8
             ) throw new Exception('Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character.');
         } else throw new Exception("Please fill in the password confirmation when changing your password.");
+        if (empty($data['current-password'])) throw new Exception('Please insert your current password before changing it.');
     }
     if (!empty($data['title'])) {
         if (!in_array($data['title'], ['Mr.', 'Ms.', 'Mrs.', 'Dr.', 'Prof.', 'Sir', 'Miss', 'Mx.', '-'])) throw new Exception("Please select a valid title.");
@@ -394,25 +400,38 @@ function account_edit($data, $uid, $token)
     // Retrieve API credentials.
     $options = get_option('policycloud_marketplace_plugin_settings');
     if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
-    $jsondata = json_encode([
-        'info' => [
-            'name' => $data['name'],
-            'surname' => $data['surname'],
-            'title' => $data['title'],
-            'gender' => $data['gender'],
-            'organization' => $data['organization'],
-            'phone' => $data['phone'],
-            'social' => array_map(function ($k, $v) {
-                return $k . ":" . $v;
-            }, $data['socials-title'] ?? [], $data['socials-url']?? []),
-            'about' => $data['about']
-        ],
-        'profile_parameters' => [
-            'public_email' => intval($data['public-email']),
-            'public_phone' => intval($data['public-phone']),
-        ]
-        ]);
-    // Contact Marketplace registration API.
+
+    // Contact the PolicyCloud Marketplace API for password change.
+    if (!empty($data['password']) && $isself) {
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/accounts/users/password/change',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => json_encode([
+                'old_password' => $data['current-password'],
+                'new_password' => $data['password']
+            ]),
+            CURLOPT_HTTPHEADER => array('Content-Type: application/json', (!empty($token['encoded']) ? ('x-access-token: ' . $token['encoded']) : null))
+        ));
+        $password_update_response = json_decode(curl_exec($curl), true);
+        $error = curl_errno($curl);
+        if ($error) {
+            throw new Exception("Unable to reach the Marketplace server to change the password. More details: " . curl_error($curl));
+        }
+        curl_close($curl);
+        if (!isset($password_update_response)) throw new Exception("The Marketplace API response for changing the user's password was invalid.");
+        elseif ($password_update_response['_status'] != 'successful') throw new Exception('There was an error updating the user\'s password: '.$password_update_response['message']);
+    }
+
+    // TODO @alexandrosraikos: Handle email change with API endpoint.
+
+    // Contact the PolicyCloud Marketplace API for non-sensitive information updating.
     $curl = curl_init();
     curl_setopt_array($curl, array(
         CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/accounts/users/information/' . $uid,
@@ -423,26 +442,40 @@ function account_edit($data, $uid, $token)
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => 'PUT',
-        CURLOPT_POSTFIELDS => $jsondata,
-        CURLOPT_HTTPHEADER => array('Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null), 'x-more-time: 1')
+        CURLOPT_POSTFIELDS => json_encode([
+            'info' => [
+                'name' => $data['name'],
+                'surname' => $data['surname'],
+                'title' => $data['title'],
+                'gender' => $data['gender'],
+                'organization' => $data['organization'],
+                'phone' => $data['phone'],
+                'social' => array_map(function ($k, $v) {
+                    return $k . ":" . $v;
+                }, $data['socials-title'] ?? [], $data['socials-url'] ?? []),
+                'about' => $data['about']
+            ],
+            'profile_parameters' => [
+                'public_email' => intval($data['public-email']),
+                'public_phone' => intval($data['public-phone']),
+            ]
+        ]),
+        CURLOPT_HTTPHEADER => array('Content-Type: application/json', (!empty($token['encoded']) ? ('x-access-token: ' . $token['encoded']) : null), 'x-more-time: 1')
     ));
-    $response = json_decode(curl_exec($curl), true);
+    $nonsensitive_update_response = json_decode(curl_exec($curl), true);
     $error = curl_errno($curl);
     if ($error) {
-        throw new Exception("Unable to reach the Marketplace server. More details: " . curl_error($curl));
+        throw new Exception("Unable to reach the Marketplace server to update the information. More details: " . curl_error($curl));
     }
-
     curl_close($curl);
-
-    // Check response and return encypted token.
-    if (!isset($response)) throw new Exception("The Marketplace API response was invalid.");
-    elseif ($response['_status'] == 'successful') {
+    if (!isset($nonsensitive_update_response)) throw new Exception("The Marketplace API response for changing the user's password was invalid.");
+    elseif ($nonsensitive_update_response['_status'] == 'successful') {
         try {
             // Encrypt token using the same key and return.
             if (empty($options['encryption_key'])) throw new Exception("No PolicyCloud Marketplace encryption key was defined in WordPress settings.");
-            return openssl_encrypt($response['token'], "AES-128-ECB", $options['encryption_key']);
+            return openssl_encrypt($nonsensitive_update_response['token'], "AES-128-ECB", $options['encryption_key']);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
-    } else throw new Exception($response['message']);
+    } else throw new Exception('There was an error updating user information: '.$nonsensitive_update_response['message']);
 }

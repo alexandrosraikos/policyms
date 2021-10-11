@@ -54,7 +54,8 @@ class PolicyCloud_Marketplace_Public
 		$this->version = $version;
 	}
 
-	public function enqueue_head_scripts() {
+	public function enqueue_head_scripts()
+	{
 		echo '<script>FontAwesomeConfig = { autoA11y: true }</script><script src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>';
 	}
 
@@ -363,13 +364,12 @@ class PolicyCloud_Marketplace_Public
 		try {
 			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
 
-			if(!empty($_POST['title']) && !empty($_POST['type']) && !empty($_POST['owner']) && !empty($_POST['description'])) {
+			if (!empty($_POST['title']) && !empty($_POST['type']) && !empty($_POST['owner']) && !empty($_POST['description'])) {
 				die(json_encode([
 					'status' => 'success',
 					'id' => create_description($_POST)
 				]));
 			} else throw new Exception("Please fill in all the required fields.");
-
 		} catch (Exception $e) {
 			die(json_encode([
 				'status' => 'failure',
@@ -565,7 +565,7 @@ class PolicyCloud_Marketplace_Public
 		}
 
 		try {
-			$token = retrieve_token();
+			$token = retrieve_token(true);
 			if (!empty($token)) {
 				die(json_encode([
 					'status' => 'success',

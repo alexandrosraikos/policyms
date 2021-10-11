@@ -751,7 +751,7 @@ function account_html($token, array $descriptions = null, array $args)
                                 <ul>
                                     <?php
                                     foreach ($token->info->social as $link) {
-                                        echo '<a href="' . explode(':', $link, 2)[1] . '" target="blank">' . explode(':', $link, 2)[0] . '</a>';
+                                        echo '<li><a href="' . explode(':', $link, 2)[1] . '" target="blank">' . explode(':', $link, 2)[0] . '</a></li>';
                                     }
                                     ?>
                                 </ul>
@@ -951,8 +951,8 @@ function account_html($token, array $descriptions = null, array $args)
                                             <option value="Mx." <?php echo ($token->info->title == 'Mx.' ? 'selected' : '') ?>>Mx.</option>
                                             <option value="-" <?php echo ($token->info->title == '-' ? 'selected' : '') ?>>None</option>
                                         </select>
-                                        <input class="folding" type="text" name="name" placeholder="Name" value="<?php echo ($token->info->name ?? ''); ?>" />
-                                        <input class="folding" type="text" name="surname" placeholder="Surname" value="<?php echo ($token->info->surname ?? ''); ?>" />
+                                        <input class="folding" type="text" name="name" placeholder="Name" value="<?php echo ($token->info->name ?? ''); ?>" required />
+                                        <input class="folding" type="text" name="surname" placeholder="Surname" value="<?php echo ($token->info->surname ?? ''); ?>" required />
                                     </td>
                                 </tr>
                                 <tr>
@@ -1003,12 +1003,12 @@ function account_html($token, array $descriptions = null, array $args)
                                             <?php
                                                 print_r($token);
                                             } else {
-                                                echo ($token->profile_parameters->public_email == 0) ? ' (Private)' : ' (Public)';
+                                                echo ' <span class="label notice">'.(($token->profile_parameters->public_email == 0) ? 'Private' : 'Public').'</span>';
                                             }
                                             ?>
                                         </span>
-                                        <input class="folding" type="email" name="email" value="<?php echo $token->info->email ?>" />
                                         <label for="email" class="folding">Changing this setting will require a verification of the new e-mail address.</label>
+                                        <input class="folding" type="email" name="email" value="<?php echo $token->info->email ?>" required />
                                         <select name="public-email" class="folding">
                                             <option value="1" <?php echo ($token->profile_parameters->public_email == 1 ? 'selected' : '') ?>>Public</option>
                                             <option value="0" <?php echo ($token->profile_parameters->public_email == 0 ? 'selected' : '') ?>>Private</option>
@@ -1023,7 +1023,7 @@ function account_html($token, array $descriptions = null, array $args)
                                         <span class="folding visible">
                                             <?php
                                             if (!empty($token->info->phone)) {
-                                                echo ($token->info->phone) . (($token->profile_parameters->public_phone == 0) ? ' (Private)' : ' (Public)');
+                                                echo ($token->info->phone) . ' <span class="label notice">'. (($token->profile_parameters->public_phone == 0) ? 'Private' : ' Public').'</span>';
                                             } else echo '-';
                                             ?>
                                         </span>
@@ -1047,6 +1047,11 @@ function account_html($token, array $descriptions = null, array $args)
                                 </tr>
                             </table>
                             <div class="folding error"></div>
+                            <div class="folding notice"></div>
+                            <div class="critical-action">
+                                <label for="current-password">Please type your current password to continue.</label>
+                                <input name="current-password" type="password" placeholder="Insert your current password here">
+                            </div>
                             <button type="submit" class="folding">Submit</button>
                         </form>
                     </section>
