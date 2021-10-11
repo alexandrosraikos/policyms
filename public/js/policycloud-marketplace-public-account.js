@@ -21,7 +21,7 @@
 
     // Check for existing hash
     if (
-      window.location.hash == "#objects" ||
+      window.location.hash == "#assets" ||
       window.location.hash == "#reviews" ||
       window.location.hash == "#information"
     ) {
@@ -58,6 +58,21 @@
         // Show all if no filters.
         $("#policycloud-account-assets-list li").addClass("visible");
       }
+    });
+
+    // Descriptions pagination
+    $(".policycloud-account-assets nav.pagination button").click(function (e) {
+      e.preventDefault();
+      $(".policycloud-account-assets nav.pagination button").removeClass(
+        "active"
+      );
+      $("#policycloud-account-assets-list > ul").removeClass("visible");
+      $(this).addClass("active");
+      $(
+        "#policycloud-account-assets-list > ul[data-page='" +
+          $(this).attr("data-descriptions-page") +
+          "']"
+      ).addClass("visible");
     });
 
     // Profile editing.
@@ -187,12 +202,17 @@
                   "visible"
                 );
               } else if (response_data.status === "success") {
-                // Set 30 day cookie.
-                let date = new Date();
-                date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
-                const expires = "expires=" + date.toUTCString();
-                document.cookie =
-                  "ppmapi-token=" + response_data.data + "; path=/;" + expires;
+                if (response_data.data != null) {
+                  // Set 30 day cookie.
+                  let date = new Date();
+                  date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
+                  const expires = "expires=" + date.toUTCString();
+                  document.cookie =
+                    "ppmapi-token=" +
+                    response_data.data +
+                    "; path=/;" +
+                    expires;
+                }
                 window.location.reload();
               }
             }

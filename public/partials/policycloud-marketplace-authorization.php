@@ -262,7 +262,7 @@ function retrieve_token(bool $decode = false)
 
         return ($decode) ? [
             'encoded' => $token,
-            'decoded' => $decoded_token
+            'decoded' => json_decode(json_encode($decoded_token),true)
         ] : $token;
     } else return false;
 }
@@ -355,29 +355,121 @@ function verify_user(string $verification_code)
 }
 
 /**
+ * Get another user's information.
+ * For more information concerning the schema of the account data, please visit:
+ * https://documenter.getpostman.com/view/16776360/TzsZs8kn#17a87988-323b-4209-b93c-ea3854616ab3 
+ * 
+ * @param   string $uid The valid username of the user whose information will be edited.
+ * @param   array $token The decoded access token of the requesting user.
+ * 
+ * @since	1.0.0
+ */
+function get_user_information($uid, $token)
+{
+
+    // Retrieve credentials.
+    $options = get_option('policycloud_marketplace_plugin_settings');
+    if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
+
+    $curl = curl_init();
+
+    // Contact PolicyCloud Marketplace API.
+    curl_setopt_array($curl, [
+        CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/accounts/users/information/' . $uid,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => "",
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => "GET",
+        CURLOPT_HTTPHEADER => ['Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null)]
+    ]);
+
+    // Handle errors.
+    if (!empty(curl_error($curl))) throw new Exception("There was a connection error while attempting to retrieve the user's information.");
+
+    // Get data.
+    $information = json_decode(curl_exec($curl), true);
+
+    // Close session.
+    curl_close($curl);
+
+
+    // Return encypted token.
+    if (!isset($information)) {
+        throw new Exception("The Marketplace API response was invalid when trying to retrieve this user's information.");
+    } elseif ($information['_status'] == 'successful') {
+        return $information['result'];
+    } else throw new Exception("The user couldn't be retrieved. More details: " . $information['message']);
+}
+
+/**
+ * Get a user's statistics.
+ * For more information concerning the schema of the account data, please visit:
+ * https://documenter.getpostman.com/view/16776360/TzsZs8kn#5805e187-2319-4166-bf58-b78c6e902e42
+ * 
+ * @param   string $uid The valid username of the user whose information will be edited.
+ * @param   array $token The decoded access token of the requesting user.
+ * 
+ * @since	1.0.0
+ */
+function get_user_statistics($uid, $token)
+{
+
+    // Retrieve credentials.
+    $options = get_option('policycloud_marketplace_plugin_settings');
+    if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
+
+    $curl = curl_init();
+
+    // Contact PolicyCloud Marketplace API.
+    curl_setopt_array($curl, [
+        CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/accounts/users/statistics/' . $uid,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => "",
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => "GET",
+        CURLOPT_HTTPHEADER => ['Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null)]
+    ]);
+
+    // Handle errors.
+    if (!empty(curl_error($curl))) throw new Exception("There was a connection error while attempting to retrieve the user's statistics.");
+
+    // Get data.
+    $statistics = json_decode(curl_exec($curl), true);
+
+    // Close session.
+    curl_close($curl);
+
+    // Return 
+    if (!isset($statistics)) throw new Exception("The Marketplace API response for changing the user's password was invalid.");
+    elseif ($statistics['_status'] == 'successful') {
+       return $statistics['results'];
+    } else throw new Exception("The Marketplace API response was invalid when trying to retrieve this user's statistics. " . $statistics['message']);
+}
+
+/**
  * Enact account editing using the Marketplace API.
  * For more information concerning the schema of the account data, please visit:
  * https://documenter.getpostman.com/view/16776360/TzsZs8kn#17a87988-323b-4209-b93c-ea3854616ab3 
  * 
  * @param	array $data The user information to be edited
  * @param   string $uid The valid username of the user whose information will be edited.
- * @param   array $token The decoded access token of the requesting user.
+ * @param   array $token The encoded access token of the requesting user.
  * @usedby PolicyCloud_Marketplace_Public::account_edit_handler()
  * @since	1.0.0
  */
 function account_edit($data, $uid, $token)
 {
-    // Check if editing self.
-    $isself = $token['decoded']->username == $uid;
 
     // Information validation checks and errors.
-    if (
-        empty($data['email']) ||
-        empty($data['name']) ||
-        empty($data['surname'])
-    ) throw new Exception('Please fill all required fields!');
+    if (empty($data['email']) || empty($data['name']) || empty($data['surname'])) throw new Exception('Please fill all required fields!');
     if (!filter_var($data["email"], FILTER_VALIDATE_EMAIL)) throw new Exception("Please enter a valid email.");
-    if ($isself && !empty($data['password'])) {
+    if (!empty($data['password'])) {
         if (!empty($data['password-confirm'])) {
             if ($data['password'] !== $data['password-confirm']) throw new Exception('Password and password confirmation should match!');
             if (
@@ -402,7 +494,7 @@ function account_edit($data, $uid, $token)
     if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
 
     // Contact the PolicyCloud Marketplace API for password change.
-    if (!empty($data['password']) && $isself) {
+    if (!empty($data['password'])) {
         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/accounts/users/password/change',
@@ -417,7 +509,7 @@ function account_edit($data, $uid, $token)
                 'old_password' => $data['current-password'],
                 'new_password' => $data['password']
             ]),
-            CURLOPT_HTTPHEADER => array('Content-Type: application/json', (!empty($token['encoded']) ? ('x-access-token: ' . $token['encoded']) : null))
+            CURLOPT_HTTPHEADER => array('Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null))
         ));
         $password_update_response = json_decode(curl_exec($curl), true);
         $error = curl_errno($curl);
@@ -426,7 +518,7 @@ function account_edit($data, $uid, $token)
         }
         curl_close($curl);
         if (!isset($password_update_response)) throw new Exception("The Marketplace API response for changing the user's password was invalid.");
-        elseif ($password_update_response['_status'] != 'successful') throw new Exception('There was an error updating the user\'s password: '.$password_update_response['message']);
+        elseif ($password_update_response['_status'] != 'successful') throw new Exception('There was an error updating the user\'s password: ' . $password_update_response['message']);
     }
 
     // TODO @alexandrosraikos: Handle email change with API endpoint.
@@ -460,7 +552,7 @@ function account_edit($data, $uid, $token)
                 'public_phone' => intval($data['public-phone']),
             ]
         ]),
-        CURLOPT_HTTPHEADER => array('Content-Type: application/json', (!empty($token['encoded']) ? ('x-access-token: ' . $token['encoded']) : null), 'x-more-time: 1')
+        CURLOPT_HTTPHEADER => array('Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null), 'x-more-time: 1')
     ));
     $nonsensitive_update_response = json_decode(curl_exec($curl), true);
     $error = curl_errno($curl);
@@ -477,5 +569,5 @@ function account_edit($data, $uid, $token)
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
-    } else throw new Exception('There was an error updating user information: '.$nonsensitive_update_response['message']);
+    } else throw new Exception('There was an error updating user information: ' . $nonsensitive_update_response['message']);
 }

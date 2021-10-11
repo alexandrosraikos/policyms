@@ -110,6 +110,83 @@ function get_descriptions(array $args)
     return $descriptions;
 }
 
+/**
+ * Retrieve user specific Description Objects from the Marketplace API, also filtered by collection.
+ *
+ * To learn more about the Marketplace API data schema for retrieving objects and filtering them, visit:
+ * https://documenter.getpostman.com/view/16776360/TzsZs8kn#763f96da-4c32-4e98-9dc3-39ce30a73eaa
+ * 
+ * To add additional argument for sorting and pagination, visit:
+ * https://documenter.getpostman.com/view/16776360/TzsZs8kn#8174c0cb-29a7-4d95-9d13-4182c8b64c44
+ *
+ * @param   string $uid The relevant username.
+ * @param	array $args An array of arguments to filter the search. 
+ * NOTICE: When filtering with items_per_page the returning descriptions will be arranged in arrays.
+ * @throws  Exception If there is no PolicyCloud API hostname defined in the settings.
+ * @throws  Exception If there was a connection error.
+ * @throws  ErrorException If no descriptions were found for the assigned arguments.
+ * 
+ * @since    1.0.0
+ */
+function get_user_descriptions(string $uid, string $token = null, array $args = [])
+{
+
+    // Check arguments
+    if (!empty($args['sort_by'])) {
+        if (
+            $args['sort_by'] != 'newest' ||
+            $args['sort_by'] != 'oldest' ||
+            $args['sort_by'] != 'rating-asc' ||
+            $args['sort_by'] != 'rating-desc' ||
+            $args['sort_by'] != 'views-asc' ||
+            $args['sort_by'] != 'views-desc' ||
+            $args['sort_by'] != 'title'
+        ) {
+            throw new Exception('The asset sorting setting is invalid.');
+        }
+    }
+
+    // Retrieve credentials.
+    $options = get_option('policycloud_marketplace_plugin_settings');
+    if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
+
+    $filters = '?' . http_build_query([
+        'sortBy' => $args['sort_by'] ?? null,
+        'page' => $args['assets_page'] ?? null,
+        'itemsPerPage' => $args['items_per_page'] ?? 5
+    ]);
+
+    $curl = curl_init();
+
+    // Contact PolicyCloud Marketplace API.
+    curl_setopt_array($curl, [
+        CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/descriptions/provider/' . $uid . '/all' . $filters,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => "",
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => "GET",
+        CURLOPT_HTTPHEADER => ['Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null)]
+    ]);
+
+    if (!empty(curl_error($curl))) throw new Exception("There was a connection error while attempting to retrieve the user's descriptions.");
+
+    // Get data.
+    $descriptions = json_decode(curl_exec($curl), true);
+
+    // Close session.
+    curl_close($curl);
+
+    // Return encypted token.
+    if (!isset($descriptions)) {
+        throw new Exception("The Marketplace API response was invalid when attempting to retrieve this user's descriptions.");
+    } elseif ($descriptions['_status'] == 'successful') {
+        return $descriptions;
+    } else throw new Exception("There was an error retrieving user descriptions. ".$descriptions['message']);
+}
+
 
 /**
  * Retrieve a specific Description Object from the Marketplace API.
@@ -168,8 +245,6 @@ function description_editing($updated)
     // Retrieve credentials.
     $options = get_option('policycloud_marketplace_plugin_settings');
     if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
-
-    // TODO @alexandrosraikos: Update & match data fields and test functionality.
 
     try {
 

@@ -1173,11 +1173,49 @@ select#type.type-create {
 .policycloud-marketplace span.label {
   background-color: var(--policycloud-background-notice);
   border-radius: 100px;
-  font-size: 75%;
+  font-size: 12px;
   font-weight: 600;
   display: inline-block !important;
   padding: 0 10px;
   border: 1px solid var(--policycloud-background-notice-outline);
+}
+
+.policycloud-marketplace span.label.success {
+  background-color: var(--policycloud-background-success);
+  border: 1px solid var(--policycloud-background-success-outline);
+}
+
+/* Pagination */
+
+.policycloud-marketplace nav.pagination {
+  text-align: center;
+}
+
+.policycloud-marketplace nav.pagination button {
+  border: none;
+  border-radius: 5px;
+  padding: 0 8px;
+  margin: 0 2px;
+  background: transparent !important;
+  color: inherit !important;
+  font-size: 16px;
+  transition: all 0.1s ease-in-out;
+}
+
+.policycloud-marketplace nav.pagination button:hover {
+  background: rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.1s ease-in-out;
+}
+
+.policycloud-marketplace nav.pagination button:active {
+  transform: scale(0.98);
+  opacity: 0.5;
+  transition: all 0.1s ease-in-out;
+}
+
+.policycloud-marketplace nav.pagination button.active {
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.05) !important;
 }
 
 /* Forms */
@@ -1585,7 +1623,7 @@ section.policycloud-account-overview table .large-figure {
   font-weight: bold;
 }
 
-/* Objects tab */
+/* Assets tab */
 
 section.policycloud-account-assets
   #policycloud-account-asset-collection-filters {
@@ -1609,11 +1647,14 @@ section.policycloud-account-assets
   margin: 0 5px 5px 0;
 }
 
-section.policycloud-account-assets #policycloud-account-assets-list {
+section.policycloud-account-assets #policycloud-account-assets-list ul {
+  display: none;
   padding: 0 10px 0 0;
   margin: 0;
-  max-height: 600px;
-  overflow-y: scroll;
+}
+
+section.policycloud-account-assets #policycloud-account-assets-list ul.visible {
+  display: block;
 }
 
 section.policycloud-account-assets #policycloud-account-assets-list li {
