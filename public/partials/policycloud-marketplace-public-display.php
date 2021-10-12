@@ -664,7 +664,6 @@ function account_html(array $information, array $assets, array $statistics, arra
     // TODO @alexandrosraikos: Handle email change (waiting on @vkoukos).
     // TODO @alexandrosraikos: Add delete account button (waiting on @vkoukos).
     // TODO @alexandrosraikos: Add Request data copy button.
-    // TODO @alexandrosraikos: Finalize mockup CSS.
 
 
     // Check for any errors regarding authorization.
@@ -811,9 +810,6 @@ function account_html(array $information, array $assets, array $statistics, arra
                         </header>
                         <div id="policycloud-account-asset-collection-filters">
                             <div>Filter by type:</div>
-                            <?php
-                            // TODO @alexandrosraikos: Add type filter (JS).
-                            ?>
                         </div>
                         <div id="policycloud-account-assets-list">
                             <?php
@@ -825,7 +821,7 @@ function account_html(array $information, array $assets, array $statistics, arra
                                         if (!empty($assets)) {
                                             foreach ($grouped_assets as $asset) {
                                         ?>
-                                                <li data-type-filter="<?php echo $asset['info']['type'] ?>" data-date-updated="<?php echo strtotime($asset['metadata']['uploadDate'])?>" data-average-rating="<?php echo $asset['metadata']['reviews']['average_rating']?>" data-total-views="<?php echo $asset['metadata']['views'] ?>" class="visible">
+                                                <li data-type-filter="<?php echo $asset['info']['type'] ?>" data-date-updated="<?php echo strtotime($asset['metadata']['uploadDate']) ?>" data-average-rating="<?php echo $asset['metadata']['reviews']['average_rating'] ?>" data-total-views="<?php echo $asset['metadata']['views'] ?>" class="visible">
                                                     <div class="description">
                                                         <a href="<?php echo $args['description_page'] . "?did=" . $asset['id'] ?>">
                                                             <h4><?php echo $asset['info']['title'] ?></h4>
@@ -834,7 +830,7 @@ function account_html(array $information, array $assets, array $statistics, arra
                                                         <div class="metadata">
                                                             <a class="pill"><?php echo $asset['info']['type']  ?></a>
                                                             <a class="pill"><?php echo $asset['info']['subtype']  ?></a>
-                                                            <span><span class="fas fa-star"></span> <?php echo $asset['metadata']['reviews']['average_rating'].' ('.$asset['metadata']['reviews']['no_reviews'].' reviews)' ?></span>
+                                                            <span><span class="fas fa-star"></span> <?php echo $asset['metadata']['reviews']['average_rating'] . ' (' . $asset['metadata']['reviews']['no_reviews'] . ' reviews)' ?></span>
                                                             <span><span class="fas fa-eye"></span> <?php echo $asset['metadata']['views'] ?> views</span>
                                                             <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($asset['metadata']['uploadDate']))) ?></span>
                                                             <span class="label <?php echo ($asset['metadata']['approved'] == 1) ? 'success' : 'notice' ?>"><?php echo ($asset['metadata']['approved'] == 1) ? 'Approved' : 'Pending' ?></span>
@@ -1061,7 +1057,7 @@ function account_html(array $information, array $assets, array $statistics, arra
                                         <td>
                                             <span class="folding visible">
                                                 <?php
-                                                echo ($information['info']['email'] ?? '-');
+                                                echo ($information['info']['email']);
                                                 if ($information['account']['verified'] != '1') {
                                                 ?>
                                                     <span class="unverified">(Unverified)</span>
@@ -1069,7 +1065,9 @@ function account_html(array $information, array $assets, array $statistics, arra
                                                 <?php
                                                     print_r($information);
                                                 } else {
-                                                    echo ' <span class="label notice">' . (($information['profile_parameters']['public_email'] == 0) ? 'Private' : 'Public') . '</span>';
+                                                    if (!$args['visiting'] || $args['is_admin']) {
+                                                        echo ' <span class="label ' . (($information['profile_parameters']['public_email'] == 0) ? 'notice' : 'success') . '">' . (($information['profile_parameters']['public_email'] == 0) ? 'Private' : 'Public') . '</span>';
+                                                    }
                                                 }
                                                 ?>
                                             </span>
@@ -1099,7 +1097,10 @@ function account_html(array $information, array $assets, array $statistics, arra
                                             <span class="folding visible">
                                                 <?php
                                                 if (!empty($information['info']['phone'])) {
-                                                    echo ($information['info']['phone']) . ' <span class="label notice">' . (($information['profile_parameters']['public_phone'] == 0) ? 'Private' : ' Public') . '</span>';
+                                                    echo ($information['info']['phone']);
+                                                    if (!$args['visiting'] || $args['is_admin']) {
+                                                        echo ' <span class="label ' . (($information['profile_parameters']['public_phone'] == 0) ? 'notice' : 'success') . '">' . (($information['profile_parameters']['public_phone'] == 0) ? 'Private' : ' Public') . '</span>';
+                                                    }
                                                 } else echo '-';
                                                 ?>
                                             </span>
@@ -1145,6 +1146,16 @@ function account_html(array $information, array $assets, array $statistics, arra
                             }
                             ?>
                         </form>
+                        <?php
+                        if (!$args['visiting']) {
+                        ?>
+                            <button id="policycloud-marketplace-request-data-copy" class="action">Request data copy</button>
+                        <?php
+                        }
+                        if (!$args['visiting'] || $args['is_admin']) {
+                        ?>
+                            <button id="policycloud-marketplace-delete-account" class="action destructive">Delete account</button>
+                        <?php } ?>
                     </section>
                 </div>
             </div>

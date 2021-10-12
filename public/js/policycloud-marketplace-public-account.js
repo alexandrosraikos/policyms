@@ -1,10 +1,76 @@
 (function ($) {
   "use strict";
   $(document).ready(function () {
-    // Navigation
-    $(
-      "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-reviews, button#policycloud-account-information"
-    ).click(function (e) {
+    /**
+     * Generic
+     *
+     * This section includes generic functionality
+     * regarding the usage of the account shortcode.
+     *
+     */
+
+    /**
+     * Request a new account verification email via AJAX.
+     *
+     * @param {Event} e
+     */
+    function sendVerificationEmail(e) {
+      e.preventDefault();
+      $(this).addClass("disabled");
+
+      // Perform AJAX request.
+      $.ajax({
+        url: ajax_properties_account_editing.ajax_url,
+        type: "post",
+        data: {
+          action: "policycloud_marketplace_user_email_verification_resend",
+          nonce: ajax_properties_account_editing.nonce,
+        },
+
+        // Handle response.
+        complete: function (response) {
+          try {
+            var response_data = JSON.parse(response.responseText);
+            if (response_data != null) {
+              if (response_data.status === "failure") {
+                alert(response_data.data);
+                $("#policycloud-marketplace-account-edit .error").html(
+                  response_data.data
+                );
+                $(
+                  "#policycloud-marketplace-account-edit button[type=submit]"
+                ).removeClass("disabled");
+              } else if (response_data.status === "success") {
+                alert(
+                  "Successfully sent a verification email. If you still haven't received it, please check your spam inbox as well."
+                );
+              }
+            }
+            if (response.status != 200) {
+              alert(
+                "HTTP Error " + response.status + ": " + response.statusText
+              );
+              $(
+                "#policycloud-marketplace-account-edit button[type=submit]"
+              ).removeClass("disabled");
+            }
+          } catch (objError) {
+            alert("Invalid response: " + response.responseText);
+            $(
+              "#policycloud-marketplace-account-edit button[type=submit]"
+            ).removeClass("disabled");
+          }
+        },
+        dataType: "json",
+      });
+    }
+
+    /**
+     * Switch visible interface tab.
+     *
+     * @param {Event} e
+     */
+    function switchTab(e) {
       e.preventDefault();
       $(
         "section.policycloud-account-overview, section.policycloud-account-reviews, section.policycloud-account-assets, section.policycloud-account-information"
@@ -17,9 +83,25 @@
       $(this).addClass("active");
       var hashPrepare = $(this).attr("id").split("-");
       window.location.hash = "#" + hashPrepare[hashPrepare.length - 1];
-    });
+    }
 
-    // Check for existing hash
+    /**
+     *
+     * Generic interface actions & event listeners.
+     *
+     */
+
+    // Request a verification email.
+    $("a#policycloud-marketplace-resend-verification-email").click(
+      sendVerificationEmail
+    );
+
+    // Change account navigation tab.
+    $(
+      "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-reviews, button#policycloud-account-information"
+    ).click(switchTab);
+
+    // Hash determines active tab?
     if (
       window.location.hash == "#assets" ||
       window.location.hash == "#reviews" ||
@@ -32,28 +114,45 @@
 
     /**
      * Assets
+     * ---------
+     * This section contains all the functionality
+     * related to the Assets tab.
+     *
+     * Sorting, viewing and filtering takes place here.
+     *
      */
 
-    // - Asset sorting.
-    function rearrageAssetsLists(rememberPage = false) {
+    /**
+     * Rearranges all the assets (as list items) into new lists,
+     * based on the properties of the shortcode's Assets section.
+     * @param {Boolean} rememberPage Pass *true* to stay on the same page after
+     * the rearrangement.
+     * @param {Int} itemsPerPage Defaults to form value and can
+     * be used to rearrange based on custom page size.
+     * @param {Int} sortBy Defaults to form value and can be used
+     * to rearrange based on a custom sorting rule: `newest`, `oldest`, `rating-asc`, `rating-desc`, `views-asc`, `views-desc` and `title`.
+     */
+    function rearrageAssetsLists(
+      rememberPage = false,
+      itemsPerPage = $(
+        ".policycloud-account-assets form.selector select[name=items-per-page]"
+      ).val(),
+      sortBy = $(
+        ".policycloud-account-assets form.selector select[name=sort-by]"
+      ).val()
+    ) {
       // Get structure and clear DOM.
       var items = $("#policycloud-account-assets-list ul li.visible");
       var hiddenItems = $(
         "#policycloud-account-assets-list ul li:not(.visible)"
       );
-      var itemsPerPage = $(
-        ".policycloud-account-assets form.selector select[name=items-per-page]"
-      ).val();
-      var sortBy = $(
-        ".policycloud-account-assets form.selector select[name=sort-by]"
-      ).val();
       var activePage = rememberPage
         ? $("#policycloud-account-assets-list ul.visible").data("page")
         : 1;
 
       $("#policycloud-account-assets-list").empty();
 
-      // Sort.
+      // Sort by property.
       switch (sortBy) {
         case "newest":
           items.sort((a, b) => {
@@ -139,24 +238,12 @@
       $("#policycloud-account-assets-list ul.hidden").append(hiddenItems);
     }
 
-    // Sorting by attribute.
-    $(".policycloud-account-assets form.selector select[name=sort-by]").change(
-      function (e) {
-        e.preventDefault();
-        rearrageAssetsLists(true);
-      }
-    );
-
-    // Regrouping by page size.
-    $(
-      ".policycloud-account-assets form.selector select[name=items-per-page]"
-    ).change(function (e) {
-      e.preventDefault();
-      rearrageAssetsLists();
-    });
-
-    // - Asset collection filters.
-    // Print buttons.
+    /**
+     * Print the collection filter buttons by reading the
+     * available collections in the asset list.
+     *
+     * @param {[String]} collections
+     */
     function calculateCollectionFilters(collections = null) {
       if (collections == null) {
         var collections = [];
@@ -175,65 +262,139 @@
         );
       }
     }
+
+    /**
+     * Manages button activation, filter application and subsquent rearrangement
+     * of active asset list items.
+     *
+     * @listens click
+     * @param {Event} e
+     */
+    function applyFilters(e) {
+      e.preventDefault();
+
+      // Highlight active button.
+      $(this).toggleClass("active");
+
+      // If at least one filter is active.
+      if (
+        $("#policycloud-account-asset-collection-filters button.active")
+          .length > 0
+      ) {
+        // Remove "visible" class from every asset.
+        $("#policycloud-account-assets-list li").removeClass("visible");
+
+        // Iterate only active filters.
+        $("#policycloud-account-asset-collection-filters button.active").each(
+          /**
+           * Add "visible" class to filter matching data type assets.
+           */
+          function () {
+            $(
+              "#policycloud-account-assets-list li[data-type-filter=" +
+                $(this).data("type-filter") +
+                "]"
+            ).addClass("visible");
+          }
+        );
+      }
+      // If no filter is active.
+      else {
+        // Add "visible" class to every asset.
+        $("#policycloud-account-assets-list li").addClass("visible");
+      }
+      rearrageAssetsLists();
+    }
+
+    /**
+     *
+     * Move the event related asset page into view.
+     *
+     * @param {Event} e
+     */
+    function changePage(e) {
+      e.preventDefault();
+      $(".policycloud-account-assets nav.pagination button").removeClass(
+        "active"
+      );
+      $("#policycloud-account-assets-list > ul").removeClass("visible");
+      $(this).addClass("active");
+      $(
+        "#policycloud-account-assets-list > ul[data-page='" +
+          $(this).attr("data-assets-page") +
+          "']"
+      ).addClass("visible");
+    }
+
+    /**
+     *
+     * Assets interface actions & event listeners.
+     *
+     */
+
+    // Initial print of the filtering buttons.
     calculateCollectionFilters();
 
-    $(document).on(
-      "click",
-      "#policycloud-account-asset-collection-filters button",
+    // Select different asset sorting.
+    $(".policycloud-account-assets form.selector select[name=sort-by]").change(
+      /**
+       * Rearranges the asset list on sorting value change.
+       *
+       * @listens change
+       * @param {Event} e
+       */
       function (e) {
         e.preventDefault();
+        rearrageAssetsLists(true);
+      }
+    );
 
-        // Highlight filter button.
-        $(this).toggleClass("active");
-
-        if (
-          $("#policycloud-account-asset-collection-filters button.active")
-            .length > 0
-        ) {
-          $("#policycloud-account-assets-list li").removeClass("visible");
-
-          // Show all filtered items.
-          var buttons = $(
-            "#policycloud-account-asset-collection-filters button"
-          );
-          buttons.each(function (i, v) {
-            if ($(v).hasClass("active")) {
-              $(
-                "#policycloud-account-assets-list li[data-type-filter=" +
-                  $(v).data("type-filter") +
-                  "]"
-              ).addClass("visible");
-            }
-          });
-        } else {
-          // Show all if no filters.
-          $("#policycloud-account-assets-list li").addClass("visible");
-        }
+    // Select different page size.
+    $(
+      ".policycloud-account-assets form.selector select[name=items-per-page]"
+    ).change(
+      /**
+       * Rearranges the asset list on page size value change.
+       *
+       * @listens change
+       * @param {Event} e
+       */
+      function (e) {
+        e.preventDefault();
         rearrageAssetsLists();
       }
     );
 
-    // - Assets pagination.
+    // Filter asset by collection.
+    $(document).on(
+      "click",
+      "#policycloud-account-asset-collection-filters button",
+      applyFilters
+    );
+
+    // Change page.
     $(document).on(
       "click",
       ".policycloud-account-assets nav.pagination button",
-      function (e) {
-        e.preventDefault();
-        $(".policycloud-account-assets nav.pagination button").removeClass(
-          "active"
-        );
-        $("#policycloud-account-assets-list > ul").removeClass("visible");
-        $(this).addClass("active");
-        $(
-          "#policycloud-account-assets-list > ul[data-page='" +
-            $(this).attr("data-assets-page") +
-            "']"
-        ).addClass("visible");
-      }
+      changePage
     );
 
-    // Profile editing.
-    $("#policycloud-marketplace-account-edit-toggle").click(function (e) {
+    /**
+     * Information
+     * ---------
+     * This section contains all the functionality
+     * related to the Information tab.
+     *
+     * Editing fields, email verification and
+     *
+     */
+
+    /**
+     * Toggle the "visible" class for all form fields and special divs.
+     *
+     * @param {Event} e
+     */
+    function toggleFormFields(e) {
       e.preventDefault();
       $(".folding").toggleClass("visible");
       if ($(this).html().includes("Edit")) {
@@ -243,91 +404,74 @@
       }
       $("#policycloud-marketplace-account-edit .error").removeClass("visible");
       $("#policycloud-marketplace-account-edit .notice").removeClass("visible");
-    });
+    }
 
-    // -- Dynamic socials fields
-    $("#policycloud-marketplace-account-edit .socials button.add-field").click(
-      function (e) {
-        e.preventDefault();
-        $(
-          "#policycloud-marketplace-account-edit .socials > div > div:last-of-type"
-        )
-          .clone()
-          .appendTo("#policycloud-marketplace-account-edit .socials > div");
-        $(
-          "#policycloud-marketplace-account-edit .socials button.remove-field"
-        ).prop(
-          "disabled",
-          $(
-            "#policycloud-marketplace-account-edit .socials button.remove-field"
-          ).length === 1
+    /**
+     * Add another sibling field for weblinks.
+     *
+     * @param {Event} e
+     */
+    function addWeblinkField(e) {
+      e.preventDefault();
+      $(
+        "#policycloud-marketplace-account-edit .socials > div > div:last-of-type"
+      )
+        .clone()
+        .appendTo("#policycloud-marketplace-account-edit .socials > div");
+      $(
+        "#policycloud-marketplace-account-edit .socials button.remove-field"
+      ).prop(
+        "disabled",
+        $("#policycloud-marketplace-account-edit .socials button.remove-field")
+          .length === 1
+      );
+    }
+
+    /**
+     * Remove the weblink field.
+     * @param {Event} e
+     */
+    function removeWeblinkField(e) {
+      e.preventDefault();
+      $(this).parent().remove();
+      $(
+        "#policycloud-marketplace-account-edit .socials button.remove-field"
+      ).prop(
+        "disabled",
+        $("#policycloud-marketplace-account-edit .socials button.remove-field")
+          .length === 1
+      );
+    }
+
+    /**
+     * Display a current password requirement in the form.
+     *
+     * @param {Boolean} active Set to `true` if you want to display the prompt.
+     */
+    function setCurrentPasswordRequirement(enabled = false) {
+      if (enabled) {
+        $("#policycloud-marketplace-account-edit .critical-action").addClass(
+          "visible"
         );
-      }
-    );
-    $(document).on(
-      "click",
-      "#policycloud-marketplace-account-edit .socials button.remove-field",
-      function (e) {
-        e.preventDefault();
-        $(this).parent().remove();
         $(
-          "#policycloud-marketplace-account-edit .socials button.remove-field"
-        ).prop(
-          "disabled",
-          $(
-            "#policycloud-marketplace-account-edit .socials button.remove-field"
-          ).length === 1
+          "#policycloud-marketplace-account-edit input[name=current-password]"
+        ).prop("required", true);
+      } else {
+        $("#policycloud-marketplace-account-edit .critical-action").removeClass(
+          "visible"
         );
+        $(
+          "#policycloud-marketplace-account-edit input[name=current-password]"
+        ).prop("required", false);
       }
-    );
+    }
 
-    // Critical information editing (email, password).
-    var initialEmailAddress = $(
-      "#policycloud-marketplace-account-edit input[name=email]"
-    ).val();
-    $("#policycloud-marketplace-account-edit input[name=email]").on(
-      "change paste keyup",
-      function (e) {
-        if ($(this).val() !== initialEmailAddress) {
-          $("#policycloud-marketplace-account-edit .critical-action").addClass(
-            "visible"
-          );
-          $(
-            "#policycloud-marketplace-account-edit input[name=current-password]"
-          ).prop("required", true);
-        } else {
-          $(
-            "#policycloud-marketplace-account-edit .critical-action"
-          ).removeClass("visible");
-          $(
-            "#policycloud-marketplace-account-edit input[name=current-password]"
-          ).prop("required", false);
-        }
-      }
-    );
-    $("#policycloud-marketplace-account-edit input[name=password]").on(
-      "change paste keyup",
-      function (e) {
-        if ($(this).val() !== "") {
-          $("#policycloud-marketplace-account-edit .critical-action").addClass(
-            "visible"
-          );
-          $(
-            "#policycloud-marketplace-account-edit input[name=current-password]"
-          ).prop("required", true);
-        } else {
-          $(
-            "#policycloud-marketplace-account-edit .critical-action"
-          ).removeClass("visible");
-          $(
-            "#policycloud-marketplace-account-edit input[name=current-password]"
-          ).prop("required", false);
-        }
-      }
-    );
-
-    // Editing submission
-    $("#policycloud-marketplace-account-edit").submit((e) => {
+    /**
+     * Prepare and submit via AJAX the edited information fields.
+     *
+     * @param {Event} e
+     */
+    function updateInformation(e) {
       e.preventDefault();
       var formData = new FormData(
         $("#policycloud-marketplace-account-edit")[0]
@@ -360,15 +504,7 @@
                 );
               } else if (response_data.status === "success") {
                 if (response_data.data != null) {
-                  // Set 30 day cookie.
-                  let date = new Date();
-                  date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
-                  const expires = "expires=" + date.toUTCString();
-                  document.cookie =
-                    "ppmapi-token=" +
-                    response_data.data +
-                    "; path=/;" +
-                    expires;
+                  setAuthorizedToken(response_data.data);
                 }
                 window.location.reload();
               }
@@ -395,75 +531,59 @@
         },
         dataType: "json",
       });
-    });
+    }
 
-    // Verification email resend.
-    $(
-      "button#policycloud-marketplace-resend-verification-email, a#policycloud-marketplace-resend-verification-email"
-    ).click((e) => {
-      e.preventDefault();
-      $(this).addClass("disabled");
+    /**
+     *
+     * Information interface actions & event listeners.
+     *
+     */
 
-      // Perform AJAX request.
-      $.ajax({
-        url: ajax_properties_account_editing.ajax_url,
-        type: "post",
-        data: {
-          action: "policycloud_marketplace_user_email_verification_resend",
-          nonce: ajax_properties_account_editing.nonce,
-        },
+    // Edit information.
+    $("#policycloud-marketplace-account-edit-toggle").click(toggleFormFields);
 
-        // Handle response.
-        complete: function (response) {
-          try {
-            var response_data = JSON.parse(response.responseText);
-            if (response_data != null) {
-              if (response_data.status === "failure") {
-                alert(response_data.data);
-                $("#policycloud-marketplace-account-edit .error").html(
-                  response_data.data
-                );
-                $(
-                  "#policycloud-marketplace-account-edit button[type=submit]"
-                ).removeClass("disabled");
-              } else if (response_data.status === "success") {
-                alert(
-                  "Successfully sent a verification email. If you still haven't received it, please check your spam inbox as well."
-                );
-              }
-            }
-            if (response.status != 200) {
-              alert(
-                "HTTP Error " + response.status + ": " + response.statusText
-              );
-              $(
-                "#policycloud-marketplace-account-edit button[type=submit]"
-              ).removeClass("disabled");
-            }
-          } catch (objError) {
-            alert("Invalid response: " + response.responseText);
-            $(
-              "#policycloud-marketplace-account-edit button[type=submit]"
-            ).removeClass("disabled");
-          }
-        },
-        dataType: "json",
-      });
-    });
+    // Add a weblink field.
+    $("#policycloud-marketplace-account-edit .socials button.add-field").click(
+      addWeblinkField
+    );
 
-    // Store newly verified token
+    // Remove a weblink field.
+    $(document).on(
+      "click",
+      "#policycloud-marketplace-account-edit .socials button.remove-field",
+      removeWeblinkField
+    );
+
+    // Show current password field on email editing.
+    const initialEmailAddress = $(
+      "#policycloud-marketplace-account-edit input[name=email]"
+    ).val();
+    $("#policycloud-marketplace-account-edit input[name=email]").on(
+      "change paste keyup",
+      function () {
+        setCurrentPasswordRequirement($(this).val() !== initialEmailAddress);
+      }
+    );
+
+    // Show current password field on password editing.
+    $("#policycloud-marketplace-account-edit input[name=password]").on(
+      "change paste keyup",
+      function () {
+        setCurrentPasswordRequirement($(this).val() !== "");
+      }
+    );
+
+    // Submit the updated information.
+    $("#policycloud-marketplace-account-edit").submit(updateInformation);
+
+    // Request a verification email.
+    $("button#policycloud-marketplace-resend-verification-email").click(
+      sendVerificationEmail
+    );
+
+    // Store any newly verified encrypted token.
     if (ajax_properties_account_editing.verified_token) {
-      // Set 30 day cookie.
-      let date = new Date();
-      date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
-      const expires = "expires=" + date.toUTCString();
-      document.cookie =
-        "ppmapi-token=" +
-        ajax_properties_account_editing.verified_token +
-        "; " +
-        expires;
-
-      // Redirect to same page without the verification parameter.
+      setAuthorizedToken(ajax_properties_account_editing.verified_token);
       window.location.replace(location.pathname);
     }
   });
