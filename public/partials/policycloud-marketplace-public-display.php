@@ -19,12 +19,12 @@
 /**
  * Print the account registration form.
  * 
- * @param   string $authentication_url The url that redirects to the log in page.
+ * @param   string $authorization_url The url that redirects to the log in page.
  * @param   string $error_message Any potential error message to be displayed.
  *
  * @since    1.0.0
  */
-function account_registration_html($authentication_url, $logged_in)
+function account_registration_html($authorization_url, $logged_in)
 {
     if ($logged_in) {
         show_alert("You're already logged in.", false, 'notice');
@@ -34,7 +34,7 @@ function account_registration_html($authentication_url, $logged_in)
             <form id="policycloud-registration" action="">
                 <fieldset name="account-credentials">
                     <h2>Account credentials</h2>
-                    <p>The following information is required for authentication purposes.</p>
+                    <p>The following information is required for authorization purposes.</p>
                     <label for="username">Username *</label>
                     <input required name="username" placeholder="e.x. johndoe" type="text" />
                     <label for="password">Password *</label>
@@ -96,7 +96,7 @@ function account_registration_html($authentication_url, $logged_in)
                 </fieldset>
                 <div class="error"></div>
                 <button type="submit" class="action ">Create account</button>
-                <p>Already have an account? Please <a href="<?php echo $authentication_url ?>">Log in</a>.</p>
+                <p>Already have an account? Please <a href="<?php echo $authorization_url ?>">Log in</a>.</p>
             </form>
         </div>
     <?php
@@ -107,7 +107,7 @@ function account_registration_html($authentication_url, $logged_in)
 
 
 /**
- * Print the account authentication form.
+ * Print the account authorization form.
  * 
  * @param   string $registration_url The url that redirects to the registration page.
  * @param   bool $logged_in Whether the viewer is already logged in.
@@ -115,12 +115,12 @@ function account_registration_html($authentication_url, $logged_in)
  *
  * @since    1.0.0
  */
-function account_authentication_html($registration_url, $logged_in)
+function account_authorization_html($registration_url, $logged_in)
 {
     if (!$logged_in) {
     ?>
         <div class="policycloud-marketplace">
-            <form id="policycloud-authentication" action="">
+            <form id="policycloud-authorization" action="">
                 <fieldset name="account-credentials">
                     <h2>Insert your credentials</h2>
                     <p>The following information is required to log you in.</p>
@@ -659,46 +659,36 @@ function time_elapsed_string($datetime, $full = false)
  * @uses    show_alert()
  * @since   1.0.0
  */
-function account_html(array $information, array $descriptions, array $statistics, array $args)
+function account_html(array $information, array $assets, array $statistics, array $args)
 {
     // TODO @alexandrosraikos: Handle email change (waiting on @vkoukos).
     // TODO @alexandrosraikos: Add delete account button (waiting on @vkoukos).
     // TODO @alexandrosraikos: Add Request data copy button.
     // TODO @alexandrosraikos: Finalize mockup CSS.
 
-    if (empty($information) || !empty($args['error'])) {
-        if (!empty($args['login_page']) && !empty($args['registration_page']) && $args['error'] == 'not-logged-in') {
-            show_alert('You are not logged in, please <a href="' . $args['login_page'] . '">log in</a> to your account. Don\'t have an account yet? You can <a href="' . $args['registration_page'] . '">register</a> here.');
-        } else {
-            show_alert('An error occured: ' . $args['error']);
-        }
-    } 
-    if (!empty($args['notice'])) {
-        show_alert($args['notice'], true, 'notice');
+
+    // Check for any errors regarding authorization.
+    if (!empty($args['error'])) {
+        show_alert(($args['error'] == 'not-logged-in') ? 'You are not logged in, please <a href="' . $args['login_page'] . '">log in</a> to your account. Don\'t have an account yet? You can <a href="' . $args['registration_page'] . '">register</a> here.' : $args['error']);
     }
-    if (!empty($information['account']['verified'])){
-        if ($information['account']['verified'] !== '1') {
-            show_alert('Your account is still unverified, please check your email inbox or spam folder for a verification email. You can <a id="policycloud-marketplace-resend-verification-email">resend</a> it if you can\'t find it.');
+
+    if (!empty($information)){
+
+        // Check for any notices.
+        if (!empty($args['notice'])) {
+            show_alert($args['notice'], true, 'notice');
         }
-    } else show_alert("Your account verification status couldn't be accessed.");
-    ?>
+
+        // Show account verification notice.
+        if (!empty($information['account']['verified'])) {
+            if ($information['account']['verified'] !== '1') {
+                show_alert('Your account is still unverified, please check your email inbox or spam folder for a verification email. You can <a id="policycloud-marketplace-resend-verification-email">resend</a> it if you can\'t find it.', false, 'notice');
+            }
+        } else show_alert("Your account verification status couldn't be accessed.");
+        ?>
         <div id="policycloud-account" class="policycloud-marketplace">
             <div id="policycloud-account-sidebar">
                 <img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/user.svg') ?>" />
-                <div id="policycloud-account-hyperlinks">
-                    <?php
-                    if (!empty($information['info']['email'])) {
-                    ?>
-                        <a title="Send an email" href="mailto:<?php echo sanitize_email($information['info']['email'] ?? '') ?>"><img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/email.svg') ?>" /></a>
-                    <?php
-                    }
-                    if (!empty($information['info']['phone'])) {
-                    ?>
-                        <a title="Call" href="tel:<?php echo ($information['info']['phone'] ?? '') ?>"><img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/phone.svg') ?>" /></a>
-                    <?php
-                    }
-                    ?>
-                </div>
                 <nav>
                     <button class="tactile" id="policycloud-account-overview" class="active">Overview</button>
                     <button class="tactile" id="policycloud-account-assets">Assets</button>
@@ -711,7 +701,7 @@ function account_html(array $information, array $descriptions, array $statistics
                 <div class="policycloud-account-title">
                     <h2>
                         <?php
-                        echo ($information['info']['title'] ?? '') . ' ' . ($information['info']['name'] ?? '') . ' ' . ($information['info']['surname'] ?? '');
+                        echo ($information['info']['title'] ?? '') . ' ' . $information['info']['name'] . ' ' . $information['info']['surname'];
                         ?>
                     </h2>
                     <div>
@@ -741,44 +731,50 @@ function account_html(array $information, array $descriptions, array $statistics
                                 </ul>
                             <?php } ?>
                         </div>
-                        <table class="statistics">
-                            <tr>
-                                <td>
-                                    <div class="large-figure"><span class="fas fa-check"></span> <?php echo $statistics['approved_descriptions'] ?></div>
-                                    <div class="assets-caption">Approved descriptions</div>
-                                </td>
-                                <td>
-                                    <div class="large-figure"><span class="fas fa-file"></span> <?php echo $statistics['assets_uploaded'] ?></div>
-                                    <div>Assets uploaded</div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="large-figure"><span class="fas fa-star"></span> <?php echo $statistics['average_rating'] ?></div>
-                                    <div class="assets-caption">Average rating</div>
-                                </td>
-                                <td>
-                                    <div class="large-figure"><span class="fas fa-list"></span> <?php echo $statistics['total_descriptions'] ?></div>
-                                    <div class="assets-caption">Total descriptions</div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="large-figure"><span class="fas fa-download"></span> <?php echo $statistics['total_downloads'] ?></div>
-                                    <div class="assets-caption">Total downloads</div>
-                                </td>
-                                <td>
-                                    <div class="large-figure"><span class="fas fa-comment"></span> <?php echo $statistics['total_reviews'] ?></div>
-                                    <div class="assets-caption">Total reviews</div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="large-figure"><span class="fas fa-eye"></span> <?php echo $statistics['total_views'] ?></div>
-                                    <div class="assets-caption">Total views</div>
-                                </td>
-                            </tr>
-                        </table>
+                        <?php if (!empty($statistics)) { ?>
+                            <table class="statistics">
+                                <tr>
+                                    <td>
+                                        <div class="large-figure"><span class="fas fa-check"></span> <?php echo $statistics['approved_descriptions'] ?></div>
+                                        <div class="assets-caption">Approved descriptions</div>
+                                    </td>
+                                    <td>
+                                        <div class="large-figure"><span class="fas fa-file"></span> <?php echo $statistics['assets_uploaded'] ?></div>
+                                        <div>Assets uploaded</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="large-figure"><span class="fas fa-star"></span> <?php echo $statistics['average_rating'] ?></div>
+                                        <div class="assets-caption">Average rating</div>
+                                    </td>
+                                    <td>
+                                        <div class="large-figure"><span class="fas fa-list"></span> <?php echo $statistics['total_descriptions'] ?></div>
+                                        <div class="assets-caption">Total descriptions</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="large-figure"><span class="fas fa-download"></span> <?php echo $statistics['total_downloads'] ?></div>
+                                        <div class="assets-caption">Total downloads</div>
+                                    </td>
+                                    <td>
+                                        <div class="large-figure"><span class="fas fa-comment"></span> <?php echo $statistics['total_reviews'] ?></div>
+                                        <div class="assets-caption">Total reviews</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="large-figure"><span class="fas fa-eye"></span> <?php echo $statistics['total_views'] ?></div>
+                                        <div class="assets-caption">Total views</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        <?php
+                        } else {
+                            show_alert("Statistics for this user are currently unavailable.", false, 'notice');
+                        }
+                        ?>
                     </section>
                     <section class="policycloud-account-assets">
                         <header>
@@ -800,27 +796,27 @@ function account_html(array $information, array $descriptions, array $statistics
                         </div>
                         <div id="policycloud-account-assets-list">
                             <?php
-                            if (!empty($descriptions['results'])) {
-                                foreach ($descriptions['results'] as $page => $description_set) {
+                            if (!empty($assets['results'])) {
+                                foreach ($assets['results'] as $page => $grouped_assets) {
                             ?>
                                     <ul data-page="<?php echo $page + 1 ?>" class="<?php echo ($page == ($_GET['page'] ?? 0)) ? 'visible' : '' ?>">
                                         <?php
-                                        if (!empty($descriptions)) {
-                                            foreach ($description_set as $description) {
+                                        if (!empty($assets)) {
+                                            foreach ($grouped_assets as $asset) {
                                         ?>
-                                                <li data-type-filter="<?php echo $description['info']['type'] ?>" class="visible">
+                                                <li data-type-filter="<?php echo $asset['info']['type'] ?>" class="visible">
                                                     <div class="description">
-                                                        <a href="<?php echo $args['description_page'] . "?did=" . $description['id'] ?>">
-                                                            <h4><?php echo $description['info']['title'] ?></h4>
+                                                        <a href="<?php echo $args['description_page'] . "?did=" . $asset['id'] ?>">
+                                                            <h4><?php echo $asset['info']['title'] ?></h4>
                                                         </a>
-                                                        <p><?php echo $description['info']['short_desc'] ?></p>
+                                                        <p><?php echo $asset['info']['short_desc'] ?></p>
                                                         <div class="metadata">
-                                                            <a class="pill"><?php echo $description['info']['type']  ?></a>
-                                                            <a class="pill"><?php echo $description['info']['subtype']  ?></a>
+                                                            <a class="pill"><?php echo $asset['info']['type']  ?></a>
+                                                            <a class="pill"><?php echo $asset['info']['subtype']  ?></a>
                                                             <span><span class="fas fa-star"></span> 4,2 (128 reviews)</span>
                                                             <span>2 assets uploaded</span>
-                                                            <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($description['metadata']['uploadDate']))) ?></span>
-                                                            <span class="label <?php echo ($description['metadata']['approved'] == 1) ? 'success' : 'notice' ?>"><?php echo ($description['metadata']['approved'] == 1) ? 'Approved' : 'Pending' ?></span>
+                                                            <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($asset['metadata']['uploadDate']))) ?></span>
+                                                            <span class="label <?php echo ($asset['metadata']['approved'] == 1) ? 'success' : 'notice' ?>"><?php echo ($asset['metadata']['approved'] == 1) ? 'Approved' : 'Pending' ?></span>
                                                         </div>
                                                     </div>
                                                 </li>
@@ -829,24 +825,20 @@ function account_html(array $information, array $descriptions, array $statistics
                                         } else {
                                             ?>
                                             <p class="policycloud-account-notice">Upload your first asset to get started.</p>
-                                        <?php
-                                        }
-                                        ?>
+                                        <?php } ?>
                                     </ul>
                             <?php
                                 }
                             } else {
-                                echo '<p>This user does not have any descriptions yet.</p>';
-                            }
-                            ?>
+                                show_alert('This user has not uploaded any assets yet.', false, 'notice');
+                            } ?>
                             <nav class="pagination">
                                 <?php
-                                if (count($descriptions['results'] ?? []) > 1) {
-                                    foreach ($descriptions['results'] as $page => $description_set) {
-                                        echo '<button class="page-selector ' . (($page == ($_GET['page'] ?? 0)) ? 'active' : '') . '" data-descriptions-page="' . $page + 1 . '">' . ($page + 1) . '</button>';
+                                if (count($assets['results'] ?? []) > 1) {
+                                    foreach ($assets['results'] as $page => $grouped_assets) {
+                                        echo '<button class="page-selector ' . (($page == ($_GET['page'] ?? 0)) ? 'active' : '') . '" data-assets-page="' . $page + 1 . '">' . ($page + 1) . '</button>';
                                     }
-                                }
-                                ?>
+                                } ?>
                             </nav>
                         </div>
                     </section>
@@ -860,7 +852,6 @@ function account_html(array $information, array $descriptions, array $statistics
                         <header>
                             <h3>Information</h3>
                             <?php
-                            // TODO @alexandrosraikos: Check account editing cases for account owners and administrators.
                             if (!$args['visiting'] || $args['is_admin']) {
                             ?>
                                 <button id="policycloud-marketplace-account-edit-toggle"><span class="fas fa-pen"></span> Edit</button>
@@ -941,17 +932,17 @@ function account_html(array $information, array $descriptions, array $statistics
                                     <?php
                                     if (!$args['visiting']) {
                                     ?>
-                                    <td>
-                                        Password
-                                    </td>
-                                    <td>
-                                        <span class="folding visible">*****************</span>
+                                        <td>
+                                            Password
+                                        </td>
+                                        <td>
+                                            <span class="folding visible">*****************</span>
                                             <input class="folding" type="password" name="password" placeholder="Enter your new password here" />
                                             <input class="folding" type="password" name="password-confirm" placeholder="Confirm new password here" />
                                         <?php
-                                        }
+                                    }
                                         ?>
-                                    </td>
+                                        </td>
                                 </tr>
                                 <tr>
                                     <td>
@@ -970,7 +961,7 @@ function account_html(array $information, array $descriptions, array $statistics
                                     <td>
                                         <span class="folding visible">
                                             <?php
-                                            echo ($information['info']['title'] ?? '') . ' ' . ($information['info']['name'] ?? '') . ' ' . ($information['info']['surname'] ?? '');
+                                            echo ($information['info']['title'] ?? '') . ' ' . ($information['info']['name']) . ' ' . ($information['info']['surname']);
                                             ?>
                                         </span>
                                         <?php
@@ -987,8 +978,8 @@ function account_html(array $information, array $descriptions, array $statistics
                                                 <option value="Mx." <?php echo ($information['info']['title'] == 'Mx.' ? 'selected' : '') ?>>Mx.</option>
                                                 <option value="-" <?php echo ($information['info']['title'] == '-' ? 'selected' : '') ?>>None</option>
                                             </select>
-                                            <input class="folding" type="text" name="name" placeholder="Name" value="<?php echo ($information['info']['name'] ?? ''); ?>" required />
-                                            <input class="folding" type="text" name="surname" placeholder="Surname" value="<?php echo ($information['info']['surname'] ?? ''); ?>" required />
+                                            <input class="folding" type="text" name="name" placeholder="Name" value="<?php echo ($information['info']['name']); ?>" required />
+                                            <input class="folding" type="text" name="surname" placeholder="Surname" value="<?php echo ($information['info']['surname']); ?>" required />
                                         <?php
                                         }
                                         ?>
@@ -1139,4 +1130,4 @@ function account_html(array $information, array $descriptions, array $statistics
         </div>
 <?php
     }
-
+}

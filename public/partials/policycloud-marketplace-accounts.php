@@ -122,13 +122,19 @@ function account_registration($data)
         ]),
         CURLOPT_HTTPHEADER => array('Content-Type: application/json', 'x-more-time: 1')
     ));
+
+    // Get the data.
     $response = json_decode(curl_exec($curl), true);
+
+    // Handle errors.
     if (curl_errno($curl)) {
         throw new Exception("Unable to reach the Marketplace server. More details: " . curl_error($curl));
     }
+
+    // Close the session.
     curl_close($curl);
 
-    // Check response and return encypted token.
+    // Handle response.
     if (!isset($response)) throw new Exception("The Marketplace API response was invalid.");
     elseif ($response['_status'] == 'successful') {
         try {
@@ -152,17 +158,17 @@ function account_registration($data)
 
 
 /**
- * Enact account authentication using the Marketplace API.
+ * Enact account authorization using the Marketplace API.
  *
- * @param array $data The data user for existing user authentication (username, password).
+ * @param array $data The data user for existing user authorization (username, password).
  * @return string The encoded Marketplace API token for the successfully authenticated user.
- * @usedby PolicyCloud_Marketplace_Public::account_authentication_handler()
+ * @usedby PolicyCloud_Marketplace_Public::account_authorization_handler()
  * 
  * @throws Exception For invalid registration data, missing options, or connectivity issues.
  * 
  * @since    1.0.0
  */
-function account_authentication($data)
+function account_authorization($data)
 {
 
     // Check submitted log in information.
@@ -200,13 +206,19 @@ function account_authentication($data)
         CURLOPT_POSTFIELDS => json_encode($data),
         CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'x-more-time: 1']
     ]);
+    
+    // Get the data.
     $response = json_decode(curl_exec($curl), true);
+
+    // Handle errors.
     if (curl_errno($curl)) {
         throw new Exception("Unable to reach the Marketplace server. More details: " . curl_error($curl));
     }
+
+    // Close the session.
     curl_close($curl);
 
-    // Return encypted token.
+    // Handle response.
     if (!isset($response)) {
         throw new Exception("The Marketplace API response was invalid.");
     } elseif ($response['_status'] == 'successful') {
@@ -332,13 +344,19 @@ function verify_user(string $verification_code)
         CURLOPT_CUSTOMREQUEST => 'GET',
         CURLOPT_HTTPHEADER => array('Content-Type: application/json', 'x-more-time: 1')
     ));
+
+    // Get the data.
     $response = json_decode(curl_exec($curl), true);
+
+    // Handle errors.
     if (curl_errno($curl)) {
         throw new Exception("Unable to reach the Marketplace server. More details: " . curl_error($curl));
     }
+
+    // Close the session.
     curl_close($curl);
 
-    // Return encypted token.
+    // Handle response.
     if (!isset($response)) {
         throw new Exception("The Marketplace API response was invalid.");
     } elseif ($response['_status'] == 'successful') {
@@ -386,15 +404,14 @@ function get_user_information($uid, $token)
         CURLOPT_HTTPHEADER => ['Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null)]
     ]);
 
-    // Handle errors.
-    if (!empty(curl_error($curl))) throw new Exception("There was a connection error while attempting to retrieve the user's information.");
-
     // Get data.
     $information = json_decode(curl_exec($curl), true);
 
+    // Handle errors.
+    if (!empty(curl_error($curl))) throw new Exception("There was a connection error while attempting to retrieve the user's information.");
+
     // Close session.
     curl_close($curl);
-
 
     // Return encypted token.
     if (!isset($information)) {
@@ -436,17 +453,17 @@ function get_user_statistics($uid, $token)
         CURLOPT_HTTPHEADER => ['Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null)]
     ]);
 
-    // Handle errors.
-    if (!empty(curl_error($curl))) throw new Exception("There was a connection error while attempting to retrieve the user's statistics.");
-
     // Get data.
     $statistics = json_decode(curl_exec($curl), true);
+
+    // Handle errors.
+    if (!empty(curl_error($curl))) throw new Exception("There was a connection error while attempting to retrieve the user's statistics: ". curl_error($curl));
 
     // Close session.
     curl_close($curl);
 
     // Return 
-    if (!isset($statistics)) throw new Exception("The Marketplace API response for changing the user's password was invalid.");
+    if (!isset($statistics)) throw new Exception("The Marketplace API response for retrieving the user's statistics was invalid.");
     elseif ($statistics['_status'] == 'successful') {
        return $statistics['results'];
     } else throw new Exception("The Marketplace API response was invalid when trying to retrieve this user's statistics. " . $statistics['message']);
@@ -511,12 +528,17 @@ function account_edit($data, $uid, $token)
             ]),
             CURLOPT_HTTPHEADER => array('Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null))
         ));
+        
+        // Get the data.
         $password_update_response = json_decode(curl_exec($curl), true);
-        $error = curl_errno($curl);
-        if ($error) {
-            throw new Exception("Unable to reach the Marketplace server to change the password. More details: " . curl_error($curl));
-        }
+
+        // Handle errors.
+        if (curl_errno($curl)) throw new Exception("Unable to reach the Marketplace server to change the password. More details: " . curl_error($curl));
+
+        // Close the session.
         curl_close($curl);
+
+        // Handle the response.
         if (!isset($password_update_response)) throw new Exception("The Marketplace API response for changing the user's password was invalid.");
         elseif ($password_update_response['_status'] != 'successful') throw new Exception('There was an error updating the user\'s password: ' . $password_update_response['message']);
     }
@@ -554,15 +576,21 @@ function account_edit($data, $uid, $token)
         ]),
         CURLOPT_HTTPHEADER => array('Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null), 'x-more-time: 1')
     ));
+
+    // Get the data
     $nonsensitive_update_response = json_decode(curl_exec($curl), true);
-    $error = curl_errno($curl);
-    if ($error) {
-        throw new Exception("Unable to reach the Marketplace server to update the information. More details: " . curl_error($curl));
-    }
+
+    // Handle errors.
+    if (curl_errno($curl)) throw new Exception("Unable to reach the Marketplace server to update the information. More details: " . curl_error($curl));
+
+    // Close the session.
     curl_close($curl);
+
+    // Handle response.
     if (!isset($nonsensitive_update_response)) throw new Exception("The Marketplace API response for changing the user's password was invalid.");
     elseif ($nonsensitive_update_response['_status'] == 'successful') {
         try {
+
             // Encrypt token using the same key and return.
             if (empty($options['encryption_key'])) throw new Exception("No PolicyCloud Marketplace encryption key was defined in WordPress settings.");
             return openssl_encrypt($nonsensitive_update_response['token'], "AES-128-ECB", $options['encryption_key']);

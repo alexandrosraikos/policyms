@@ -183,9 +183,9 @@ class PolicyCloud_Marketplace
 		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_registration', $plugin_public, 'account_registration_handler');
 		$this->loader->add_action('wp_ajax_policycloud_marketplace_user_email_verification_resend', $plugin_public, 'user_email_verification_resend_handler');
 		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_user_email_verification_resend', $plugin_public, 'user_email_verification_resend_handler');
-		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_authentication', $plugin_public, 'account_authentication_handler');
-		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_authentication', $plugin_public, 'account_authentication_handler');
-		$this->loader->add_action('init', $plugin_public, 'add_authentication_shortcodes');
+		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_authorization', $plugin_public, 'account_authorization_handler');
+		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_authorization', $plugin_public, 'account_authorization_handler');
+		$this->loader->add_action('init', $plugin_public, 'add_accounts_shortcodes');
 
 		// Add user access management menu item.
 		$this->loader->add_filter('wp_nav_menu_items', $plugin_public, 'add_conditional_access_menu_item', 10, 2);

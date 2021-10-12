@@ -70,7 +70,7 @@
       $(this).addClass("active");
       $(
         "#policycloud-account-assets-list > ul[data-page='" +
-          $(this).attr("data-descriptions-page") +
+          $(this).attr("data-assets-page") +
           "']"
       ).addClass("visible");
     });

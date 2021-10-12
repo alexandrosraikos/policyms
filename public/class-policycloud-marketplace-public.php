@@ -81,7 +81,7 @@ class PolicyCloud_Marketplace_Public
 
 		// Authorization related scripts.
 		wp_register_script("policycloud-marketplace-account-registration", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-registration.js', array('jquery'), $this->version, false);
-		wp_register_script("policycloud-marketplace-account-authentication", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-authentication.js', array('jquery'), $this->version, false);
+		wp_register_script("policycloud-marketplace-account-authorization", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-authorization.js', array('jquery'), $this->version, false);
 		wp_register_script("policycloud-marketplace-account", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account.js', array('jquery'), $this->version, false);
 		// TODO @alexandrosraikos: Create password reset shortcode & functionality.
 
@@ -91,17 +91,17 @@ class PolicyCloud_Marketplace_Public
 	}
 
 	/**
-	 * Register all the shortcodes concerning user authentication.
+	 * Register all the shortcodes concerning user authorization.
 	 *
 	 * @since    1.0.0
 	 */
-	public function add_authentication_shortcodes()
+	public function add_accounts_shortcodes()
 	{
 		// Registration sequence.
 		add_shortcode('policycloud-marketplace-registration', 'PolicyCloud_Marketplace_Public::account_registration_shortcode');
 
 		// Log in sequence.
-		add_shortcode('policycloud-marketplace-login', 'PolicyCloud_Marketplace_Public::account_authentication_shortcode');
+		add_shortcode('policycloud-marketplace-login', 'PolicyCloud_Marketplace_Public::account_authorization_shortcode');
 	}
 
 	/**
@@ -113,7 +113,7 @@ class PolicyCloud_Marketplace_Public
 	{
 
 		// Check for existing token.
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 		try {
 			// Retrieve credentials.
 			$options = get_option('policycloud_marketplace_plugin_settings');
@@ -145,7 +145,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public function account_registration_handler()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_registration')) {
@@ -175,7 +175,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public function user_email_verification_resend_handler()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_account_editing_verification')) {
@@ -203,11 +203,11 @@ class PolicyCloud_Marketplace_Public
 
 
 	/**
-	 * Register the shortcode for account authentication.
+	 * Register the shortcode for account authorization.
 	 *
 	 * @since    1.0.0
 	 */
-	public static function account_authentication_shortcode()
+	public static function account_authorization_shortcode()
 	{
 
 		$options = get_option('policycloud_marketplace_plugin_settings');
@@ -215,7 +215,7 @@ class PolicyCloud_Marketplace_Public
 
 
 		// Check for existing token.
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 		try {
 			if (retrieve_token()) {
 				$logged_in = true;
@@ -224,25 +224,25 @@ class PolicyCloud_Marketplace_Public
 			$error_message =  $e->getMessage();
 		}
 
-		wp_enqueue_script("policycloud-marketplace-account-authentication");
-		wp_localize_script('policycloud-marketplace-account-authentication', 'ajax_properties_account_authentication', array(
+		wp_enqueue_script("policycloud-marketplace-account-authorization");
+		wp_localize_script('policycloud-marketplace-account-authorization', 'ajax_properties_account_authorization', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce('ajax_login')
 		));
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		account_authentication_html($options['registration_page'], $logged_in ?? false);
+		account_authorization_html($options['registration_page'], $logged_in ?? false);
 	}
 
 	/**
 	 * Handle user login AJAX requests.
 	 *
-	 * @uses	PolicyCloud_Marketplace_Public::account_authentication()
+	 * @uses	PolicyCloud_Marketplace_Public::account_authorization()
 	 * @since	1.0.0
 	 */
-	public function account_authentication_handler()
+	public function account_authorization_handler()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_login')) {
@@ -253,7 +253,7 @@ class PolicyCloud_Marketplace_Public
 		try {
 			die(json_encode([
 				'status' => 'success',
-				'data' => account_authentication($_POST)
+				'data' => account_authorization($_POST)
 			]));
 		} catch (Exception $e) {
 			die(json_encode([
@@ -272,7 +272,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public static function add_conditional_access_menu_item($items, $args)
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 
 		// Retrieve credentials.
 		$options = get_option('policycloud_marketplace_plugin_settings');
@@ -386,7 +386,7 @@ class PolicyCloud_Marketplace_Public
 	public static function object_creation_shortcode()
 	{
 
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 
 		try {
 			// Get specific Description data for authorized users.
@@ -418,7 +418,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public static function read_multiple_objects()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
 
 		try {
@@ -454,7 +454,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public static function read_single_object()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
 
 		try {
@@ -492,7 +492,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public static function account_shortcode()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 
 		// TODO @alexandrosraikos: Specify and apply editing differences for account owners and administrators.
 		// TODO @alexandrosraikos: Specify and apply view differences for account owners, administrators and visitors.
@@ -524,18 +524,20 @@ class PolicyCloud_Marketplace_Public
 					$visiting = true;
 					$account_information = get_user_information($_GET['user'], $token['encoded']);
 				}
-			} else {
-				$error = "not-logged-in";
+
+				// Get the user's descriptions.
+				if (!empty($account_information)) {
+					$descriptions = get_user_descriptions(($visiting) ? $_GET['user'] : $token['decoded']['username'], $token['encoded'] ?? null, [
+						'page' => $_GET['page'] ?? null,
+						'items_per_page' => $_GET['items_per_page'] ?? null,
+						'sort_by' => $_GET['sort_by'] ?? null,
+					]);
+				}
+			} else $error = "not-logged-in";
+
+			if (!empty($account_information)) {
+				$statistics = get_user_statistics(($visiting) ? $_GET['user'] : $token['decoded']['username'], $token['encoded'] ?? null);
 			}
-
-			// Get the user's descriptions.
-			$descriptions = get_user_descriptions(($visiting) ? $_GET['user'] : $token['decoded']['username'], $token['encoded'] ?? null, [
-				'page' => $_GET['page'] ?? null,
-				'items_per_page' => $_GET['items_per_page'] ?? null,
-				'sort_by' => $_GET['sort_by'] ?? null,
-			]);
-
-			$statistics = get_user_statistics(($visiting) ? $_GET['user'] : $token['decoded']['username'], $token['encoded'] ?? null);
 		} catch (ErrorException $e) {
 		} catch (Exception $e) {
 			$error = $e->getMessage();
@@ -543,6 +545,11 @@ class PolicyCloud_Marketplace_Public
 
 		// Retrieve credentials.
 		$options = get_option('policycloud_marketplace_plugin_settings');
+		if (empty($options['login_page']) || empty($options['registration_page']) || empty($options['description_page'])) {
+			$error = 'Please update your PolicyCloud Marketplace settings in the WordPress Dashboard.';
+		}
+
+		// Localize script.
 		wp_enqueue_script('policycloud-marketplace-account');
 		wp_localize_script('policycloud-marketplace-account', 'ajax_properties_account_editing', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
@@ -551,7 +558,7 @@ class PolicyCloud_Marketplace_Public
 			'user_id' => $_GET['user'] ?? $token['decoded']['username']
 		));
 
-		// Print shortcode
+		// Print shortcode HTML.
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 		account_html($account_information ?? [], $descriptions ?? [], $statistics ?? [], [
 			"is_admin" => $is_admin ?? false,
@@ -573,7 +580,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public function account_edit_handler()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_account_editing_verification')) {

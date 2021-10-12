@@ -66,11 +66,11 @@ function get_descriptions(array $args)
             CURLOPT_CUSTOMREQUEST => "GET",
         ]);
 
-        // Handle errors.
-        if (!empty(curl_error($curl))) throw new Exception("There was a connection error while attempting to retrieve all descriptions.");
-
         // Get data.
         $descriptions = json_decode(curl_exec($curl), true);
+
+        // Handle errors.
+        if (!empty(curl_error($curl))) throw new Exception("There was a connection error while attempting to retrieve all descriptions.");
     }
 
     // Filtering by collection.
@@ -91,11 +91,11 @@ function get_descriptions(array $args)
                 CURLOPT_CUSTOMREQUEST => "GET",
             ]);
 
-            // Handle errors.
-            if (!empty(curl_error($curl))) throw new Exception("There was a connection error while attempting to retrieve all descriptions.");
-
             // Append descriptions
             $descriptions += (array) json_decode(curl_exec($curl), true);
+
+            // Handle errors.
+            if (!empty(curl_error($curl))) throw new Exception("There was a connection error while attempting to retrieve all descriptions.");
         }
     }
 
@@ -168,13 +168,15 @@ function get_user_descriptions(string $uid, string $token = null, array $args = 
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => "GET",
+        CURLOPT_FAILONERROR => true,
         CURLOPT_HTTPHEADER => ['Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null)]
     ]);
 
-    if (!empty(curl_error($curl))) throw new Exception("There was a connection error while attempting to retrieve the user's descriptions.");
-
     // Get data.
     $descriptions = json_decode(curl_exec($curl), true);
+
+    // Handle any errors.
+    if (!empty(curl_error($curl))) throw new Exception("There was a connection error while attempting to retrieve the user's descriptions: ". curl_error($curl));
 
     // Close session.
     curl_close($curl);
@@ -248,7 +250,7 @@ function description_editing($updated)
 
     try {
 
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-authorization.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 
         // Check authorization status
         $token = retrieve_token();
@@ -269,9 +271,7 @@ function description_editing($updated)
                 CURLOPT_HTTPHEADER => ['x-access-token: ' . $token]
             ));
 
-            if (!curl_exec($curl)) {
-                throw new Exception("There an API error while updating the Description.");
-            }
+            if (!curl_exec($curl)) throw new Exception("There an API error while updating the Description.");
 
             // Handle errors.
             if (!empty(curl_error($curl))) throw new Exception("There was a connection error while updating the Description.");
@@ -300,7 +300,7 @@ function create_description($new)
     if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
 
     try {
-        require_once plugin_dir_path(dirname(__FILE__)) . 'partials/policycloud-marketplace-authorization.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'partials/policycloud-marketplace-accounts.php';
 
         // Check authorization status
         $token = retrieve_token();
@@ -334,11 +334,13 @@ function create_description($new)
                 CURLOPT_HTTPHEADER => array('Content-Type: application/json', 'x-access-token: ' . $token)
             ));
 
+            // Send data.
             $response = json_decode(curl_exec($curl), true);
 
             // Handle errors.
             if (!empty(curl_error($curl))) throw new Exception("There was a connection error while creating the Description.");
 
+            // Close the session.
             curl_close($curl);
 
             // Check response and return encypted token.

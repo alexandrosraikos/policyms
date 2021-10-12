@@ -1,20 +1,20 @@
 (function ($) {
   "use strict";
   $(document).ready(() => {
-    $("#policycloud-authentication").submit((e) => {
+    $("#policycloud-authorization").submit((e) => {
       e.preventDefault();
-      var formData = new FormData($("#policycloud-authentication")[0]);
+      var formData = new FormData($("#policycloud-authorization")[0]);
       formData.append(
         "action",
-        "policycloud_marketplace_account_authentication"
+        "policycloud_marketplace_account_authorization"
       );
-      formData.append("nonce", ajax_properties_account_authentication.nonce);
+      formData.append("nonce", ajax_properties_account_authorization.nonce);
 
-      $("#policycloud-authentication button[type=submit]").addClass("loading");
+      $("#policycloud-authorization button[type=submit]").addClass("loading");
 
       // Perform AJAX request.
       $.ajax({
-        url: ajax_properties_account_authentication.ajax_url,
+        url: ajax_properties_account_authorization.ajax_url,
         type: "post",
         processData: false,
         contentType: false,
@@ -24,7 +24,7 @@
           var response_data = JSON.parse(response.responseText);
           if (response_data != null) {
             if (response_data.status === "failure") {
-              $("#policycloud-authentication .error").html(response_data.data);
+              $("#policycloud-authorization .error").html(response_data.data);
             } else if (response_data.status === "success") {
               // Set 30 day cookie.
               let date = new Date();
@@ -35,11 +35,11 @@
               window.location.href = "/";
             }
           } else {
-            $("#policycloud-authentication .error").html(
+            $("#policycloud-authorization .error").html(
               "There was an internal error."
             );
           }
-          $("#policycloud-authentication button[type=submit]").removeClass(
+          $("#policycloud-authorization button[type=submit]").removeClass(
             "loading"
           );
         },

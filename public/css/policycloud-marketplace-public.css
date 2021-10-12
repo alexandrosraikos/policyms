@@ -1456,29 +1456,6 @@ select#type.type-create {
   margin: 10px auto;
 }
 
-#policycloud-account-sidebar > #policycloud-account-hyperlinks {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-}
-
-#policycloud-account-sidebar > #policycloud-account-hyperlinks a {
-  display: block;
-  padding: 5px 8px;
-  transition: all 0.2s ease-in-out;
-}
-
-#policycloud-account-sidebar > #policycloud-account-hyperlinks a:hover {
-  transform: scale(0.95);
-  opacity: 0.7;
-  transition: all 0.2s ease-in-out;
-}
-
-#policycloud-account-sidebar > #policycloud-account-hyperlinks img {
-  max-width: 32px;
-}
-
 #policycloud-account-sidebar > nav {
   margin-top: 30px;
 }
