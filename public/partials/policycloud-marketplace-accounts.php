@@ -543,7 +543,7 @@ function account_edit($data, $uid, $token)
         elseif ($password_update_response['_status'] != 'successful') throw new Exception('There was an error updating the user\'s password: ' . $password_update_response['message']);
     }
 
-    // TODO @alexandrosraikos: Handle email change with API endpoint.
+    // TODO @alexandrosraikos: Handle email change with API endpoint (waiting on @vkoukos).
 
     // Contact the PolicyCloud Marketplace API for non-sensitive information updating.
     $curl = curl_init();

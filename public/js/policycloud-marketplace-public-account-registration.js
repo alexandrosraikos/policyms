@@ -1,3 +1,5 @@
+// TODO @alexandrosraikos: Clean up, comment and claim.
+
 (function ($) {
   "use strict";
   $(document).ready(() => {

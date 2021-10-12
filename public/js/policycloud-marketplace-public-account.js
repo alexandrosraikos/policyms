@@ -1,3 +1,5 @@
+// TODO @alexandrosraikos: Clean up, comment and claim.
+
 (function ($) {
   "use strict";
   $(document).ready(function () {
@@ -534,6 +536,75 @@
     }
 
     /**
+     * Request a copy of the user's data via AJAX.
+     *
+     * @param {Event} e
+     */
+    function requestDataCopy(e) {
+      e.preventDefault();
+      $("#policycloud-marketplace-request-data-copy").addClass("loading");
+
+      // Perform AJAX request.
+      $.ajax({
+        url: ajax_properties_account_editing.ajax_url,
+        type: "post",
+        data: {
+          action: "policycloud_marketplace_account_data_request",
+          nonce: ajax_properties_account_editing.nonce,
+        },
+        complete: function (response) {
+          try {
+            var response_data = JSON.parse(response.responseText);
+            if (response_data != null) {
+              if (response_data.status === "failure") {
+                console.log(response_data.data);
+              } else if (response_data.status === "success") {
+                if (response_data.data != null) {
+                  var blob = new Blob(
+                    [JSON.stringify(response_data.data, null, 2)],
+                    {
+                      type: "text/plain",
+                    }
+                  );
+                  var a = document.createElement("a");
+                  a.download = "account_data.txt";
+                  a.href = URL.createObjectURL(blob);
+                  a.dataset.downloadurl = [
+                    "text/plain",
+                    a.download,
+                    a.href,
+                  ].join(":");
+                  a.style.display = "none";
+                  a.setAttribute(
+                    "id",
+                    "policycloud-marketplace-download-data-copy"
+                  );
+                  $("section.policycloud-account-information").append(a);
+                  $("#policycloud-marketplace-download-data-copy")
+                    .get(0)
+                    .click();
+                }
+              }
+            }
+            if (response.status != 200) {
+              console.log(
+                "HTTP Error " + response.status + ": " + response.statusText
+              );
+            }
+            $("#policycloud-marketplace-request-data-copy").removeClass(
+              "loading"
+            );
+          } catch (objError) {
+            console.log("Invalid response: " + objError);
+          }
+        },
+        dataType: "json",
+      });
+
+      $("#policycloud-marketplace-request-data-copy").removeClass("loading");
+    }
+
+    /**
      *
      * Information interface actions & event listeners.
      *
@@ -580,6 +651,8 @@
     $("button#policycloud-marketplace-resend-verification-email").click(
       sendVerificationEmail
     );
+
+    $("#policycloud-marketplace-request-data-copy").click(requestDataCopy);
 
     // Store any newly verified encrypted token.
     if (ajax_properties_account_editing.verified_token) {

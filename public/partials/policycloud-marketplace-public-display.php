@@ -527,8 +527,6 @@ function read_single_html($description_object, $args)
     }
 }
 
-
-
 function object_creation_html(string $error = null)
 {
     if (!empty($error)) {
@@ -661,7 +659,6 @@ function time_elapsed_string($datetime, $full = false)
  */
 function account_html(array $information, array $assets, array $statistics, array $args)
 {
-    // TODO @alexandrosraikos: Handle email change (waiting on @vkoukos).
     // TODO @alexandrosraikos: Add delete account button (waiting on @vkoukos).
     // TODO @alexandrosraikos: Add Request data copy button.
 

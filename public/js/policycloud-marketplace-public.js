@@ -1,3 +1,5 @@
+// TODO @alexandrosraikos: Clean up, comment and claim.
+
 /**
  * Store the encrypted token as a cookie
  * into the user's browser for 15 days.

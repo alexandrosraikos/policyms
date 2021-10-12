@@ -494,8 +494,7 @@ class PolicyCloud_Marketplace_Public
 	{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 
-		// TODO @alexandrosraikos: Specify and apply editing differences for account owners and administrators.
-		// TODO @alexandrosraikos: Specify and apply view differences for account owners, administrators and visitors.
+		// TODO @alexandrosraikos: Specify and apply viewing & editing differences for account owners, administrators and visitors.
 
 		try {
 			// Get specific Description data for authorized users.
@@ -601,6 +600,41 @@ class PolicyCloud_Marketplace_Public
 						'data' => $data
 					]));
 				}
+			} else throw new Exception("User token not found.");
+		} catch (Exception $e) {
+			die(json_encode([
+				'status' => 'failure',
+				'data' => $e->getMessage()
+			]));
+		}
+	}
+
+	/**
+	 * Handle user account editing AJAX requests.
+	 *
+	 * @uses 	PolicyCloud_Marketplace_Public::account_registration()
+	 * @since	1.0.0
+	 */
+	public function account_data_request_handler()
+	{
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+
+		// Verify WordPress generated nonce (using the same as account editing due to them being in the same page).
+		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_account_editing_verification')) {
+			die("Unverified request of account data.");
+		}
+
+		try {
+			$token = retrieve_token(true);
+			if (!empty($token)) {
+				$data['information'] = $token['decoded'];
+				
+				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
+				$data['assets'] = get_user_descriptions($token['decoded']['username'], $token['encoded']);
+				die(json_encode([
+					'status' => 'success',
+					'data' => $data
+				]));
 			} else throw new Exception("User token not found.");
 		} catch (Exception $e) {
 			die(json_encode([

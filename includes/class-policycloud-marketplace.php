@@ -181,10 +181,13 @@ class PolicyCloud_Marketplace
 
 		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_registration', $plugin_public, 'account_registration_handler');
 		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_registration', $plugin_public, 'account_registration_handler');
-		$this->loader->add_action('wp_ajax_policycloud_marketplace_user_email_verification_resend', $plugin_public, 'user_email_verification_resend_handler');
-		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_user_email_verification_resend', $plugin_public, 'user_email_verification_resend_handler');
 		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_authorization', $plugin_public, 'account_authorization_handler');
 		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_authorization', $plugin_public, 'account_authorization_handler');
+		$this->loader->add_action('wp_ajax_policycloud_marketplace_user_email_verification_resend', $plugin_public, 'user_email_verification_resend_handler');
+		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_user_email_verification_resend', $plugin_public, 'user_email_verification_resend_handler');
+		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_data_request', $plugin_public, 'account_data_request_handler');
+		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_data_request', $plugin_public, 'account_data_request_handler');
+
 		$this->loader->add_action('init', $plugin_public, 'add_accounts_shortcodes');
 
 		// Add user access management menu item.
