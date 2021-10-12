@@ -30,50 +30,207 @@
       );
     }
 
-    // Asset collection filters
-    $("#policycloud-account-asset-collection-filters button").click(function (
-      e
-    ) {
-      e.preventDefault();
-      $(this).toggleClass("active");
+    /**
+     * Assets
+     */
 
-      if (
-        $("#policycloud-account-asset-collection-filters button.active")
-          .length > 0
-      ) {
-        $("#policycloud-account-assets-list li").removeClass("visible");
-
-        // Show all active filters.
-        var buttons = $("#policycloud-account-asset-collection-filters button");
-        buttons.each(function (i, v) {
-          if ($(v).hasClass("active")) {
-            $(
-              "#policycloud-account-assets-list li[data-type-filter=" +
-                $(v).data("type-filter") +
-                "]"
-            ).addClass("visible");
-          }
-        });
-      } else {
-        // Show all if no filters.
-        $("#policycloud-account-assets-list li").addClass("visible");
-      }
-    });
-
-    // Descriptions pagination
-    $(".policycloud-account-assets nav.pagination button").click(function (e) {
-      e.preventDefault();
-      $(".policycloud-account-assets nav.pagination button").removeClass(
-        "active"
+    // - Asset sorting.
+    function rearrageAssetsLists(rememberPage = false) {
+      // Get structure and clear DOM.
+      var items = $("#policycloud-account-assets-list ul li.visible");
+      var hiddenItems = $(
+        "#policycloud-account-assets-list ul li:not(.visible)"
       );
-      $("#policycloud-account-assets-list > ul").removeClass("visible");
-      $(this).addClass("active");
-      $(
-        "#policycloud-account-assets-list > ul[data-page='" +
-          $(this).attr("data-assets-page") +
-          "']"
-      ).addClass("visible");
+      var itemsPerPage = $(
+        ".policycloud-account-assets form.selector select[name=items-per-page]"
+      ).val();
+      var sortBy = $(
+        ".policycloud-account-assets form.selector select[name=sort-by]"
+      ).val();
+      var activePage = rememberPage
+        ? $("#policycloud-account-assets-list ul.visible").data("page")
+        : 1;
+
+      $("#policycloud-account-assets-list").empty();
+
+      // Sort.
+      switch (sortBy) {
+        case "newest":
+          items.sort((a, b) => {
+            return $(a).data("date-updated") > $(b).data("date-updated");
+          });
+          break;
+        case "oldest":
+          items.sort((a, b) => {
+            return $(a).data("date-updated") < $(b).data("date-updated");
+          });
+          break;
+        case "rating-asc":
+          items.sort((a, b) => {
+            return (
+              $(a).data("date-average-rating") <
+              $(b).data("date-average-rating")
+            );
+          });
+          break;
+        case "rating-desc":
+          items.sort((a, b) => {
+            return (
+              $(a).data("date-average-rating") >
+              $(b).data("date-average-rating")
+            );
+          });
+          break;
+        case "views-asc":
+          items.sort((a, b) => {
+            return $(a).data("total-views") < $(b).data("total-views");
+          });
+          break;
+        case "views-desc":
+          items.sort((a, b) => {
+            return $(a).data("total-views") > $(b).data("total-views");
+          });
+          break;
+        case "title":
+          items.sort((a, b) => {
+            return $(a).find("h4").html().localeCompare($(b).find("h4").html());
+          });
+          break;
+      }
+
+      // Add items and page selectors.
+      var page = 1;
+      for (let i = 0; i < items.length; i++) {
+        if (i == 0 || i % itemsPerPage == 0) {
+          // Add page.
+          $("#policycloud-account-assets-list").prepend(
+            '<ul data-page="' +
+              page +
+              '" class="' +
+              (page == activePage ? "visible" : "") +
+              '"></ul>'
+          );
+
+          // Add pagination and buttons.
+          if (i == 0) {
+            $("#policycloud-account-assets-list").append(
+              '<nav class="pagination"></nav>'
+            );
+          }
+          $("#policycloud-account-assets-list nav.pagination").append(
+            '<button class="page-selector' +
+              (page == activePage ? " active" : "") +
+              '" data-assets-page="' +
+              page +
+              '">' +
+              page +
+              "</button>"
+          );
+          page++;
+        }
+        // Add items to page.
+        $(
+          "#policycloud-account-assets-list ul[data-page='" + (page - 1) + "']"
+        ).append(items[i]);
+      }
+
+      // Add hidden items list for future use.
+      $("#policycloud-account-assets-list").append('<ul class="hidden"></ul>');
+      $("#policycloud-account-assets-list ul.hidden").append(hiddenItems);
+    }
+
+    // Sorting by attribute.
+    $(".policycloud-account-assets form.selector select[name=sort-by]").change(
+      function (e) {
+        e.preventDefault();
+        rearrageAssetsLists(true);
+      }
+    );
+
+    // Regrouping by page size.
+    $(
+      ".policycloud-account-assets form.selector select[name=items-per-page]"
+    ).change(function (e) {
+      e.preventDefault();
+      rearrageAssetsLists();
     });
+
+    // - Asset collection filters.
+    // Print buttons.
+    function calculateCollectionFilters(collections = null) {
+      if (collections == null) {
+        var collections = [];
+        $.each($("#policycloud-account-assets-list ul li"), function () {
+          if (!collections.includes($(this).data("type-filter")))
+            collections.push($(this).data("type-filter"));
+        });
+      }
+      for (let i = 0; i < collections.length; i++) {
+        $("#policycloud-account-asset-collection-filters").append(
+          '<button class="outlined" data-type-filter="' +
+            collections[i] +
+            '">' +
+            collections[i] +
+            "</button>"
+        );
+      }
+    }
+    calculateCollectionFilters();
+
+    $(document).on(
+      "click",
+      "#policycloud-account-asset-collection-filters button",
+      function (e) {
+        e.preventDefault();
+
+        // Highlight filter button.
+        $(this).toggleClass("active");
+
+        if (
+          $("#policycloud-account-asset-collection-filters button.active")
+            .length > 0
+        ) {
+          $("#policycloud-account-assets-list li").removeClass("visible");
+
+          // Show all filtered items.
+          var buttons = $(
+            "#policycloud-account-asset-collection-filters button"
+          );
+          buttons.each(function (i, v) {
+            if ($(v).hasClass("active")) {
+              $(
+                "#policycloud-account-assets-list li[data-type-filter=" +
+                  $(v).data("type-filter") +
+                  "]"
+              ).addClass("visible");
+            }
+          });
+        } else {
+          // Show all if no filters.
+          $("#policycloud-account-assets-list li").addClass("visible");
+        }
+        rearrageAssetsLists();
+      }
+    );
+
+    // - Assets pagination.
+    $(document).on(
+      "click",
+      ".policycloud-account-assets nav.pagination button",
+      function (e) {
+        e.preventDefault();
+        $(".policycloud-account-assets nav.pagination button").removeClass(
+          "active"
+        );
+        $("#policycloud-account-assets-list > ul").removeClass("visible");
+        $(this).addClass("active");
+        $(
+          "#policycloud-account-assets-list > ul[data-page='" +
+            $(this).attr("data-assets-page") +
+            "']"
+        ).addClass("visible");
+      }
+    );
 
     // Profile editing.
     $("#policycloud-marketplace-account-edit-toggle").click(function (e) {

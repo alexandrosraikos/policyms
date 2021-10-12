@@ -672,7 +672,7 @@ function account_html(array $information, array $assets, array $statistics, arra
         show_alert(($args['error'] == 'not-logged-in') ? 'You are not logged in, please <a href="' . $args['login_page'] . '">log in</a> to your account. Don\'t have an account yet? You can <a href="' . $args['registration_page'] . '">register</a> here.' : $args['error']);
     }
 
-    if (!empty($information)){
+    if (!empty($information)) {
 
         // Check for any notices.
         if (!empty($args['notice'])) {
@@ -685,7 +685,7 @@ function account_html(array $information, array $assets, array $statistics, arra
                 show_alert('Your account is still unverified, please check your email inbox or spam folder for a verification email. You can <a id="policycloud-marketplace-resend-verification-email">resend</a> it if you can\'t find it.', false, 'notice');
             }
         } else show_alert("Your account verification status couldn't be accessed.");
-        ?>
+    ?>
         <div id="policycloud-account" class="policycloud-marketplace">
             <div id="policycloud-account-sidebar">
                 <img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/user.svg') ?>" />
@@ -694,7 +694,7 @@ function account_html(array $information, array $assets, array $statistics, arra
                     <button class="tactile" id="policycloud-account-assets">Assets</button>
                     <button class="tactile" id="policycloud-account-reviews">Reviews</button>
                     <button class="tactile" id="policycloud-account-information">Information</button>
-                    <button class="tactile policycloud-logout">Log Out</button>
+                    <button class="tactile policycloud-logout">Log out</button>
                 </nav>
             </div>
             <div id="policycloud-account-content">
@@ -716,6 +716,7 @@ function account_html(array $information, array $assets, array $statistics, arra
                             <h3>Overview</h3>
                         </header>
                         <div>
+                            <h4>About</h4>
                             <p>
                                 <?php echo $information['info']['about'] ?? '' ?>
                             </p>
@@ -732,6 +733,7 @@ function account_html(array $information, array $assets, array $statistics, arra
                             <?php } ?>
                         </div>
                         <?php if (!empty($statistics)) { ?>
+                            <h4>Statistics</h4>
                             <table class="statistics">
                                 <tr>
                                     <td>
@@ -779,14 +781,33 @@ function account_html(array $information, array $assets, array $statistics, arra
                     <section class="policycloud-account-assets">
                         <header>
                             <h3>Assets</h3>
-                            <?php
-                            if (!$args['visiting']) {
-                                // TODO @alexandrosraikos: Add sorting links (sort_by) and pagination (items_per_page).
-                            ?>
-                                <div class="actions">
+                            <div class="actions">
+                                <form action="" class="selector">
+                                    <label for="sort-by">Sort by</label>
+                                    <select name="sort-by">
+                                        <option value="newest" <?php echo ((($_GET['sort_by'] ?? '' == 'newest') || empty($_GET['sort_by'])) ? "selected" : "") ?>>Newest</option>
+                                        <option value="oldest" <?php echo (($_GET['sort_by'] ?? '' == 'oldest') ? "selected" : "") ?>>Oldest</option>
+                                        <option value="rating-asc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-asc') ? "selected" : "") ?>>Highest rated</option>
+                                        <option value="rating-desc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-desc') ? "selected" : "") ?>>Lowest rated</option>
+                                        <option value="views-asc" <?php echo (($_GET['sort_by'] ?? '' == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
+                                        <option value="views-desc" <?php echo (($_GET['sort_by'] ?? '' == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
+                                        <option value="title" <?php echo (($_GET['sort_by'] ?? '' == 'title') ? "selected" : "") ?>>Title</option>
+                                    </select>
+                                    <label for="items-per-page">Items per page</label>
+                                    <select name="items-per-page">
+                                        <option value="5" <?php echo ((($_GET['items_per_page'] ?? '' == '5') || empty($_GET['items_per_page'])) ? "selected" : "") ?>>5</option>
+                                        <option value="10" <?php echo (($_GET['items_per_page'] ?? '' == '10') ? "selected" : "") ?>>10</option>
+                                        <option value="25" <?php echo (($_GET['items_per_page'] ?? '' == '25') ? "selected" : "") ?>>25</option>
+                                        <option value="50" <?php echo (($_GET['items_per_page'] ?? '' == '50') ? "selected" : "") ?>>50</option>
+                                        <option value="100" <?php echo (($_GET['items_per_page'] ?? '' == '100') ? "selected" : "") ?>>100</option>
+                                    </select>
+                                </form>
+                                <?php
+                                if (!$args['visiting']) {
+                                ?>
                                     <a id="policycloud-upload" href="<?php echo $args['upload_page'] ?>" title="Create a new asset"><span class="fas fa-plus"></span> Create new asset</a>
-                                </div>
-                            <?php } ?>
+                                <?php } ?>
+                            </div>
                         </header>
                         <div id="policycloud-account-asset-collection-filters">
                             <div>Filter by type:</div>
@@ -804,7 +825,7 @@ function account_html(array $information, array $assets, array $statistics, arra
                                         if (!empty($assets)) {
                                             foreach ($grouped_assets as $asset) {
                                         ?>
-                                                <li data-type-filter="<?php echo $asset['info']['type'] ?>" class="visible">
+                                                <li data-type-filter="<?php echo $asset['info']['type'] ?>" data-date-updated="<?php echo strtotime($asset['metadata']['uploadDate'])?>" data-average-rating="<?php echo $asset['metadata']['reviews']['average_rating']?>" data-total-views="<?php echo $asset['metadata']['views'] ?>" class="visible">
                                                     <div class="description">
                                                         <a href="<?php echo $args['description_page'] . "?did=" . $asset['id'] ?>">
                                                             <h4><?php echo $asset['info']['title'] ?></h4>
@@ -813,8 +834,8 @@ function account_html(array $information, array $assets, array $statistics, arra
                                                         <div class="metadata">
                                                             <a class="pill"><?php echo $asset['info']['type']  ?></a>
                                                             <a class="pill"><?php echo $asset['info']['subtype']  ?></a>
-                                                            <span><span class="fas fa-star"></span> 4,2 (128 reviews)</span>
-                                                            <span>2 assets uploaded</span>
+                                                            <span><span class="fas fa-star"></span> <?php echo $asset['metadata']['reviews']['average_rating'].' ('.$asset['metadata']['reviews']['no_reviews'].' reviews)' ?></span>
+                                                            <span><span class="fas fa-eye"></span> <?php echo $asset['metadata']['views'] ?> views</span>
                                                             <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($asset['metadata']['uploadDate']))) ?></span>
                                                             <span class="label <?php echo ($asset['metadata']['approved'] == 1) ? 'success' : 'notice' ?>"><?php echo ($asset['metadata']['approved'] == 1) ? 'Approved' : 'Pending' ?></span>
                                                         </div>
