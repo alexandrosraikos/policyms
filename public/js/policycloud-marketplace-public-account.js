@@ -1,4 +1,9 @@
-// TODO @alexandrosraikos: Clean up, comment and claim.
+/**
+ * @file Provides dynamic fields and handles AJAX requests for forms and buttons
+ * in the account shortcode.
+ *
+ * @author Alexandros Raikos <araikos@unipi.gr>
+ */
 
 (function ($) {
   "use strict";
@@ -15,9 +20,52 @@
      * Request a new account verification email via AJAX.
      *
      * @param {Event} e
+     *
+     * @author Alexandros Raikos <araikos@unipi.gr>
      */
     function sendVerificationEmail(e) {
       e.preventDefault();
+      /**
+       * Handle the response after requesting a new verification email.
+       *
+       * @param {Object} response
+       *
+       * @author Alexandros Raikos <araikos@unipi.gr>
+       */
+      function handleResponse(response) {
+        try {
+          var payload = JSON.parse(response.responseText);
+          if (payload != null) {
+            if (payload.status === "failure") {
+              showAlert(
+                "#policycloud-marketplace-account-edit button[type=submit]",
+                payload.data
+              );
+            } else if (payload.status === "success") {
+              showAlert(
+                "#policycloud-marketplace-account-edit button[type=submit]",
+                "Successfully sent a verification email. If you still haven't received it, please check your spam inbox as well.",
+                "notice"
+              );
+            }
+          }
+          if (response.status != 200) {
+            showAlert(
+              "#policycloud-marketplace-account-edit button[type=submit]",
+              "HTTP Error " + response.status + ": " + response.statusText
+            );
+          }
+        } catch (objError) {
+          showAlert(
+            "#policycloud-marketplace-account-edit button[type=submit]",
+            "Invalid response: " + response.responseText
+          );
+        }
+        $(
+          "#policycloud-marketplace-account-edit button[type=submit]"
+        ).removeClass("disabled");
+      }
+
       $(this).addClass("disabled");
 
       // Perform AJAX request.
@@ -30,39 +78,7 @@
         },
 
         // Handle response.
-        complete: function (response) {
-          try {
-            var response_data = JSON.parse(response.responseText);
-            if (response_data != null) {
-              if (response_data.status === "failure") {
-                alert(response_data.data);
-                $("#policycloud-marketplace-account-edit .error").html(
-                  response_data.data
-                );
-                $(
-                  "#policycloud-marketplace-account-edit button[type=submit]"
-                ).removeClass("disabled");
-              } else if (response_data.status === "success") {
-                alert(
-                  "Successfully sent a verification email. If you still haven't received it, please check your spam inbox as well."
-                );
-              }
-            }
-            if (response.status != 200) {
-              alert(
-                "HTTP Error " + response.status + ": " + response.statusText
-              );
-              $(
-                "#policycloud-marketplace-account-edit button[type=submit]"
-              ).removeClass("disabled");
-            }
-          } catch (objError) {
-            alert("Invalid response: " + response.responseText);
-            $(
-              "#policycloud-marketplace-account-edit button[type=submit]"
-            ).removeClass("disabled");
-          }
-        },
+        complete: handleResponse,
         dataType: "json",
       });
     }
@@ -133,6 +149,8 @@
      * be used to rearrange based on custom page size.
      * @param {Int} sortBy Defaults to form value and can be used
      * to rearrange based on a custom sorting rule: `newest`, `oldest`, `rating-asc`, `rating-desc`, `views-asc`, `views-desc` and `title`.
+     *
+     * @author Alexandros Raikos <araikos@unipi.gr>
      */
     function rearrageAssetsLists(
       rememberPage = false,
@@ -168,18 +186,12 @@
           break;
         case "rating-asc":
           items.sort((a, b) => {
-            return (
-              $(a).data("date-average-rating") <
-              $(b).data("date-average-rating")
-            );
+            return $(a).data("average-rating") < $(b).data("average-rating");
           });
           break;
         case "rating-desc":
           items.sort((a, b) => {
-            return (
-              $(a).data("date-average-rating") >
-              $(b).data("date-average-rating")
-            );
+            return $(a).data("average-rating") > $(b).data("average-rating");
           });
           break;
         case "views-asc":
@@ -245,6 +257,8 @@
      * available collections in the asset list.
      *
      * @param {[String]} collections
+     *
+     * @author Alexandros Raikos <araikos@unipi.gr>
      */
     function calculateCollectionFilters(collections = null) {
       if (collections == null) {
@@ -271,6 +285,8 @@
      *
      * @listens click
      * @param {Event} e
+     *
+     * @author Alexandros Raikos <araikos@unipi.gr>
      */
     function applyFilters(e) {
       e.preventDefault();
@@ -313,6 +329,8 @@
      * Move the event related asset page into view.
      *
      * @param {Event} e
+     *
+     * @author Alexandros Raikos <araikos@unipi.gr>
      */
     function changePage(e) {
       e.preventDefault();
@@ -344,6 +362,8 @@
        *
        * @listens change
        * @param {Event} e
+       *
+       * @author Alexandros Raikos <araikos@unipi.gr>
        */
       function (e) {
         e.preventDefault();
@@ -360,6 +380,8 @@
        *
        * @listens change
        * @param {Event} e
+       *
+       * @author Alexandros Raikos <araikos@unipi.gr>
        */
       function (e) {
         e.preventDefault();
@@ -395,6 +417,8 @@
      * Toggle the "visible" class for all form fields and special divs.
      *
      * @param {Event} e
+     *
+     * @author Alexandros Raikos <araikos@unipi.gr>
      */
     function toggleFormFields(e) {
       e.preventDefault();
@@ -412,6 +436,8 @@
      * Add another sibling field for weblinks.
      *
      * @param {Event} e
+     *
+     * @author Alexandros Raikos <araikos@unipi.gr>
      */
     function addWeblinkField(e) {
       e.preventDefault();
@@ -432,6 +458,8 @@
     /**
      * Remove the weblink field.
      * @param {Event} e
+     *
+     * @author Alexandros Raikos <araikos@unipi.gr>
      */
     function removeWeblinkField(e) {
       e.preventDefault();
@@ -449,6 +477,8 @@
      * Display a current password requirement in the form.
      *
      * @param {Boolean} active Set to `true` if you want to display the prompt.
+     *
+     * @author Alexandros Raikos <araikos@unipi.gr>
      */
     function setCurrentPasswordRequirement(enabled = false) {
       if (enabled) {
@@ -472,20 +502,56 @@
      * Prepare and submit via AJAX the edited information fields.
      *
      * @param {Event} e
+     *
+     * @author Alexandros Raikos <araikos@unipi.gr>
      */
     function updateInformation(e) {
       e.preventDefault();
+
+      /**
+       * Handle the response after requesting an update of the account information.
+       *
+       * @param {Object} response The raw response AJAX object.
+       *
+       * @author Alexandros Raikos <araikos@unipi.gr>
+       */
+      function handleResponse(response) {
+        if (response.status === 200) {
+          try {
+            var data = JSON.parse(response.responseText);
+            setAuthorizedToken(data);
+            window.location.reload();
+          } catch (objError) {
+            console.error("Invalid JSON response: " + objError);
+          }
+        } else if (
+          response.status === 400 ||
+          response.status === 404 ||
+          response.status === 500
+        ) {
+          showAlert(
+            "#policycloud-marketplace-request-data-copy",
+            response.responseText
+          );
+        } else if (response.status === 440) {
+          removeAuthorization(true);
+        } else {
+          console.error(response.responseText);
+        }
+      }
+
       var formData = new FormData(
         $("#policycloud-marketplace-account-edit")[0]
       );
       formData.append("action", "policycloud_marketplace_account_edit");
       formData.append("nonce", ajax_properties_account_editing.nonce);
-      formData.append("username", ajax_properties_account_editing.user_id);
-
+      formData.append(
+        "username",
+        ajax_properties_account_editing.user_id ?? ""
+      );
       $("#policycloud-marketplace-account-edit button[type=submit]").addClass(
         "loading"
       );
-
       // Perform AJAX request.
       $.ajax({
         url: ajax_properties_account_editing.ajax_url,
@@ -493,57 +559,64 @@
         processData: false,
         contentType: false,
         data: formData,
-        complete: function (response) {
-          try {
-            var response_data = JSON.parse(response.responseText);
-            if (response_data != null) {
-              if (response_data.status === "failure") {
-                $("#policycloud-marketplace-account-edit .error").html(
-                  response_data.data
-                );
-                $("#policycloud-marketplace-account-edit .error").addClass(
-                  "visible"
-                );
-              } else if (response_data.status === "success") {
-                if (response_data.data != null) {
-                  setAuthorizedToken(response_data.data);
-                }
-                window.location.reload();
-              }
-            }
-            if (response.status != 200) {
-              $("#policycloud-marketplace-account-edit .error").html(
-                "HTTP Error " + response.status + ": " + response.statusText
-              );
-              $("#policycloud-marketplace-account-edit .error").addClass(
-                "visible"
-              );
-            }
-            $(
-              "#policycloud-marketplace-account-edit button[type=submit]"
-            ).removeClass("loading");
-          } catch (objError) {
-            $("#policycloud-marketplace-account-edit .error").html(
-              "Invalid response: " + response.responseText
-            );
-            $("#policycloud-marketplace-account-edit .error").addClass(
-              "visible"
-            );
-          }
-        },
+        complete: handleResponse,
         dataType: "json",
       });
+
+      $(
+        "#policycloud-marketplace-account-edit button[type=submit]"
+      ).removeClass("loading");
     }
 
     /**
      * Request a copy of the user's data via AJAX.
      *
      * @param {Event} e
+     *
+     * @author Alexandros Raikos <araikos@unipi.gr>
      */
     function requestDataCopy(e) {
       e.preventDefault();
-      $("#policycloud-marketplace-request-data-copy").addClass("loading");
+      /**
+       * Handle the response after requesting a copy of the account data.
+       *
+       * @param {Object} response The raw response AJAX object.
+       *
+       * @author Alexandros Raikos <araikos@unipi.gr>
+       */
+      function handleResponse(response) {
+        if (response.status === 200) {
+          try {
+            var data = JSON.parse(response.responseText);
+            var blob = new Blob([JSON.stringify(data, null, 2)], {
+              type: "text/plain",
+            });
+            var a = document.createElement("a");
+            a.download = "account_data.txt";
+            a.href = URL.createObjectURL(blob);
+            a.dataset.downloadurl = ["text/plain", a.download, a.href].join(
+              ":"
+            );
+            a.style.display = "none";
+            a.setAttribute("id", "policycloud-marketplace-download-data-copy");
+            $("section.policycloud-account-information").append(a);
+            $("#policycloud-marketplace-download-data-copy").get(0).click();
+          } catch (objError) {
+            console.error("Invalid JSON response: " + objError);
+          }
+        } else if (response.status === 404 || response.status === 500) {
+          showAlert(
+            "#policycloud-marketplace-request-data-copy",
+            response.responseText
+          );
+        } else if (response.status === 440) {
+          removeAuthorization();
+        } else {
+          console.error(response.responseText);
+        }
+      }
 
+      $("#policycloud-marketplace-request-data-copy").addClass("loading");
       // Perform AJAX request.
       $.ajax({
         url: ajax_properties_account_editing.ajax_url,
@@ -552,56 +625,87 @@
           action: "policycloud_marketplace_account_data_request",
           nonce: ajax_properties_account_editing.nonce,
         },
-        complete: function (response) {
-          try {
-            var response_data = JSON.parse(response.responseText);
-            if (response_data != null) {
-              if (response_data.status === "failure") {
-                console.log(response_data.data);
-              } else if (response_data.status === "success") {
-                if (response_data.data != null) {
-                  var blob = new Blob(
-                    [JSON.stringify(response_data.data, null, 2)],
-                    {
-                      type: "text/plain",
-                    }
-                  );
-                  var a = document.createElement("a");
-                  a.download = "account_data.txt";
-                  a.href = URL.createObjectURL(blob);
-                  a.dataset.downloadurl = [
-                    "text/plain",
-                    a.download,
-                    a.href,
-                  ].join(":");
-                  a.style.display = "none";
-                  a.setAttribute(
-                    "id",
-                    "policycloud-marketplace-download-data-copy"
-                  );
-                  $("section.policycloud-account-information").append(a);
-                  $("#policycloud-marketplace-download-data-copy")
-                    .get(0)
-                    .click();
-                }
-              }
-            }
-            if (response.status != 200) {
-              console.log(
-                "HTTP Error " + response.status + ": " + response.statusText
-              );
-            }
-            $("#policycloud-marketplace-request-data-copy").removeClass(
-              "loading"
-            );
-          } catch (objError) {
-            console.log("Invalid response: " + objError);
-          }
-        },
+        complete: handleResponse,
         dataType: "json",
       });
-
       $("#policycloud-marketplace-request-data-copy").removeClass("loading");
+    }
+
+    /**
+     * Show password prompt and verify the deletion request
+     * before sending via AJAX.
+     *
+     * @param {Event} e
+     *
+     * @author Alexandros Raikos <araikos@unipi.gr>
+     */
+    function validateDeletionRequest(e) {
+      e.preventDefault();
+
+      /**
+       * Handle the response after requesting account deletion.
+       *
+       * @param {Object} response The raw response AJAX object.
+       *
+       * @author Alexandros Raikos <araikos@unipi.gr>
+       */
+      function handleResponse(response) {
+        try {
+          var payload = JSON.parse(response.responseText);
+          if (payload != null) {
+            if (payload.status === "failure") {
+              showAlert(
+                "#policycloud-marketplace-delete-account",
+                payload.data
+              );
+            } else if (payload.status === "success") {
+              removeAuthorization();
+              window.reload();
+            }
+          }
+          if (response.status != 200) {
+            showAlert(
+              "#policycloud-marketplace-delete-account",
+              "HTTP Error " + response.status + ": " + response.statusText
+            );
+          }
+          $("#policycloud-marketplace-request-data-copy").removeClass(
+            "loading"
+          );
+        } catch (objError) {
+          showAlert(
+            "#policycloud-marketplace-delete-account",
+            "Invalid response: " + objError
+          );
+        }
+      }
+
+      // Show password prompt.
+      $("#policycloud-marketplace-delete-account > div").addClass("visible");
+      $(
+        "#policycloud-marketplace-delete-account input[name=current-password]"
+      ).attr("required", true);
+
+      // Perform the AJAX request for a present password value.
+      if (
+        $(
+          "#policycloud-marketplace-delete-account input[name=current-password]"
+        ).val() !== ""
+      ) {
+        $.ajax({
+          url: ajax_properties_account_editing.ajax_url,
+          type: "post",
+          data: {
+            action: "policycloud_marketplace_account_deletion",
+            nonce: ajax_properties_account_editing.nonce,
+            current_password: $(
+              "#policycloud-marketplace-delete-account input[name=current-password]"
+            ).val(),
+          },
+          complete: handleResponse,
+          dataType: "json",
+        });
+      }
     }
 
     /**
@@ -642,6 +746,11 @@
       function () {
         setCurrentPasswordRequirement($(this).val() !== "");
       }
+    );
+
+    // Show current password field on deletion request.
+    $("#policycloud-marketplace-delete-account").submit(
+      validateDeletionRequest
     );
 
     // Submit the updated information.

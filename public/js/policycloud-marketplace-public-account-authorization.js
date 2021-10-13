@@ -28,12 +28,7 @@
             if (response_data.status === "failure") {
               $("#policycloud-authorization .error").html(response_data.data);
             } else if (response_data.status === "success") {
-              // Set 30 day cookie.
-              let date = new Date();
-              date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
-              const expires = "expires=" + date.toUTCString();
-              document.cookie =
-                "ppmapi-token=" + response_data.data + "; Path=/; " + expires;
+              setAuthorizedToken(response_data.data);
               window.location.href = "/";
             }
           } else {

@@ -120,13 +120,16 @@ function get_descriptions(array $args)
  * https://documenter.getpostman.com/view/16776360/TzsZs8kn#8174c0cb-29a7-4d95-9d13-4182c8b64c44
  *
  * @param   string $uid The relevant username.
- * @param	array $args An array of arguments to filter the search. 
- * NOTICE: When filtering with items_per_page the returning descriptions will be arranged in arrays.
- * @throws  Exception If there is no PolicyCloud API hostname defined in the settings.
- * @throws  Exception If there was a connection error.
- * @throws  ErrorException If no descriptions were found for the assigned arguments.
+ * @param	array $args An array of arguments to filter the search. NOTICE: When filtering with
+ * items_per_page the returning descriptions will be arranged in arrays.
  * 
- * @since    1.0.0
+ * @throws  InvalidArgumentException If there is no PolicyCloud API hostname defined in the settings.
+ * @throws  InvalidArgumentException If no descriptions were found for the assigned arguments.
+ * @throws  LogicException If the sorting setting is unsupported.
+ * @throws  ErrorException If there was a request or connection error to the PolicyCloud Marketplace API.
+ * 
+ * @since   1.0.0
+ * @author  Alexandros Raikos <araikos@unipi.gr>
  */
 function get_user_descriptions(string $uid, string $token = null, array $args = [])
 {
@@ -142,13 +145,13 @@ function get_user_descriptions(string $uid, string $token = null, array $args = 
             $args['sort_by'] != 'views-desc' ||
             $args['sort_by'] != 'title'
         ) {
-            throw new Exception('The asset sorting setting is invalid.');
+            throw new LogicException('The '.$args['sort_by'].' sorting setting was not found.');
         }
     }
 
     // Retrieve credentials.
     $options = get_option('policycloud_marketplace_plugin_settings');
-    if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
+    if (empty($options['marketplace_host'])) throw new InvalidArgumentException("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
 
     $filters = '?' . http_build_query([
         'sortBy' => $args['sort_by'] ?? null,
@@ -176,17 +179,22 @@ function get_user_descriptions(string $uid, string $token = null, array $args = 
     $descriptions = json_decode(curl_exec($curl), true);
 
     // Handle any errors.
-    if (!empty(curl_error($curl))) throw new Exception("There was a connection error while attempting to retrieve the user's descriptions: ". curl_error($curl));
+    if (!empty(curl_error($curl))) {
+        if (curl_getinfo($curl,CURLINFO_HTTP_CODE) == '404') {
+            return null;
+        }
+        throw new ErrorException("There was an error while attempting to retrieve the user's descriptions: " . curl_error($curl));
+    };
 
     // Close session.
     curl_close($curl);
 
     // Return encypted token.
     if (!isset($descriptions)) {
-        throw new Exception("The Marketplace API response was invalid when attempting to retrieve this user's descriptions.");
+        throw new InvalidArgumentException("The Marketplace API response was invalid when attempting to retrieve this user's descriptions.");
     } elseif ($descriptions['_status'] == 'successful') {
         return $descriptions;
-    } else throw new Exception("There was an error retrieving user descriptions. ".$descriptions['message']);
+    } else throw new ErrorException("There was an error retrieving user descriptions. " . $descriptions['message']);
 }
 
 

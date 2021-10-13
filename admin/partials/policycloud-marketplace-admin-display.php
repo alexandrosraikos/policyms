@@ -159,6 +159,24 @@ function policycloud_marketplace_plugin_description_page_selector()
 <?php
 }
 
+function policycloud_marketplace_plugin_archive_page_selector()
+{
+    $options = get_option('policycloud_marketplace_plugin_settings');
+    $pages = get_pages([
+        'post_status' => 'publish'
+    ]);
+?>
+    <select name="policycloud_marketplace_plugin_settings[archive_page]">
+        <?php
+        foreach ($pages as $page) {
+            echo '<option value="' . get_page_link($page->ID) . '" '.($options['archive_page']==get_page_link($page->ID) ? 'selected' : '').'>' . $page->post_title . '</option>';
+        }
+        ?>
+    </select>
+    <p>Select the page where you've inserted the <em>[policycloud-marketplace-read-multiple]</em> shortcode.</p>
+<?php
+}
+
 function policycloud_marketplace_plugin_upload_page_selector()
 {
     $options = get_option('policycloud_marketplace_plugin_settings');

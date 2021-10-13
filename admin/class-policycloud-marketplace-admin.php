@@ -85,6 +85,7 @@ class PolicyCloud_Marketplace_Admin
 		$output['selected_menu'] = sanitize_text_field($input['selected_menu']);
 		$output['description_page'] = esc_url($input['description_page']);
 		$output['upload_page'] = esc_url($input['upload_page']);
+		$output['archive_page'] = esc_url($input['archive_page']);
 		return $output;
 	}
 
@@ -179,6 +180,14 @@ class PolicyCloud_Marketplace_Admin
 			'description_page',
 			'Redirect to single Description page',
 			'policycloud_marketplace_plugin_description_page_selector',
+			'policycloud_marketplace_plugin',
+			'section_three'
+		);
+
+		add_settings_field(
+			'archive_page',
+			'Redirect to Assets archive page',
+			'policycloud_marketplace_plugin_archive_page_selector',
 			'policycloud_marketplace_plugin',
 			'section_three'
 		);

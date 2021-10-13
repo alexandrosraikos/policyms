@@ -486,15 +486,21 @@ class PolicyCloud_Marketplace_Public
 	}
 
 	/**
-	 * Display the account page for authenticated users.
-	 *
+	 * Requests account related content to display for authenticated users.
+	 * 
+	 * @uses	retrieve_token()
+	 * @uses	verify_user()
+	 * @uses	get_user_information()
+	 * @uses	get_user_descriptions()
+	 * @uses	get_user_statistics()
+	 * @uses	account_html()
+	 * 
 	 * @since    1.0.0
+	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
 	public static function account_shortcode()
 	{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
-
-		// TODO @alexandrosraikos: Specify and apply viewing & editing differences for account owners, administrators and visitors.
 
 		try {
 			// Get specific Description data for authorized users.
@@ -554,12 +560,12 @@ class PolicyCloud_Marketplace_Public
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce('ajax_policycloud_account_editing_verification'),
 			'verified_token' => $verified_token ?? null,
-			'user_id' => $_GET['user'] ?? $token['decoded']['username']
+			'user_id' => $_GET['user'] ?? $token['decoded']['username'] ?? '',
 		));
 
 		// Print shortcode HTML.
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		account_html($account_information ?? [], $descriptions ?? [], $statistics ?? [], [
+		account_html($account_information ?? [], $descriptions ?? [], $statistics ?? [], [], [
 			"is_admin" => $is_admin ?? false,
 			"visiting" => $visiting ?? false,
 			"error" => $error ?? '',
@@ -567,6 +573,7 @@ class PolicyCloud_Marketplace_Public
 			"login_page" => $options['login_page'] ?? '',
 			"registration_page" => $options['registration_page'] ?? '',
 			"description_page" => $options['description_page'] ?? '',
+			"archive_page" => $options['archive_page'] ?? '',
 			"upload_page" => $options['upload_page'] ?? ''
 		]);
 	}
@@ -589,33 +596,100 @@ class PolicyCloud_Marketplace_Public
 		try {
 			$token = retrieve_token(true);
 			if (!empty($token)) {
-				$data = account_edit($_POST, $_POST['username'], $token['encoded']);
-				if ($token['decoded']['account']['role'] == 'admin') {
-					die(json_encode([
-						'status' => 'success'
-					]));
-				} else {
-					die(json_encode([
-						'status' => 'success',
-						'data' => $data
-					]));
-				}
-			} else throw new Exception("User token not found.");
-		} catch (Exception $e) {
-			die(json_encode([
-				'status' => 'failure',
-				'data' => $e->getMessage()
-			]));
+
+				// Respond with data.
+				$updated_token = account_edit([
+					'password' => $_POST['password'] ?? '',
+					'password-confirm' => $_POST['password-confirm'] ?? '',
+					'current-password' => $_POST['current-password'] ?? '',
+					'name' => $_POST['name'],
+					'surname' => $_POST['surname'],
+					'title' => $_POST['title'] ?? '',
+					'gender' => $_POST['gender'] ?? '',
+					'organization' => $_POST['organization'] ?? '',
+					'email' => $_POST['email'],
+					'phone' => $_POST['phone'] ?? '',
+					'socials-title' => $_POST['socials-title'] ?? '',
+					'socials-url' => $_POST['socials-url'] ?? '',
+					'about' => $_POST['about'] ?? '',
+					'public_email' => $_POST['public_email'],
+					'public_phone' => $_POST['public_phone'],
+				], $_POST['username'], $token['encoded']);
+				http_response_code(200);
+				die(json_encode($updated_token));
+			} else {
+				http_response_code(404);
+				die("User token not found.");
+			}
+		} catch (RuntimeException $e) {
+			http_response_code(400);
+			die($e->getMessage());
+		} catch (InvalidArgumentException $e) {
+			http_response_code(404);
+			die($e->getMessage());
+		} catch (JsonException $e) {
+			http_response_code(440);
+			die();
+		} catch (ErrorException $e) {
+			http_response_code(500);
+			die($e->getMessage());
+		} catch (LogicException $e) {
+			http_response_code(501);
+			die($e->getMessage());
 		}
 	}
 
 	/**
 	 * Handle user account editing AJAX requests.
 	 *
-	 * @uses 	PolicyCloud_Marketplace_Public::account_registration()
 	 * @since	1.0.0
 	 */
 	public function account_data_request_handler()
+	{
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+
+		// Verify WordPress generated nonce (using the same as account editing).
+		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_account_editing_verification')) {
+			http_response_code(401);
+			die("Unverified request of account data.");
+		}
+
+		try {
+			$token = retrieve_token(true);
+			if (!empty($token)) {
+				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
+
+				// Respond with data.
+				http_response_code(200);
+				die(json_encode([
+					'information' => $token['decoded'],
+					'assets' => get_user_descriptions($token['decoded']['username'], $token['encoded'])
+				]));
+			} else {
+				http_response_code(404);
+				die("User token not found.");
+			}
+		} catch (InvalidArgumentException $e) {
+			http_response_code(404);
+			die($e->getMessage());
+		} catch (JsonException $e) {
+			http_response_code(440);
+			die();
+		} catch (ErrorException $e) {
+			http_response_code(500);
+			die($e->getMessage());
+		} catch (LogicException $e) {
+			http_response_code(501);
+			die($e->getMessage());
+		}
+	}
+
+	/**
+	 * Handle user account deletion AJAX requests.
+	 *
+	 * @since	1.0.0
+	 */
+	public function account_deletion_handler()
 	{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 
@@ -627,14 +701,12 @@ class PolicyCloud_Marketplace_Public
 		try {
 			$token = retrieve_token(true);
 			if (!empty($token)) {
-				$data['information'] = $token['decoded'];
-				
-				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
-				$data['assets'] = get_user_descriptions($token['decoded']['username'], $token['encoded']);
-				die(json_encode([
-					'status' => 'success',
-					'data' => $data
-				]));
+				// Prepare data from $_POST
+				if (account_deletion($token['decoded']['username'], $token['encoded'], $_POST['current_password'])) {
+					die(json_encode([
+						'status' => 'success'
+					]));
+				}
 			} else throw new Exception("User token not found.");
 		} catch (Exception $e) {
 			die(json_encode([

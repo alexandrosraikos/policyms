@@ -1919,6 +1919,18 @@ section.policycloud-account-information button.action {
   margin: 15px 0;
 }
 
+section.policycloud-account-information
+  #policycloud-marketplace-delete-account
+  div {
+  display: none;
+}
+
+section.policycloud-account-information
+  #policycloud-marketplace-delete-account
+  div.visible {
+  display: block;
+}
+
 button#policycloud-marketplace-resend-verification-email.disabled,
 a#policycloud-marketplace-resend-verification-email.disabled {
   opacity: 0.8;

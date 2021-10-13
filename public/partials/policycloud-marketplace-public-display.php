@@ -649,20 +649,22 @@ function time_elapsed_string($datetime, $full = false)
 /**
  * Display the account page HTML for authenticated users.
  *
- * @param   array $information The user information array, either extracted from a token or requested through the API.
- * @param   array $descriptions The relevant Descriptions from the PolicyCloud Marketplace API.
- * @param   array $statistics The relevant Statistics from the PolicyCloud Marketplace API.
+ * @param   array $information The user information array.
+ * @param   array $assets The assets connected to this account.
+ * @param   array $statistics The statistics connected to this account.
+ * @param   array $reviews The asset reviews connected to this account.
  * @param   array $args An array of arguments.
  * 
  * @uses    show_alert()
+ * @uses    time_elapsed_string()
+ * 
+ * @usedby  PolicyCloud_Marketplace_Public::account_shortcode()
+ * 
  * @since   1.0.0
+ * @author  Alexandros Raikos <araikos@unipi.gr>
  */
-function account_html(array $information, array $assets, array $statistics, array $args)
+function account_html(array $information, array $assets, array $statistics, array $reviews, array $args = [])
 {
-    // TODO @alexandrosraikos: Add delete account button (waiting on @vkoukos).
-    // TODO @alexandrosraikos: Add Request data copy button.
-
-
     // Check for any errors regarding authorization.
     if (!empty($args['error'])) {
         show_alert(($args['error'] == 'not-logged-in') ? 'You are not logged in, please <a href="' . $args['login_page'] . '">log in</a> to your account. Don\'t have an account yet? You can <a href="' . $args['registration_page'] . '">register</a> here.' : $args['error']);
@@ -1151,7 +1153,13 @@ function account_html(array $information, array $assets, array $statistics, arra
                         }
                         if (!$args['visiting'] || $args['is_admin']) {
                         ?>
-                            <button id="policycloud-marketplace-delete-account" class="action destructive">Delete account</button>
+                            <form id="policycloud-marketplace-delete-account">
+                                <div>
+                                    <label for="current-password">Please type your current password to continue.</label>
+                                    <input name="current-password" type="password" placeholder="Insert your current password here">
+                                </div>
+                                <button type="submit" class="action destructive">Delete account</button>
+                            </form>
                         <?php } ?>
                     </section>
                 </div>
