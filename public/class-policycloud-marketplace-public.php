@@ -324,7 +324,6 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public function description_edit_handler()
 	{
-		// TODO @alexandrosraikos: Edit other descriptions when token is admin.
 
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_description_editing_verification')) {

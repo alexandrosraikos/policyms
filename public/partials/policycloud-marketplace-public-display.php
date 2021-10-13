@@ -665,6 +665,10 @@ function time_elapsed_string($datetime, $full = false)
  */
 function account_html(array $information, array $assets, array $statistics, array $reviews, array $args = [])
 {
+    // TODO @alexandrosraikos: Support uploading and viewing a profile picture (waiting on @vkoukos).
+    // TODO @alexandrosraikos: Mockup and add reviews. (Visible by all, editable & deletable by owner, deletable by admin).
+    // TODO @alexandrosraikos: Rearrange statistics labels based on instructions.
+
     // Check for any errors regarding authorization.
     if (!empty($args['error'])) {
         show_alert(($args['error'] == 'not-logged-in') ? 'You are not logged in, please <a href="' . $args['login_page'] . '">log in</a> to your account. Don\'t have an account yet? You can <a href="' . $args['registration_page'] . '">register</a> here.' : $args['error']);
