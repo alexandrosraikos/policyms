@@ -518,29 +518,28 @@
        * @author Alexandros Raikos <araikos@unipi.gr>
        */
       function handleResponse(response) {
-        try {
-          if (response.status === 200) {
-            try {
-              var data = JSON.parse(response.responseText);
-              setAuthorizedToken(data);
-              window.location.reload();
-            } catch (objError) {
-              console.error("Invalid JSON response: " + objError);
-            }
-          } else if (
-            response.status === 400 ||
-            response.status === 404 ||
-            response.status === 500
-          ) {
-            showAlert(
-              "#policycloud-marketplace-account-edit button[type=submit]",
-              response.responseText
-            );
-          } else if (response.status === 440) {
-            removeAuthorization(true);
-          } else {
-            console.error(response.responseText);
+        if (response.status === 200) {
+          try {
+            var data = JSON.parse(response.responseText);
+            setAuthorizedToken(data);
+            window.location.reload();
+          } catch (objError) {
+            console.error("Invalid JSON response: " + objError);
           }
+        } else if (
+          response.status === 400 ||
+          response.status === 404 ||
+          response.status === 500
+        ) {
+          showAlert(
+            "#policycloud-marketplace-account-edit button[type=submit]",
+            response.responseText
+          );
+        } else if (response.status === 440) {
+          removeAuthorization(true);
+        } else {
+          console.error(response.responseText);
+        }
         $(
           "#policycloud-marketplace-account-edit button[type=submit]"
         ).removeClass("disabled");

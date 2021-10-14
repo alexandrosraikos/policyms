@@ -1066,7 +1066,6 @@ function account_html(array $information, array $assets, array $statistics, arra
                                                     <span class="unverified">(Unverified)</span>
                                                     <button id="policycloud-marketplace-resend-verification-email">Resend verification email</button>
                                                 <?php
-                                                    print_r($information);
                                                 } else {
                                                     if (!$args['visiting'] || $args['is_admin']) {
                                                         echo ' <span class="label ' . (($information['profile_parameters']['public_email'] == 0) ? 'notice' : 'success') . '">' . (($information['profile_parameters']['public_email'] == 0) ? 'Private' : 'Public') . '</span>';

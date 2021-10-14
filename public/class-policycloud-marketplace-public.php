@@ -83,7 +83,7 @@ class PolicyCloud_Marketplace_Public
 		wp_register_script("policycloud-marketplace-account-registration", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-registration.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
 		wp_register_script("policycloud-marketplace-account-authorization", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-authorization.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
 		wp_register_script("policycloud-marketplace-account", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
-		// TODO @alexandrosraikos: Create password reset shortcode & functionality.
+		// TODO @alexandrosraikos: Create password reset functionality. (API access token will be included in a later stage).
 
 		// Content related scripts.
 		wp_register_script("policycloud-marketplace-object-create", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-object-create.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
@@ -149,20 +149,41 @@ class PolicyCloud_Marketplace_Public
 
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_registration')) {
+			http_response_code(403);
 			die("Unverified request to register user.");
 		}
 
-		// Attempt to register the user using POST data.
 		try {
+			// Respond with data.
+			$registration = account_registration([
+				'username' => $_POST['username'],
+				'password' => $_POST['password'],
+				'password-confirm' => $_POST['password-confirm'],
+				'name' => $_POST['name'],
+				'surname' => $_POST['surname'],
+				'title' => $_POST['title'] ?? '',
+				'gender' => $_POST['gender'] ?? '',
+				'organization' => $_POST['organization'] ?? '',
+				'email' => $_POST['email'],
+				'phone' => $_POST['phone'] ?? '',
+				'social-title' => $_POST['social-title'] ?? '',
+				'social-url' => $_POST['social-url'] ?? '',
+				'about' => $_POST['about'] ?? '',
+			]);
+			http_response_code(200);
 			die(json_encode([
-				'status' => 'success',
-				'data' => account_registration($_POST),
+				"newToken" => $registration['new_token'],
+				"warningMessage" => $registration['warning']
 			]));
-		} catch (Exception $e) {
-			die(json_encode([
-				'status' => 'failure',
-				'data' => $e->getMessage()
-			]));
+		} catch (RuntimeException $e) {
+			http_response_code(400);
+			die($e->getMessage());
+		} catch (InvalidArgumentException $e) {
+			http_response_code(404);
+			die($e->getMessage());
+		}	catch (ErrorException $e) {
+			http_response_code(500);
+			die($e->getMessage());
 		}
 	}
 
@@ -186,7 +207,7 @@ class PolicyCloud_Marketplace_Public
 				$logged_in = true;
 			}
 		} catch (\Exception $e) {
-			$error_message =  $e->getMessage();
+			$logged_in = false;
 		}
 
 		wp_enqueue_script("policycloud-marketplace-account-authorization");
@@ -211,20 +232,23 @@ class PolicyCloud_Marketplace_Public
 
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_login')) {
+			http_response_code(403);
 			die("Unverified request to register user.");
 		}
 
 		// Attempt to authorize the user using POST data.
 		try {
-			die(json_encode([
-				'status' => 'success',
-				'data' => account_authorization($_POST)
-			]));
+			http_response_code(200);
+			die(json_encode(account_authorization($_POST)));
+		} catch (InvalidArgumentException $e) {
+			http_response_code(404);
+			die($e->getMessage());
+		} catch (ErrorException $e) {
+			http_response_code(500);
+			die($e->getMessage());
 		} catch (Exception $e) {
-			die(json_encode([
-				'status' => 'failure',
-				'data' => $e->getMessage()
-			]));
+			http_response_code(501);
+			die($e->getMessage());
 		}
 	}
 

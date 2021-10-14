@@ -1325,7 +1325,7 @@ select#type.type-create {
   background-color: salmon;
   color: darkred;
   text-align: center;
-  margin: 25px auto;
+  margin: 10px auto !important;
   border-radius: 8px;
   padding: 10px 15px;
   position: relative;
