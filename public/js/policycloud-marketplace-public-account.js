@@ -17,73 +17,6 @@
      */
 
     /**
-     * Request a new account verification email via AJAX.
-     *
-     * @param {Event} e
-     *
-     * @author Alexandros Raikos <araikos@unipi.gr>
-     */
-    function sendVerificationEmail(e) {
-      e.preventDefault();
-      /**
-       * Handle the response after requesting a new verification email.
-       *
-       * @param {Object} response
-       *
-       * @author Alexandros Raikos <araikos@unipi.gr>
-       */
-      function handleResponse(response) {
-        try {
-          var payload = JSON.parse(response.responseText);
-          if (payload != null) {
-            if (payload.status === "failure") {
-              showAlert(
-                "#policycloud-marketplace-account-edit button[type=submit]",
-                payload.data
-              );
-            } else if (payload.status === "success") {
-              showAlert(
-                "#policycloud-marketplace-account-edit button[type=submit]",
-                "Successfully sent a verification email. If you still haven't received it, please check your spam inbox as well.",
-                "notice"
-              );
-            }
-          }
-          if (response.status != 200) {
-            showAlert(
-              "#policycloud-marketplace-account-edit button[type=submit]",
-              "HTTP Error " + response.status + ": " + response.statusText
-            );
-          }
-        } catch (objError) {
-          showAlert(
-            "#policycloud-marketplace-account-edit button[type=submit]",
-            "Invalid response: " + response.responseText
-          );
-        }
-        $(
-          "#policycloud-marketplace-account-edit button[type=submit]"
-        ).removeClass("disabled");
-      }
-
-      $(this).addClass("disabled");
-
-      // Perform AJAX request.
-      $.ajax({
-        url: ajax_properties_account_editing.ajax_url,
-        type: "post",
-        data: {
-          action: "policycloud_marketplace_user_email_verification_resend",
-          nonce: ajax_properties_account_editing.nonce,
-        },
-
-        // Handle response.
-        complete: handleResponse,
-        dataType: "json",
-      });
-    }
-
-    /**
      * Switch visible interface tab.
      *
      * @param {Event} e
@@ -566,6 +499,68 @@
       $(
         "#policycloud-marketplace-account-edit button[type=submit]"
       ).removeClass("loading");
+    }
+
+    /**
+     * Request a new account verification email via AJAX.
+     *
+     * @param {Event} e
+     *
+     * @author Alexandros Raikos <araikos@unipi.gr>
+     */
+    function sendVerificationEmail(e) {
+      e.preventDefault();
+      /**
+       * Handle the response after requesting a new verification email.
+       *
+       * @param {Object} response
+       *
+       * @author Alexandros Raikos <araikos@unipi.gr>
+       */
+      function handleResponse(response) {
+        try {
+          if (response.status === 200) {
+            try {
+              var data = JSON.parse(response.responseText);
+              setAuthorizedToken(data);
+              window.location.reload();
+            } catch (objError) {
+              console.error("Invalid JSON response: " + objError);
+            }
+          } else if (
+            response.status === 400 ||
+            response.status === 404 ||
+            response.status === 500
+          ) {
+            showAlert(
+              "#policycloud-marketplace-account-edit button[type=submit]",
+              response.responseText
+            );
+          } else if (response.status === 440) {
+            removeAuthorization(true);
+          } else {
+            console.error(response.responseText);
+          }
+        $(
+          "#policycloud-marketplace-account-edit button[type=submit]"
+        ).removeClass("disabled");
+      }
+
+      $(this).addClass("disabled");
+
+      // Perform AJAX request.
+      $.ajax({
+        url: ajax_properties_account_editing.ajax_url,
+        type: "post",
+        data: {
+          action: "policycloud_marketplace_user_email_verification_resend",
+          nonce: ajax_properties_account_editing.nonce,
+        },
+
+        // Handle response.
+        complete: handleResponse,
+        dataType: "json",
+      });
     }
 
     /**

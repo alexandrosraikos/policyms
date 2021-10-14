@@ -291,16 +291,17 @@ function retrieve_token(bool $decode = false)
  * @param string $verification_code The verification code of the user.
  * @param string $email The user's email address.
  * 
- * @throws Exception If the email cannot be sent.
- * @throws Exception If the verification code is empty.
+ * @throws RuntimeException If the email cannot be sent.
+ * @throws InvalidArgumentException If no credentials were defined in WordPress settings
+ * or theh verification details were not found.
  * 
  * @since 1.0.0
  */
 function user_email_verification_resend(string $verification_code, string $email)
 {
     $options = get_option('policycloud_marketplace_plugin_settings');
-    if (empty($options['account_page'])) throw new Exception("No PolicyCloud Marketplace account page defined in WordPress settings.");
-    if (!empty($verification_code)) {
+    if (empty($options['account_page'])) throw new InvalidArgumentException("No PolicyCloud Marketplace account page defined in WordPress settings.");
+    if (!empty($verification_code) && !empty($email)) {
         $host = parse_url(get_site_url())['host'];
         if (!wp_mail(
             $email,
@@ -308,10 +309,10 @@ function user_email_verification_resend(string $verification_code, string $email
             "You are receiving this email because a new PolicyCloud Marketplace account was created with this address. If that was you, please click this link to verify your email address: " . $options['account_page'] . "#details?verification-code=" . $verification_code,
             ['From: PolicyCloud Marketplace <noreply@' . $host . '>']
         )) {
-            throw new Exception("The email couldn't be delivered, please contact the server administrator.");
+            throw new RuntimeException("The email couldn't be delivered, please contact the server administrator.");
         }
     } else {
-        throw new Exception("The verification code was not found.");
+        throw new InvalidArgumentException("The verification details were not found.");
     }
 }
 

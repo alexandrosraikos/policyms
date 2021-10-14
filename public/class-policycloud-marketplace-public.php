@@ -166,41 +166,6 @@ class PolicyCloud_Marketplace_Public
 		}
 	}
 
-	/**
-	 * Handle user verification email AJAX requests.
-	 *
-	 * @uses 	user_email_verification_resend()
-	 * 
-	 * @since	1.0.0
-	 */
-	public function user_email_verification_resend_handler()
-	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
-
-		// Verify WordPress generated nonce.
-		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_account_editing_verification')) {
-			die(json_encode([
-				'status' => 'failure',
-				'data' => "Unverified request to verify user email."
-			]));
-		}
-
-		try {
-			$token = retrieve_token(true);
-			if (!empty($token)) {
-				user_email_verification_resend($token['decoded']['account']['verified'] ?? '', $token['decoded']['info']['email'] ?? '');
-				die(json_encode([
-					'status' => 'success',
-				]));
-			} else throw new Exception("User token not found.");
-		} catch (Exception $e) {
-			die(json_encode([
-				'status' => 'failure',
-				'data' => $e->getMessage()
-			]));
-		}
-	}
-
 
 	/**
 	 * Register the shortcode for account authorization.
@@ -255,6 +220,280 @@ class PolicyCloud_Marketplace_Public
 				'status' => 'success',
 				'data' => account_authorization($_POST)
 			]));
+		} catch (Exception $e) {
+			die(json_encode([
+				'status' => 'failure',
+				'data' => $e->getMessage()
+			]));
+		}
+	}
+
+	/**
+	 * Requests account related content to display for authenticated users.
+	 * 
+	 * @uses	retrieve_token()
+	 * @uses	verify_user()
+	 * @uses	get_user_information()
+	 * @uses	get_user_descriptions()
+	 * @uses	get_user_statistics()
+	 * @uses	account_html()
+	 * 
+	 * @since    1.0.0
+	 * @author	Alexandros Raikos <araikos@unipi.gr>
+	 */
+	public static function account_shortcode()
+	{
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+
+		try {
+			// Get specific Description data for authorized users.
+			$token = retrieve_token(true);
+			if (!empty($token)) {
+
+				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
+
+				if (empty($_GET['user'])) {
+
+					// Check for verification code email redirect.
+					if (!empty($_GET['verification-code'])) {
+						if ($_GET['verification-code'] == $token['decoded']['account']['verified']) {
+							$verified_token = verify_user($_GET['verification-code']);
+							if (!empty($verified_token)) {
+								$notice = "Your email address was successfully verified.";
+							}
+						} else if ($token['decoded']['account']['verified'] == 1) {
+							throw new Exception("This account is already verified.");
+						}
+					}
+					$account_information = json_decode(json_encode($token['decoded']), true);
+					$visiting = false;
+				} else {
+					$is_admin = $token['decoded']['account']['role'] == 'admin';
+					$visiting = true;
+					$account_information = get_user_information($_GET['user'], $token['encoded']);
+				}
+
+				// Get the user's descriptions.
+				if (!empty($account_information)) {
+					$descriptions = get_user_descriptions(($visiting) ? $_GET['user'] : $token['decoded']['username'], $token['encoded'] ?? null, [
+						'page' => $_GET['page'] ?? null,
+						'items_per_page' => $_GET['items_per_page'] ?? null,
+						'sort_by' => $_GET['sort_by'] ?? null,
+					]);
+				}
+			} else $error = "not-logged-in";
+
+			if (!empty($account_information)) {
+				$statistics = get_user_statistics(($visiting) ? $_GET['user'] : $token['decoded']['username'], $token['encoded'] ?? null);
+			}
+		} catch (ErrorException $e) {
+		} catch (Exception $e) {
+			$error = $e->getMessage();
+		}
+
+		// Retrieve credentials.
+		$options = get_option('policycloud_marketplace_plugin_settings');
+		if (empty($options['login_page']) || empty($options['registration_page']) || empty($options['description_page'])) {
+			$error = 'Please update your PolicyCloud Marketplace settings in the WordPress Dashboard.';
+		}
+
+		// Localize script.
+		wp_enqueue_script('policycloud-marketplace-account');
+		wp_localize_script('policycloud-marketplace-account', 'ajax_properties_account_editing', array(
+			'ajax_url' => admin_url('admin-ajax.php'),
+			'nonce' => wp_create_nonce('ajax_policycloud_account_editing_verification'),
+			'verified_token' => $verified_token ?? null,
+			'user_id' => $_GET['user'] ?? $token['decoded']['username'] ?? '',
+		));
+
+		// Print shortcode HTML.
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
+		account_html($account_information ?? [], $descriptions ?? [], $statistics ?? [], [], [
+			"is_admin" => $is_admin ?? false,
+			"visiting" => $visiting ?? false,
+			"error" => $error ?? '',
+			"notice" => $notice ?? '',
+			"login_page" => $options['login_page'] ?? '',
+			"registration_page" => $options['registration_page'] ?? '',
+			"description_page" => $options['description_page'] ?? '',
+			"archive_page" => $options['archive_page'] ?? '',
+			"upload_page" => $options['upload_page'] ?? ''
+		]);
+	}
+
+	/**
+	 * Handle user account editing AJAX requests.
+	 *
+	 * @uses 	PolicyCloud_Marketplace_Public::account_registration()
+	 * @since	1.0.0
+	 */
+	public function account_edit_handler()
+	{
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+
+		// Verify WordPress generated nonce.
+		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_account_editing_verification')) {
+			http_response_code(403);
+			die("Unverified request to edit account.");
+		}
+
+		try {
+			$token = retrieve_token(true);
+			if (!empty($token)) {
+
+				// Respond with data.
+				$updated_token = account_edit([
+					'password' => $_POST['password'] ?? '',
+					'password-confirm' => $_POST['password-confirm'] ?? '',
+					'current-password' => $_POST['current-password'] ?? '',
+					'name' => $_POST['name'],
+					'surname' => $_POST['surname'],
+					'title' => $_POST['title'] ?? '',
+					'gender' => $_POST['gender'] ?? '',
+					'organization' => $_POST['organization'] ?? '',
+					'email' => $_POST['email'],
+					'phone' => $_POST['phone'] ?? '',
+					'socials-title' => $_POST['socials-title'] ?? '',
+					'socials-url' => $_POST['socials-url'] ?? '',
+					'about' => $_POST['about'] ?? '',
+					'public_email' => $_POST['public_email'],
+					'public_phone' => $_POST['public_phone'],
+				], $_POST['username'], $token['encoded']);
+				http_response_code(200);
+				die(json_encode($updated_token));
+			} else {
+				http_response_code(404);
+				die("User token not found.");
+			}
+		} catch (RuntimeException $e) {
+			http_response_code(400);
+			die($e->getMessage());
+		} catch (InvalidArgumentException $e) {
+			http_response_code(404);
+			die($e->getMessage());
+		} catch (JsonException $e) {
+			http_response_code(440);
+			die();
+		} catch (ErrorException $e) {
+			http_response_code(500);
+			die($e->getMessage());
+		} catch (LogicException $e) {
+			http_response_code(501);
+			die($e->getMessage());
+		}
+	}
+
+	/**
+	 * Handle user verification email AJAX requests.
+	 *
+	 * @uses 	user_email_verification_resend()
+	 * 
+	 * @since	1.0.0
+	 */
+	public function user_email_verification_resend_handler()
+	{
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+
+		// Verify WordPress generated nonce.
+		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_account_editing_verification')) {
+			http_response_code(403);
+			die("Unverified request to verify user email.");
+		}
+
+		try {
+			$token = retrieve_token(true);
+			if (!empty($token)) {
+				user_email_verification_resend($token['decoded']['account']['verified'] ?? '', $token['decoded']['info']['email'] ?? '');
+				http_response_code(200);
+			} else {
+				http_response_code(404);
+				die("User token not found.");
+			}
+		} catch (RuntimeException $e) {
+			http_response_code(400);
+			die($e->getMessage());
+		} catch (InvalidArgumentException $e) {
+			http_response_code(404);
+			die($e->getMessage());
+		} catch (JsonException $e) {
+			http_response_code(440);
+			die();
+		} catch (ErrorException $e) {
+			http_response_code(500);
+			die($e->getMessage());
+		}
+	}
+
+	/**
+	 * Handle user account editing AJAX requests.
+	 *
+	 * @since	1.0.0
+	 */
+	public function account_data_request_handler()
+	{
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+
+		// Verify WordPress generated nonce (using the same as account editing).
+		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_account_editing_verification')) {
+			http_response_code(403);
+			die("Unverified request of account data.");
+		}
+
+		try {
+			$token = retrieve_token(true);
+			if (!empty($token)) {
+				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
+
+				// Respond with data.
+				http_response_code(200);
+				die(json_encode([
+					'information' => $token['decoded'],
+					'assets' => get_user_descriptions($token['decoded']['username'], $token['encoded'])
+				]));
+			} else {
+				http_response_code(404);
+				die("User token not found.");
+			}
+		} catch (InvalidArgumentException $e) {
+			http_response_code(404);
+			die($e->getMessage());
+		} catch (JsonException $e) {
+			http_response_code(440);
+			die();
+		} catch (ErrorException $e) {
+			http_response_code(500);
+			die($e->getMessage());
+		} catch (LogicException $e) {
+			http_response_code(501);
+			die($e->getMessage());
+		}
+	}
+
+	/**
+	 * Handle user account deletion AJAX requests.
+	 *
+	 * @since	1.0.0
+	 */
+	public function account_deletion_handler()
+	{
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+
+		// Verify WordPress generated nonce (using the same as account editing due to them being in the same page).
+		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_account_editing_verification')) {
+			http_response_code(403);
+			die("Unverified request to delete the account.");
+		}
+
+		try {
+			$token = retrieve_token(true);
+			if (!empty($token)) {
+				// Prepare data from $_POST
+				if (account_deletion($token['decoded']['username'], $token['encoded'], $_POST['current_password'])) {
+					die(json_encode([
+						'status' => 'success'
+					]));
+				}
+			} else throw new Exception("User token not found.");
 		} catch (Exception $e) {
 			die(json_encode([
 				'status' => 'failure',
@@ -482,236 +721,5 @@ class PolicyCloud_Marketplace_Public
 			"is_owner" => $owner ?? false,
 			"error" => $error ?? '',
 		]);
-	}
-
-	/**
-	 * Requests account related content to display for authenticated users.
-	 * 
-	 * @uses	retrieve_token()
-	 * @uses	verify_user()
-	 * @uses	get_user_information()
-	 * @uses	get_user_descriptions()
-	 * @uses	get_user_statistics()
-	 * @uses	account_html()
-	 * 
-	 * @since    1.0.0
-	 * @author	Alexandros Raikos <araikos@unipi.gr>
-	 */
-	public static function account_shortcode()
-	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
-
-		try {
-			// Get specific Description data for authorized users.
-			$token = retrieve_token(true);
-			if (!empty($token)) {
-
-				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
-
-				if (empty($_GET['user'])) {
-
-					// Check for verification code email redirect.
-					if (!empty($_GET['verification-code'])) {
-						if ($_GET['verification-code'] == $token['decoded']['account']['verified']) {
-							$verified_token = verify_user($_GET['verification-code']);
-							if (!empty($verified_token)) {
-								$notice = "Your email address was successfully verified.";
-							}
-						} else if ($token['decoded']['account']['verified'] == 1) {
-							throw new Exception("This account is already verified.");
-						}
-					}
-					$account_information = json_decode(json_encode($token['decoded']), true);
-					$visiting = false;
-				} else {
-					$is_admin = $token['decoded']['account']['role'] == 'admin';
-					$visiting = true;
-					$account_information = get_user_information($_GET['user'], $token['encoded']);
-				}
-
-				// Get the user's descriptions.
-				if (!empty($account_information)) {
-					$descriptions = get_user_descriptions(($visiting) ? $_GET['user'] : $token['decoded']['username'], $token['encoded'] ?? null, [
-						'page' => $_GET['page'] ?? null,
-						'items_per_page' => $_GET['items_per_page'] ?? null,
-						'sort_by' => $_GET['sort_by'] ?? null,
-					]);
-				}
-			} else $error = "not-logged-in";
-
-			if (!empty($account_information)) {
-				$statistics = get_user_statistics(($visiting) ? $_GET['user'] : $token['decoded']['username'], $token['encoded'] ?? null);
-			}
-		} catch (ErrorException $e) {
-		} catch (Exception $e) {
-			$error = $e->getMessage();
-		}
-
-		// Retrieve credentials.
-		$options = get_option('policycloud_marketplace_plugin_settings');
-		if (empty($options['login_page']) || empty($options['registration_page']) || empty($options['description_page'])) {
-			$error = 'Please update your PolicyCloud Marketplace settings in the WordPress Dashboard.';
-		}
-
-		// Localize script.
-		wp_enqueue_script('policycloud-marketplace-account');
-		wp_localize_script('policycloud-marketplace-account', 'ajax_properties_account_editing', array(
-			'ajax_url' => admin_url('admin-ajax.php'),
-			'nonce' => wp_create_nonce('ajax_policycloud_account_editing_verification'),
-			'verified_token' => $verified_token ?? null,
-			'user_id' => $_GET['user'] ?? $token['decoded']['username'] ?? '',
-		));
-
-		// Print shortcode HTML.
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		account_html($account_information ?? [], $descriptions ?? [], $statistics ?? [], [], [
-			"is_admin" => $is_admin ?? false,
-			"visiting" => $visiting ?? false,
-			"error" => $error ?? '',
-			"notice" => $notice ?? '',
-			"login_page" => $options['login_page'] ?? '',
-			"registration_page" => $options['registration_page'] ?? '',
-			"description_page" => $options['description_page'] ?? '',
-			"archive_page" => $options['archive_page'] ?? '',
-			"upload_page" => $options['upload_page'] ?? ''
-		]);
-	}
-
-	/**
-	 * Handle user account editing AJAX requests.
-	 *
-	 * @uses 	PolicyCloud_Marketplace_Public::account_registration()
-	 * @since	1.0.0
-	 */
-	public function account_edit_handler()
-	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
-
-		// Verify WordPress generated nonce.
-		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_account_editing_verification')) {
-			die("Unverified request to edit account.");
-		}
-
-		try {
-			$token = retrieve_token(true);
-			if (!empty($token)) {
-
-				// Respond with data.
-				$updated_token = account_edit([
-					'password' => $_POST['password'] ?? '',
-					'password-confirm' => $_POST['password-confirm'] ?? '',
-					'current-password' => $_POST['current-password'] ?? '',
-					'name' => $_POST['name'],
-					'surname' => $_POST['surname'],
-					'title' => $_POST['title'] ?? '',
-					'gender' => $_POST['gender'] ?? '',
-					'organization' => $_POST['organization'] ?? '',
-					'email' => $_POST['email'],
-					'phone' => $_POST['phone'] ?? '',
-					'socials-title' => $_POST['socials-title'] ?? '',
-					'socials-url' => $_POST['socials-url'] ?? '',
-					'about' => $_POST['about'] ?? '',
-					'public_email' => $_POST['public_email'],
-					'public_phone' => $_POST['public_phone'],
-				], $_POST['username'], $token['encoded']);
-				http_response_code(200);
-				die(json_encode($updated_token));
-			} else {
-				http_response_code(404);
-				die("User token not found.");
-			}
-		} catch (RuntimeException $e) {
-			http_response_code(400);
-			die($e->getMessage());
-		} catch (InvalidArgumentException $e) {
-			http_response_code(404);
-			die($e->getMessage());
-		} catch (JsonException $e) {
-			http_response_code(440);
-			die();
-		} catch (ErrorException $e) {
-			http_response_code(500);
-			die($e->getMessage());
-		} catch (LogicException $e) {
-			http_response_code(501);
-			die($e->getMessage());
-		}
-	}
-
-	/**
-	 * Handle user account editing AJAX requests.
-	 *
-	 * @since	1.0.0
-	 */
-	public function account_data_request_handler()
-	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
-
-		// Verify WordPress generated nonce (using the same as account editing).
-		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_account_editing_verification')) {
-			http_response_code(401);
-			die("Unverified request of account data.");
-		}
-
-		try {
-			$token = retrieve_token(true);
-			if (!empty($token)) {
-				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
-
-				// Respond with data.
-				http_response_code(200);
-				die(json_encode([
-					'information' => $token['decoded'],
-					'assets' => get_user_descriptions($token['decoded']['username'], $token['encoded'])
-				]));
-			} else {
-				http_response_code(404);
-				die("User token not found.");
-			}
-		} catch (InvalidArgumentException $e) {
-			http_response_code(404);
-			die($e->getMessage());
-		} catch (JsonException $e) {
-			http_response_code(440);
-			die();
-		} catch (ErrorException $e) {
-			http_response_code(500);
-			die($e->getMessage());
-		} catch (LogicException $e) {
-			http_response_code(501);
-			die($e->getMessage());
-		}
-	}
-
-	/**
-	 * Handle user account deletion AJAX requests.
-	 *
-	 * @since	1.0.0
-	 */
-	public function account_deletion_handler()
-	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
-
-		// Verify WordPress generated nonce (using the same as account editing due to them being in the same page).
-		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_account_editing_verification')) {
-			die("Unverified request of account data.");
-		}
-
-		try {
-			$token = retrieve_token(true);
-			if (!empty($token)) {
-				// Prepare data from $_POST
-				if (account_deletion($token['decoded']['username'], $token['encoded'], $_POST['current_password'])) {
-					die(json_encode([
-						'status' => 'success'
-					]));
-				}
-			} else throw new Exception("User token not found.");
-		} catch (Exception $e) {
-			die(json_encode([
-				'status' => 'failure',
-				'data' => $e->getMessage()
-			]));
-		}
 	}
 }
