@@ -1927,6 +1927,12 @@ section.policycloud-account-information
 
 section.policycloud-account-information
   #policycloud-marketplace-delete-account
+  div.policycloud-marketplace-error {
+  display: block;
+}
+
+section.policycloud-account-information
+  #policycloud-marketplace-delete-account
   div.visible {
   display: block;
 }

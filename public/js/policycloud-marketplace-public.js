@@ -75,6 +75,43 @@ function showAlert(selector, message, type = "error", placeBefore = false) {
 }
 
 /**
+ * Handle the response after requesting via WP ajax.
+ *
+ * @param {Object} response The raw response AJAX object.
+ * @param {string} actionSelector The selector of the DOM element triggering the action.
+ * @param {completedAction} callback The actions to perform when the response was successful.
+ *
+ * @author Alexandros Raikos <araikos@unipi.gr>
+ */
+function handleAJAXResponse(response, actionSelector, completedAction) {
+  if (response.status === 200) {
+    try {
+      var data = JSON.parse(
+        response.responseText == ""
+          ? '{"string":"completed"}'
+          : response.responseText
+      );
+      completedAction(data);
+    } catch (objError) {
+      console.error("Invalid JSON response: " + objError);
+    }
+  } else if (
+    response.status === 400 ||
+    response.status === 404 ||
+    response.status === 500
+  ) {
+    showAlert(actionSelector, response.responseText);
+  } else if (response.status === 440) {
+    removeAuthorization(true);
+  } else {
+    console.error(response.responseText);
+  }
+
+  // Remove the loading class.
+  $(actionSelector).removeClass("loading");
+}
+
+/**
  *
  * Global interface actions & event listeners.
  *

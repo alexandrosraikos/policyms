@@ -513,16 +513,24 @@ class PolicyCloud_Marketplace_Public
 			if (!empty($token)) {
 				// Prepare data from $_POST
 				if (account_deletion($token['decoded']['username'], $token['encoded'], $_POST['current_password'])) {
-					die(json_encode([
-						'status' => 'success'
-					]));
+					http_response_code(200);
 				}
-			} else throw new Exception("User token not found.");
-		} catch (Exception $e) {
-			die(json_encode([
-				'status' => 'failure',
-				'data' => $e->getMessage()
-			]));
+			} else {
+				http_response_code(404);
+				die("User token not found.");
+			}
+		} catch (InvalidArgumentException $e) {
+			http_response_code(404);
+			die($e->getMessage());
+		} catch (JsonException $e) {
+			http_response_code(440);
+			die();
+		} catch (ErrorException $e) {
+			http_response_code(500);
+			die($e->getMessage());
+		} catch (LogicException $e) {
+			http_response_code(501);
+			die($e->getMessage());
 		}
 	}
 

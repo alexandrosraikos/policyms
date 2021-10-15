@@ -640,13 +640,17 @@ function account_edit($data, $uid, $token)
  * @param   string $uid The valid username of the user whose information will be edited.
  * @param   array $token The encoded access token of the requesting user.
  * @usedby PolicyCloud_Marketplace_Public::account_edit_handler()
+ * 
+ * @throws InvalidArgumentException If there is no PolicyCloud API hostname defined in the settings.
+ * @throws ErrorException If there was a request or connection error to the PolicyCloud Marketplace 
+ * 
  * @since	1.0.0
  */
 function account_deletion($username, $token, $password)
 {
     // Retrieve API credentials.
     $options = get_option('policycloud_marketplace_plugin_settings');
-    if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
+    if (empty($options['marketplace_host'])) throw new InvalidArgumentException("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
 
     // Contact the PolicyCloud Marketplace API for non-sensitive information updating.
     $curl = curl_init();
@@ -669,14 +673,14 @@ function account_deletion($username, $token, $password)
     $nonsensitive_update_response = json_decode(curl_exec($curl), true);
 
     // Handle errors.
-    if (curl_errno($curl)) throw new Exception("Unable to reach the Marketplace server to delete this account. More details: " . curl_error($curl));
+    if (curl_errno($curl)) throw new ErrorException("Unable to reach the Marketplace server to delete this account. More details: " . curl_error($curl));
 
     // Close the session.
     curl_close($curl);
 
     // Handle response.
-    if (!isset($nonsensitive_update_response)) throw new Exception("The Marketplace API response for deleting this account was invalid.");
+    if (!isset($nonsensitive_update_response)) throw new ErrorException("The Marketplace API response for deleting this account was invalid.");
     elseif ($nonsensitive_update_response['_status'] == 'successful') {
         return true;
-    } else throw new Exception('There was an error updating user information: ' . $nonsensitive_update_response['message']);
+    } else throw new ErrorException('There was an error deleting the user account: ' . $nonsensitive_update_response['message']);
 }

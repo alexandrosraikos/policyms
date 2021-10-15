@@ -441,38 +441,12 @@
     function updateInformation(e) {
       e.preventDefault();
 
-      /**
-       * Handle the response after requesting an update of the account information.
-       *
-       * @param {Object} response The raw response AJAX object.
-       *
-       * @author Alexandros Raikos <araikos@unipi.gr>
-       */
-      function handleResponse(response) {
-        if (response.status === 200) {
-          try {
-            var data = JSON.parse(response.responseText);
-            setAuthorizedToken(data);
-            window.location.reload();
-          } catch (objError) {
-            console.error("Invalid JSON response: " + objError);
-          }
-        } else if (
-          response.status === 400 ||
-          response.status === 404 ||
-          response.status === 500
-        ) {
-          showAlert(
-            "#policycloud-marketplace-request-data-copy",
-            response.responseText
-          );
-        } else if (response.status === 440) {
-          removeAuthorization(true);
-        } else {
-          console.error(response.responseText);
-        }
-      }
+      // Add loading class.
+      $("#policycloud-marketplace-account-edit button[type=submit]").addClass(
+        "loading"
+      );
 
+      // Prepare form data.
       var formData = new FormData(
         $("#policycloud-marketplace-account-edit")[0]
       );
@@ -482,9 +456,7 @@
         "username",
         ajax_properties_account_editing.user_id ?? ""
       );
-      $("#policycloud-marketplace-account-edit button[type=submit]").addClass(
-        "loading"
-      );
+
       // Perform AJAX request.
       $.ajax({
         url: ajax_properties_account_editing.ajax_url,
@@ -492,13 +464,18 @@
         processData: false,
         contentType: false,
         data: formData,
-        complete: handleResponse,
         dataType: "json",
+        complete: (response) => {
+          handleAJAXResponse(
+            response,
+            "#policycloud-marketplace-account-edit button[type=submit]",
+            (data) => {
+              setAuthorizedToken(data);
+              window.location.reload();
+            }
+          );
+        },
       });
-
-      $(
-        "#policycloud-marketplace-account-edit button[type=submit]"
-      ).removeClass("loading");
     }
 
     /**
@@ -510,42 +487,10 @@
      */
     function sendVerificationEmail(e) {
       e.preventDefault();
-      /**
-       * Handle the response after requesting a new verification email.
-       *
-       * @param {Object} response
-       *
-       * @author Alexandros Raikos <araikos@unipi.gr>
-       */
-      function handleResponse(response) {
-        if (response.status === 200) {
-          try {
-            var data = JSON.parse(response.responseText);
-            setAuthorizedToken(data);
-            window.location.reload();
-          } catch (objError) {
-            console.error("Invalid JSON response: " + objError);
-          }
-        } else if (
-          response.status === 400 ||
-          response.status === 404 ||
-          response.status === 500
-        ) {
-          showAlert(
-            "#policycloud-marketplace-account-edit button[type=submit]",
-            response.responseText
-          );
-        } else if (response.status === 440) {
-          removeAuthorization(true);
-        } else {
-          console.error(response.responseText);
-        }
-        $(
-          "#policycloud-marketplace-account-edit button[type=submit]"
-        ).removeClass("disabled");
-      }
 
-      $(this).addClass("disabled");
+      $("button#policycloud-marketplace-resend-verification-email").addClass(
+        "loading"
+      );
 
       // Perform AJAX request.
       $.ajax({
@@ -555,10 +500,20 @@
           action: "policycloud_marketplace_user_email_verification_resend",
           nonce: ajax_properties_account_editing.nonce,
         },
-
-        // Handle response.
-        complete: handleResponse,
         dataType: "json",
+        complete: (response) => {
+          handleAJAXResponse(
+            response,
+            "button#policycloud-marketplace-resend-verification-email",
+            (data) => {
+              showAlert(
+                "button#policycloud-marketplace-resend-verification-email",
+                data,
+                "notice"
+              );
+            }
+          );
+        },
       });
     }
 
@@ -571,46 +526,8 @@
      */
     function requestDataCopy(e) {
       e.preventDefault();
-      /**
-       * Handle the response after requesting a copy of the account data.
-       *
-       * @param {Object} response The raw response AJAX object.
-       *
-       * @author Alexandros Raikos <araikos@unipi.gr>
-       */
-      function handleResponse(response) {
-        if (response.status === 200) {
-          try {
-            var data = JSON.parse(response.responseText);
-            var blob = new Blob([JSON.stringify(data, null, 2)], {
-              type: "text/plain",
-            });
-            var a = document.createElement("a");
-            a.download = "account_data.txt";
-            a.href = URL.createObjectURL(blob);
-            a.dataset.downloadurl = ["text/plain", a.download, a.href].join(
-              ":"
-            );
-            a.style.display = "none";
-            a.setAttribute("id", "policycloud-marketplace-download-data-copy");
-            $("section.policycloud-account-information").append(a);
-            $("#policycloud-marketplace-download-data-copy").get(0).click();
-          } catch (objError) {
-            console.error("Invalid JSON response: " + objError);
-          }
-        } else if (response.status === 404 || response.status === 500) {
-          showAlert(
-            "#policycloud-marketplace-request-data-copy",
-            response.responseText
-          );
-        } else if (response.status === 440) {
-          removeAuthorization();
-        } else {
-          console.error(response.responseText);
-        }
-      }
 
-      $("#policycloud-marketplace-request-data-copy").addClass("loading");
+      $("button#policycloud-marketplace-request-data-copy").addClass("loading");
       // Perform AJAX request.
       $.ajax({
         url: ajax_properties_account_editing.ajax_url,
@@ -619,10 +536,32 @@
           action: "policycloud_marketplace_account_data_request",
           nonce: ajax_properties_account_editing.nonce,
         },
-        complete: handleResponse,
         dataType: "json",
+        complete: (response) => {
+          handleAJAXResponse(
+            response,
+            "button#policycloud-marketplace-request-data-copy",
+            (data) => {
+              var blob = new Blob([JSON.stringify(data, null, 2)], {
+                type: "text/plain",
+              });
+              var a = document.createElement("a");
+              a.download = "account_data.txt";
+              a.href = URL.createObjectURL(blob);
+              a.dataset.downloadurl = ["text/plain", a.download, a.href].join(
+                ":"
+              );
+              a.style.display = "none";
+              a.setAttribute(
+                "id",
+                "policycloud-marketplace-download-data-copy"
+              );
+              $("section.policycloud-account-information").append(a);
+              $("#policycloud-marketplace-download-data-copy").get(0).click();
+            }
+          );
+        },
       });
-      $("#policycloud-marketplace-request-data-copy").removeClass("loading");
     }
 
     /**
@@ -636,44 +575,6 @@
     function validateDeletionRequest(e) {
       e.preventDefault();
 
-      /**
-       * Handle the response after requesting account deletion.
-       *
-       * @param {Object} response The raw response AJAX object.
-       *
-       * @author Alexandros Raikos <araikos@unipi.gr>
-       */
-      function handleResponse(response) {
-        try {
-          var payload = JSON.parse(response.responseText);
-          if (payload != null) {
-            if (payload.status === "failure") {
-              showAlert(
-                "#policycloud-marketplace-delete-account",
-                payload.data
-              );
-            } else if (payload.status === "success") {
-              removeAuthorization();
-              window.reload();
-            }
-          }
-          if (response.status != 200) {
-            showAlert(
-              "#policycloud-marketplace-delete-account",
-              "HTTP Error " + response.status + ": " + response.statusText
-            );
-          }
-          $("#policycloud-marketplace-request-data-copy").removeClass(
-            "loading"
-          );
-        } catch (objError) {
-          showAlert(
-            "#policycloud-marketplace-delete-account",
-            "Invalid response: " + objError
-          );
-        }
-      }
-
       // Show password prompt.
       $("#policycloud-marketplace-delete-account > div").addClass("visible");
       $(
@@ -686,6 +587,11 @@
           "#policycloud-marketplace-delete-account input[name=current-password]"
         ).val() !== ""
       ) {
+        // Add loading class
+        $(
+          "#policycloud-marketplace-delete-account button[type=submit]"
+        ).addClass("loading");
+
         $.ajax({
           url: ajax_properties_account_editing.ajax_url,
           type: "post",
@@ -696,8 +602,17 @@
               "#policycloud-marketplace-delete-account input[name=current-password]"
             ).val(),
           },
-          complete: handleResponse,
           dataType: "json",
+          complete: (response) => {
+            handleAJAXResponse(
+              response,
+              "#policycloud-marketplace-delete-account button[type=submit]",
+              () => {
+                removeAuthorization();
+                window.reload();
+              }
+            );
+          },
         });
       }
     }
@@ -742,20 +657,23 @@
       }
     );
 
-    // Show current password field on deletion request.
-    $("#policycloud-marketplace-delete-account").submit(
-      validateDeletionRequest
-    );
-
-    // Submit the updated information.
-    $("#policycloud-marketplace-account-edit").submit(updateInformation);
-
     // Request a verification email.
     $("button#policycloud-marketplace-resend-verification-email").click(
       sendVerificationEmail
     );
 
-    $("#policycloud-marketplace-request-data-copy").click(requestDataCopy);
+    // Submit the updated information.
+    $("#policycloud-marketplace-account-edit").submit(updateInformation);
+
+    // Request a copy of the account's data.
+    $("button#policycloud-marketplace-request-data-copy").click(
+      requestDataCopy
+    );
+
+    // Show current password field on deletion request.
+    $("#policycloud-marketplace-delete-account").submit(
+      validateDeletionRequest
+    );
 
     // Store any newly verified encrypted token.
     if (ajax_properties_account_editing.verified_token) {

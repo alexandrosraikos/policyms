@@ -60,57 +60,13 @@
     function registerUser(e) {
       e.preventDefault();
 
-      /**
-       * Handle the response after requesting user registration.
-       *
-       * @param {Event} response
-       *
-       * @author Alexandros Raikos <araikos@unipi.gr>
-       */
-      function handleResponse(response) {
-        if (response.status === 200) {
-          try {
-            var data = JSON.parse(response.responseText);
-            setAuthorizedToken(data.newToken);
-
-            // Handle any warning message in case of semi-complete registration.
-            if (data.warningMessage) {
-              $("#policycloud-registration fieldset").prop("disabled", true);
-              showAlert(
-                "#policycloud-registration button[type=submit]",
-                data.warningMessage
-              );
-            } else {
-              window.location.reload();
-            }
-          } catch (objError) {
-            console.error("Invalid JSON response: " + objError);
-          }
-        } else if (
-          response.status === 400 ||
-          response.status === 404 ||
-          response.status === 500
-        ) {
-          showAlert(
-            "#policycloud-registration button[type=submit]",
-            response.responseText
-          );
-        } else {
-          console.error(response.responseText);
-        }
-
-        $("#policycloud-registration button[type=submit]").removeClass(
-          "loading"
-        );
-      }
+      // Add "loading" class to the submission button.
+      $("#policycloud-registration button[type=submit]").addClass("loading");
 
       // Prepare form data.
       var formData = new FormData($("#policycloud-registration")[0]);
       formData.append("action", "policycloud_marketplace_account_registration");
       formData.append("nonce", ajax_properties_account_registration.nonce);
-
-      // Add "loading" class to the submission button.
-      $("#policycloud-registration button[type=submit]").addClass("loading");
 
       // Perform AJAX request.
       $.ajax({
@@ -120,7 +76,26 @@
         contentType: false,
         data: formData,
         dataType: "json",
-        complete: handleResponse,
+        complete: (response) => {
+          handleAJAXResponse(
+            response,
+            "#policycloud-registration button[type=submit]",
+            (data) => {
+              setAuthorizedToken(data.newToken);
+
+              // Handle any warning message in case of semi-complete registration.
+              if (data.warningMessage) {
+                $("#policycloud-registration fieldset").prop("disabled", true);
+                showAlert(
+                  "#policycloud-registration button[type=submit]",
+                  data.warningMessage
+                );
+              } else {
+                window.location.reload();
+              }
+            }
+          );
+        },
       });
     }
 
