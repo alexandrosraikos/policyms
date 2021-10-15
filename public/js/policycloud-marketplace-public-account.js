@@ -61,6 +61,8 @@
       $("button#policycloud-account-" + window.location.hash.substr(1)).trigger(
         "click"
       );
+    } else {
+      $("button#policycloud-account-overview").trigger("click");
     }
 
     /**
