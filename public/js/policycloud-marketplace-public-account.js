@@ -499,7 +499,7 @@
         url: ajax_properties_account_editing.ajax_url,
         type: "post",
         data: {
-          action: "policycloud_marketplace_user_email_verification_resend",
+          action: "policycloud_marketplace_account_email_verification_resend",
           nonce: ajax_properties_account_editing.nonce,
         },
         dataType: "json",

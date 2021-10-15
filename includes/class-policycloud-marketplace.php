@@ -179,30 +179,20 @@ class PolicyCloud_Marketplace
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
 		$this->loader->add_action('wp_head', $plugin_public, 'enqueue_head_scripts');
 
-		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_registration', $plugin_public, 'account_registration_handler');
+		// Support for user accounts.
+		$this->loader->add_action('init', $plugin_public, 'add_accounts_shortcodes');
+		$this->loader->add_filter('wp_nav_menu_items', $plugin_public, 'add_conditional_access_menu_item', 10, 2);
 		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_registration', $plugin_public, 'account_registration_handler');
-		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_authorization', $plugin_public, 'account_authorization_handler');
 		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_authorization', $plugin_public, 'account_authorization_handler');
-		$this->loader->add_action('wp_ajax_policycloud_marketplace_user_email_verification_resend', $plugin_public, 'user_email_verification_resend_handler');
-		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_user_email_verification_resend', $plugin_public, 'user_email_verification_resend_handler');
-		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_data_request', $plugin_public, 'account_data_request_handler');
+		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_email_verification_resend', $plugin_public, 'account_email_verification_resend_handler');
+		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_edit', $plugin_public, 'account_editing_handler');
 		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_data_request', $plugin_public, 'account_data_request_handler');
-		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_deletion', $plugin_public, 'account_deletion_handler');
 		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_deletion', $plugin_public, 'account_deletion_handler');
 
-		$this->loader->add_action('init', $plugin_public, 'add_accounts_shortcodes');
-
-		// Add user access management menu item.
-		$this->loader->add_filter('wp_nav_menu_items', $plugin_public, 'add_conditional_access_menu_item', 10, 2);
-
-		// -- CRUD operations on database.
+		// Support for assets.
 		$this->loader->add_action('init', $plugin_public, 'add_content_shortcodes');
-		$this->loader->add_action('wp_ajax_description_edit', $plugin_public, 'description_edit_handler');
-		$this->loader->add_action('wp_ajax_nopriv_description_edit', $plugin_public, 'description_edit_handler');
-		$this->loader->add_action('wp_ajax_policycloud_marketplace_object_creation', $plugin_public, 'object_creation_handler');
-		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_object_creation', $plugin_public, 'object_creation_handler');
-		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_edit', $plugin_public, 'account_edit_handler');
-		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_edit', $plugin_public, 'account_edit_handler');
+		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_asset_creation', $plugin_public, 'asset_creation_handler');
+		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_asset_editing', $plugin_public, 'asset_editing_handler');
 	}
 
 	/**

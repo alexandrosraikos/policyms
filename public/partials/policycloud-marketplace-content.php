@@ -1,35 +1,76 @@
 <?php
 
 /**
- * Retrieve publicly available Description Objects from the Marketplace API, also filtered by collection.
+ * Send a request to the PolicyCloud Marketplace API. 
+ * Documentation: https://documenter.getpostman.com/view/16776360/TzsZs8kn#intro
+ * 
+ * @param string $http_method The standardized HTTP method used for the request.
+ * @param array $data The data to be sent according to the documented schema.
+ * @param string $token The encoded user access token.
+ * @param array $additional_headers Any additional HTTP headers for the request.
+ * 
+ * @throws InvalidArgumentException For missing WordPress settings.
+ * @throws ErrorException For connectivity and other API issues.
+ * 
+ * @since   1.0.0
+ * @author  Alexandros Raikos <araikos@unipi.gr>
+ */
+function policyCloudMarketplaceAPIRequest($http_method, $uri, $data = [], $token = null, $additional_headers = [])
+{
+
+    // Retrieve hostname URL.
+    $options = get_option('policycloud_marketplace_plugin_settings');
+    if (empty($options['marketplace_host'])) throw new InvalidArgumentException("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
+
+    // Contact Marketplace login API endpoint.
+    $curl = curl_init();
+    curl_setopt_array($curl, [
+        CURLOPT_URL => 'https://' . $options['marketplace_host'] . $uri,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => $http_method,
+        CURLOPT_POSTFIELDS => (!empty($data)) ? json_encode($data) : null,
+        CURLOPT_HTTPHEADER => array_merge(['Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null), 'x-more-time: 1'], $additional_headers)
+    ]);
+
+    // Get the data.
+    $response = json_decode(curl_exec($curl), true);
+
+    // Handle errors.
+    if (curl_errno($curl)) {
+        throw new Exception("Unable to reach the Marketplace server. More details: " . curl_error($curl));
+    }
+
+    // Close the session.
+    curl_close($curl);
+
+    // Handle response.
+    if (!isset($response)) {
+        throw new ErrorException("The Marketplace API response was invalid.");
+    } elseif ($response['_status'] == 'successful') {
+        return $response;
+    } else throw new ErrorException($response['message']);
+}
+
+/**
+ * Retrieve publicly available Assets from the Marketplace API, also filtered by collection.
  *
  * To learn more about the Marketplace API data schema for retrieving objects and filtering them, visit:
  * https://documenter.getpostman.com/view/16776360/TzsZs8kn#6c8e45e3-5be6-4c10-82a6-7d698b092e9e
  *
  * @param	array $args An array of arguments to filter the search.
- * @throws  Exception If there is no PolicyCloud API hostname defined in the settings.
- * @throws  Exception If there was a connection error.
- * @throws  ErrorException If no descriptions were found for the assigned arguments.
  * 
- * @since    1.0.0
+ * @uses    policyCloudMarketplaceAPIRequest()
+ * 
+ * @since   1.0.0
+ * @author  Alexandros Raikos <araikos@unipi.gr>
  */
-function get_descriptions(array $args)
+function get_assets(array $args)
 {
-
-    // Retrieve credentials.
-    $options = get_option('policycloud_marketplace_plugin_settings');
-    if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
-
-    /** 
-     * 
-     * 	TODO @alexandrosraikos: Coordinate query parameters for front-end usage. More information here:
-     *  https://documenter.getpostman.com/view/16776360/TzsZs8kn#595b5504-1d07-49f8-8166-8efdb400c5f4
-     * 
-     * */
-
-    // "in" can be get arrays for multiple parameters.
-    // "gte"/"lte" are range selectors in HTML.
-
     $filters = '?' . http_build_query([
         'info.owner' => $args['owner'] ?? null,
         'info.title' => $args['title'] ?? $args['search'] ?? null,
@@ -49,69 +90,27 @@ function get_descriptions(array $args)
         'metadata.updateDate.lte' => $args['update_date_lte'] ?? null
     ]);
 
-    $curl = curl_init();
-
     // Get all descriptions.
     if (!isset($args['collections'])) {
-
-        // Contact PolicyCloud Marketplace API.
-        curl_setopt_array($curl, [
-            CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/descriptions/all' . $filters,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-        ]);
-
-        // Get data.
-        $descriptions = json_decode(curl_exec($curl), true);
-
-        // Handle errors.
-        if (!empty(curl_error($curl))) throw new Exception("There was a connection error while attempting to retrieve all descriptions.");
+        return policyCloudMarketplaceAPIRequest(
+            'GET',
+            '/descriptions/all' . $filters,
+        );
     }
 
     // Filtering by collection.
     else {
-        $descriptions = array();
-        foreach ($args['collection'] as $collection) {
-
-            // Contact PolicyCloud Marketplace API.
-            $curl = curl_init();
-            curl_setopt_array($curl, [
-                CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/descriptions/' . $collection . $filters,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => "",
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 30,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => "GET",
-            ]);
-
-            // Append descriptions
-            $descriptions += (array) json_decode(curl_exec($curl), true);
-
-            // Handle errors.
-            if (!empty(curl_error($curl))) throw new Exception("There was a connection error while attempting to retrieve all descriptions.");
-        }
+        return array_map(function ($collection) use ($filters) {
+            return policyCloudMarketplaceAPIRequest(
+                'GET',
+                '/descriptions/' . $collection . $filters
+            );
+        }, (is_array($args['collection']) ? $args['collection'] : [$args['collection']]));
     }
-
-    if (!empty($descriptions['_status'])) {
-        if ($descriptions['_status'] == "unsuccessful") {
-            throw new ErrorException("No descriptions were found.");
-        }
-    }
-
-    // Close session.
-    curl_close($curl);
-    return $descriptions;
 }
 
 /**
- * Retrieve user specific Description Objects from the Marketplace API, also filtered by collection.
+ * Retrieve user specific Assets from the Marketplace API, also filtered by collection.
  *
  * To learn more about the Marketplace API data schema for retrieving objects and filtering them, visit:
  * https://documenter.getpostman.com/view/16776360/TzsZs8kn#763f96da-4c32-4e98-9dc3-39ce30a73eaa
@@ -123,17 +122,15 @@ function get_descriptions(array $args)
  * @param	array $args An array of arguments to filter the search. NOTICE: When filtering with
  * items_per_page the returning descriptions will be arranged in arrays.
  * 
- * @throws  InvalidArgumentException If there is no PolicyCloud API hostname defined in the settings.
- * @throws  InvalidArgumentException If no descriptions were found for the assigned arguments.
  * @throws  LogicException If the sorting setting is unsupported.
- * @throws  ErrorException If there was a request or connection error to the PolicyCloud Marketplace API.
+ * 
+ * @uses    policyCloudMarketplaceAPIRequest()
  * 
  * @since   1.0.0
  * @author  Alexandros Raikos <araikos@unipi.gr>
  */
-function get_user_descriptions(string $uid, string $token = null, array $args = [])
+function get_user_assets(string $uid, string $token = null, array $args = [])
 {
-
     // Check arguments
     if (!empty($args['sort_by'])) {
         if (
@@ -149,97 +146,70 @@ function get_user_descriptions(string $uid, string $token = null, array $args = 
         }
     }
 
-    // Retrieve credentials.
-    $options = get_option('policycloud_marketplace_plugin_settings');
-    if (empty($options['marketplace_host'])) throw new InvalidArgumentException("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
-
     $filters = '?' . http_build_query([
         'sortBy' => $args['sort_by'] ?? null,
         'page' => $args['assets_page'] ?? null,
         'itemsPerPage' => $args['items_per_page'] ?? 5
     ]);
 
-    $curl = curl_init();
-
-    // Contact PolicyCloud Marketplace API.
-    curl_setopt_array($curl, [
-        CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/descriptions/provider/' . $uid . '/all' . $filters,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => "",
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 30,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => "GET",
-        CURLOPT_FAILONERROR => true,
-        CURLOPT_HTTPHEADER => ['Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null)]
-    ]);
-
-    // Get data.
-    $descriptions = json_decode(curl_exec($curl), true);
-
-    // Handle any errors.
-    if (!empty(curl_error($curl))) {
-        if (curl_getinfo($curl,CURLINFO_HTTP_CODE) == '404') {
-            return null;
-        }
-        throw new ErrorException("There was an error while attempting to retrieve the user's descriptions: " . curl_error($curl));
-    };
-
-    // Close session.
-    curl_close($curl);
-
-    // Return encypted token.
-    if (!isset($descriptions)) {
-        throw new InvalidArgumentException("The Marketplace API response was invalid when attempting to retrieve this user's descriptions.");
-    } elseif ($descriptions['_status'] == 'successful') {
-        return $descriptions;
-    } else throw new ErrorException("There was an error retrieving user descriptions. " . $descriptions['message']);
+    return policyCloudMarketplaceAPIRequest(
+        'GET',
+        '/descriptions/provider/' . $uid . '/all' . $filters,
+        [],
+        $token
+    );
 }
 
 
 /**
- * Retrieve a specific Description Object from the Marketplace API.
+ * Retrieve a specific Asset from the Marketplace API.
  * For more information on the retrieved schema, visit: 
  * https://documenter.getpostman.com/view/16776360/TzsZs8kn#8191ba2b-f1aa-4b05-8e66-12025c85d999
  * 
  * @param	string $api_host The hostname of the Marketplace API server.
  * @param	string $token The user's access token used for authorization (encoded).
+ * 
  * @return  array An array containing the description information.
- * @since    1.0.0
+ * 
+ * @uses    policyCloudMarketplaceAPIRequest()
+ * 
+ * @since   1.0.0
+ * @author  Alexandros Raikos <araikos@unipi.gr>
  */
-function get_specific_description(string $did, string $token = null)
+function get_asset(string $did, string $token = null)
 {
-    // Retrieve credentials.
-    $options = get_option('policycloud_marketplace_plugin_settings');
-    if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
-
-    // Contact Marketplace login API endpoint.
-    $curl = curl_init();
-
-    curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/descriptions/all/' . $did,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'GET',
-        CURLOPT_HTTPHEADER => ['Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null)]
-    ));
-
-    // Get data,
-    $description = json_decode(curl_exec($curl), true);
-
-    // Handle errors.
-    if (!empty(curl_error($curl))) throw new Exception("There was a connection error while attempting to retrieve all descriptions.");
-
-    // Close session.
-    curl_close($curl);
-    return $description;
+    return policyCloudMarketplaceAPIRequest(
+        'GET',
+        '/descriptions/all/' . $did,
+        [],
+        $token
+    );
 }
 
+
+/**
+ * Create an asset using the PolicyCloud Marketplace API. For more info visit:
+ * https://documenter.getpostman.com/view/16776360/TzsZs8kn#5b7e797a-682f-4b0a-bb5f-d9c371988a05
+ * 
+ * @param	array $data An array using schema fields as keys and the requested updated values.
+ * @param	string $token The user's access token used for authorization (encoded).
+ * 
+ * @return  array An array containing the description ID.
+ * 
+ * @uses    policyCloudMarketplaceAPIRequest()
+ * 
+ * @since   1.0.0
+ * @author  Alexandros Raikos <araikos@unipi.gr>
+ */
+function create_asset($data, $token)
+{
+    return policyCloudMarketplaceAPIRequest(
+        'POST',
+        '/descriptions/' . $data['type'],
+        $data,
+        $token
+    );
+}
 
 
 /**
@@ -247,117 +217,20 @@ function get_specific_description(string $did, string $token = null)
  * https://documenter.getpostman.com/view/16776360/TzsZs8kn#5b7e797a-682f-4b0a-bb5f-d9c371988a05
  * 
  * @param	array $changes An array using schema fields as keys and the requested updated values.
- * @uses	PolicyCloud_Marketplace_Public::retrieve_token()
- * @since	1.0.0
- */
-function description_editing($updated)
-{
-    // Retrieve credentials.
-    $options = get_option('policycloud_marketplace_plugin_settings');
-    if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
-
-    try {
-
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
-
-        // Check authorization status
-        $token = retrieve_token();
-        if (!empty($token)) {
-
-            // Contact Marketplace API endpoint.
-            $curl = curl_init();
-
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/descriptions/all/' . $updated['id'],
-                CURLOPT_RETURNTRANSFER => false,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'PUT',
-                CURLOPT_HTTPHEADER => ['x-access-token: ' . $token]
-            ));
-
-            if (!curl_exec($curl)) throw new Exception("There an API error while updating the Description.");
-
-            // Handle errors.
-            if (!empty(curl_error($curl))) throw new Exception("There was a connection error while updating the Description.");
-
-            // Close session.
-            curl_close($curl);
-        } else throw new Exception("You need to be logged in in order to make modifications.");
-    } catch (Exception $e) {
-        throw $e;
-    }
-}
-
-
-/**
- * Create Description objects using the PolicyCloud Marketplace. For more info visit:
- * https://documenter.getpostman.com/view/16776360/TzsZs8kn#5b7e797a-682f-4b0a-bb5f-d9c371988a05
  * 
- * @param	array $changes An array using schema fields as keys and the requested updated values.
- * @uses	PolicyCloud_Marketplace_Public::retrieve_token()
- * @since	1.0.0
+ * @uses    policyCloudMarketplaceAPIRequest()
+ * 
+ * @since   1.0.0
+ * @author  Alexandros Raikos <araikos@unipi.gr>
  */
-function create_description($new)
+function edit_asset($did, $information, $token)
 {
-    // Retrieve credentials.
-    $options = get_option('policycloud_marketplace_plugin_settings');
-    if (empty($options['marketplace_host'])) throw new Exception("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
-
-    try {
-        require_once plugin_dir_path(dirname(__FILE__)) . 'partials/policycloud-marketplace-accounts.php';
-
-        // Check authorization status
-        $token = retrieve_token();
-        if (!empty($token)) {
-
-            // Contact Marketplace API endpoint.
-            $curl = curl_init();
-
-            $data = json_encode([
-                'title' => $new['title'],
-                'type' => $new['type'],
-                'subtype' => $new['subtype'] ?? '',
-                'owner' => $new['owner'],
-                'description' => $new['description'],
-                'fieldOfUse' => [
-                    $new['field_of_use'] ?? ''
-                ],
-                'comments' => $new['comment'] ?? '',
-            ]);
-
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://' . $options['marketplace_host'] . '/descriptions/' . $new['type'],
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => $data,
-                CURLOPT_HTTPHEADER => array('Content-Type: application/json', 'x-access-token: ' . $token)
-            ));
-
-            // Send data.
-            $response = json_decode(curl_exec($curl), true);
-
-            // Handle errors.
-            if (!empty(curl_error($curl))) throw new Exception("There was a connection error while creating the Description.");
-
-            // Close the session.
-            curl_close($curl);
-
-            // Check response and return encypted token.
-            if (!isset($response)) throw new Exception("Unable to reach the Marketplace server.");
-            elseif ($response['_status'] == 'successful') {
-                return $response['id'];
-            } elseif ($response['_status'] != 'successful') throw new Exception($response['message']);
-        } else throw new Exception("You need to be logged in in order to create a new object.");
-    } catch (Exception $e) {
-        throw $e;
+    if (policyCloudMarketplaceAPIRequest(
+        'PUT',
+        '/descriptions/all/' . $did,
+        $information,
+        $token
+    )) {
+        return true;
     }
 }

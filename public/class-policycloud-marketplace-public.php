@@ -54,6 +54,14 @@ class PolicyCloud_Marketplace_Public
 		$this->version = $version;
 	}
 
+	/**
+	 * 
+	 * Generic
+	 * 
+	 * This section refers to global functionality.
+	 * 
+	 */
+
 	public function enqueue_head_scripts()
 	{
 		echo '<script>FontAwesomeConfig = { autoA11y: true }</script><script src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>';
@@ -86,9 +94,17 @@ class PolicyCloud_Marketplace_Public
 		// TODO @alexandrosraikos: Create password reset functionality. (API access token will be included in a later stage).
 
 		// Content related scripts.
-		wp_register_script("policycloud-marketplace-object-create", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-object-create.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
+		wp_register_script("policycloud-marketplace-asset-creation", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-asset-creation.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
 		wp_register_script("policycloud-marketplace-read-single", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-single.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
 	}
+
+	/**
+	 * 
+	 * Accounts
+	 * 
+	 * This section refers to functionality and shortcodes relevant to user accounts.
+	 * 
+	 */
 
 	/**
 	 * Register all the shortcodes concerning user authorization.
@@ -102,6 +118,38 @@ class PolicyCloud_Marketplace_Public
 
 		// Log in sequence.
 		add_shortcode('policycloud-marketplace-login', 'PolicyCloud_Marketplace_Public::account_authorization_shortcode');
+	}
+
+
+	/**
+	 * Add a menu item to a selected menu, which conditionally switches
+	 * from log in to log out actions.
+	 * 
+	 * @since    1.0.0
+	 */
+	public static function add_conditional_access_menu_item($items, $args)
+	{
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+
+		// Retrieve credentials.
+		$options = get_option('policycloud_marketplace_plugin_settings');
+		if (empty($options['selected_menu']) || empty($options['login_page']) || empty($options['account_page']) || empty($options['registration_page'])) return $items;
+
+		// Add conditional menu item.
+		if ($args->theme_location == $options['selected_menu']) {
+			try {
+				if (!empty(retrieve_token())) {
+					$link = '<a class="menu-link elementor-item" href="' . $options['account_page'] . '">My Account</a>';
+					$link .= '<a class="menu-link elementor-item policycloud-logout">Log out</a>';
+				} else {
+					$link = '<a class="menu-link elementor-item" href="' . $options['login_page'] . '">Log In</a>';
+					$link .= '<a class="menu-link elementor-item" href="' . $options['registration_page'] . '">Register</a>';
+				}
+			} catch (\Exception $e) {
+				$link = '<a class="menu-link elementor-item" href="' . $options['login_page'] . '">Log In</a>';
+			}
+			return $items . '<li class="menu-item menu-item-type-post_type menu-item-object-page policycloud-access-button">' . $link . '</li>';
+		} else return $items;
 	}
 
 	/**
@@ -123,7 +171,7 @@ class PolicyCloud_Marketplace_Public
 				$logged_in = true;
 			}
 		} catch (\Exception $e) {
-			$error_message =  $e->getMessage();
+			$logged_in = false;
 		}
 
 		wp_enqueue_script("policycloud-marketplace-account-registration");
@@ -299,7 +347,7 @@ class PolicyCloud_Marketplace_Public
 
 				// Get the user's descriptions.
 				if (!empty($account_information)) {
-					$descriptions = get_user_descriptions(($visiting) ? $_GET['user'] : $token['decoded']['username'], $token['encoded'] ?? null, [
+					$descriptions = get_user_assets(($visiting) ? $_GET['user'] : $token['decoded']['username'], $token['encoded'] ?? null, [
 						'page' => $_GET['page'] ?? null,
 						'items_per_page' => $_GET['items_per_page'] ?? null,
 						'sort_by' => $_GET['sort_by'] ?? null,
@@ -351,7 +399,7 @@ class PolicyCloud_Marketplace_Public
 	 * @uses 	PolicyCloud_Marketplace_Public::account_registration()
 	 * @since	1.0.0
 	 */
-	public function account_edit_handler()
+	public function account_editing_handler()
 	{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 
@@ -414,7 +462,7 @@ class PolicyCloud_Marketplace_Public
 	 * 
 	 * @since	1.0.0
 	 */
-	public function user_email_verification_resend_handler()
+	public function account_email_verification_resend_handler()
 	{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 
@@ -472,7 +520,7 @@ class PolicyCloud_Marketplace_Public
 				http_response_code(200);
 				die(json_encode([
 					'information' => $token['decoded'],
-					'assets' => get_user_descriptions($token['decoded']['username'], $token['encoded'])
+					'assets' => get_user_assets($token['decoded']['username'], $token['encoded'])
 				]));
 			} else {
 				http_response_code(404);
@@ -534,37 +582,13 @@ class PolicyCloud_Marketplace_Public
 		}
 	}
 
-
 	/**
-	 * Add a menu item to a selected menu, which conditionally switches
-	 * from log in to log out actions.
 	 * 
-	 * @since    1.0.0
+	 * Content
+	 * 
+	 * This section refers to functionality and shortcodes relevant to content.
+	 * 
 	 */
-	public static function add_conditional_access_menu_item($items, $args)
-	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
-
-		// Retrieve credentials.
-		$options = get_option('policycloud_marketplace_plugin_settings');
-		if (empty($options['selected_menu']) || empty($options['login_page']) || empty($options['account_page']) || empty($options['registration_page'])) return $items;
-
-		// Add conditional menu item.
-		if ($args->theme_location == $options['selected_menu']) {
-			try {
-				if (!empty(retrieve_token())) {
-					$link = '<a class="menu-link elementor-item" href="' . $options['account_page'] . '">My Account</a>';
-					$link .= '<a class="menu-link elementor-item policycloud-logout">Log out</a>';
-				} else {
-					$link = '<a class="menu-link elementor-item" href="' . $options['login_page'] . '">Log In</a>';
-					$link .= '<a class="menu-link elementor-item" href="' . $options['registration_page'] . '">Register</a>';
-				}
-			} catch (\Exception $e) {
-				$link = '<a class="menu-link elementor-item" href="' . $options['login_page'] . '">Log In</a>';
-			}
-			return $items . '<li class="menu-item menu-item-type-post_type menu-item-object-page policycloud-access-button">' . $link . '</li>';
-		} else return $items;
-	}
 
 	/**
 	 * Register all the shortcodes concerning content handling.
@@ -581,71 +605,10 @@ class PolicyCloud_Marketplace_Public
 		add_shortcode('policycloud-marketplace-read-single', 'PolicyCloud_Marketplace_Public::read_single_object');
 
 		// Create object sequence.
-		add_shortcode('policycloud-marketplace-create-object', 'PolicyCloud_Marketplace_Public::object_creation_shortcode');
+		add_shortcode('policycloud-marketplace-create-object', 'PolicyCloud_Marketplace_Public::asset_creation_shortcode');
 
 		// Account page shortcode.
 		add_shortcode('policycloud-marketplace-account', 'PolicyCloud_Marketplace_Public::account_shortcode');
-	}
-
-	/**
-	 * Handle description editing AJAX requests.
-	 *
-	 * @uses	PolicyCloud_Marketplace_Public::description_editing()
-	 * @since	1.0.0
-	 */
-	public function description_edit_handler()
-	{
-
-		// Verify WordPress generated nonce.
-		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_description_editing_verification')) {
-			die("Unverified request to edit description object.");
-		}
-
-		// Attempt to edit the description using POST data.
-		try {
-			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
-
-			description_editing($_POST);
-			die(json_encode([
-				'status' => 'success'
-			]));
-		} catch (Exception $e) {
-			die(json_encode([
-				'status' => 'failure',
-				'data' => $e->getMessage()
-			]));
-		}
-	}
-
-	/**
-	 * Handle description creation AJAX requests.
-	 *
-	 * @uses	PolicyCloud_Marketplace_Public::description_creation()
-	 * @since	1.0.0
-	 */
-	public function object_creation_handler()
-	{
-		// Verify WordPress generated nonce.
-		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_description_creation_verification')) {
-			die("Unverified request to create description object.");
-		}
-
-		// Attempt to edit the description using POST data.
-		try {
-			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
-
-			if (!empty($_POST['title']) && !empty($_POST['type']) && !empty($_POST['owner']) && !empty($_POST['description'])) {
-				die(json_encode([
-					'status' => 'success',
-					'id' => create_description($_POST)
-				]));
-			} else throw new Exception("Please fill in all the required fields.");
-		} catch (Exception $e) {
-			die(json_encode([
-				'status' => 'failure',
-				'data' => $e->getMessage()
-			]));
-		}
 	}
 
 	/**
@@ -653,7 +616,7 @@ class PolicyCloud_Marketplace_Public
 	 *
 	 * @since    1.0.0
 	 */
-	public static function object_creation_shortcode()
+	public static function asset_creation_shortcode()
 	{
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
@@ -661,7 +624,7 @@ class PolicyCloud_Marketplace_Public
 		try {
 			// Get specific Description data for authorized users.
 			$token = retrieve_token();
-			if (empty($token)) $error_message = "You need to be logged in to create a Description Object.";
+			if (empty($token)) $error_message = "You need to be logged in to create an Asset.";
 		} catch (Exception $e) {
 			$error_message = $e->getMessage();
 		}
@@ -670,15 +633,100 @@ class PolicyCloud_Marketplace_Public
 		$options = get_option('policycloud_marketplace_plugin_settings');
 		if (empty($options['account_page'])) $error_message = "You have not set an account page in your PolicyCloud Marketplace settings.";
 
-		wp_enqueue_script("policycloud-marketplace-object-create");
-		wp_localize_script('policycloud-marketplace-object-create', 'ajax_properties_object_creation', array(
+		wp_enqueue_script("policycloud-marketplace-asset-creation");
+		wp_localize_script('policycloud-marketplace-asset-creation', 'ajax_properties_asset_creation', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
-			'nonce' => wp_create_nonce('ajax_policycloud_description_creation_verification'),
+			'nonce' => wp_create_nonce('ajax_policycloud_asset_creation_verification'),
 			'account_page' => $options['account_page']
 		));
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 		object_creation_html($error_message ?? '');
+	}
+
+	/**
+	 * Handle description creation AJAX requests.
+	 *
+	 * @uses	PolicyCloud_Marketplace_Public::description_creation()
+	 * @since	1.0.0
+	 */
+	public function asset_creation_handler()
+	{
+		// Verify WordPress generated nonce.
+		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_asset_creation_verification')) {
+			http_response_code(403);
+			die("Unverified request to create an asset.");
+		}
+
+		// TODO @alexandrosraikos: Check all $_POST fields.
+
+		try {
+			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+			$token = retrieve_token();
+			if (!empty($token)) {
+				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
+				$asset_id = create_asset($_POST, $token);
+				http_response_code(200);
+				die(json_encode($asset_id));
+			} else {
+				http_response_code(404);
+				die("User token not found.");
+			}
+		} catch (RuntimeException $e) {
+			http_response_code(400);
+			die($e->getMessage());
+		} catch (InvalidArgumentException $e) {
+			http_response_code(404);
+			die($e->getMessage());
+		} catch (JsonException $e) {
+			http_response_code(440);
+			die();
+		} catch (ErrorException $e) {
+			http_response_code(500);
+			die($e->getMessage());
+		}
+	}
+
+	/**
+	 * Handle description editing AJAX requests.
+	 *
+	 * @uses	PolicyCloud_Marketplace_Public::description_editing()
+	 * @since	1.0.0
+	 */
+	public function asset_editing_handler()
+	{
+
+		// Verify WordPress generated nonce.
+		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_asset_editing_verification')) {
+			http_response_code(403);
+			die("Unverified request to edit this asset.");
+		}
+
+		// TODO @alexandrosraikos: Check all $_POST fields (waiting on asset editing form).
+
+		try {
+			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+			$token = retrieve_token();
+			if (!empty($token)) {
+				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
+				if(edit_asset($_POST['id'], $_POST, $token)) http_response_code(200);
+			} else {
+				http_response_code(404);
+				die("User token not found.");
+			}
+		} catch (RuntimeException $e) {
+			http_response_code(400);
+			die($e->getMessage());
+		} catch (InvalidArgumentException $e) {
+			http_response_code(404);
+			die($e->getMessage());
+		} catch (JsonException $e) {
+			http_response_code(440);
+			die();
+		} catch (ErrorException $e) {
+			http_response_code(500);
+			die($e->getMessage());
+		}
 	}
 
 	/**
@@ -693,7 +741,7 @@ class PolicyCloud_Marketplace_Public
 
 		try {
 			// Retrieve all public descriptions based on GET parameter filtering.
-			$descriptions = get_descriptions($_GET);
+			$descriptions = get_assets($_GET);
 		} catch (ErrorException $e) {
 			$notice = $e->getMessage();
 		} catch (Exception $e) {
@@ -731,11 +779,11 @@ class PolicyCloud_Marketplace_Public
 			// Get specific Description data for authorized users.
 			$token = retrieve_token(true);
 			if (!empty($token)) {
-				$description = get_specific_description($_GET['did'], $token['encoded']);
+				$description = get_asset($_GET['did'], $token['encoded']);
 
 				// Specify Description ownership.
 				$owner = ($description['info']['provider'] == $token['decoded']['username']);
-			} else $description = get_specific_description($_GET['did']);
+			} else $description = get_asset($_GET['did']);
 		} catch (Exception $e) {
 			$error = $e->getMessage();
 		}

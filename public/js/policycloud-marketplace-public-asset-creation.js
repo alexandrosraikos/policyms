@@ -18,10 +18,10 @@
 
       // Perform AJAX request.
       $.ajax({
-        url: ajax_properties_object_creation.ajax_url,
+        url: ajax_properties_asset_creation.ajax_url,
         type: "post",
         data: {
-          action: "policycloud_marketplace_object_creation",
+          action: "policycloud_marketplace_asset_creation",
           nonce: ajax_properties_object_creation.nonce,
           title: $("input[name=title]").val(),
           type: $("input[name=type]").val(),
