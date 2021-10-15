@@ -1724,6 +1724,89 @@ section.policycloud-account-assets
   margin-right: 8px;
 }
 
+/* Reviews tab */
+
+section.policycloud-account-reviews header form.selector {
+  display: inline;
+}
+
+section.policycloud-account-reviews header form.selector * {
+  width: auto;
+  display: inline-block;
+  float: none;
+  margin-right: 5px;
+  padding: 0 5px;
+}
+
+section.policycloud-account-reviews
+  #policycloud-account-review-collection-filters {
+  margin-bottom: 20px;
+  border-top: 1px solid var(--policycloud-border-color-light);
+  border-bottom: 1px solid var(--policycloud-border-color-light);
+  padding: 15px 0;
+  font-size: 75%;
+  font-weight: bold;
+}
+
+section.policycloud-account-reviews #policycloud-account-reviews-list > ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+section.policycloud-account-reviews #policycloud-account-reviews-list li {
+  list-style-type: none;
+  margin: 5px 0;
+  padding: 15px 10px;
+  border-top: 1px solid var(--policycloud-border-color-light);
+}
+
+section.policycloud-account-reviews #policycloud-account-reviews-list .rating {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+section.policycloud-account-reviews
+  #policycloud-account-reviews-list
+  .rating
+  span:first-of-type {
+  font-size: 32px;
+  font-weight: bold;
+}
+
+section.policycloud-account-reviews
+  #policycloud-account-reviews-list
+  .rating
+  span:last-of-type {
+  font-size: 16px;
+  margin-left: 10px;
+  color: var(--policycloud-text-color-secondary);
+}
+
+section.policycloud-account-reviews
+  #policycloud-account-reviews-list
+  .review
+  p {
+  color: var(--policycloud-text-color);
+  margin: 15px 0;
+}
+
+section.policycloud-account-reviews
+  #policycloud-account-reviews-list
+  .review
+  a {
+  color: var(--policycloud-text-color-secondary);
+  text-decoration: none;
+}
+
+section.policycloud-account-reviews
+  #policycloud-account-reviews-list
+  .review
+  .metadata {
+  font-size: 14px;
+  margin-top: 10px;
+}
+
 /* Information tab */
 
 section.policycloud-account-information table.information {
@@ -2008,6 +2091,10 @@ a#policycloud-marketplace-resend-verification-email.disabled:hover {
     flex: unset;
     height: 200px;
     margin-bottom: 25px;
+  }
+
+  section.policycloud-account-reviews #policycloud-account-reviews-list li {
+    margin: 10px 0;
   }
 
   section.policycloud-account-information

@@ -347,7 +347,12 @@ class PolicyCloud_Marketplace_Public
 
 				// Get the user's descriptions.
 				if (!empty($account_information)) {
-					$descriptions = get_user_assets(($visiting) ? $_GET['user'] : $token['decoded']['username'], $token['encoded'] ?? null, [
+					$descriptions = get_account_assets(($visiting) ? $_GET['user'] : $token['decoded']['username'], $token['encoded'] ?? null, [
+						'page' => $_GET['page'] ?? null,
+						'items_per_page' => $_GET['items_per_page'] ?? null,
+						'sort_by' => $_GET['sort_by'] ?? null,
+					]);
+					$reviews = get_account_reviews(($visiting) ? $_GET['user'] : $token['decoded']['username'], $token['encoded'] ?? null, [
 						'page' => $_GET['page'] ?? null,
 						'items_per_page' => $_GET['items_per_page'] ?? null,
 						'sort_by' => $_GET['sort_by'] ?? null,
@@ -380,7 +385,7 @@ class PolicyCloud_Marketplace_Public
 
 		// Print shortcode HTML.
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		account_html($account_information ?? [], $descriptions ?? [], $statistics ?? [], [], [
+		account_html($account_information ?? [], $statistics ?? [], $descriptions ?? [], $reviews ?? [], [
 			"is_admin" => $is_admin ?? false,
 			"visiting" => $visiting ?? false,
 			"error" => $error ?? '',

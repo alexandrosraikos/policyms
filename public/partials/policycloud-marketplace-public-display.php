@@ -142,6 +142,8 @@ function account_authorization_html($registration_url, $logged_in)
 
 function read_multiple_html($description_objects, $args)
 {
+    // TODO @alexandrosraikos: Rename and clean up shortcode (after the account page).
+
     /** 
      * TODO @elefkour: Create filter queries in form.
      * + add submit button
@@ -308,7 +310,7 @@ function read_multiple_html($description_objects, $args)
 
 function read_single_html($description_object, $args)
 {
-    // TODO @elefkour: Remove comments, use PHP - check IFs for empty fields.
+    // TODO @alexandrosraikos: Rename and clean up shortcode (after the account & assets page).
 
     //echo 'Hello ' . htmlspecialchars($_GET["did"]) . '!';
     // echo $args['description'];
@@ -663,11 +665,9 @@ function time_elapsed_string($datetime, $full = false)
  * @since   1.0.0
  * @author  Alexandros Raikos <araikos@unipi.gr>
  */
-function account_html(array $information, array $assets, array $statistics, array $reviews, array $args = [])
+function account_html(array $information, array $statistics, array $assets, array $reviews, array $args = [])
 {
     // TODO @alexandrosraikos: Support uploading and viewing a profile picture (waiting on @vkoukos).
-    // TODO @alexandrosraikos: Mockup and add reviews. (Visible by all, editable & deletable by owner, deletable by admin).
-    // TODO @alexandrosraikos: Rearrange statistics labels based on instructions.
 
     // Check for any errors regarding authorization.
     if (!empty($args['error'])) {
@@ -739,22 +739,12 @@ function account_html(array $information, array $assets, array $statistics, arra
                             <table class="statistics">
                                 <tr>
                                     <td>
-                                        <div class="large-figure"><span class="fas fa-check"></span> <?php echo $statistics['approved_descriptions'] ?></div>
-                                        <div class="assets-caption">Approved descriptions</div>
-                                    </td>
-                                    <td>
-                                        <div class="large-figure"><span class="fas fa-file"></span> <?php echo $statistics['assets_uploaded'] ?></div>
-                                        <div>Assets uploaded</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="large-figure"><span class="fas fa-star"></span> <?php echo $statistics['average_rating'] ?></div>
-                                        <div class="assets-caption">Average rating</div>
-                                    </td>
-                                    <td>
                                         <div class="large-figure"><span class="fas fa-list"></span> <?php echo $statistics['total_descriptions'] ?></div>
                                         <div class="assets-caption">Total descriptions</div>
+                                    </td>
+                                    <td>
+                                        <div class="large-figure"><span class="fas fa-check"></span> <?php echo $statistics['approved_descriptions'] ?></div>
+                                        <div class="assets-caption">Approved descriptions</div>
                                     </td>
                                 </tr>
                                 <tr>
@@ -763,8 +753,18 @@ function account_html(array $information, array $assets, array $statistics, arra
                                         <div class="assets-caption">Total downloads</div>
                                     </td>
                                     <td>
+                                        <div class="large-figure"><span class="fas fa-file"></span> <?php echo $statistics['assets_uploaded'] ?></div>
+                                        <div>Assets uploaded</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
                                         <div class="large-figure"><span class="fas fa-comment"></span> <?php echo $statistics['total_reviews'] ?></div>
                                         <div class="assets-caption">Total reviews</div>
+                                    </td>
+                                    <td>
+                                        <div class="large-figure"><span class="fas fa-star"></span> <?php echo $statistics['average_rating'] ?></div>
+                                        <div class="assets-caption">Average rating</div>
                                     </td>
                                 </tr>
                                 <tr>
@@ -865,8 +865,79 @@ function account_html(array $information, array $assets, array $statistics, arra
                     <section class="policycloud-account-reviews">
                         <header>
                             <h3>Reviews</h3>
+                            <div class="actions">
+                                <form action="" class="selector">
+                                    <label for="sort-by">Sort by</label>
+                                    <select name="sort-by">
+                                        <?php 
+                                        // TODO @alexandrosraikos: Tweak and activate filters for reviews. 
+                                        ?>
+                                        <option value="newest" <?php echo ((($_GET['sort_by'] ?? '' == 'newest') || empty($_GET['sort_by'])) ? "selected" : "") ?>>Newest</option>
+                                        <option value="oldest" <?php echo (($_GET['sort_by'] ?? '' == 'oldest') ? "selected" : "") ?>>Oldest</option>
+                                        <option value="rating-asc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-asc') ? "selected" : "") ?>>Highest rated</option>
+                                        <option value="rating-desc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-desc') ? "selected" : "") ?>>Lowest rated</option>
+                                    </select>
+                                    <label for="items-per-page">Items per page</label>
+                                    <select name="items-per-page">
+                                        <option value="5" <?php echo ((($_GET['items_per_page'] ?? '' == '5') || empty($_GET['items_per_page'])) ? "selected" : "") ?>>5</option>
+                                        <option value="10" <?php echo (($_GET['items_per_page'] ?? '' == '10') ? "selected" : "") ?>>10</option>
+                                        <option value="25" <?php echo (($_GET['items_per_page'] ?? '' == '25') ? "selected" : "") ?>>25</option>
+                                        <option value="50" <?php echo (($_GET['items_per_page'] ?? '' == '50') ? "selected" : "") ?>>50</option>
+                                        <option value="100" <?php echo (($_GET['items_per_page'] ?? '' == '100') ? "selected" : "") ?>>100</option>
+                                    </select>
+                                </form>
+                            </div>
                         </header>
-                        <p>Coming soon!</p>
+                        <div id="policycloud-account-review-collection-filters">
+                            <div>Filter by type:</div>
+                        </div>
+                        <div id="policycloud-account-reviews-list">
+                            <?php
+                            if (!empty($reviews['results'])) {
+                                foreach ($reviews['results'] as $page => $grouped_reviews) {
+                            ?>
+                                    <ul data-page="<?php echo $page + 1 ?>" class="<?php echo ($page == ($_GET['page'] ?? 0)) ? 'visible' : '' ?>">
+                                        <?php
+                                        if (!empty($reviews)) {
+                                            foreach ($grouped_reviews as $review) {
+                                        ?>
+                                                <li data-date-created="<?php echo strtotime($review['initial_review_date']) ?>" data-rating="<?php echo $review['rating'] ?>" class="visible">
+                                                    <div class="review">
+                                                        <div class="rating">
+                                                            <span><span class="fas fa-star"></span> <?php echo $review['rating'] ?></span>
+                                                            <span>Posted <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($review['initial_review_date']))) ?></span>
+                                                        </div>
+                                                        <p>"<?php echo $review['comment'] ?>"</p>
+                                                        <a href="<?php echo $args['description_page'] . "?did=" . $review['did'] ?>">
+                                                            <h4><?php echo $review['title'] ?></h4>
+                                                        </a>
+                                                        <div class="metadata">
+                                                            <a class="pill"><?php echo $review['collection']  ?></a>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            <?php
+                                            }
+                                        } else {
+                                            ?>
+                                            <p class="policycloud-account-notice">Upload your first review to get started.</p>
+                                        <?php } ?>
+                                    </ul>
+                            <?php
+                                }
+                            } else {
+                                show_alert('This user has not uploaded any reviews yet.', false, 'notice');
+                            } ?>
+                            <nav class="pagination">
+                                <?php
+                                // TODO @alexandrosraikos: Tweak and test pagination. (waiting on @vkoukos for a user with many reviews).
+                                if (count($reviews['results'] ?? []) > 1) {
+                                    foreach ($reviews['results'] as $page => $grouped_reviews) {
+                                        echo '<button class="page-selector ' . (($page == ($_GET['page'] ?? 0)) ? 'active' : '') . '" data-reviews-page="' . $page + 1 . '">' . ($page + 1) . '</button>';
+                                    }
+                                } ?>
+                            </nav>
+                        </div>
                     </section>
                     <section class="policycloud-account-information">
                         <header>

@@ -1,59 +1,7 @@
 <?php
 
-/**
- * Send a request to the PolicyCloud Marketplace API. 
- * Documentation: https://documenter.getpostman.com/view/16776360/TzsZs8kn#intro
- * 
- * @param string $http_method The standardized HTTP method used for the request.
- * @param array $data The data to be sent according to the documented schema.
- * @param string $token The encoded user access token.
- * @param array $additional_headers Any additional HTTP headers for the request.
- * 
- * @throws InvalidArgumentException For missing WordPress settings.
- * @throws ErrorException For connectivity and other API issues.
- * 
- * @since   1.0.0
- * @author  Alexandros Raikos <araikos@unipi.gr>
- */
-function policyCloudMarketplaceAPIRequest($http_method, $uri, $data = [], $token = null, $additional_headers = [])
-{
-
-    // Retrieve hostname URL.
-    $options = get_option('policycloud_marketplace_plugin_settings');
-    if (empty($options['marketplace_host'])) throw new InvalidArgumentException("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
-
-    // Contact Marketplace login API endpoint.
-    $curl = curl_init();
-    curl_setopt_array($curl, [
-        CURLOPT_URL => 'https://' . $options['marketplace_host'] . $uri,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => $http_method,
-        CURLOPT_POSTFIELDS => (!empty($data)) ? json_encode($data) : null,
-        CURLOPT_HTTPHEADER => array_merge(['Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null), 'x-more-time: 1'], $additional_headers)
-    ]);
-
-    // Get the data.
-    $response = json_decode(curl_exec($curl), true);
-
-    // Handle errors.
-    if (curl_errno($curl)) {
-        throw new Exception("Unable to reach the Marketplace server. More details: " . curl_error($curl));
-    }
-
-    // Close the session.
-    curl_close($curl);
-
-    // Handle response.
-    if (!isset($response)) {
-        throw new ErrorException("The Marketplace API response was invalid.");
-    } elseif ($response['_status'] == 'successful') {
-        return $response;
-    } else throw new ErrorException($response['message']);
+if (!function_exists("policyCloudMarketplaceAPIRequest")) {
+    require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 }
 
 /**
@@ -120,7 +68,7 @@ function get_assets(array $args)
  *
  * @param   string $uid The relevant username.
  * @param	array $args An array of arguments to filter the search. NOTICE: When filtering with
- * items_per_page the returning descriptions will be arranged in arrays.
+ * items_per_page the returning assets will be arranged in arrays.
  * 
  * @throws  LogicException If the sorting setting is unsupported.
  * 
@@ -129,7 +77,7 @@ function get_assets(array $args)
  * @since   1.0.0
  * @author  Alexandros Raikos <araikos@unipi.gr>
  */
-function get_user_assets(string $uid, string $token = null, array $args = [])
+function get_account_assets(string $uid, string $token = null, array $args = [])
 {
     // Check arguments
     if (!empty($args['sort_by'])) {
@@ -155,6 +103,54 @@ function get_user_assets(string $uid, string $token = null, array $args = [])
     return policyCloudMarketplaceAPIRequest(
         'GET',
         '/descriptions/provider/' . $uid . '/all' . $filters,
+        [],
+        $token
+    );
+}
+
+/**
+ * Retrieve account specific Reviews from the Marketplace API.
+ *
+ * To learn more about the Marketplace API data schema for retrieving objects and filtering them, visit:
+ * https://documenter.getpostman.com/view/16776360/TzsZs8kn#e8f85a28-7e5d-419f-9892-0f5eb7a2ef10
+ *
+ * @param   string $uid The relevant username.
+ * @param	array $args An array of arguments to filter the search. NOTICE: When filtering with
+ * items_per_page the returning reviews will be arranged in arrays.
+ * 
+ * @throws  LogicException If the sorting setting is unsupported.
+ * 
+ * @uses    policyCloudMarketplaceAPIRequest()
+ * 
+ * @since   1.0.0
+ * @author  Alexandros Raikos <araikos@unipi.gr>
+ */
+function get_account_reviews(string $uid, string $token = null, array $args = [])
+{
+    // Check arguments
+    if (!empty($args['sort_by'])) {
+        if (
+            $args['sort_by'] != 'newest' ||
+            $args['sort_by'] != 'oldest' ||
+            $args['sort_by'] != 'rating-asc' ||
+            $args['sort_by'] != 'rating-desc' ||
+            $args['sort_by'] != 'views-asc' ||
+            $args['sort_by'] != 'views-desc' ||
+            $args['sort_by'] != 'title'
+        ) {
+            throw new LogicException('The '.$args['sort_by'].' sorting setting was not found.');
+        }
+    }
+
+    $filters = '?' . http_build_query([
+        'sortBy' => $args['sort_by'] ?? null,
+        'page' => $args['assets_page'] ?? null,
+        'itemsPerPage' => $args['items_per_page'] ?? 5
+    ]);
+
+    return policyCloudMarketplaceAPIRequest(
+        'GET',
+        '/descriptions/review/' . $uid . $filters,
         [],
         $token
     );
