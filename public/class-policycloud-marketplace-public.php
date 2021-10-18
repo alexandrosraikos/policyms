@@ -340,10 +340,11 @@ class PolicyCloud_Marketplace_Public
 					$account_information = json_decode(json_encode($token['decoded']), true);
 					$visiting = false;
 				} else {
-					$is_admin = $token['decoded']['account']['role'] == 'admin';
 					$visiting = true;
 					$account_information = get_user_information($_GET['user'], $token['encoded']);
 				}
+
+				$is_admin = (($token['decoded']['account']['role'] ?? '') == 'admin');
 
 				// Get the user's descriptions.
 				if (!empty($account_information)) {
@@ -357,6 +358,9 @@ class PolicyCloud_Marketplace_Public
 						'items_per_page' => $_GET['items_per_page'] ?? null,
 						'sort_by' => $_GET['sort_by'] ?? null,
 					]);
+					if($is_admin && !$visiting) {
+						$approvals = get_pending_assets($token['encoded']);
+					}
 				}
 			} else $error = "not-logged-in";
 
@@ -385,7 +389,7 @@ class PolicyCloud_Marketplace_Public
 
 		// Print shortcode HTML.
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		account_html($account_information ?? [], $statistics ?? [], $descriptions ?? [], $reviews ?? [], [
+		account_html($account_information ?? [], $statistics ?? [], $descriptions ?? [], $reviews ?? [], $approvals ?? [], [
 			"is_admin" => $is_admin ?? false,
 			"visiting" => $visiting ?? false,
 			"error" => $error ?? '',
@@ -525,7 +529,7 @@ class PolicyCloud_Marketplace_Public
 				http_response_code(200);
 				die(json_encode([
 					'information' => $token['decoded'],
-					'assets' => get_user_assets($token['decoded']['username'], $token['encoded'])
+					'assets' => get_account_assets($token['decoded']['username'], $token['encoded'])
 				]));
 			} else {
 				http_response_code(404);

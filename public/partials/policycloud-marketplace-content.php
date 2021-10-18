@@ -58,6 +58,44 @@ function get_assets(array $args)
 }
 
 /**
+ * Retrieve private Assets in pending state from the Marketplace API, also filtered by collection.
+ *
+ * To learn more about the Marketplace API data schema for retrieving objects and filtering them, visit:
+ * https://documenter.getpostman.com/view/16776360/TzsZs8kn#f3cb0963-533d-44d1-9706-b686fdc3a3d2
+ *
+ * @param	array $args An array of arguments to filter the search.
+ * 
+ * @uses    policyCloudMarketplaceAPIRequest()
+ * 
+ * @since   1.0.0
+ * @author  Alexandros Raikos <araikos@unipi.gr>
+ */
+function get_pending_assets(string $token, array $args = [])
+{
+    // Get all descriptions.
+    if (empty($args['collections'])) {
+        return policyCloudMarketplaceAPIRequest(
+            'GET',
+            '/descriptions/permit/all',
+            [],
+            $token
+        );
+    }
+
+    // Filtering by collection.
+    else {
+        return array_map(function ($collection) use ($token) {
+            return policyCloudMarketplaceAPIRequest(
+                'GET',
+                '/descriptions/permit/' . $collection,
+                [],
+                $token
+            );
+        }, (is_array($args['collection']) ? $args['collection'] : [$args['collection']]));
+    }
+}
+
+/**
  * Retrieve user specific Assets from the Marketplace API, also filtered by collection.
  *
  * To learn more about the Marketplace API data schema for retrieving objects and filtering them, visit:

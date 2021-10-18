@@ -23,14 +23,9 @@
      */
     function switchTab(e) {
       e.preventDefault();
-      $(
-        "section.policycloud-account-overview, section.policycloud-account-reviews, section.policycloud-account-assets, section.policycloud-account-information"
-      ).removeClass("focused");
+      $("#policycloud-account section").removeClass("focused");
       $("section." + $(this).attr("id")).addClass("focused");
-
-      $(
-        "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-reviews, button#policycloud-account-information"
-      ).removeClass("active");
+      $("#policycloud-account nav button").removeClass("active");
       $(this).addClass("active");
       var hashPrepare = $(this).attr("id").split("-");
       window.location.hash = "#" + hashPrepare[hashPrepare.length - 1];
@@ -49,7 +44,7 @@
 
     // Change account navigation tab.
     $(
-      "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-reviews, button#policycloud-account-information"
+      "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-reviews, button#policycloud-account-asset-approvals, button#policycloud-account-information"
     ).click(switchTab);
 
     // Hash determines active tab?
@@ -66,10 +61,10 @@
     }
 
     /**
-     * Assets
+     * Assets / Reviews / Approvals
      * ---------
      * This section contains all the functionality
-     * related to the Assets tab.
+     * related to the Assets, Reviews and Approvals tabs.
      *
      * Sorting, viewing and filtering takes place here.
      *
@@ -78,6 +73,7 @@
     /**
      * Rearranges all the assets (as list items) into new lists,
      * based on the properties of the shortcode's Assets section.
+     * @param {String} category The category of list items to rearrange.
      * @param {Boolean} rememberPage Pass *true* to stay on the same page after
      * the rearrangement.
      * @param {Int} itemsPerPage Defaults to form value and can
@@ -88,35 +84,37 @@
      * @author Alexandros Raikos <araikos@unipi.gr>
      */
     function rearrageAssetsLists(
+      category,
       rememberPage = false,
       itemsPerPage = $(
-        ".policycloud-account-assets form.selector select[name=items-per-page]"
+        ".policycloud-account-" +
+          category +
+          " form.selector select[name=items-per-page]"
       ).val(),
       sortBy = $(
-        ".policycloud-account-assets form.selector select[name=sort-by]"
+        ".policycloud-account-" +
+          category +
+          " form.selector select[name=sort-by]"
       ).val()
     ) {
       // Get structure and clear DOM.
-      var items = $("#policycloud-account-assets-list ul li.visible");
-      var hiddenItems = $(
-        "#policycloud-account-assets-list ul li:not(.visible)"
-      );
+      var items = $("ul." + category + " li.visible");
+      var hiddenItems = $("ul." + category + " li:not(.visible)");
       var activePage = rememberPage
-        ? $("#policycloud-account-assets-list ul.visible").data("page")
+        ? $("ul." + category + ".visible").data("page")
         : 1;
-
-      $("#policycloud-account-assets-list").empty();
+      $("#policycloud-account-" + category + "-list").empty();
 
       // Sort by property.
       switch (sortBy) {
         case "newest":
           items.sort((a, b) => {
-            return $(a).data("date-updated") > $(b).data("date-updated");
+            return $(a).data("date-updated") < $(b).data("date-updated");
           });
           break;
         case "oldest":
           items.sort((a, b) => {
-            return $(a).data("date-updated") < $(b).data("date-updated");
+            return $(a).data("date-updated") > $(b).data("date-updated");
           });
           break;
         case "rating-asc":
@@ -151,24 +149,30 @@
       for (let i = 0; i < items.length; i++) {
         if (i == 0 || i % itemsPerPage == 0) {
           // Add page.
-          $("#policycloud-account-assets-list").prepend(
+          $("#policycloud-account-" + category + "-list").prepend(
             '<ul data-page="' +
               page +
               '" class="' +
+              category +
+              " " +
               (page == activePage ? "visible" : "") +
               '"></ul>'
           );
 
           // Add pagination and buttons.
           if (i == 0) {
-            $("#policycloud-account-assets-list").append(
+            $("#policycloud-account-" + category + "-list").append(
               '<nav class="pagination"></nav>'
             );
           }
-          $("#policycloud-account-assets-list nav.pagination").append(
-            '<button class="page-selector' +
+          $("#policycloud-account-" + category + "-list nav.pagination").append(
+            '<button data-category="' +
+              category +
+              '" class="page-selector' +
               (page == activePage ? " active" : "") +
-              '" data-assets-page="' +
+              '" data-' +
+              category +
+              '-page="' +
               page +
               '">' +
               page +
@@ -177,37 +181,44 @@
           page++;
         }
         // Add items to page.
-        $(
-          "#policycloud-account-assets-list ul[data-page='" + (page - 1) + "']"
-        ).append(items[i]);
+        $("ul[data-page='" + (page - 1) + "']." + category).append(items[i]);
       }
 
       // Add hidden items list for future use.
-      $("#policycloud-account-assets-list").append('<ul class="hidden"></ul>');
-      $("#policycloud-account-assets-list ul.hidden").append(hiddenItems);
+      $("#policycloud-account-" + category + "-list").append(
+        '<ul class="' + category + ' hidden"></ul>'
+      );
+      $("#policycloud-account-" + category + "-list ul.hidden").append(
+        hiddenItems
+      );
     }
 
     /**
      * Print the collection filter buttons by reading the
      * available collections in the asset list.
      *
-     * @param {String} tab The tab in which the filters are being displayed
+     * @param {String} category The tab in which the filters are being displayed
      * (currently only supports `asset` and `review`).
      * @param {[String]} collections
      *
      * @author Alexandros Raikos <araikos@unipi.gr>
      */
-    function calculateCollectionFilters(tab, collections = null) {
+    function calculateCollectionFilters(category, collections = null) {
       if (collections == null) {
         var collections = [];
-        $.each($("#policycloud-account-" + tab + "s-list ul li"), function () {
-          if (!collections.includes($(this).data("type-filter")))
-            collections.push($(this).data("type-filter"));
-        });
+        $.each(
+          $('.paginated-list[data-category="' + category + 's"] li'),
+          function () {
+            if (!collections.includes($(this).data("type-filter")))
+              collections.push($(this).data("type-filter"));
+          }
+        );
       }
       for (let i = 0; i < collections.length; i++) {
-        $("#policycloud-account-" + tab + "-collection-filters").append(
-          '<button class="outlined" data-type-filter="' +
+        $('.collection-filters[data-category="' + category + 's"]').append(
+          '<button class="outlined" data-category="' +
+            category +
+            's" data-type-filter="' +
             collections[i] +
             '">' +
             collections[i] +
@@ -221,34 +232,46 @@
      * of active asset list items.
      *
      * @listens click
-     * @param {Event} e
+     *
+     * @param {jQuery} button The filter button.
+     * @param {String} category The category of the list.
      *
      * @author Alexandros Raikos <araikos@unipi.gr>
      */
-    function applyFilters(e) {
-      e.preventDefault();
-
+    function applyFilters(category, collection) {
       // Highlight active button.
-      $(this).toggleClass("active");
+      $(
+        '#policycloud-account-content .collection-filters[data-category="' +
+          category +
+          '"] button[data-type-filter="' +
+          collection +
+          '"]'
+      ).toggleClass("active");
 
       // If at least one filter is active.
       if (
-        $("#policycloud-account-asset-collection-filters button.active")
+        $('.collection-filters[data-category="' + category + '"] button.active')
           .length > 0
       ) {
         // Remove "visible" class from every asset.
-        $("#policycloud-account-assets-list li").removeClass("visible");
+        $('.paginated-list[data-category="' + category + '"] li').removeClass(
+          "visible"
+        );
 
         // Iterate only active filters.
-        $("#policycloud-account-asset-collection-filters button.active").each(
+        $(
+          '.collection-filters[data-category="' + category + '"] button.active'
+        ).each(
           /**
            * Add "visible" class to filter matching data type assets.
            */
           function () {
             $(
-              "#policycloud-account-assets-list li[data-type-filter=" +
+              '.paginated-list[data-category="' +
+                category +
+                '"] li[data-type-filter="' +
                 $(this).data("type-filter") +
-                "]"
+                '"]'
             ).addClass("visible");
           }
         );
@@ -256,9 +279,11 @@
       // If no filter is active.
       else {
         // Add "visible" class to every asset.
-        $("#policycloud-account-assets-list li").addClass("visible");
+        $('.paginated-list[data-category="' + category + '"] li').addClass(
+          "visible"
+        );
       }
-      rearrageAssetsLists();
+      rearrageAssetsLists(category);
     }
 
     /**
@@ -271,21 +296,25 @@
      */
     function changePage(e) {
       e.preventDefault();
-      $(".policycloud-account-assets nav.pagination button").removeClass(
+      $("#policycloud-account-content nav.pagination button").removeClass(
         "active"
       );
-      $("#policycloud-account-assets-list > ul").removeClass("visible");
+      console.log($(this).data("category"));
+      $(
+        "#policycloud-account-content section ul." + $(this).data("category")
+      ).removeClass("visible");
       $(this).addClass("active");
       $(
-        "#policycloud-account-assets-list > ul[data-page='" +
-          $(this).attr("data-assets-page") +
-          "']"
+        "#policycloud-account-content section ul[data-page='" +
+          $(this).data($(this).data("category") + "-page") +
+          "']." +
+          $(this).data("category")
       ).addClass("visible");
     }
 
     /**
      *
-     * Assets interface actions & event listeners.
+     * Assets / Reviews / Approvals interface actions & event listeners.
      *
      */
 
@@ -293,10 +322,10 @@
     calculateCollectionFilters("asset");
     calculateCollectionFilters("review");
 
-    // Select different asset sorting.
-    $(".policycloud-account-assets form.selector select[name=sort-by]").change(
+    // Select different sorting.
+    $("#policycloud-account-content form.selector select[name=sort-by]").change(
       /**
-       * Rearranges the asset list on sorting value change.
+       * Rearranges the list on sorting value change.
        *
        * @listens change
        * @param {Event} e
@@ -305,16 +334,16 @@
        */
       function (e) {
         e.preventDefault();
-        rearrageAssetsLists(true);
+        rearrageAssetsLists($(this).data("category"), true);
       }
     );
 
     // Select different page size.
     $(
-      ".policycloud-account-assets form.selector select[name=items-per-page]"
+      "#policycloud-account-content form.selector select[name=items-per-page]"
     ).change(
       /**
-       * Rearranges the asset list on page size value change.
+       * Rearranges the list on page size value change.
        *
        * @listens change
        * @param {Event} e
@@ -323,28 +352,27 @@
        */
       function (e) {
         e.preventDefault();
-        rearrageAssetsLists();
+        rearrageAssetsLists($(this).data("category"));
       }
     );
 
-    // Filter asset by collection.
+    // Filter by collection.
     $(document).on(
       "click",
-      "#policycloud-account-asset-collection-filters button",
-      applyFilters
-    );
-
-    // Filter asset by collection.
-    $(document).on(
-      "click",
-      "#policycloud-account-review-collection-filters button",
-      applyFilters
+      "#policycloud-account-content .collection-filters button",
+      (e) => {
+        e.preventDefault();
+        applyFilters(
+          $(e.target).data("category"),
+          $(e.target).data("type-filter")
+        );
+      }
     );
 
     // Change page.
     $(document).on(
       "click",
-      ".policycloud-account-assets nav.pagination button",
+      "#policycloud-account-content nav.pagination button",
       changePage
     );
 
@@ -387,10 +415,8 @@
     function addWeblinkField(e) {
       e.preventDefault();
       $(
-        "#policycloud-marketplace-account-edit .socials > div > div:last-of-type"
-      )
-        .clone()
-        .appendTo("#policycloud-marketplace-account-edit .socials > div");
+        "<div><input type='text' name='socials-title[]' placeholder='Example' /><input type='url' name='socials-url[]' placeholder='https://www.example.org/' /><button class='remove-field' title='Remove this link.' ><span class='fas fa-times'></span></button></div>"
+      ).appendTo("#policycloud-marketplace-account-edit .socials > div");
       $(
         "#policycloud-marketplace-account-edit .socials button.remove-field"
       ).prop(

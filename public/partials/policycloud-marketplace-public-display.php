@@ -665,10 +665,8 @@ function time_elapsed_string($datetime, $full = false)
  * @since   1.0.0
  * @author  Alexandros Raikos <araikos@unipi.gr>
  */
-function account_html(array $information, array $statistics, array $assets, array $reviews, array $args = [])
+function account_html(array $information, array $statistics, array $assets, array $reviews, array $approvals = [], array $args = [])
 {
-    // TODO @alexandrosraikos: Support uploading and viewing a profile picture (waiting on @vkoukos).
-
     // Check for any errors regarding authorization.
     if (!empty($args['error'])) {
         show_alert(($args['error'] == 'not-logged-in') ? 'You are not logged in, please <a href="' . $args['login_page'] . '">log in</a> to your account. Don\'t have an account yet? You can <a href="' . $args['registration_page'] . '">register</a> here.' : $args['error']);
@@ -695,6 +693,13 @@ function account_html(array $information, array $statistics, array $assets, arra
                     <button class="tactile" id="policycloud-account-overview" class="active">Overview</button>
                     <button class="tactile" id="policycloud-account-assets">Assets</button>
                     <button class="tactile" id="policycloud-account-reviews">Reviews</button>
+                    <?php
+                    if (!$args['visiting'] && $args['is_admin']) {
+                    ?>
+                        <button class="tactile" id="policycloud-account-asset-approvals">Approvals</button>
+                    <?php
+                    }
+                    ?>
                     <button class="tactile" id="policycloud-account-information">Information</button>
                     <button class="tactile policycloud-logout">Log out</button>
                 </nav>
@@ -723,7 +728,7 @@ function account_html(array $information, array $statistics, array $assets, arra
                                 <?php echo $information['info']['about'] ?? '' ?>
                             </p>
                             <?php
-                            if (!empty($information['info']['social'])) {
+                            if (!empty($information['info']['social'][0])) {
                             ?>
                                 <ul>
                                     <?php
@@ -781,12 +786,13 @@ function account_html(array $information, array $statistics, array $assets, arra
                         ?>
                     </section>
                     <section class="policycloud-account-assets">
+                        // TODO @alexandrosraikos: Generalize asset list.
                         <header>
                             <h3>Assets</h3>
                             <div class="actions">
                                 <form action="" class="selector">
                                     <label for="sort-by">Sort by</label>
-                                    <select name="sort-by">
+                                    <select name="sort-by" data-category="assets">
                                         <option value="newest" <?php echo ((($_GET['sort_by'] ?? '' == 'newest') || empty($_GET['sort_by'])) ? "selected" : "") ?>>Newest</option>
                                         <option value="oldest" <?php echo (($_GET['sort_by'] ?? '' == 'oldest') ? "selected" : "") ?>>Oldest</option>
                                         <option value="rating-asc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-asc') ? "selected" : "") ?>>Highest rated</option>
@@ -796,7 +802,7 @@ function account_html(array $information, array $statistics, array $assets, arra
                                         <option value="title" <?php echo (($_GET['sort_by'] ?? '' == 'title') ? "selected" : "") ?>>Title</option>
                                     </select>
                                     <label for="items-per-page">Items per page</label>
-                                    <select name="items-per-page">
+                                    <select name="items-per-page" data-category="assets">
                                         <option value="5" <?php echo ((($_GET['items_per_page'] ?? '' == '5') || empty($_GET['items_per_page'])) ? "selected" : "") ?>>5</option>
                                         <option value="10" <?php echo (($_GET['items_per_page'] ?? '' == '10') ? "selected" : "") ?>>10</option>
                                         <option value="25" <?php echo (($_GET['items_per_page'] ?? '' == '25') ? "selected" : "") ?>>25</option>
@@ -811,15 +817,15 @@ function account_html(array $information, array $statistics, array $assets, arra
                                 <?php } ?>
                             </div>
                         </header>
-                        <div id="policycloud-account-asset-collection-filters">
+                        <div class="collection-filters" data-category="assets">
                             <div>Filter by type:</div>
                         </div>
-                        <div id="policycloud-account-assets-list">
+                        <div class="paginated-list" data-category="assets">
                             <?php
                             if (!empty($assets['results'])) {
                                 foreach ($assets['results'] as $page => $grouped_assets) {
                             ?>
-                                    <ul data-page="<?php echo $page + 1 ?>" class="<?php echo ($page == ($_GET['page'] ?? 0)) ? 'visible' : '' ?>">
+                                    <ul data-page="<?php echo $page + 1 ?>" class="page assets <?php echo ($page == ($_GET['page'] ?? 0)) ? 'visible' : '' ?>">
                                         <?php
                                         if (!empty($assets)) {
                                             foreach ($grouped_assets as $asset) {
@@ -856,29 +862,27 @@ function account_html(array $information, array $statistics, array $assets, arra
                                 <?php
                                 if (count($assets['results'] ?? []) > 1) {
                                     foreach ($assets['results'] as $page => $grouped_assets) {
-                                        echo '<button class="page-selector ' . (($page == ($_GET['page'] ?? 0)) ? 'active' : '') . '" data-assets-page="' . $page + 1 . '">' . ($page + 1) . '</button>';
+                                        echo '<button data-category="assets" class="page-selector ' . (($page == ($_GET['page'] ?? 0)) ? 'active' : '') . '" data-assets-page="' . $page + 1 . '">' . ($page + 1) . '</button>';
                                     }
                                 } ?>
                             </nav>
                         </div>
                     </section>
                     <section class="policycloud-account-reviews">
+                        // TODO @alexandrosraikos: Generalize asset list.
                         <header>
                             <h3>Reviews</h3>
                             <div class="actions">
                                 <form action="" class="selector">
                                     <label for="sort-by">Sort by</label>
-                                    <select name="sort-by">
-                                        <?php
-                                        // TODO @alexandrosraikos: Tweak and activate filters for reviews. 
-                                        ?>
+                                    <select name="sort-by" data-category="reviews">
                                         <option value="newest" <?php echo ((($_GET['sort_by'] ?? '' == 'newest') || empty($_GET['sort_by'])) ? "selected" : "") ?>>Newest</option>
                                         <option value="oldest" <?php echo (($_GET['sort_by'] ?? '' == 'oldest') ? "selected" : "") ?>>Oldest</option>
                                         <option value="rating-asc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-asc') ? "selected" : "") ?>>Highest rated</option>
                                         <option value="rating-desc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-desc') ? "selected" : "") ?>>Lowest rated</option>
                                     </select>
                                     <label for="items-per-page">Items per page</label>
-                                    <select name="items-per-page">
+                                    <select name="items-per-page" data-category="reviews">
                                         <option value="5" <?php echo ((($_GET['items_per_page'] ?? '' == '5') || empty($_GET['items_per_page'])) ? "selected" : "") ?>>5</option>
                                         <option value="10" <?php echo (($_GET['items_per_page'] ?? '' == '10') ? "selected" : "") ?>>10</option>
                                         <option value="25" <?php echo (($_GET['items_per_page'] ?? '' == '25') ? "selected" : "") ?>>25</option>
@@ -888,15 +892,15 @@ function account_html(array $information, array $statistics, array $assets, arra
                                 </form>
                             </div>
                         </header>
-                        <div id="policycloud-account-review-collection-filters">
+                        <div class="collection-filters" data-category="reviews">
                             <div>Filter by type:</div>
                         </div>
-                        <div id="policycloud-account-reviews-list">
+                        <div class="paginated-list" data-category="reviews">
                             <?php
                             if (!empty($reviews['results'])) {
                                 foreach ($reviews['results'] as $page => $grouped_reviews) {
                             ?>
-                                    <ul data-page="<?php echo $page + 1 ?>" class="<?php echo ($page == ($_GET['page'] ?? 0)) ? 'visible' : '' ?>">
+                                    <ul data-page="<?php echo $page + 1 ?>" class="page reviews <?php echo ($page == ($_GET['page'] ?? 0)) ? 'visible' : '' ?>">
                                         <?php
                                         if (!empty($reviews)) {
                                             foreach ($grouped_reviews as $review) {
@@ -929,15 +933,102 @@ function account_html(array $information, array $statistics, array $assets, arra
                             } ?>
                             <nav class="pagination">
                                 <?php
-                                // TODO @alexandrosraikos: Tweak and test pagination. (waiting on @vkoukos for a user with many reviews).
                                 if (count($reviews['results'] ?? []) > 1) {
                                     foreach ($reviews['results'] as $page => $grouped_reviews) {
-                                        echo '<button class="page-selector ' . (($page == ($_GET['page'] ?? 0)) ? 'active' : '') . '" data-reviews-page="' . $page + 1 . '">' . ($page + 1) . '</button>';
+                                        echo '<button data-category="reviews" class="page-selector ' . (($page == 0) ? 'active' : '') . '" data-reviews-page="' . $page + 1 . '">' . ($page + 1) . '</button>';
                                     }
                                 } ?>
                             </nav>
                         </div>
                     </section>
+                    <?php
+                    if (!$args['visiting'] && $args['is_admin']) {
+                        // TODO @alexandrosraikos: Generalize asset list.
+                    ?>
+                        <section class="policycloud-account-asset-approvals"><header>
+                            <h3>Assets</h3>
+                            <div class="actions">
+                                <form action="" class="selector">
+                                    <label for="sort-by">Sort by</label>
+                                    <select name="sort-by" data-category="approvals">
+                                        <option value="newest" <?php echo ((($_GET['sort_by'] ?? '' == 'newest') || empty($_GET['sort_by'])) ? "selected" : "") ?>>Newest</option>
+                                        <option value="oldest" <?php echo (($_GET['sort_by'] ?? '' == 'oldest') ? "selected" : "") ?>>Oldest</option>
+                                        <option value="rating-asc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-asc') ? "selected" : "") ?>>Highest rated</option>
+                                        <option value="rating-desc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-desc') ? "selected" : "") ?>>Lowest rated</option>
+                                        <option value="views-asc" <?php echo (($_GET['sort_by'] ?? '' == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
+                                        <option value="views-desc" <?php echo (($_GET['sort_by'] ?? '' == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
+                                        <option value="title" <?php echo (($_GET['sort_by'] ?? '' == 'title') ? "selected" : "") ?>>Title</option>
+                                    </select>
+                                    <label for="items-per-page">Items per page</label>
+                                    <select name="items-per-page" data-category="approvals">
+                                        <option value="5" <?php echo ((($_GET['items_per_page'] ?? '' == '5') || empty($_GET['items_per_page'])) ? "selected" : "") ?>>5</option>
+                                        <option value="10" <?php echo (($_GET['items_per_page'] ?? '' == '10') ? "selected" : "") ?>>10</option>
+                                        <option value="25" <?php echo (($_GET['items_per_page'] ?? '' == '25') ? "selected" : "") ?>>25</option>
+                                        <option value="50" <?php echo (($_GET['items_per_page'] ?? '' == '50') ? "selected" : "") ?>>50</option>
+                                        <option value="100" <?php echo (($_GET['items_per_page'] ?? '' == '100') ? "selected" : "") ?>>100</option>
+                                    </select>
+                                </form>
+                                <?php
+                                if (!$args['visiting']) {
+                                ?>
+                                    <a id="policycloud-upload" href="<?php echo $args['upload_page'] ?>" title="Create a new approval"><span class="fas fa-plus"></span> Create new approval</a>
+                                <?php } ?>
+                            </div>
+                        </header>
+                        <div class="collection-filters" data-category="approvals">
+                            <div>Filter by type:</div>
+                        </div>
+                        <div class="paginated-list" data-category="approvals">
+                            <?php
+                            if (!empty($approvals['results'])) {
+                                foreach ($approvals['results'] as $page => $grouped_approvals) {
+                            ?>
+                                    <ul data-page="<?php echo $page + 1 ?>" class="page approvals <?php echo ($page == ($_GET['page'] ?? 0)) ? 'visible' : '' ?>">
+                                        <?php
+                                        if (!empty($approvals)) {
+                                            foreach ($grouped_approvals as $approval) {
+                                        ?>
+                                                <li data-type-filter="<?php echo $approval['info']['type'] ?>" data-date-updated="<?php echo strtotime($approval['metadata']['uploadDate']) ?>" data-rating="<?php echo $approval['metadata']['reviews']['average_rating'] ?>" data-total-views="<?php echo $approval['metadata']['views'] ?>" class="visible">
+                                                    <div class="description">
+                                                        <a href="<?php echo $args['description_page'] . "?did=" . $approval['id'] ?>">
+                                                            <h4><?php echo $approval['info']['title'] ?></h4>
+                                                        </a>
+                                                        <p><?php echo $approval['info']['short_desc'] ?></p>
+                                                        <div class="metadata">
+                                                            <a class="pill"><?php echo $approval['info']['type']  ?></a>
+                                                            <a class="pill"><?php echo $approval['info']['subtype']  ?></a>
+                                                            <span><span class="fas fa-star"></span> <?php echo $approval['metadata']['reviews']['average_rating'] . ' (' . $approval['metadata']['reviews']['no_reviews'] . ' reviews)' ?></span>
+                                                            <span><span class="fas fa-eye"></span> <?php echo $approval['metadata']['views'] ?> views</span>
+                                                            <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($approval['metadata']['uploadDate']))) ?></span>
+                                                            <span class="label notice">Pending</span>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            <?php
+                                            }
+                                        } else {
+                                            ?>
+                                            <p class="policycloud-account-notice">Upload your first approval to get started.</p>
+                                        <?php } ?>
+                                    </ul>
+                            <?php
+                                }
+                            } else {
+                                show_alert('This user has not uploaded any approvals yet.', false, 'notice');
+                            } ?>
+                            <nav class="pagination">
+                                <?php
+                                if (count($approvals['results'] ?? []) > 1) {
+                                    foreach ($approvals['results'] as $page => $grouped_approvals) {
+                                        echo '<button data-category="approvals" class="page-selector ' . (($page == ($_GET['page'] ?? 0)) ? 'active' : '') . '" data-approvals-page="' . $page + 1 . '">' . ($page + 1) . '</button>';
+                                    }
+                                } ?>
+                            </nav>
+                        </div>
+                        </section>
+                    <?php
+                    }
+                    ?>
                     <section class="policycloud-account-information">
                         <header>
                             <h3>Information</h3>
@@ -951,6 +1042,23 @@ function account_html(array $information, array $statistics, array $assets, arra
                         </header>
                         <form id="policycloud-marketplace-account-edit" action="">
                             <table class="information">
+                                <tr>
+                                    <td class="folding">
+                                        <span class="folding">Profile picture</span>
+                                    </td>
+                                    <td class="folding">
+                                        <?php
+                                        if ($information['profile_parameters']['profile_image'] != 'default_image_users') {
+                                            // TODO @alexandrosraikos: Admin can delete others' images.
+                                            // TODO @alexandrosraikos: Print previous image (waiting on @vkoukos).
+                                        }
+                                        ?>
+                                        <span class="folding">
+                                            <input type="file" name="picture" accept="image/png, image/jpeg" />
+                                            <label for="picture">Please select an image of up to 2MB and over 256x256. Supported file types: jpg, png.</label>
+                                        </span>
+                                    </td>
+                                </tr>
                                 <tr>
                                     <td>
                                         Summary
@@ -975,8 +1083,10 @@ function account_html(array $information, array $statistics, array $assets, arra
                                     <td>
                                         <span class="folding visible">
                                             <?php
-                                            foreach ($information['info']['social'] as $link) {
-                                                echo '<a href="' . explode(':', $link, 2)[1] . '" target="blank">' . explode(':', $link, 2)[0] . '</a><br/>';
+                                            if (!empty($information['info']['social'][0])) {
+                                                foreach ($information['info']['social'] as $link) {
+                                                    echo '<a href="' . explode(':', $link, 2)[1] . '" target="blank">' . explode(':', $link, 2)[0] . '</a><br/>';
+                                                }
                                             }
                                             ?>
                                         </span>
@@ -986,16 +1096,19 @@ function account_html(array $information, array $statistics, array $assets, arra
                                             <div class="socials folding">
                                                 <div>
                                                     <?php
-                                                    foreach ($information['info']['social'] as $key => $link) {
-                                                        $link_title = explode(':', $link, 2)[0];
-                                                        $link_url = explode(':', $link, 2)[1];
+
+                                                    if (!empty($information['info']['social'][0])) {
+                                                        foreach ($information['info']['social'] as $link) {
+                                                            $link_title = explode(':', $link, 2)[0];
+                                                            $link_url = explode(':', $link, 2)[1];
                                                     ?>
-                                                        <div>
-                                                            <input type="text" name="socials-title[]" placeholder="Example" value="<?php echo $link_title ?>" />
-                                                            <input type="url" name="socials-url[]" placeholder="https://www.example.org/" value="<?php echo $link_url ?>" />
-                                                            <button class="remove-field" title="Remove this link." <?php if (count($information['info']['social']) == 1) echo 'disabled' ?>><span class="fas fa-times"></span></button>
-                                                        </div>
+                                                            <div>
+                                                                <input type="text" name="socials-title[]" placeholder="Example" value="<?php echo $link_title ?>" />
+                                                                <input type="url" name="socials-url[]" placeholder="https://www.example.org/" value="<?php echo $link_url ?>" />
+                                                                <button class="remove-field" title="Remove this link." <?php if (count($information['info']['social']) == 1) echo 'disabled' ?>><span class="fas fa-times"></span></button>
+                                                            </div>
                                                     <?php
+                                                        }
                                                     }
                                                     ?>
                                                 </div>

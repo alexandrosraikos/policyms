@@ -1271,7 +1271,7 @@ select#type.type-create {
   padding: 0;
 }
 
-.policycloud-marketplace form input,
+.policycloud-marketplace form input:not(input[type="file"]),
 .policycloud-marketplace form textarea,
 .policycloud-marketplace form select {
   display: block;
@@ -1619,11 +1619,10 @@ section.policycloud-account-overview table .large-figure {
 
 /* Assets tab */
 
-section.policycloud-account-assets header form.selector {
+#policycloud-account-content section header form.selector {
   display: inline;
 }
-
-section.policycloud-account-assets header form.selector * {
+#policycloud-account-content section header form.selector * {
   width: auto;
   display: inline-block;
   float: none;
@@ -1631,8 +1630,7 @@ section.policycloud-account-assets header form.selector * {
   padding: 0 5px;
 }
 
-section.policycloud-account-assets
-  #policycloud-account-asset-collection-filters {
+#policycloud-account-content section .collection-filters {
   margin-bottom: 20px;
   border-top: 1px solid var(--policycloud-border-color-light);
   border-bottom: 1px solid var(--policycloud-border-color-light);
@@ -1641,35 +1639,32 @@ section.policycloud-account-assets
   font-weight: bold;
 }
 
-section.policycloud-account-assets
-  #policycloud-account-asset-collection-filters
-  div {
+#policycloud-account-content section .collection-filters,
+div {
   margin-bottom: 5px;
 }
 
-section.policycloud-account-assets
-  #policycloud-account-asset-collection-filters
-  button {
+#policycloud-account-content section .collection-filters button {
   margin: 0 5px 5px 0;
 }
 
-section.policycloud-account-assets #policycloud-account-assets-list ul {
+#policycloud-account-content section .paginated-list .page {
   display: none;
   padding: 0 10px 0 0;
   margin: 0;
 }
 
-section.policycloud-account-assets #policycloud-account-assets-list ul.visible {
+#policycloud-account-content section .paginated-list .page.visible {
   display: block;
 }
 
-section.policycloud-account-assets #policycloud-account-assets-list li {
+#policycloud-account-content section .paginated-list .page li {
   display: none;
   max-height: 0;
   overflow: hidden;
 }
 
-section.policycloud-account-assets #policycloud-account-assets-list li.visible {
+#policycloud-account-content section .paginated-list .page li.visible {
   display: block;
   max-height: 1000vh;
   margin: 5px 0;
@@ -1678,87 +1673,41 @@ section.policycloud-account-assets #policycloud-account-assets-list li.visible {
   animation: sweep-in 0.3s ease-in-out forwards;
 }
 
-section.policycloud-account-assets #policycloud-account-assets-list li h4 {
+#policycloud-account-content section .paginated-list .page li h4 {
   margin-bottom: 10px;
 }
 
-section.policycloud-account-assets
-  #policycloud-account-assets-list
-  li
-  > div
-  > a {
+#policycloud-account-content section .paginated-list .page li > div > a {
   text-decoration: none;
   border-radius: 10px;
   display: block !important;
   transition: all 0.2s ease-in-out;
 }
 
-section.policycloud-account-assets
-  #policycloud-account-assets-list
-  li
-  > div
-  > p {
+#policycloud-account-content section .paginated-list .page li > div > p {
   color: var(--policycloud-text-color-secondary);
   font-size: 80%;
 }
 
-section.policycloud-account-assets
-  #policycloud-account-assets-list
-  li
-  .metadata {
+#policycloud-account-content section .paginated-list .page li .metadata {
   font-size: 70%;
   margin-top: 10px;
   color: var(--policycloud-text-color-secondary);
 }
-section.policycloud-account-assets
-  #policycloud-account-assets-list
+
+#policycloud-account-content
+  section
+  .paginated-list
+  .page
   li
   .metadata
   a:last-of-type,
-section.policycloud-account-assets
-  #policycloud-account-assets-list
-  li
-  .metadata
-  span {
+#policycloud-account-content section .paginated-list .page li .metadata span {
   display: inline-block;
   margin-right: 8px;
 }
 
 /* Reviews tab */
-
-section.policycloud-account-reviews header form.selector {
-  display: inline;
-}
-
-section.policycloud-account-reviews header form.selector * {
-  width: auto;
-  display: inline-block;
-  float: none;
-  margin-right: 5px;
-  padding: 0 5px;
-}
-
-section.policycloud-account-reviews
-  #policycloud-account-review-collection-filters {
-  margin-bottom: 20px;
-  border-top: 1px solid var(--policycloud-border-color-light);
-  border-bottom: 1px solid var(--policycloud-border-color-light);
-  padding: 15px 0;
-  font-size: 75%;
-  font-weight: bold;
-}
-
-section.policycloud-account-reviews #policycloud-account-reviews-list > ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-section.policycloud-account-reviews #policycloud-account-reviews-list li {
-  list-style-type: none;
-  margin: 5px 0;
-  padding: 15px 10px;
-  border-top: 1px solid var(--policycloud-border-color-light);
-}
 
 section.policycloud-account-reviews #policycloud-account-reviews-list .rating {
   display: flex;
@@ -1766,42 +1715,27 @@ section.policycloud-account-reviews #policycloud-account-reviews-list .rating {
   align-items: center;
 }
 
-section.policycloud-account-reviews
-  #policycloud-account-reviews-list
-  .rating
-  span:first-of-type {
+section.policycloud-account-reviews .paginated-list .rating span:first-of-type {
   font-size: 32px;
   font-weight: bold;
 }
 
-section.policycloud-account-reviews
-  #policycloud-account-reviews-list
-  .rating
-  span:last-of-type {
+section.policycloud-account-reviews .paginated-list .rating span:last-of-type {
   font-size: 16px;
   margin-left: 10px;
   color: var(--policycloud-text-color-secondary);
 }
 
-section.policycloud-account-reviews
-  #policycloud-account-reviews-list
-  .review
-  p {
+section.policycloud-account-reviews .paginated-list .review p {
   color: var(--policycloud-text-color);
   margin: 15px 0;
 }
 
-section.policycloud-account-reviews
-  #policycloud-account-reviews-list
-  .review
-  a {
+section.policycloud-account-reviews .paginated-list .review a {
   text-decoration: none;
 }
 
-section.policycloud-account-reviews
-  #policycloud-account-reviews-list
-  .review
-  .metadata {
+section.policycloud-account-reviews .paginated-list .review .metadata {
   font-size: 14px;
   margin-top: 10px;
 }
@@ -1845,7 +1779,7 @@ section.policycloud-account-information
   #policycloud-marketplace-account-edit
   .folding.visible,
 #policycloud-marketplace-description-create .folding.visible {
-  display: block;
+  display: table-cell;
   animation: sweep-in 0.3s ease-in-out;
 }
 
@@ -2072,18 +2006,19 @@ a#policycloud-marketplace-resend-verification-email.disabled:hover {
     margin: 0;
   }
 
-  section.policycloud-account-assets #policycloud-account-assets-list {
+  #policycloud-account-content section #policycloud-account-assets-list {
     padding: 0;
     margin: 0;
     max-height: unset;
     overflow-y: visible;
   }
 
-  section.policycloud-account-assets #policycloud-account-assets-list li a {
+  #policycloud-account-content section #policycloud-account-assets-list li a {
     flex-direction: column;
   }
 
-  section.policycloud-account-assets
+  #policycloud-account-content
+    section
     #policycloud-account-assets-list
     li
     .thumbnail {

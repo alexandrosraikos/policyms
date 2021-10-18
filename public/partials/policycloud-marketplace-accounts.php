@@ -375,6 +375,8 @@ function verify_user(string $verification_code)
  */
 function get_user_information($uid, $token)
 {
+    // TODO @alexandrosraikos: Support getting the profile picture (waiting on @vkoukos).
+
     $response = policyCloudMarketplaceAPIRequest(
         'GET',
         '/accounts/users/information/' . $uid,
@@ -431,6 +433,7 @@ function get_user_statistics($uid, $token)
 function account_edit($data, $uid, $token)
 {
     // Check and retrieve saved encryption key.
+    $options = get_option('policycloud_marketplace_plugin_settings');
     if (empty($options['encryption_key'])) throw new InvalidArgumentException("No PolicyCloud Marketplace encryption key was defined in WordPress settings.");
 
     // Information validation checks and errors.
@@ -442,6 +445,8 @@ function account_edit($data, $uid, $token)
     if (!empty($data['gender'])) {
         if (!in_array($data['gender'], ['male', 'female', 'transgender', 'genderqueer', 'questioning', '-'])) throw new RuntimeException("Please select a gender from the list.");
     }
+
+    // TODO @alexandrosraikos: Support uploading a profile picture (waiting on @vkoukos).
 
     // Contact the PolicyCloud Marketplace API for password change.
     if (!empty($data['password'])) {
