@@ -1466,6 +1466,12 @@ select#type.type-create {
   width: 90%;
   max-width: 256px;
   margin: 10px auto;
+  border-radius: 1000px;
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+  user-select: none;
 }
 
 #policycloud-account-sidebar > nav {

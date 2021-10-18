@@ -652,7 +652,7 @@ function time_elapsed_string($datetime, $full = false)
  * Display the account page HTML for authenticated users.
  *
  * @param   array $information The user information array.
- * @param   array $assets The assets connected to this account.
+ * @param   array $item The assets connected to this account.
  * @param   array $statistics The statistics connected to this account.
  * @param   array $reviews The asset reviews connected to this account.
  * @param   array $args An array of arguments.
@@ -665,8 +665,80 @@ function time_elapsed_string($datetime, $full = false)
  * @since   1.0.0
  * @author  Alexandros Raikos <araikos@unipi.gr>
  */
-function account_html(array $information, array $statistics, array $assets, array $reviews, array $approvals = [], array $args = [])
+function account_html(array $information, $picture, array $statistics, array $assets, array $reviews, array $approvals = [], array $args = [])
 {
+    /**
+     * Display a list of assets with filtering, sorting and custom pagination. 
+     * 
+     * @param string $id The identifier for the viewer.
+     * @param array $content The asset structure to be displayed.
+     * @param callable $inner_html The callback that prints the list item HTML.
+     * @param array $args The arguments of the parent function
+     * 
+     * @since   1.0.0
+     * @author  Alexandros Raikos <araikos@unipi.gr>
+     * 
+     */
+    function asset_viewer_html(string $id, array $content, array $args, callable $inner_html)
+    {
+    ?>
+        <header>
+            <h3><?php echo ucfirst($id) ?></h3>
+            <div class="actions">
+                <form action="" class="selector">
+                    <label for="sort-by">Sort by</label>
+                    <select name="sort-by" data-category="<?php echo $id ?>">
+                        <option value="newest" <?php echo ((($_GET['sort_by'] ?? '' == 'newest') || empty($_GET['sort_by'])) ? "selected" : "") ?>>Newest</option>
+                        <option value="oldest" <?php echo (($_GET['sort_by'] ?? '' == 'oldest') ? "selected" : "") ?>>Oldest</option>
+                        <option value="rating-asc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-asc') ? "selected" : "") ?>>Highest rated</option>
+                        <option value="rating-desc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-desc') ? "selected" : "") ?>>Lowest rated</option>
+                        <option value="views-asc" <?php echo (($_GET['sort_by'] ?? '' == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
+                        <option value="views-desc" <?php echo (($_GET['sort_by'] ?? '' == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
+                        <option value="title" <?php echo (($_GET['sort_by'] ?? '' == 'title') ? "selected" : "") ?>>Title</option>
+                    </select>
+                    <label for="items-per-page">Items per page</label>
+                    <select name="items-per-page" data-category="<?php echo $id ?>">
+                        <option value="5" <?php echo ((($_GET['items_per_page'] ?? '' == '5') || empty($_GET['items_per_page'])) ? "selected" : "") ?>>5</option>
+                        <option value="10" <?php echo (($_GET['items_per_page'] ?? '' == '10') ? "selected" : "") ?>>10</option>
+                        <option value="25" <?php echo (($_GET['items_per_page'] ?? '' == '25') ? "selected" : "") ?>>25</option>
+                        <option value="50" <?php echo (($_GET['items_per_page'] ?? '' == '50') ? "selected" : "") ?>>50</option>
+                        <option value="100" <?php echo (($_GET['items_per_page'] ?? '' == '100') ? "selected" : "") ?>>100</option>
+                    </select>
+                </form>
+                <?php
+                if (!$args['visiting'] && $id == 'assets') {
+                ?>
+                    <a id="policycloud-upload" href="<?php echo $args['upload_page'] ?>" title="Create new"><span class="fas fa-plus"></span> Create new</a>
+                <?php } ?>
+            </div>
+        </header>
+        <div class="collection-filters" data-category="<?php echo $id ?>">
+            <div>Filter by type:</div>
+        </div>
+        <div class="paginated-list" data-category="<?php echo $id ?>">
+            <?php
+            if (!empty($content['results'])) {
+                foreach ($content['results'] as $page => $page_items) {
+                    echo '<ul data-page="' . ($page + 1) . '" class="page ' . $id . ' ' . ($page == 0 ? 'visible' : '') . '">';
+                    if (!empty($content)) foreach ($page_items as $item) $inner_html($item);
+                    else show_alert("You don't have any ".$id." yet.");
+                    echo '</ul>';
+                }
+            } else {
+                show_alert('This user does not have any ' . $id . '.', false, 'notice');
+            } ?>
+            <nav class="pagination">
+                <?php
+                if (count($content['results'] ?? []) > 1) {
+                    foreach ($content['results'] as $page => $page_items) {
+                        echo '<button data-category="' . $id . '" class="page-selector ' . (($page == ($_GET['page'] ?? 0)) ? 'active' : '') . '" data-'.$id.'-page="' . $page + 1 . '">' . ($page + 1) . '</button>';
+                    }
+                } ?>
+            </nav>
+        </div>
+    <?php
+    }
+
     // Check for any errors regarding authorization.
     if (!empty($args['error'])) {
         show_alert(($args['error'] == 'not-logged-in') ? 'You are not logged in, please <a href="' . $args['login_page'] . '">log in</a> to your account. Don\'t have an account yet? You can <a href="' . $args['registration_page'] . '">register</a> here.' : $args['error']);
@@ -688,7 +760,14 @@ function account_html(array $information, array $statistics, array $assets, arra
     ?>
         <div id="policycloud-account" class="policycloud-marketplace">
             <div id="policycloud-account-sidebar">
-                <img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/user.svg') ?>" />
+                <?php
+                    if(!empty($picture)) {
+                        echo '<img src="data:image/*;base64,'.base64_encode($picture).'" draggable="false" />';
+                    }
+                    else {
+                        echo '<img src="'.get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/user.svg').'" draggable="false" />';
+                    }
+                ?>
                 <nav>
                     <button class="tactile" id="policycloud-account-overview" class="active">Overview</button>
                     <button class="tactile" id="policycloud-account-assets">Assets</button>
@@ -786,245 +865,79 @@ function account_html(array $information, array $statistics, array $assets, arra
                         ?>
                     </section>
                     <section class="policycloud-account-assets">
-                        // TODO @alexandrosraikos: Generalize asset list.
-                        <header>
-                            <h3>Assets</h3>
-                            <div class="actions">
-                                <form action="" class="selector">
-                                    <label for="sort-by">Sort by</label>
-                                    <select name="sort-by" data-category="assets">
-                                        <option value="newest" <?php echo ((($_GET['sort_by'] ?? '' == 'newest') || empty($_GET['sort_by'])) ? "selected" : "") ?>>Newest</option>
-                                        <option value="oldest" <?php echo (($_GET['sort_by'] ?? '' == 'oldest') ? "selected" : "") ?>>Oldest</option>
-                                        <option value="rating-asc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-asc') ? "selected" : "") ?>>Highest rated</option>
-                                        <option value="rating-desc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-desc') ? "selected" : "") ?>>Lowest rated</option>
-                                        <option value="views-asc" <?php echo (($_GET['sort_by'] ?? '' == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
-                                        <option value="views-desc" <?php echo (($_GET['sort_by'] ?? '' == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
-                                        <option value="title" <?php echo (($_GET['sort_by'] ?? '' == 'title') ? "selected" : "") ?>>Title</option>
-                                    </select>
-                                    <label for="items-per-page">Items per page</label>
-                                    <select name="items-per-page" data-category="assets">
-                                        <option value="5" <?php echo ((($_GET['items_per_page'] ?? '' == '5') || empty($_GET['items_per_page'])) ? "selected" : "") ?>>5</option>
-                                        <option value="10" <?php echo (($_GET['items_per_page'] ?? '' == '10') ? "selected" : "") ?>>10</option>
-                                        <option value="25" <?php echo (($_GET['items_per_page'] ?? '' == '25') ? "selected" : "") ?>>25</option>
-                                        <option value="50" <?php echo (($_GET['items_per_page'] ?? '' == '50') ? "selected" : "") ?>>50</option>
-                                        <option value="100" <?php echo (($_GET['items_per_page'] ?? '' == '100') ? "selected" : "") ?>>100</option>
-                                    </select>
-                                </form>
-                                <?php
-                                if (!$args['visiting']) {
-                                ?>
-                                    <a id="policycloud-upload" href="<?php echo $args['upload_page'] ?>" title="Create a new asset"><span class="fas fa-plus"></span> Create new asset</a>
-                                <?php } ?>
-                            </div>
-                        </header>
-                        <div class="collection-filters" data-category="assets">
-                            <div>Filter by type:</div>
-                        </div>
-                        <div class="paginated-list" data-category="assets">
-                            <?php
-                            if (!empty($assets['results'])) {
-                                foreach ($assets['results'] as $page => $grouped_assets) {
-                            ?>
-                                    <ul data-page="<?php echo $page + 1 ?>" class="page assets <?php echo ($page == ($_GET['page'] ?? 0)) ? 'visible' : '' ?>">
-                                        <?php
-                                        if (!empty($assets)) {
-                                            foreach ($grouped_assets as $asset) {
-                                        ?>
-                                                <li data-type-filter="<?php echo $asset['info']['type'] ?>" data-date-updated="<?php echo strtotime($asset['metadata']['uploadDate']) ?>" data-rating="<?php echo $asset['metadata']['reviews']['average_rating'] ?>" data-total-views="<?php echo $asset['metadata']['views'] ?>" class="visible">
-                                                    <div class="description">
-                                                        <a href="<?php echo $args['description_page'] . "?did=" . $asset['id'] ?>">
-                                                            <h4><?php echo $asset['info']['title'] ?></h4>
-                                                        </a>
-                                                        <p><?php echo $asset['info']['short_desc'] ?></p>
-                                                        <div class="metadata">
-                                                            <a class="pill"><?php echo $asset['info']['type']  ?></a>
-                                                            <a class="pill"><?php echo $asset['info']['subtype']  ?></a>
-                                                            <span><span class="fas fa-star"></span> <?php echo $asset['metadata']['reviews']['average_rating'] . ' (' . $asset['metadata']['reviews']['no_reviews'] . ' reviews)' ?></span>
-                                                            <span><span class="fas fa-eye"></span> <?php echo $asset['metadata']['views'] ?> views</span>
-                                                            <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($asset['metadata']['uploadDate']))) ?></span>
-                                                            <span class="label <?php echo ($asset['metadata']['approved'] == 1) ? 'success' : 'notice' ?>"><?php echo ($asset['metadata']['approved'] == 1) ? 'Approved' : 'Pending' ?></span>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                            <?php
-                                            }
-                                        } else {
-                                            ?>
-                                            <p class="policycloud-account-notice">Upload your first asset to get started.</p>
-                                        <?php } ?>
-                                    </ul>
-                            <?php
-                                }
-                            } else {
-                                show_alert('This user has not uploaded any assets yet.', false, 'notice');
-                            } ?>
-                            <nav class="pagination">
-                                <?php
-                                if (count($assets['results'] ?? []) > 1) {
-                                    foreach ($assets['results'] as $page => $grouped_assets) {
-                                        echo '<button data-category="assets" class="page-selector ' . (($page == ($_GET['page'] ?? 0)) ? 'active' : '') . '" data-assets-page="' . $page + 1 . '">' . ($page + 1) . '</button>';
-                                    }
-                                } ?>
-                            </nav>
-                        </div>
+                        <?php
+                        asset_viewer_html('assets', $assets, $args, function ($asset) use ($args) {
+                        ?>
+                            <li data-type-filter="<?php echo $asset['info']['type'] ?>" data-date-updated="<?php echo strtotime($asset['metadata']['uploadDate']) ?>" data-rating="<?php echo $asset['metadata']['reviews']['average_rating'] ?>" data-total-views="<?php echo $asset['metadata']['views'] ?>" class="visible">
+                                <div class="description">
+                                    <a href="<?php echo $args['description_page'] . "?did=" . $asset['id'] ?>">
+                                        <h4><?php echo $asset['info']['title'] ?></h4>
+                                    </a>
+                                    <p><?php echo $asset['info']['short_desc'] ?></p>
+                                    <div class="metadata">
+                                        <a class="pill"><?php echo $asset['info']['type']  ?></a>
+                                        <a class="pill"><?php echo $asset['info']['subtype']  ?></a>
+                                        <span><span class="fas fa-star"></span> <?php echo $asset['metadata']['reviews']['average_rating'] . ' (' . $asset['metadata']['reviews']['no_reviews'] . ' reviews)' ?></span>
+                                        <span><span class="fas fa-eye"></span> <?php echo $asset['metadata']['views'] ?> views</span>
+                                        <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($asset['metadata']['uploadDate']))) ?></span>
+                                        <span class="label <?php echo ($asset['metadata']['approved'] == 1) ? 'success' : 'notice' ?>"><?php echo ($asset['metadata']['approved'] == 1) ? 'Approved' : 'Pending' ?></span>
+                                    </div>
+                                </div>
+                            </li>
+                        <?php
+                        });
+                        ?>
                     </section>
                     <section class="policycloud-account-reviews">
-                        // TODO @alexandrosraikos: Generalize asset list.
-                        <header>
-                            <h3>Reviews</h3>
-                            <div class="actions">
-                                <form action="" class="selector">
-                                    <label for="sort-by">Sort by</label>
-                                    <select name="sort-by" data-category="reviews">
-                                        <option value="newest" <?php echo ((($_GET['sort_by'] ?? '' == 'newest') || empty($_GET['sort_by'])) ? "selected" : "") ?>>Newest</option>
-                                        <option value="oldest" <?php echo (($_GET['sort_by'] ?? '' == 'oldest') ? "selected" : "") ?>>Oldest</option>
-                                        <option value="rating-asc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-asc') ? "selected" : "") ?>>Highest rated</option>
-                                        <option value="rating-desc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-desc') ? "selected" : "") ?>>Lowest rated</option>
-                                    </select>
-                                    <label for="items-per-page">Items per page</label>
-                                    <select name="items-per-page" data-category="reviews">
-                                        <option value="5" <?php echo ((($_GET['items_per_page'] ?? '' == '5') || empty($_GET['items_per_page'])) ? "selected" : "") ?>>5</option>
-                                        <option value="10" <?php echo (($_GET['items_per_page'] ?? '' == '10') ? "selected" : "") ?>>10</option>
-                                        <option value="25" <?php echo (($_GET['items_per_page'] ?? '' == '25') ? "selected" : "") ?>>25</option>
-                                        <option value="50" <?php echo (($_GET['items_per_page'] ?? '' == '50') ? "selected" : "") ?>>50</option>
-                                        <option value="100" <?php echo (($_GET['items_per_page'] ?? '' == '100') ? "selected" : "") ?>>100</option>
-                                    </select>
-                                </form>
-                            </div>
-                        </header>
-                        <div class="collection-filters" data-category="reviews">
-                            <div>Filter by type:</div>
-                        </div>
-                        <div class="paginated-list" data-category="reviews">
-                            <?php
-                            if (!empty($reviews['results'])) {
-                                foreach ($reviews['results'] as $page => $grouped_reviews) {
-                            ?>
-                                    <ul data-page="<?php echo $page + 1 ?>" class="page reviews <?php echo ($page == ($_GET['page'] ?? 0)) ? 'visible' : '' ?>">
-                                        <?php
-                                        if (!empty($reviews)) {
-                                            foreach ($grouped_reviews as $review) {
-                                        ?>
-                                                <li data-type-filter="<?php echo $review['collection'] ?>" data-date-updated="<?php echo strtotime($review['updated_review_date']) ?>" data-rating="<?php echo $review['rating'] ?>" class="visible">
-                                                    <div class="review">
-                                                        <div class="rating">
-                                                            <span><span class="fas fa-star"></span> <?php echo $review['rating'] ?></span>
-                                                            <span>Posted <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($review['updated_review_date']))) ?></span>
-                                                        </div>
-                                                        <p>"<?php echo $review['comment'] ?>"</p>
-                                                        <a href="<?php echo $args['description_page'] . "?did=" . $review['did'] ?>">
-                                                            <h4><?php echo $review['title'] ?></h4>
-                                                        </a>
-                                                        <div class="metadata">
-                                                            <a class="pill"><?php echo $review['collection']  ?></a>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                        <?php
-                                            }
-                                        } else {
-                                            show_alert("You haven't reviewed any assets yet.", false, 'notice');
-                                        } ?>
-                                    </ul>
-                            <?php
-                                }
-                            } else {
-                                show_alert('This user has not uploaded any reviews yet.', false, 'notice');
-                            } ?>
-                            <nav class="pagination">
-                                <?php
-                                if (count($reviews['results'] ?? []) > 1) {
-                                    foreach ($reviews['results'] as $page => $grouped_reviews) {
-                                        echo '<button data-category="reviews" class="page-selector ' . (($page == 0) ? 'active' : '') . '" data-reviews-page="' . $page + 1 . '">' . ($page + 1) . '</button>';
-                                    }
-                                } ?>
-                            </nav>
-                        </div>
+                        <?php
+                        asset_viewer_html('reviews', $reviews, $args, function ($review) use ($args) {
+                        ?>
+                            <li data-type-filter="<?php echo $review['collection'] ?>" data-date-updated="<?php echo strtotime($review['updated_review_date']) ?>" data-rating="<?php echo $review['rating'] ?>" class="visible">
+                                <div class="review">
+                                    <div class="rating">
+                                        <span><span class="fas fa-star"></span> <?php echo $review['rating'] ?></span>
+                                        <span>Posted <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($review['updated_review_date']))) ?></span>
+                                    </div>
+                                    <p>"<?php echo $review['comment'] ?>"</p>
+                                    <a href="<?php echo $args['description_page'] . "?did=" . $review['did'] ?>">
+                                        <h4><?php echo $review['title'] ?></h4>
+                                    </a>
+                                    <div class="metadata">
+                                        <a class="pill"><?php echo $review['collection']  ?></a>
+                                    </div>
+                                </div>
+                            </li>
+                        <?php
+                        });
+                        ?>
                     </section>
                     <?php
                     if (!$args['visiting'] && $args['is_admin']) {
-                        // TODO @alexandrosraikos: Generalize asset list.
+                        // TODO @alexandrosraikos: Check filters and pagination (waiting on @vkoukos).
                     ?>
-                        <section class="policycloud-account-asset-approvals"><header>
-                            <h3>Assets</h3>
-                            <div class="actions">
-                                <form action="" class="selector">
-                                    <label for="sort-by">Sort by</label>
-                                    <select name="sort-by" data-category="approvals">
-                                        <option value="newest" <?php echo ((($_GET['sort_by'] ?? '' == 'newest') || empty($_GET['sort_by'])) ? "selected" : "") ?>>Newest</option>
-                                        <option value="oldest" <?php echo (($_GET['sort_by'] ?? '' == 'oldest') ? "selected" : "") ?>>Oldest</option>
-                                        <option value="rating-asc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-asc') ? "selected" : "") ?>>Highest rated</option>
-                                        <option value="rating-desc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-desc') ? "selected" : "") ?>>Lowest rated</option>
-                                        <option value="views-asc" <?php echo (($_GET['sort_by'] ?? '' == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
-                                        <option value="views-desc" <?php echo (($_GET['sort_by'] ?? '' == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
-                                        <option value="title" <?php echo (($_GET['sort_by'] ?? '' == 'title') ? "selected" : "") ?>>Title</option>
-                                    </select>
-                                    <label for="items-per-page">Items per page</label>
-                                    <select name="items-per-page" data-category="approvals">
-                                        <option value="5" <?php echo ((($_GET['items_per_page'] ?? '' == '5') || empty($_GET['items_per_page'])) ? "selected" : "") ?>>5</option>
-                                        <option value="10" <?php echo (($_GET['items_per_page'] ?? '' == '10') ? "selected" : "") ?>>10</option>
-                                        <option value="25" <?php echo (($_GET['items_per_page'] ?? '' == '25') ? "selected" : "") ?>>25</option>
-                                        <option value="50" <?php echo (($_GET['items_per_page'] ?? '' == '50') ? "selected" : "") ?>>50</option>
-                                        <option value="100" <?php echo (($_GET['items_per_page'] ?? '' == '100') ? "selected" : "") ?>>100</option>
-                                    </select>
-                                </form>
-                                <?php
-                                if (!$args['visiting']) {
-                                ?>
-                                    <a id="policycloud-upload" href="<?php echo $args['upload_page'] ?>" title="Create a new approval"><span class="fas fa-plus"></span> Create new approval</a>
-                                <?php } ?>
-                            </div>
-                        </header>
-                        <div class="collection-filters" data-category="approvals">
-                            <div>Filter by type:</div>
-                        </div>
-                        <div class="paginated-list" data-category="approvals">
+                        <section class="policycloud-account-asset-approvals">
                             <?php
-                            if (!empty($approvals['results'])) {
-                                foreach ($approvals['results'] as $page => $grouped_approvals) {
+                            asset_viewer_html('approvals', $approvals, $args, function ($approval) use ($args) {
                             ?>
-                                    <ul data-page="<?php echo $page + 1 ?>" class="page approvals <?php echo ($page == ($_GET['page'] ?? 0)) ? 'visible' : '' ?>">
-                                        <?php
-                                        if (!empty($approvals)) {
-                                            foreach ($grouped_approvals as $approval) {
-                                        ?>
-                                                <li data-type-filter="<?php echo $approval['info']['type'] ?>" data-date-updated="<?php echo strtotime($approval['metadata']['uploadDate']) ?>" data-rating="<?php echo $approval['metadata']['reviews']['average_rating'] ?>" data-total-views="<?php echo $approval['metadata']['views'] ?>" class="visible">
-                                                    <div class="description">
-                                                        <a href="<?php echo $args['description_page'] . "?did=" . $approval['id'] ?>">
-                                                            <h4><?php echo $approval['info']['title'] ?></h4>
-                                                        </a>
-                                                        <p><?php echo $approval['info']['short_desc'] ?></p>
-                                                        <div class="metadata">
-                                                            <a class="pill"><?php echo $approval['info']['type']  ?></a>
-                                                            <a class="pill"><?php echo $approval['info']['subtype']  ?></a>
-                                                            <span><span class="fas fa-star"></span> <?php echo $approval['metadata']['reviews']['average_rating'] . ' (' . $approval['metadata']['reviews']['no_reviews'] . ' reviews)' ?></span>
-                                                            <span><span class="fas fa-eye"></span> <?php echo $approval['metadata']['views'] ?> views</span>
-                                                            <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($approval['metadata']['uploadDate']))) ?></span>
-                                                            <span class="label notice">Pending</span>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                            <?php
-                                            }
-                                        } else {
-                                            ?>
-                                            <p class="policycloud-account-notice">Upload your first approval to get started.</p>
-                                        <?php } ?>
-                                    </ul>
+                                <li data-type-filter="<?php echo $approval['info']['type'] ?>" data-date-updated="<?php echo strtotime($approval['metadata']['uploadDate']) ?>" data-rating="<?php echo $approval['metadata']['reviews']['average_rating'] ?>" data-total-views="<?php echo $approval['metadata']['views'] ?>" class="visible">
+                                    <div class="description">
+                                        <a href="<?php echo $args['description_page'] . "?did=" . $approval['id'] ?>">
+                                            <h4><?php echo $approval['info']['title'] ?></h4>
+                                        </a>
+                                        <p><?php echo $approval['info']['short_desc'] ?></p>
+                                        <div class="metadata">
+                                            <a class="pill"><?php echo $approval['info']['type']  ?></a>
+                                            <a class="pill"><?php echo $approval['info']['subtype']  ?></a>
+                                            <span><span class="fas fa-star"></span> <?php echo $approval['metadata']['reviews']['average_rating'] . ' (' . $approval['metadata']['reviews']['no_reviews'] . ' reviews)' ?></span>
+                                            <span><span class="fas fa-eye"></span> <?php echo $approval['metadata']['views'] ?> views</span>
+                                            <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($approval['metadata']['uploadDate']))) ?></span>
+                                            <span class="label notice">Pending</span>
+                                        </div>
+                                    </div>
+                                </li>
                             <?php
-                                }
-                            } else {
-                                show_alert('This user has not uploaded any approvals yet.', false, 'notice');
-                            } ?>
-                            <nav class="pagination">
-                                <?php
-                                if (count($approvals['results'] ?? []) > 1) {
-                                    foreach ($approvals['results'] as $page => $grouped_approvals) {
-                                        echo '<button data-category="approvals" class="page-selector ' . (($page == ($_GET['page'] ?? 0)) ? 'active' : '') . '" data-approvals-page="' . $page + 1 . '">' . ($page + 1) . '</button>';
-                                    }
-                                } ?>
-                            </nav>
-                        </div>
+                            });
+                            ?>
                         </section>
                     <?php
                     }
@@ -1050,7 +963,7 @@ function account_html(array $information, array $statistics, array $assets, arra
                                         <?php
                                         if ($information['profile_parameters']['profile_image'] != 'default_image_users') {
                                             // TODO @alexandrosraikos: Admin can delete others' images.
-                                            // TODO @alexandrosraikos: Print previous image (waiting on @vkoukos).
+                                            // TODO @alexandrosraikos: Update image.
                                         }
                                         ?>
                                         <span class="folding">

@@ -22,7 +22,7 @@ use Firebase\JWT\SignatureInvalidException;
  * @since   1.0.0
  * @author  Alexandros Raikos <araikos@unipi.gr>
  */
-function policyCloudMarketplaceAPIRequest($http_method, $uri, $data = [], $token = null, $additional_headers = [])
+function policyCloudMarketplaceAPIRequest($http_method, $uri, $data = [], $token = null, $headers = null)
 {
 
     // Retrieve hostname URL.
@@ -36,31 +36,37 @@ function policyCloudMarketplaceAPIRequest($http_method, $uri, $data = [], $token
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => '',
         CURLOPT_MAXREDIRS => 10,
+        CURLOPT_HEADER => 0,
         CURLOPT_TIMEOUT => 0,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => $http_method,
         CURLOPT_POSTFIELDS => (!empty($data)) ? json_encode($data) : null,
-        CURLOPT_HTTPHEADER => array_merge(['Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null), 'x-more-time: 1'], $additional_headers)
+        CURLOPT_HTTPHEADER => $headers ?? ['Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null), 'x-more-time: 1']
     ]);
 
     // Get the data.
-    $response = json_decode(curl_exec($curl), true);
+    $response = curl_exec($curl);
+    $info = curl_getinfo($curl);
 
     // Handle errors.
     if (curl_errno($curl)) {
         throw new Exception("Unable to reach the Marketplace server. More details: " . curl_error($curl));
     }
 
-    // Close the session.
     curl_close($curl);
-
-    // Handle response.
-    if (!isset($response)) {
-        throw new ErrorException("The Marketplace API response was invalid.");
-    } elseif ($response['_status'] == 'successful') {
-        return $response;
-    } else throw new ErrorException($response['message']);
+    if (isset($response)) {
+        if (!is_bool($response)) {
+            if (in_array('Content-Type: application/json', $headers ?? ['Content-Type: application/json'])) {
+                $response = json_decode($response, true);
+                if ($response['_status'] == 'successful') {
+                    return $response;
+                } else throw new ErrorException($response['message']);
+            } elseif (in_array('Content-Type: application/octet-stream', $headers)) {
+                return $response;
+            }
+        }
+    } else throw new ErrorException("There was no response.");
 }
 
 
@@ -336,6 +342,8 @@ function user_email_verification_resend(string $verification_code, string $email
     }
 }
 
+
+
 /**
  * 
  * Verifies the user with the PolicyCloud Marketplace API.
@@ -366,7 +374,7 @@ function verify_user(string $verification_code)
  * https://documenter.getpostman.com/view/16776360/TzsZs8kn#17a87988-323b-4209-b93c-ea3854616ab3 
  * 
  * @param   string $uid The valid username of the user whose information will be edited.
- * @param   array $token The decoded access token of the requesting user.
+ * @param   array $token The encoded access token of the requesting user.
  * 
  * @uses    policyCloudMarketplaceAPIRequest()
  * 
@@ -385,6 +393,32 @@ function get_user_information($uid, $token)
     );
 
     return $response['result'];
+}
+
+
+/**
+ * Get a user's picture blob.
+ * 
+ * @param   string $id The unique ID of the image file.
+ * @param   array $token The encoded access token of the requesting user.
+ * 
+ * @uses    policyCloudMarketplaceAPIRequest()
+ * 
+ * @since	1.0.0
+ * @author Alexandros Raikos <araikos@unipi.gr>
+ */
+function get_user_picture($id, $token)
+{
+    return policyCloudMarketplaceAPIRequest(
+        'GET',
+        '/images/' . $id,
+        [],
+        $token,
+        [
+            'Content-Type: application/octet-stream',
+            'Content-Disposition: attachment; filename="picture"'
+        ],
+    );
 }
 
 /**

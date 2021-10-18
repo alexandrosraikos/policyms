@@ -229,7 +229,7 @@ class PolicyCloud_Marketplace_Public
 		} catch (InvalidArgumentException $e) {
 			http_response_code(404);
 			die($e->getMessage());
-		}	catch (ErrorException $e) {
+		} catch (ErrorException $e) {
 			http_response_code(500);
 			die($e->getMessage());
 		}
@@ -318,12 +318,12 @@ class PolicyCloud_Marketplace_Public
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 
 		try {
-			// Get specific Description data for authorized users.
+			// Authorize.
 			$token = retrieve_token(true);
 			if (!empty($token)) {
-
 				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
 
+				// Get information.
 				if (empty($_GET['user'])) {
 
 					// Check for verification code email redirect.
@@ -337,28 +337,39 @@ class PolicyCloud_Marketplace_Public
 							throw new Exception("This account is already verified.");
 						}
 					}
-					$account_information = json_decode(json_encode($token['decoded']), true);
+
+					$account_information = $token['decoded'];
 					$visiting = false;
 				} else {
 					$visiting = true;
 					$account_information = get_user_information($_GET['user'], $token['encoded']);
 				}
-
 				$is_admin = (($token['decoded']['account']['role'] ?? '') == 'admin');
 
-				// Get the user's descriptions.
+				// Get content.
 				if (!empty($account_information)) {
-					$descriptions = get_account_assets(($visiting) ? $_GET['user'] : $token['decoded']['username'], $token['encoded'] ?? null, [
+
+					// Get user profile picture.
+					if ($account_information['profile_parameters']['profile_image'] != 'default_image_users') {
+						$picture = get_user_picture($account_information['profile_parameters']['profile_image'], $token['encoded']);
+					}
+					
+					// Get user descriptions.
+					$descriptions = get_account_assets($account_information['username'], $token['encoded'] ?? null, [
 						'page' => $_GET['page'] ?? null,
 						'items_per_page' => $_GET['items_per_page'] ?? null,
 						'sort_by' => $_GET['sort_by'] ?? null,
 					]);
-					$reviews = get_account_reviews(($visiting) ? $_GET['user'] : $token['decoded']['username'], $token['encoded'] ?? null, [
+
+					// Get user reviews.
+					$reviews = get_account_reviews($account_information['username'], $token['encoded'] ?? null, [
 						'page' => $_GET['page'] ?? null,
 						'items_per_page' => $_GET['items_per_page'] ?? null,
 						'sort_by' => $_GET['sort_by'] ?? null,
 					]);
-					if($is_admin && !$visiting) {
+
+					if ($is_admin && !$visiting) {
+						// Get admin approvals.
 						$approvals = get_pending_assets($token['encoded']);
 					}
 				}
@@ -367,14 +378,19 @@ class PolicyCloud_Marketplace_Public
 			if (!empty($account_information)) {
 				$statistics = get_user_statistics(($visiting) ? $_GET['user'] : $token['decoded']['username'], $token['encoded'] ?? null);
 			}
-		} catch (ErrorException $e) {
 		} catch (Exception $e) {
 			$error = $e->getMessage();
 		}
 
 		// Retrieve credentials.
 		$options = get_option('policycloud_marketplace_plugin_settings');
-		if (empty($options['login_page']) || empty($options['registration_page']) || empty($options['description_page'])) {
+		if (
+			empty($options['login_page']) ||
+			empty($options['registration_page']) ||
+			empty($options['description_page']) ||
+			empty($options['archive_page']) ||
+			empty($options['upload_page'])
+		) {
 			$error = 'Please update your PolicyCloud Marketplace settings in the WordPress Dashboard.';
 		}
 
@@ -389,17 +405,25 @@ class PolicyCloud_Marketplace_Public
 
 		// Print shortcode HTML.
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		account_html($account_information ?? [], $statistics ?? [], $descriptions ?? [], $reviews ?? [], $approvals ?? [], [
-			"is_admin" => $is_admin ?? false,
-			"visiting" => $visiting ?? false,
-			"error" => $error ?? '',
-			"notice" => $notice ?? '',
-			"login_page" => $options['login_page'] ?? '',
-			"registration_page" => $options['registration_page'] ?? '',
-			"description_page" => $options['description_page'] ?? '',
-			"archive_page" => $options['archive_page'] ?? '',
-			"upload_page" => $options['upload_page'] ?? ''
-		]);
+		account_html(
+			$account_information ?? [],
+			$picture ?? null,
+			$statistics ?? [],
+			$descriptions ?? [],
+			$reviews ?? [],
+			$approvals ?? [],
+			[
+				"is_admin" => $is_admin,
+				"visiting" => $visiting,
+				"error" => $error ?? '',
+				"notice" => $notice ?? '',
+				"login_page" => $options['login_page'],
+				"registration_page" => $options['registration_page'],
+				"description_page" => $options['description_page'],
+				"archive_page" => $options['archive_page'],
+				"upload_page" => $options['upload_page']
+			]
+		);
 	}
 
 	/**
@@ -718,7 +742,7 @@ class PolicyCloud_Marketplace_Public
 			$token = retrieve_token();
 			if (!empty($token)) {
 				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
-				if(edit_asset($_POST['id'], $_POST, $token)) http_response_code(200);
+				if (edit_asset($_POST['id'], $_POST, $token)) http_response_code(200);
 			} else {
 				http_response_code(404);
 				die("User token not found.");
