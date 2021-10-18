@@ -1795,7 +1795,6 @@ section.policycloud-account-reviews
   #policycloud-account-reviews-list
   .review
   a {
-  color: var(--policycloud-text-color-secondary);
   text-decoration: none;
 }
 

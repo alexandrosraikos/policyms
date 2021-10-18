@@ -121,12 +121,12 @@
           break;
         case "rating-asc":
           items.sort((a, b) => {
-            return $(a).data("average-rating") < $(b).data("average-rating");
+            return $(a).data("rating") < $(b).data("rating");
           });
           break;
         case "rating-desc":
           items.sort((a, b) => {
-            return $(a).data("average-rating") > $(b).data("average-rating");
+            return $(a).data("rating") > $(b).data("rating");
           });
           break;
         case "views-asc":
@@ -191,20 +191,22 @@
      * Print the collection filter buttons by reading the
      * available collections in the asset list.
      *
+     * @param {String} tab The tab in which the filters are being displayed
+     * (currently only supports `asset` and `review`).
      * @param {[String]} collections
      *
      * @author Alexandros Raikos <araikos@unipi.gr>
      */
-    function calculateCollectionFilters(collections = null) {
+    function calculateCollectionFilters(tab, collections = null) {
       if (collections == null) {
         var collections = [];
-        $.each($("#policycloud-account-assets-list ul li"), function () {
+        $.each($("#policycloud-account-" + tab + "s-list ul li"), function () {
           if (!collections.includes($(this).data("type-filter")))
             collections.push($(this).data("type-filter"));
         });
       }
       for (let i = 0; i < collections.length; i++) {
-        $("#policycloud-account-asset-collection-filters").append(
+        $("#policycloud-account-" + tab + "-collection-filters").append(
           '<button class="outlined" data-type-filter="' +
             collections[i] +
             '">' +
@@ -288,7 +290,8 @@
      */
 
     // Initial print of the filtering buttons.
-    calculateCollectionFilters();
+    calculateCollectionFilters("asset");
+    calculateCollectionFilters("review");
 
     // Select different asset sorting.
     $(".policycloud-account-assets form.selector select[name=sort-by]").change(
@@ -328,6 +331,13 @@
     $(document).on(
       "click",
       "#policycloud-account-asset-collection-filters button",
+      applyFilters
+    );
+
+    // Filter asset by collection.
+    $(document).on(
+      "click",
+      "#policycloud-account-review-collection-filters button",
       applyFilters
     );
 

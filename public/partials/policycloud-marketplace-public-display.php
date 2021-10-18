@@ -824,7 +824,7 @@ function account_html(array $information, array $statistics, array $assets, arra
                                         if (!empty($assets)) {
                                             foreach ($grouped_assets as $asset) {
                                         ?>
-                                                <li data-type-filter="<?php echo $asset['info']['type'] ?>" data-date-updated="<?php echo strtotime($asset['metadata']['uploadDate']) ?>" data-average-rating="<?php echo $asset['metadata']['reviews']['average_rating'] ?>" data-total-views="<?php echo $asset['metadata']['views'] ?>" class="visible">
+                                                <li data-type-filter="<?php echo $asset['info']['type'] ?>" data-date-updated="<?php echo strtotime($asset['metadata']['uploadDate']) ?>" data-rating="<?php echo $asset['metadata']['reviews']['average_rating'] ?>" data-total-views="<?php echo $asset['metadata']['views'] ?>" class="visible">
                                                     <div class="description">
                                                         <a href="<?php echo $args['description_page'] . "?did=" . $asset['id'] ?>">
                                                             <h4><?php echo $asset['info']['title'] ?></h4>
@@ -869,7 +869,7 @@ function account_html(array $information, array $statistics, array $assets, arra
                                 <form action="" class="selector">
                                     <label for="sort-by">Sort by</label>
                                     <select name="sort-by">
-                                        <?php 
+                                        <?php
                                         // TODO @alexandrosraikos: Tweak and activate filters for reviews. 
                                         ?>
                                         <option value="newest" <?php echo ((($_GET['sort_by'] ?? '' == 'newest') || empty($_GET['sort_by'])) ? "selected" : "") ?>>Newest</option>
@@ -901,11 +901,11 @@ function account_html(array $information, array $statistics, array $assets, arra
                                         if (!empty($reviews)) {
                                             foreach ($grouped_reviews as $review) {
                                         ?>
-                                                <li data-date-created="<?php echo strtotime($review['initial_review_date']) ?>" data-rating="<?php echo $review['rating'] ?>" class="visible">
+                                                <li data-type-filter="<?php echo $review['collection'] ?>" data-date-updated="<?php echo strtotime($review['updated_review_date']) ?>" data-rating="<?php echo $review['rating'] ?>" class="visible">
                                                     <div class="review">
                                                         <div class="rating">
                                                             <span><span class="fas fa-star"></span> <?php echo $review['rating'] ?></span>
-                                                            <span>Posted <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($review['initial_review_date']))) ?></span>
+                                                            <span>Posted <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($review['updated_review_date']))) ?></span>
                                                         </div>
                                                         <p>"<?php echo $review['comment'] ?>"</p>
                                                         <a href="<?php echo $args['description_page'] . "?did=" . $review['did'] ?>">
@@ -916,12 +916,11 @@ function account_html(array $information, array $statistics, array $assets, arra
                                                         </div>
                                                     </div>
                                                 </li>
-                                            <?php
+                                        <?php
                                             }
                                         } else {
-                                            ?>
-                                            <p class="policycloud-account-notice">Upload your first review to get started.</p>
-                                        <?php } ?>
+                                            show_alert("You haven't reviewed any assets yet.", false, 'notice');
+                                        } ?>
                                     </ul>
                             <?php
                                 }
