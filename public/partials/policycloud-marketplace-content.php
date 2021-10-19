@@ -76,7 +76,7 @@ function get_pending_assets(string $token, array $args = [])
     if (empty($args['collections'])) {
         return policyCloudMarketplaceAPIRequest(
             'GET',
-            '/descriptions/permit/all',
+            '/descriptions/permit/all?itemsPerPage=5',
             [],
             $token
         );

@@ -22,12 +22,16 @@ use Firebase\JWT\SignatureInvalidException;
  * @since   1.0.0
  * @author  Alexandros Raikos <araikos@unipi.gr>
  */
-function policyCloudMarketplaceAPIRequest($http_method, $uri, $data = [], $token = null, $headers = null)
+function policyCloudMarketplaceAPIRequest($http_method, $uri, $data = [], $token = null, $headers = null, $skip_encoding = false)
 {
 
     // Retrieve hostname URL.
     $options = get_option('policycloud_marketplace_plugin_settings');
     if (empty($options['marketplace_host'])) throw new InvalidArgumentException("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
+
+    if (!empty($data)) {
+        $data = ($skip_encoding) ?  $data : json_encode($data);
+    }
 
     // Contact Marketplace login API endpoint.
     $curl = curl_init();
@@ -40,7 +44,7 @@ function policyCloudMarketplaceAPIRequest($http_method, $uri, $data = [], $token
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => $http_method,
-        CURLOPT_POSTFIELDS => (!empty($data)) ? json_encode($data) : null,
+        CURLOPT_POSTFIELDS => (!empty($data)) ?  $data : null,
         CURLOPT_HTTPHEADER => $headers ?? ['Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null), 'x-more-time: 1']
     ]);
 
@@ -124,13 +128,11 @@ function retrieve_token(bool $decode = false)
  * https://documenter.getpostman.com/view/16776360/TzsZs8kn#135d37d6-0eef-47e5-a31f-df4153962503
  * 
  * @param	string $username The username to be registered.
- * 
  * @return	bool The availability of the requested username.
  * 
  * @uses    policyCloudMarketplaceAPIRequest()
  * 
  * @since	1.0.0
- * 
  * @author Alexandros Raikos <araikos@unipi.gr>
  * @author Eleftheria Kouremenou <elkour@unipi.gr>
  */
@@ -413,8 +415,7 @@ function get_user_picture($id, $token)
         [],
         $token,
         [
-            'Content-Type: application/octet-stream',
-            'Content-Disposition: attachment; filename="picture"'
+            'Content-Type: application/octet-stream'
         ],
     );
 }
@@ -433,22 +434,25 @@ function get_user_picture($id, $token)
  * @since	1.0.0
  * @author Alexandros Raikos <araikos@unipi.gr>
  */
-function set_user_picture($blob, $type, $token)
+function set_user_picture($path, $type, $username, $token)
 {
-    return policyCloudMarketplaceAPIRequest(
+    $file = new CURLFile($path, $type, $username);
+    $response = policyCloudMarketplaceAPIRequest(
         'PUT',
         '/accounts/users/image',
         [
-            'image' => new CURLFile($blob)
+            'image' => $file
         ],
         $token,
         [
-            'Content-Type: application/octet-stream',
-            'file-type: '. $type,
+            'x-file-type: ' . $type,
             'x-access-token: ' . $token,
             'x-more-time: 1'
         ],
+        true
     );
+
+    return $response;
 }
 
 /**
@@ -461,14 +465,21 @@ function set_user_picture($blob, $type, $token)
  * 
  * @uses    policyCloudMarketplaceAPIRequest()
  * 
+ * @throws  InvalidArgumentException When no encryption key was defined in the WordPress settings.
+ * 
  * @since	1.0.0
  * @author Alexandros Raikos <araikos@unipi.gr>
  */
 function delete_user_picture($username, $token)
 {
-    return policyCloudMarketplaceAPIRequest(
+    // Check and retrieve saved encryption key.
+    $options = get_option('policycloud_marketplace_plugin_settings');
+    if (empty($options['encryption_key'])) throw new InvalidArgumentException("No PolicyCloud Marketplace encryption key was defined in WordPress settings.");
+
+    $response = policyCloudMarketplaceAPIRequest(
         'DELETE',
-        '/accounts/users/image'.$username,
+        '/accounts/users/image/' . $username,
+        [],
         $token,
         [
             'Content-Type: application/json',
@@ -476,6 +487,8 @@ function delete_user_picture($username, $token)
             'x-more-time: 1'
         ],
     );
+
+    return openssl_encrypt($response['token'], "AES-128-ECB", $options['encryption_key']);;
 }
 
 /**
@@ -523,10 +536,11 @@ function get_user_statistics($uid, $token)
  */
 function account_edit($data, $uid, $token)
 {
+
     // Check and retrieve saved encryption key.
     $options = get_option('policycloud_marketplace_plugin_settings');
     if (empty($options['encryption_key'])) throw new InvalidArgumentException("No PolicyCloud Marketplace encryption key was defined in WordPress settings.");
-
+    
     // Information validation checks and errors.
     if (empty($data['email']) || empty($data['name']) || empty($data['surname'])) throw new RuntimeException('Please fill all required fields!');
     if (!filter_var($data["email"], FILTER_VALIDATE_EMAIL)) throw new RuntimeException("Please enter a valid email.");
@@ -537,18 +551,18 @@ function account_edit($data, $uid, $token)
         if (!in_array($data['gender'], ['male', 'female', 'transgender', 'genderqueer', 'questioning', '-'])) throw new RuntimeException("Please select a gender from the list.");
     }
 
-    // TODO @alexandrosraikos: Support uploading a profile picture (waiting on @vkoukos).
     if ($data['new_profile_picture']) {
         $profile_picture_response = set_user_picture(
             $_FILES['profile_picture']['tmp_name'],
-            substr($_FILES['profile_picture']['type'],6),
+            $_FILES['profile_picture']['type'],
+            $uid,
             $token
         );
     }
 
     // Contact the PolicyCloud Marketplace API for password change.
     if (!empty($data['password'])) {
-    
+
         if (!empty($data['password-confirm'])) {
             if ($data['password'] !== $data['password-confirm']) throw new RuntimeException('Password and password confirmation should match!');
             if (
@@ -571,8 +585,8 @@ function account_edit($data, $uid, $token)
                 ],
                 $token
             );
+        } catch (Exception $e) {
         }
-        catch (Exception $e) {}
     }
 
     if (!is_array($data['social-title']) || !is_array($data['social-url'])) {
@@ -605,22 +619,18 @@ function account_edit($data, $uid, $token)
             ],
             $token
         );
+    } catch (Exception $e) {
     }
-    catch (Exception $e) {}
 
     // Return encrypted token.
     try {
         if (!empty($information_response)) {
             return openssl_encrypt($information_response['token'], "AES-128-ECB", $options['encryption_key']);
-        }
-        elseif (!empty($password_response)) {
+        } elseif (!empty($password_response)) {
             return openssl_encrypt($password_response['token'], "AES-128-ECB", $options['encryption_key']);
-        }
-        elseif (!empty($profile_picture_response)) {
-            echo ('Hi!');
+        } elseif (!empty($profile_picture_response)) {
             return openssl_encrypt($profile_picture_response['token'], "AES-128-ECB", $options['encryption_key']);
-        }
-        else {
+        } else {
             throw new ErrorException("Please update the fields before submitting.");
         }
     } catch (Exception $e) {

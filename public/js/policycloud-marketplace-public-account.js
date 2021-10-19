@@ -83,7 +83,7 @@
      *
      * @author Alexandros Raikos <araikos@unipi.gr>
      */
-    function rearrageAssetsLists(
+    function rearrangeAssetsLists(
       category,
       rememberPage = false,
       itemsPerPage = $(
@@ -283,7 +283,7 @@
           "visible"
         );
       }
-      rearrageAssetsLists(category);
+      rearrangeAssetsLists(category);
     }
 
     /**
@@ -321,6 +321,7 @@
     // Initial print of the filtering buttons.
     calculateCollectionFilters("asset");
     calculateCollectionFilters("review");
+    calculateCollectionFilters("approval");
 
     // Select different sorting.
     $("#policycloud-account-content form.selector select[name=sort-by]").change(
@@ -334,7 +335,7 @@
        */
       function (e) {
         e.preventDefault();
-        rearrageAssetsLists($(this).data("category"), true);
+        rearrangeAssetsLists($(this).data("category"), true);
       }
     );
 
@@ -352,7 +353,7 @@
        */
       function (e) {
         e.preventDefault();
-        rearrageAssetsLists($(this).data("category"));
+        rearrangeAssetsLists($(this).data("category"));
       }
     );
 
@@ -510,7 +511,13 @@
             response,
             "#policycloud-marketplace-account-edit button[type=submit]",
             (data) => {
-              setAuthorizedToken(data);
+              if (data.hasOwnProperty("message")) {
+                if (data.message != "completed") {
+                  setAuthorizedToken(data);
+                }
+              } else {
+                setAuthorizedToken(data);
+              }
               window.location.reload();
             }
           );
@@ -528,7 +535,6 @@
      */
     function deleteProfilePicture(e) {
       e.preventDefault();
-      console.log("Hey!");
 
       // Add loading class to delete button.
       $(
@@ -539,6 +545,10 @@
       var formData = new FormData();
       formData.append("action", "policycloud_marketplace_account_edit");
       formData.append("nonce", ajax_properties_account_editing.nonce);
+      formData.append(
+        "username",
+        ajax_properties_account_editing.user_id ?? ""
+      );
       formData.append("subsequent_action", "delete_profile_picture");
 
       // Perform AJAX request.
@@ -555,7 +565,13 @@
             response,
             '.policycloud-marketplace .file-editor[data-name="profile-picture"] button.delete',
             (data) => {
-              setAuthorizedToken(data);
+              if (data.hasOwnProperty("message")) {
+                if (data.message != "completed") {
+                  setAuthorizedToken(data);
+                }
+              } else {
+                setAuthorizedToken(data);
+              }
               window.location.reload();
             }
           );

@@ -102,7 +102,7 @@ function handleAJAXResponse(response, actionSelector, completedAction) {
     try {
       var data = JSON.parse(
         response.responseText == ""
-          ? '{"string":"completed"}'
+          ? '{"message":"completed"}'
           : response.responseText
       );
       completedAction(data);

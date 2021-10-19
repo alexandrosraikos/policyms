@@ -412,7 +412,6 @@ class PolicyCloud_Marketplace_Public
 			if (!empty($account_information)) {
 				$statistics = get_user_statistics(($visiting) ? $_GET['user'] : $token['decoded']['username'], $token['encoded'] ?? null);
 			}
-		} catch (ErrorException $e) {
 		} catch (Exception $e) {
 			$error = $e->getMessage();
 		}
@@ -482,6 +481,9 @@ class PolicyCloud_Marketplace_Public
 		try {
 			$token = retrieve_token(true);
 			if (!empty($token)) {
+				$is_admin = ($token['decoded']['account']['role'] == 'admin');
+				$visiting = ($token['decoded']['username'] != $_POST['username']);
+
 				if (!empty($_POST['subsequent_action'])) {
 					if ($_POST['subsequent_action'] == 'edit_account') {
 
@@ -495,7 +497,7 @@ class PolicyCloud_Marketplace_Public
 									throw new RuntimeException("Supported formats for  profile pictures are .png and .jpg/.jpeg.");
 								}
 								if ($_FILES['profile_picture']['size'] > 1000000) {
-									throw new RuntimeEXception("The image file is too large. Please upload a file less than 1MB in size.");
+									throw new RuntimeException("The image file is too large. Please upload a file less than 1MB in size.");
 								}
 								$new_profile_picture = true;
 							} elseif ($_FILES['profile_picture']['error'] == 4);
@@ -526,12 +528,18 @@ class PolicyCloud_Marketplace_Public
 							'new_profile_picture' => $new_profile_picture
 						], $_POST['username'], $token['encoded']);
 						http_response_code(200);
-						die(json_encode($updated_token));
+						if ($is_admin && $visiting) die();
+						else die(json_encode($updated_token));
 					}
 					if ($_POST['subsequent_action'] == 'delete_profile_picture') {
 						$updated_token = delete_user_picture($_POST['username'], $token['encoded']);
 						http_response_code(200);
-						die($updated_token);
+						if ($is_admin && $visiting) {
+							die();
+						}
+						else {
+							die(json_encode($updated_token));
+						}
 					}
 				} else {
 					throw new RuntimeException("No subsequent action was defined.");

@@ -779,7 +779,9 @@ function account_html(array $information, $picture, array $statistics, array $as
                     }
                     ?>
                     <button class="tactile" id="policycloud-account-information">Information</button>
+                    <?php if(!$args['visiting']) { ?>
                     <button class="tactile policycloud-logout">Log out</button>
+                    <?php } ?>
                 </nav>
             </div>
             <div id="policycloud-account-content">

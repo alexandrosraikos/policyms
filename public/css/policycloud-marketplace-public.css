@@ -1535,7 +1535,11 @@ select#type.type-create {
 
 #policycloud-account-sidebar > img {
   width: 90%;
+  object-fit: cover;
   max-width: 256px;
+  max-height: 256px;
+  min-width: 256px;
+  min-height: 256px;
   margin: 10px auto;
   border-radius: 1000px;
   -moz-user-select: -moz-none;
