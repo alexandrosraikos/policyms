@@ -88,15 +88,16 @@ class PolicyCloud_Marketplace_Public
 		// Generic script.
 		wp_enqueue_script("policycloud-marketplace", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public.js', array('jquery'), $this->version, false);
 
-		// Authorization related scripts.
+		// Accounts related scripts.
 		wp_register_script("policycloud-marketplace-account-registration", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-registration.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
 		wp_register_script("policycloud-marketplace-account-authorization", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-authorization.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
 		wp_register_script("policycloud-marketplace-account", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
+
 		// TODO @alexandrosraikos: Create password reset functionality. (API access token will be included in a later stage).
 
 		// Content related scripts.
-		wp_register_script("policycloud-marketplace-asset", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-single.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
-		wp_register_script("policycloud-marketplace-asset-archive", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-multiple.js', array('jquery'));
+		wp_register_script("policycloud-marketplace-asset", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-asset.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
+		wp_register_script("policycloud-marketplace-asset-archive", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-asset-archive.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
 		wp_register_script("policycloud-marketplace-asset-creation", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-asset-creation.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
 	}
 
@@ -753,7 +754,7 @@ class PolicyCloud_Marketplace_Public
 			"notice" => $notice ?? null
 		]);
 	}
-	
+
 	/**
 	 * Display a single description object for authenticated users.
 	 *
