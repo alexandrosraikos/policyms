@@ -36,7 +36,6 @@ function policyCloudMarketplaceAPIRequest($http_method, $uri, $data = [], $token
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => '',
         CURLOPT_MAXREDIRS => 10,
-        CURLOPT_HEADER => 0,
         CURLOPT_TIMEOUT => 0,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
@@ -47,7 +46,6 @@ function policyCloudMarketplaceAPIRequest($http_method, $uri, $data = [], $token
 
     // Get the data.
     $response = curl_exec($curl);
-    $info = curl_getinfo($curl);
 
     // Handle errors.
     if (curl_errno($curl)) {
@@ -59,7 +57,7 @@ function policyCloudMarketplaceAPIRequest($http_method, $uri, $data = [], $token
         if (!is_bool($response)) {
             if (in_array('Content-Type: application/json', $headers ?? ['Content-Type: application/json'])) {
                 $response = json_decode($response, true);
-                if ($response['_status'] == 'successful') {
+                if ($response['_status'] == 'successful' && curl_getinfo($curl, CURLINFO_HTTP_CODE) == 200) {
                     return $response;
                 } else throw new ErrorException($response['message']);
             } elseif (in_array('Content-Type: application/octet-stream', $headers)) {
@@ -421,6 +419,65 @@ function get_user_picture($id, $token)
     );
 }
 
+
+/**
+ * Set a user's picture blob.
+ * For more information concerning the schema of the account data, please visit:
+ * https://documenter.getpostman.com/view/16776360/TzsZs8kn#637c25f2-37ca-4c72-9a86-65e621439480
+ * 
+ * @param   string $id The unique ID of the image file.
+ * @param   array $token The encoded access token of the requesting user.
+ * 
+ * @uses    policyCloudMarketplaceAPIRequest()
+ * 
+ * @since	1.0.0
+ * @author Alexandros Raikos <araikos@unipi.gr>
+ */
+function set_user_picture($blob, $type, $token)
+{
+    return policyCloudMarketplaceAPIRequest(
+        'PUT',
+        '/accounts/users/image',
+        [
+            'image' => new CURLFile($blob)
+        ],
+        $token,
+        [
+            'Content-Type: application/octet-stream',
+            'file-type: '. $type,
+            'x-access-token: ' . $token,
+            'x-more-time: 1'
+        ],
+    );
+}
+
+/**
+ * Delete a user's picture blob.
+ * For more information concerning the schema of the account data, please visit:
+ * https://documenter.getpostman.com/view/16776360/TzsZs8kn#ebc8f12b-e002-46f3-b813-2a4797a8336e
+ * 
+ * @param   string $id The unique ID of the image file.
+ * @param   array $token The encoded access token of the requesting user.
+ * 
+ * @uses    policyCloudMarketplaceAPIRequest()
+ * 
+ * @since	1.0.0
+ * @author Alexandros Raikos <araikos@unipi.gr>
+ */
+function delete_user_picture($username, $token)
+{
+    return policyCloudMarketplaceAPIRequest(
+        'DELETE',
+        '/accounts/users/image'.$username,
+        $token,
+        [
+            'Content-Type: application/json',
+            'x-access-token: ' . $token,
+            'x-more-time: 1'
+        ],
+    );
+}
+
 /**
  * Get a user's statistics.
  * For more information concerning the schema of the account data, please visit:
@@ -481,10 +538,17 @@ function account_edit($data, $uid, $token)
     }
 
     // TODO @alexandrosraikos: Support uploading a profile picture (waiting on @vkoukos).
+    if ($data['new_profile_picture']) {
+        $profile_picture_response = set_user_picture(
+            $_FILES['profile_picture']['tmp_name'],
+            substr($_FILES['profile_picture']['type'],6),
+            $token
+        );
+    }
 
     // Contact the PolicyCloud Marketplace API for password change.
     if (!empty($data['password'])) {
-
+    
         if (!empty($data['password-confirm'])) {
             if ($data['password'] !== $data['password-confirm']) throw new RuntimeException('Password and password confirmation should match!');
             if (
@@ -497,15 +561,18 @@ function account_edit($data, $uid, $token)
         } else throw new RuntimeException("Please fill in the password confirmation when changing your password.");
         if (empty($data['current-password'])) throw new RuntimeException('Please insert your current password before changing it.');
 
-        policyCloudMarketplaceAPIRequest(
-            'POST',
-            '/accounts/users/password/change',
-            [
-                'old_password' => $data['current-password'],
-                'new_password' => $data['password']
-            ],
-            $token
-        );
+        try {
+            $password_response = policyCloudMarketplaceAPIRequest(
+                'POST',
+                '/accounts/users/password/change',
+                [
+                    'old_password' => $data['current-password'],
+                    'new_password' => $data['password']
+                ],
+                $token
+            );
+        }
+        catch (Exception $e) {}
     }
 
     if (!is_array($data['social-title']) || !is_array($data['social-url'])) {
@@ -513,35 +580,49 @@ function account_edit($data, $uid, $token)
         $data['social-url'] = [$data['social-url']];
     }
 
-    $response = policyCloudMarketplaceAPIRequest(
-        'PUT',
-        '/accounts/users/information/' . $uid,
-        [
-            'info' => [
-                'name' => $data['name'],
-                'surname' => $data['surname'],
-                'title' => $data['title'],
-                'gender' => $data['gender'],
-                'organization' => $data['organization'],
-                'email' => $data['email'],
-                'phone' => $data['phone'],
-                'social' => (empty($data['social-title'][0]) || empty($data['social-url'][0])) ? [''] : array_map(function ($k, $v) use ($data) {
-                    return $v . ":" . $data['social-url'][$k];
-                }, $data['social-title']),
-                'about' => $data['about']
+    try {
+        $information_response = policyCloudMarketplaceAPIRequest(
+            'PUT',
+            '/accounts/users/information/' . $uid,
+            [
+                'info' => [
+                    'name' => $data['name'],
+                    'surname' => $data['surname'],
+                    'title' => $data['title'],
+                    'gender' => $data['gender'],
+                    'organization' => $data['organization'],
+                    'email' => $data['email'],
+                    'phone' => $data['phone'],
+                    'social' => (empty($data['social-title'][0]) || empty($data['social-url'][0])) ? [''] : array_map(function ($k, $v) use ($data) {
+                        return $v . ":" . $data['social-url'][$k];
+                    }, $data['social-title']),
+                    'about' => $data['about']
+                ],
+                'profile_parameters' => [
+                    'public_email' => intval($data['public-email']),
+                    'public_phone' => intval($data['public-phone']),
+                ]
             ],
-            'profile_parameters' => [
-                'public_email' => intval($data['public-email']),
-                'public_phone' => intval($data['public-phone']),
-            ]
-        ],
-        $token
-    );
+            $token
+        );
+    }
+    catch (Exception $e) {}
 
     // Return encrypted token.
     try {
-        // Encrypt token using the same key and return.
-        return openssl_encrypt($response['token'], "AES-128-ECB", $options['encryption_key']);
+        if (!empty($information_response)) {
+            return openssl_encrypt($information_response['token'], "AES-128-ECB", $options['encryption_key']);
+        }
+        elseif (!empty($password_response)) {
+            return openssl_encrypt($password_response['token'], "AES-128-ECB", $options['encryption_key']);
+        }
+        elseif (!empty($profile_picture_response)) {
+            echo ('Hi!');
+            return openssl_encrypt($profile_picture_response['token'], "AES-128-ECB", $options['encryption_key']);
+        }
+        else {
+            throw new ErrorException("Please update the fields before submitting.");
+        }
     } catch (Exception $e) {
         throw new ErrorException($e->getMessage());
     }

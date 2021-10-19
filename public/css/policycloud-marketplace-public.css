@@ -1311,16 +1311,50 @@ select#type.type-create {
   color: var(--policycloud-text-color-secondary);
 }
 
-/* Errors & notices */
+/* File editor */
 
-.policycloud-marketplace-error.seen,
-.policycloud-marketplace-notice.seen {
-  display: none;
+.policycloud-marketplace .file-editor {
+  display: inline-block;
+  width: 100%;
+  margin: 10px 0;
+  position: relative;
+  --image-width: 100px;
 }
+
+.policycloud-marketplace .file-editor > * {
+  display: inline-block;
+}
+
+.policycloud-marketplace .file-editor img {
+  max-width: var(--image-width);
+  border-radius: 8px;
+}
+
+.policycloud-marketplace .file-editor button.delete {
+  padding: 3px !important;
+  text-align: center;
+  border-radius: 100px !important;
+  height: 24px;
+  width: 24px;
+  margin: 0 !important;
+  position: absolute;
+  top: -6px;
+  left: calc(var(--image-width) - 18px);
+  background-color: var(--policycloud-background-failure-outline) !important;
+}
+
+.policycloud-marketplace .file-editor button.delete:disabled {
+  cursor: wait !important;
+  z-index: 10;
+  background-color: rgba(150, 150, 150, 0.5) !important;
+}
+
+/* Errors & notices */
 
 .policycloud-marketplace-error {
   width: 100%;
   max-width: 100%;
+  max-height: auto;
   font-weight: bold;
   background-color: salmon;
   color: darkred;
@@ -1329,6 +1363,43 @@ select#type.type-create {
   border-radius: 8px;
   padding: 10px 15px;
   position: relative;
+}
+
+.policycloud-marketplace-error.animated,
+.policycloud-marketplace-notice.animated {
+  animation: show-error 0.2s ease-in-out;
+}
+
+.policycloud-marketplace-error.animated.seen,
+.policycloud-marketplace-notice.animated.seen {
+  max-height: 0;
+  padding: 0;
+  margin: 0;
+  opacity: 0;
+  transition: opacity 0.1s, max-height 0.2s, padding 0.2s, margin 0.2s;
+}
+
+.policycloud-marketplace-error.animated.seen.dismissed,
+.policycloud-marketplace-notice.animated.seen.dismissed {
+  display: none;
+}
+
+@keyframes show-error {
+  0% {
+    max-height: 0;
+    padding: 0;
+    margin: 0;
+    opacity: 0;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    max-height: inherit;
+    padding: 10px 15px;
+    margin: inherit;
+    opacity: inherit;
+  }
 }
 
 .policycloud-marketplace-notice {

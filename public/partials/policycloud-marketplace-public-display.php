@@ -721,7 +721,7 @@ function account_html(array $information, $picture, array $statistics, array $as
                 foreach ($content['results'] as $page => $page_items) {
                     echo '<ul data-page="' . ($page + 1) . '" class="page ' . $id . ' ' . ($page == 0 ? 'visible' : '') . '">';
                     if (!empty($content)) foreach ($page_items as $item) $inner_html($item);
-                    else show_alert("You don't have any ".$id." yet.");
+                    else show_alert("You don't have any " . $id . " yet.");
                     echo '</ul>';
                 }
             } else {
@@ -731,7 +731,7 @@ function account_html(array $information, $picture, array $statistics, array $as
                 <?php
                 if (count($content['results'] ?? []) > 1) {
                     foreach ($content['results'] as $page => $page_items) {
-                        echo '<button data-category="' . $id . '" class="page-selector ' . (($page == ($_GET['page'] ?? 0)) ? 'active' : '') . '" data-'.$id.'-page="' . $page + 1 . '">' . ($page + 1) . '</button>';
+                        echo '<button data-category="' . $id . '" class="page-selector ' . (($page == ($_GET['page'] ?? 0)) ? 'active' : '') . '" data-' . $id . '-page="' . $page + 1 . '">' . ($page + 1) . '</button>';
                     }
                 } ?>
             </nav>
@@ -761,12 +761,11 @@ function account_html(array $information, $picture, array $statistics, array $as
         <div id="policycloud-account" class="policycloud-marketplace">
             <div id="policycloud-account-sidebar">
                 <?php
-                    if(!empty($picture)) {
-                        echo '<img src="data:image/*;base64,'.base64_encode($picture).'" draggable="false" />';
-                    }
-                    else {
-                        echo '<img src="'.get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/user.svg').'" draggable="false" />';
-                    }
+                if (!empty($picture)) {
+                    echo '<img src="data:image/*;base64,' . base64_encode($picture) . '" draggable="false" />';
+                } else {
+                    echo '<img src="' . get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/user.svg') . '" draggable="false" />';
+                }
                 ?>
                 <nav>
                     <button class="tactile" id="policycloud-account-overview" class="active">Overview</button>
@@ -955,23 +954,35 @@ function account_html(array $information, $picture, array $statistics, array $as
                         </header>
                         <form id="policycloud-marketplace-account-edit" action="">
                             <table class="information">
-                                <tr>
-                                    <td class="folding">
-                                        <span class="folding">Profile picture</span>
-                                    </td>
-                                    <td class="folding">
-                                        <?php
-                                        if ($information['profile_parameters']['profile_image'] != 'default_image_users') {
-                                            // TODO @alexandrosraikos: Admin can delete others' images.
-                                            // TODO @alexandrosraikos: Update image.
-                                        }
-                                        ?>
-                                        <span class="folding">
-                                            <input type="file" name="picture" accept="image/png, image/jpeg" />
-                                            <label for="picture">Please select an image of up to 2MB and over 256x256. Supported file types: jpg, png.</label>
-                                        </span>
-                                    </td>
-                                </tr>
+                                <?php
+                                if ($args['is_admin'] || !$args['visiting']) {
+                                ?>
+                                    <tr>
+                                        <td class="folding">
+                                            <span>Profile picture</span>
+                                        </td>
+                                        <td class="folding">
+                                            <?php
+                                            if (!empty($picture)) {
+                                            ?>
+                                                <div class="file-editor" data-name="profile-picture">
+                                                    <img class="file" src="data:image/*;base64,<?php echo base64_encode($picture) ?>" draggable="false" />
+                                                    <button type="button" class="delete"><span class="fas fa-times"></span></button>
+                                                </div>
+                                            <?php
+                                            }
+                                            // TODO @alexandrosraikos: Delete image.
+                                            // TODO @alexandrosraikos: Add / Update image.
+                                            if (!$args['is_admin'] && !$args['visiting']) {
+                                            ?>
+                                                <span class="folding">
+                                                    <input type="file" name="profile_picture" accept="image/png, image/jpeg" />
+                                                    <label for="picture">Please select an image of up to 1MB and over 256x256 for optimal results. Supported file types: jpg, png.</label>
+                                                </span>
+                                            <?php } ?>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
                                 <tr>
                                     <td>
                                         Summary

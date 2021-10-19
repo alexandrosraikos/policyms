@@ -80,7 +80,8 @@ class PolicyCloud_Marketplace_Public
 	/**
 	 * Register the JavaScript for the public-facing side of the site.
 	 *
-	 * @since    1.0.0
+	 * @since	1.0.0
+	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
 	public function enqueue_scripts()
 	{
@@ -94,8 +95,33 @@ class PolicyCloud_Marketplace_Public
 		// TODO @alexandrosraikos: Create password reset functionality. (API access token will be included in a later stage).
 
 		// Content related scripts.
+		wp_register_script("policycloud-marketplace-asset", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-single.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
+		wp_register_script("policycloud-marketplace-asset-archive", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-multiple.js', array('jquery'));
 		wp_register_script("policycloud-marketplace-asset-creation", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-asset-creation.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
-		wp_register_script("policycloud-marketplace-read-single", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-single.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
+	}
+
+
+	/**
+	 * Return the error message derived from a file upload error code.
+	 *
+	 * @uses 	PolicyCloud_Marketplace_Public::account_registration()
+	 * 
+	 * @since	1.0.0
+	 * @author 	Alexandros Raikos <araikos@unipi.gr>
+	 */
+	public function fileUploadErrorInterpreter($code)
+	{
+		$errors = array(
+			0 => 'There is no error, the file uploaded with success',
+			1 => 'The uploaded file exceeds the upload_max_filesize directive.',
+			2 => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form',
+			3 => 'The uploaded file was only partially uploaded',
+			4 => 'No file was uploaded',
+			6 => 'Missing a temporary folder',
+			7 => 'Failed to write file to disk.',
+			8 => 'A PHP extension stopped the file upload.',
+		);
+		return $errors[$code];
 	}
 
 	/**
@@ -109,7 +135,8 @@ class PolicyCloud_Marketplace_Public
 	/**
 	 * Register all the shortcodes concerning user authorization.
 	 *
-	 * @since    1.0.0
+	 * @since	1.0.0
+	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
 	public function add_accounts_shortcodes()
 	{
@@ -124,8 +151,9 @@ class PolicyCloud_Marketplace_Public
 	/**
 	 * Add a menu item to a selected menu, which conditionally switches
 	 * from log in to log out actions.
-	 * 
-	 * @since    1.0.0
+	 *
+	 * @since	1.0.0
+	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
 	public static function add_conditional_access_menu_item($items, $args)
 	{
@@ -155,7 +183,8 @@ class PolicyCloud_Marketplace_Public
 	/**
 	 * Register the shortcodes for user registration.
 	 *
-	 * @since    1.0.0
+	 * @since	1.0.0
+	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
 	public static function account_registration_shortcode()
 	{
@@ -189,7 +218,9 @@ class PolicyCloud_Marketplace_Public
 	 * Handle user registration AJAX requests.
 	 *
 	 * @uses 	PolicyCloud_Marketplace_Public::account_registration()
+	 *
 	 * @since	1.0.0
+	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
 	public function account_registration_handler()
 	{
@@ -239,7 +270,8 @@ class PolicyCloud_Marketplace_Public
 	/**
 	 * Register the shortcode for account authorization.
 	 *
-	 * @since    1.0.0
+	 * @since	1.0.0
+	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
 	public static function account_authorization_shortcode()
 	{
@@ -272,7 +304,9 @@ class PolicyCloud_Marketplace_Public
 	 * Handle user login AJAX requests.
 	 *
 	 * @uses	PolicyCloud_Marketplace_Public::account_authorization()
+	 *
 	 * @since	1.0.0
+	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
 	public function account_authorization_handler()
 	{
@@ -309,8 +343,8 @@ class PolicyCloud_Marketplace_Public
 	 * @uses	get_user_descriptions()
 	 * @uses	get_user_statistics()
 	 * @uses	account_html()
-	 * 
-	 * @since    1.0.0
+	 *
+	 * @since	1.0.0
 	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
 	public static function account_shortcode()
@@ -353,7 +387,7 @@ class PolicyCloud_Marketplace_Public
 					if ($account_information['profile_parameters']['profile_image'] != 'default_image_users') {
 						$picture = get_user_picture($account_information['profile_parameters']['profile_image'], $token['encoded']);
 					}
-					
+
 					// Get user descriptions.
 					$descriptions = get_account_assets($account_information['username'], $token['encoded'] ?? null, [
 						'page' => $_GET['page'] ?? null,
@@ -374,10 +408,10 @@ class PolicyCloud_Marketplace_Public
 					}
 				}
 			} else $error = "not-logged-in";
-
 			if (!empty($account_information)) {
 				$statistics = get_user_statistics(($visiting) ? $_GET['user'] : $token['decoded']['username'], $token['encoded'] ?? null);
 			}
+		} catch (ErrorException $e) {
 		} catch (Exception $e) {
 			$error = $e->getMessage();
 		}
@@ -413,8 +447,8 @@ class PolicyCloud_Marketplace_Public
 			$reviews ?? [],
 			$approvals ?? [],
 			[
-				"is_admin" => $is_admin,
-				"visiting" => $visiting,
+				"is_admin" => $is_admin ?? false,
+				"visiting" => $visiting ?? false,
 				"error" => $error ?? '',
 				"notice" => $notice ?? '',
 				"login_page" => $options['login_page'],
@@ -430,7 +464,9 @@ class PolicyCloud_Marketplace_Public
 	 * Handle user account editing AJAX requests.
 	 *
 	 * @uses 	PolicyCloud_Marketplace_Public::account_registration()
+	 * 
 	 * @since	1.0.0
+	 * @author 	Alexandros Raikos <araikos@unipi.gr>
 	 */
 	public function account_editing_handler()
 	{
@@ -445,27 +481,60 @@ class PolicyCloud_Marketplace_Public
 		try {
 			$token = retrieve_token(true);
 			if (!empty($token)) {
+				if (!empty($_POST['subsequent_action'])) {
+					if ($_POST['subsequent_action'] == 'edit_account') {
 
-				// Respond with data.
-				$updated_token = account_edit([
-					'password' => $_POST['password'] ?? '',
-					'password-confirm' => $_POST['password-confirm'] ?? '',
-					'current-password' => $_POST['current-password'] ?? '',
-					'name' => $_POST['name'],
-					'surname' => $_POST['surname'],
-					'title' => $_POST['title'] ?? '',
-					'gender' => $_POST['gender'] ?? '',
-					'organization' => $_POST['organization'] ?? '',
-					'email' => $_POST['email'],
-					'phone' => $_POST['phone'] ?? '',
-					'socials-title' => $_POST['socials-title'] ?? '',
-					'socials-url' => $_POST['socials-url'] ?? '',
-					'about' => $_POST['about'] ?? '',
-					'public_email' => $_POST['public_email'],
-					'public_phone' => $_POST['public_phone'],
-				], $_POST['username'], $token['encoded']);
-				http_response_code(200);
-				die(json_encode($updated_token));
+						// Check for uploaded file.
+						if (!empty($_FILES['profile_picture'])) {
+							if ($_FILES['profile_picture']['error'] == 0) {
+								if (
+									$_FILES['profile_picture']['type'] != 'image/jpeg' &&
+									$_FILES['profile_picture']['type'] != 'image/png'
+								) {
+									throw new RuntimeException("Supported formats for  profile pictures are .png and .jpg/.jpeg.");
+								}
+								if ($_FILES['profile_picture']['size'] > 1000000) {
+									throw new RuntimeEXception("The image file is too large. Please upload a file less than 1MB in size.");
+								}
+								$new_profile_picture = true;
+							} elseif ($_FILES['profile_picture']['error'] == 4);
+							else {
+								throw new RuntimeException($this->fileUploadErrorInterpreter($_FILES['profile_picture']['error']));
+							}
+						} else {
+							$new_profile_picture = false;
+						}
+
+						// Respond with data.
+						$updated_token = account_edit([
+							'password' => $_POST['password'] ?? '',
+							'password-confirm' => $_POST['password-confirm'] ?? '',
+							'current-password' => $_POST['current-password'] ?? '',
+							'name' => $_POST['name'],
+							'surname' => $_POST['surname'],
+							'title' => $_POST['title'] ?? '',
+							'gender' => $_POST['gender'] ?? '',
+							'organization' => $_POST['organization'] ?? '',
+							'email' => $_POST['email'],
+							'phone' => $_POST['phone'] ?? '',
+							'socials-title' => $_POST['socials-title'] ?? '',
+							'socials-url' => $_POST['socials-url'] ?? '',
+							'about' => $_POST['about'] ?? '',
+							'public_email' => $_POST['public_email'],
+							'public_phone' => $_POST['public_phone'],
+							'new_profile_picture' => $new_profile_picture
+						], $_POST['username'], $token['encoded']);
+						http_response_code(200);
+						die(json_encode($updated_token));
+					}
+					if ($_POST['subsequent_action'] == 'delete_profile_picture') {
+						$updated_token = delete_user_picture($_POST['username'], $token['encoded']);
+						http_response_code(200);
+						die($updated_token);
+					}
+				} else {
+					throw new RuntimeException("No subsequent action was defined.");
+				}
 			} else {
 				http_response_code(404);
 				die("User token not found.");
@@ -492,8 +561,9 @@ class PolicyCloud_Marketplace_Public
 	 * Handle user verification email AJAX requests.
 	 *
 	 * @uses 	user_email_verification_resend()
-	 * 
+	 *
 	 * @since	1.0.0
+	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
 	public function account_email_verification_resend_handler()
 	{
@@ -533,6 +603,7 @@ class PolicyCloud_Marketplace_Public
 	 * Handle user account editing AJAX requests.
 	 *
 	 * @since	1.0.0
+	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
 	public function account_data_request_handler()
 	{
@@ -578,6 +649,7 @@ class PolicyCloud_Marketplace_Public
 	 * Handle user account deletion AJAX requests.
 	 *
 	 * @since	1.0.0
+	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
 	public function account_deletion_handler()
 	{
@@ -626,16 +698,17 @@ class PolicyCloud_Marketplace_Public
 	/**
 	 * Register all the shortcodes concerning content handling.
 	 *
-	 * @since    1.0.0
+	 * @since	1.0.0
+	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
 	public function add_content_shortcodes()
 	{
 
 		// Read multiple objects sequence.
-		add_shortcode('policycloud-marketplace-read-multiple', 'PolicyCloud_Marketplace_Public::read_multiple_objects');
+		add_shortcode('policycloud-marketplace-read-multiple', 'PolicyCloud_Marketplace_Public::assets_archive_shortcode');
 
 		// Read single object sequence.
-		add_shortcode('policycloud-marketplace-read-single', 'PolicyCloud_Marketplace_Public::read_single_object');
+		add_shortcode('policycloud-marketplace-read-single', 'PolicyCloud_Marketplace_Public::asset_shortcode');
 
 		// Create object sequence.
 		add_shortcode('policycloud-marketplace-create-object', 'PolicyCloud_Marketplace_Public::asset_creation_shortcode');
@@ -645,86 +718,88 @@ class PolicyCloud_Marketplace_Public
 	}
 
 	/**
-	 * Display Description Object creation form for authenticated users.
+	 * Display multiple Description Objects for visitors and authenticated users.
 	 *
-	 * @since    1.0.0
+	 * @since 	1.0.0
+	 * @author 	Alexandros Raikos <araikos@unipi.gr>
 	 */
-	public static function asset_creation_shortcode()
+	public static function asset_archive_shortcode()
 	{
-
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
 
 		try {
-			// Get specific Description data for authorized users.
-			$token = retrieve_token();
-			if (empty($token)) $error_message = "You need to be logged in to create an Asset.";
+			// Retrieve all public descriptions based on GET parameter filtering.
+			$descriptions = get_assets($_GET);
+		} catch (ErrorException $e) {
+			$notice = $e->getMessage();
 		} catch (Exception $e) {
-			$error_message = $e->getMessage();
+			$error = $e->getMessage();
 		}
 
 		// Retrieve description page URL.
 		$options = get_option('policycloud_marketplace_plugin_settings');
-		if (empty($options['account_page'])) $error_message = "You have not set an account page in your PolicyCloud Marketplace settings.";
+		if (empty($options['description_page'])) $error = "You have not set a Description page in your PolicyCloud Marketplace settings.";
 
-		wp_enqueue_script("policycloud-marketplace-asset-creation");
-		wp_localize_script('policycloud-marketplace-asset-creation', 'ajax_properties_asset_creation', array(
-			'ajax_url' => admin_url('admin-ajax.php'),
-			'nonce' => wp_create_nonce('ajax_policycloud_asset_creation_verification'),
-			'account_page' => $options['account_page']
-		));
-
+		// Print response data to front end.
+		wp_enqueue_script("policycloud-marketplace-asset-archive");
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		object_creation_html($error_message ?? '');
+
+
+		read_multiple_html($descriptions, [
+			"authenticated" => $authenticated ?? false,
+			"description_url" => $options['description_page'],
+			"error" => $error ?? null,
+			"notice" => $notice ?? null
+		]);
 	}
-
+	
 	/**
-	 * Handle description creation AJAX requests.
+	 * Display a single description object for authenticated users.
 	 *
-	 * @uses	PolicyCloud_Marketplace_Public::description_creation()
 	 * @since	1.0.0
+	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
-	public function asset_creation_handler()
+	public static function asset_shortcode()
 	{
-		// Verify WordPress generated nonce.
-		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_asset_creation_verification')) {
-			http_response_code(403);
-			die("Unverified request to create an asset.");
-		}
-
-		// TODO @alexandrosraikos: Check all $_POST fields.
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
 
 		try {
-			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
-			$token = retrieve_token();
+			// Get specific Description data for authorized users.
+			$token = retrieve_token(true);
 			if (!empty($token)) {
-				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
-				$asset_id = create_asset($_POST, $token);
-				http_response_code(200);
-				die(json_encode($asset_id));
-			} else {
-				http_response_code(404);
-				die("User token not found.");
-			}
-		} catch (RuntimeException $e) {
-			http_response_code(400);
-			die($e->getMessage());
-		} catch (InvalidArgumentException $e) {
-			http_response_code(404);
-			die($e->getMessage());
-		} catch (JsonException $e) {
-			http_response_code(440);
-			die();
-		} catch (ErrorException $e) {
-			http_response_code(500);
-			die($e->getMessage());
+				$description = get_asset($_GET['did'], $token['encoded']);
+
+				// Specify Description ownership.
+				$owner = ($description['info']['provider'] == $token['decoded']['username']);
+			} else $description = get_asset($_GET['did']);
+		} catch (Exception $e) {
+			$error = $e->getMessage();
 		}
+
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
+		wp_enqueue_script('policycloud-marketplace-asset');
+		wp_localize_script('policycloud-marketplace-asset', 'ajax_properties_description_editing', array(
+			'ajax_url' => admin_url('admin-ajax.php'),
+			'nonce' => wp_create_nonce('ajax_policycloud_description_editing_verification'),
+			'description_id' => $_GET['did']
+		));
+
+		read_single_html($description, [
+			"authenticated" => !empty($token ?? null),
+			"is_owner" => $owner ?? false,
+			"error" => $error ?? '',
+		]);
 	}
 
 	/**
 	 * Handle description editing AJAX requests.
 	 *
 	 * @uses	PolicyCloud_Marketplace_Public::description_editing()
+	 *
 	 * @since	1.0.0
+	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
 	public function asset_editing_handler()
 	{
@@ -763,76 +838,81 @@ class PolicyCloud_Marketplace_Public
 	}
 
 	/**
-	 * Display multiple Description Objects for visitors and authenticated users.
+	 * Display the asset creation form for authenticated users.
 	 *
-	 * @since    1.0.0
+	 * @since	1.0.0
+	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
-	public static function read_multiple_objects()
+	public static function asset_creation_shortcode()
 	{
+
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
 
 		try {
-			// Retrieve all public descriptions based on GET parameter filtering.
-			$descriptions = get_assets($_GET);
-		} catch (ErrorException $e) {
-			$notice = $e->getMessage();
+			// Get specific Description data for authorized users.
+			$token = retrieve_token();
+			if (empty($token)) $error_message = "You need to be logged in to create an Asset.";
 		} catch (Exception $e) {
-			$error = $e->getMessage();
+			$error_message = $e->getMessage();
 		}
 
 		// Retrieve description page URL.
 		$options = get_option('policycloud_marketplace_plugin_settings');
-		if (empty($options['description_page'])) $error = "You have not set a Description page in your PolicyCloud Marketplace settings.";
+		if (empty($options['account_page'])) $error_message = "You have not set an account page in your PolicyCloud Marketplace settings.";
 
-		// Print response data to front end.
-		wp_enqueue_script("policycloud-marketplace-read-multiple", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-read-multiple.js', array('jquery'));
+		wp_enqueue_script("policycloud-marketplace-asset-creation");
+		wp_localize_script('policycloud-marketplace-asset-creation', 'ajax_properties_asset_creation', array(
+			'ajax_url' => admin_url('admin-ajax.php'),
+			'nonce' => wp_create_nonce('ajax_policycloud_asset_creation_verification'),
+			'account_page' => $options['account_page']
+		));
+
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-
-
-		read_multiple_html($descriptions, [
-			"authenticated" => $authenticated ?? false,
-			"description_url" => $options['description_page'],
-			"error" => $error ?? null,
-			"notice" => $notice ?? null
-		]);
+		object_creation_html($error_message ?? '');
 	}
 
 	/**
-	 * Display a single description object for authenticated users.
+	 * Handle description creation AJAX requests.
 	 *
-	 * @since    1.0.0
+	 * @uses	PolicyCloud_Marketplace_Public::description_creation()
+	 *
+	 * @since	1.0.0
+	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
-	public static function read_single_object()
+	public function asset_creation_handler()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
-
-		try {
-			// Get specific Description data for authorized users.
-			$token = retrieve_token(true);
-			if (!empty($token)) {
-				$description = get_asset($_GET['did'], $token['encoded']);
-
-				// Specify Description ownership.
-				$owner = ($description['info']['provider'] == $token['decoded']['username']);
-			} else $description = get_asset($_GET['did']);
-		} catch (Exception $e) {
-			$error = $e->getMessage();
+		// Verify WordPress generated nonce.
+		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_asset_creation_verification')) {
+			http_response_code(403);
+			die("Unverified request to create an asset.");
 		}
 
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		wp_enqueue_script('policycloud-marketplace-read-single');
-		wp_localize_script('policycloud-marketplace-read-single', 'ajax_properties_description_editing', array(
-			'ajax_url' => admin_url('admin-ajax.php'),
-			'nonce' => wp_create_nonce('ajax_policycloud_description_editing_verification'),
-			'description_id' => $_GET['did']
-		));
+		// TODO @alexandrosraikos: Check all $_POST fields.
 
-		read_single_html($description, [
-			"authenticated" => !empty($token ?? null),
-			"is_owner" => $owner ?? false,
-			"error" => $error ?? '',
-		]);
+		try {
+			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+			$token = retrieve_token();
+			if (!empty($token)) {
+				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
+				$asset_id = create_asset($_POST, $token);
+				http_response_code(200);
+				die(json_encode($asset_id));
+			} else {
+				http_response_code(404);
+				die("User token not found.");
+			}
+		} catch (RuntimeException $e) {
+			http_response_code(400);
+			die($e->getMessage());
+		} catch (InvalidArgumentException $e) {
+			http_response_code(404);
+			die($e->getMessage());
+		} catch (JsonException $e) {
+			http_response_code(440);
+			die();
+		} catch (ErrorException $e) {
+			http_response_code(500);
+			die($e->getMessage());
+		}
 	}
 }

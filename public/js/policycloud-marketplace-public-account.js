@@ -494,6 +494,7 @@
         "username",
         ajax_properties_account_editing.user_id ?? ""
       );
+      formData.append("subsequent_action", "edit_account");
 
       // Perform AJAX request.
       $.ajax({
@@ -502,11 +503,57 @@
         processData: false,
         contentType: false,
         data: formData,
+        cache: false,
         dataType: "json",
         complete: (response) => {
           handleAJAXResponse(
             response,
             "#policycloud-marketplace-account-edit button[type=submit]",
+            (data) => {
+              setAuthorizedToken(data);
+              window.location.reload();
+            }
+          );
+        },
+      });
+    }
+
+    /**
+     * Submit via AJAX a profile picture deletion request.
+     * Uses the same endpoint as account editing.
+     *
+     * @param {Event} e
+     *
+     * @author Alexandros Raikos <araikos@unipi.gr>
+     */
+    function deleteProfilePicture(e) {
+      e.preventDefault();
+      console.log("Hey!");
+
+      // Add loading class to delete button.
+      $(
+        '.policycloud-marketplace .file-editor[data-name="profile-picture"] .delete'
+      ).prop("disabled", true);
+
+      // Prepare deletion form.
+      var formData = new FormData();
+      formData.append("action", "policycloud_marketplace_account_edit");
+      formData.append("nonce", ajax_properties_account_editing.nonce);
+      formData.append("subsequent_action", "delete_profile_picture");
+
+      // Perform AJAX request.
+      $.ajax({
+        url: ajax_properties_account_editing.ajax_url,
+        type: "post",
+        processData: false,
+        contentType: false,
+        data: formData,
+        cache: false,
+        dataType: "json",
+        complete: (response) => {
+          handleAJAXResponse(
+            response,
+            '.policycloud-marketplace .file-editor[data-name="profile-picture"] button.delete',
             (data) => {
               setAuthorizedToken(data);
               window.location.reload();
@@ -664,6 +711,11 @@
     // Edit information.
     $("#policycloud-marketplace-account-edit-toggle").click(toggleFormFields);
 
+    // Delete profile picture.
+    $(
+      '.policycloud-marketplace .file-editor[data-name="profile-picture"] .delete'
+    ).click(deleteProfilePicture);
+
     // Add a weblink field.
     $("#policycloud-marketplace-account-edit .socials button.add-field").click(
       addWeblinkField
@@ -701,7 +753,9 @@
     );
 
     // Submit the updated information.
-    $("#policycloud-marketplace-account-edit").submit(updateInformation);
+    $("#policycloud-marketplace-account-edit button[type=submit]").click(
+      updateInformation
+    );
 
     // Request a copy of the account's data.
     $("button#policycloud-marketplace-request-data-copy").click(

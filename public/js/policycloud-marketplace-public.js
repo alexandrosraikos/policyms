@@ -54,12 +54,18 @@ function removeAuthorization(reload = false) {
  *
  * @author Alexandros Raikos <araikos@unipi.gr>
  */
-function showAlert(selector, message, type = "error", placeBefore = false) {
+function showAlert(
+  selector,
+  message,
+  type = "error",
+  placeBefore = false,
+  disappearing = true
+) {
   if (placeBefore) {
     $(selector).before(
       '<div class="policycloud-marketplace-' +
         type +
-        '"><span>' +
+        ' animated"><span>' +
         message +
         "</span></div>"
     );
@@ -67,10 +73,18 @@ function showAlert(selector, message, type = "error", placeBefore = false) {
     $(selector).after(
       '<div class="policycloud-marketplace-' +
         type +
-        '"><span>' +
+        ' animated"><span>' +
         message +
         "</span></div>"
     );
+  }
+  if (disappearing) {
+    setTimeout(() => {
+      $(selector).next().addClass("seen");
+    }, 2500);
+    setTimeout(() => {
+      $(selector).next().addClass("dismissed");
+    }, 2700);
   }
 }
 
@@ -109,6 +123,9 @@ function handleAJAXResponse(response, actionSelector, completedAction) {
 
   // Remove the loading class.
   $(actionSelector).removeClass("loading");
+  if (actionSelector.includes("button")) {
+    $(actionSelector).prop("disabled", false);
+  }
 }
 
 /**
