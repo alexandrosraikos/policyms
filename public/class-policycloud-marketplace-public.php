@@ -896,7 +896,7 @@ class PolicyCloud_Marketplace_Public
 			die("Unverified request to create an asset.");
 		}
 
-		// TODO @alexandrosraikos: Check all $_POST fields.
+		// TODO @alexandrosraikos: Check all $_POST fields. (waiting on asset creation form).
 
 		try {
 			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
