@@ -973,8 +973,6 @@ function account_html(array $information, $picture, array $statistics, array $as
                                                 </div>
                                             <?php
                                             }
-                                            // TODO @alexandrosraikos: Delete image.
-                                            // TODO @alexandrosraikos: Add / Update image.
                                             if (!$args['is_admin'] && !$args['visiting']) {
                                             ?>
                                                 <span class="folding">
