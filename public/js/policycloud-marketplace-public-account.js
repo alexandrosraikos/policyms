@@ -44,13 +44,14 @@
 
     // Change account navigation tab.
     $(
-      "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-reviews, button#policycloud-account-asset-approvals, button#policycloud-account-information"
+      "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-reviews, button#policycloud-account-approvals, button#policycloud-account-information"
     ).click(switchTab);
 
     // Hash determines active tab?
     if (
       window.location.hash == "#assets" ||
       window.location.hash == "#reviews" ||
+      window.location.hash == "#approvals" ||
       window.location.hash == "#information"
     ) {
       $("button#policycloud-account-" + window.location.hash.substr(1)).trigger(
@@ -103,7 +104,7 @@
       var activePage = rememberPage
         ? $("ul." + category + ".visible").data("page")
         : 1;
-      $("#policycloud-account-" + category + "-list").empty();
+      $('.paginated-list[data-category="' + category + '"]').empty();
 
       // Sort by property.
       switch (sortBy) {
@@ -149,10 +150,10 @@
       for (let i = 0; i < items.length; i++) {
         if (i == 0 || i % itemsPerPage == 0) {
           // Add page.
-          $("#policycloud-account-" + category + "-list").prepend(
+          $('.paginated-list[data-category="' + category + '"]').prepend(
             '<ul data-page="' +
               page +
-              '" class="' +
+              '" class="page ' +
               category +
               " " +
               (page == activePage ? "visible" : "") +
@@ -161,11 +162,13 @@
 
           // Add pagination and buttons.
           if (i == 0) {
-            $("#policycloud-account-" + category + "-list").append(
+            $('.paginated-list[data-category="' + category + '"]').append(
               '<nav class="pagination"></nav>'
             );
           }
-          $("#policycloud-account-" + category + "-list nav.pagination").append(
+          $(
+            '.paginated-list[data-category="' + category + '"] nav.pagination'
+          ).append(
             '<button data-category="' +
               category +
               '" class="page-selector' +
@@ -185,10 +188,10 @@
       }
 
       // Add hidden items list for future use.
-      $("#policycloud-account-" + category + "-list").append(
+      $('.paginated-list[data-category="' + category + '"]').append(
         '<ul class="' + category + ' hidden"></ul>'
       );
-      $("#policycloud-account-" + category + "-list ul.hidden").append(
+      $('.paginated-list[data-category="' + category + '"] ul.hidden').append(
         hiddenItems
       );
     }
@@ -198,7 +201,7 @@
      * available collections in the asset list.
      *
      * @param {String} category The tab in which the filters are being displayed
-     * (currently only supports `asset` and `review`).
+     * (currently only supports `asset`, `review` and `approval`).
      * @param {[String]} collections
      *
      * @author Alexandros Raikos <araikos@unipi.gr>

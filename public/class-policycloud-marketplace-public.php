@@ -237,16 +237,16 @@ class PolicyCloud_Marketplace_Public
 			// Respond with data.
 			$registration = account_registration([
 				'username' => $_POST['username'],
-				'password' => $_POST['password'],
-				'password-confirm' => $_POST['password-confirm'],
-				'name' => $_POST['name'],
-				'surname' => $_POST['surname'],
+				'password' => stripslashes($_POST['password']),
+				'password-confirm' => stripslashes($_POST['password-confirm']),
+				'name' => stripslashes($_POST['name']),
+				'surname' => stripslashes($_POST['surname']),
 				'title' => $_POST['title'] ?? '',
 				'gender' => $_POST['gender'] ?? '',
-				'organization' => $_POST['organization'] ?? '',
+				'organization' => stripslashes($_POST['organization'] ?? ''),
 				'email' => $_POST['email'],
 				'phone' => $_POST['phone'] ?? '',
-				'social-title' => $_POST['social-title'] ?? '',
+				'social-title' => stripslashes($_POST['social-title'] ?? ''),
 				'social-url' => $_POST['social-url'] ?? '',
 				'about' => $_POST['about'] ?? '',
 			]);
@@ -322,7 +322,10 @@ class PolicyCloud_Marketplace_Public
 		// Attempt to authorize the user using POST data.
 		try {
 			http_response_code(200);
-			die(json_encode(account_authorization($_POST)));
+			die(json_encode(account_authorization([
+				'username-email' => stripslashes($_POST['username-email']),
+				'password' => stripslashes($_POST['password'])
+			])));
 		} catch (InvalidArgumentException $e) {
 			http_response_code(404);
 			die($e->getMessage());
@@ -510,19 +513,19 @@ class PolicyCloud_Marketplace_Public
 
 						// Respond with data.
 						$updated_token = account_edit([
-							'password' => $_POST['password'] ?? '',
-							'password-confirm' => $_POST['password-confirm'] ?? '',
-							'current-password' => $_POST['current-password'] ?? '',
-							'name' => $_POST['name'],
-							'surname' => $_POST['surname'],
+							'password' => stripslashes($_POST['password'] ?? ''),
+							'password-confirm' => stripslashes($_POST['password-confirm'] ?? ''),
+							'current-password' => stripslashes($_POST['current-password'] ?? ''),
+							'name' => stripslashes($_POST['name']),
+							'surname' => stripslashes($_POST['surname']),
 							'title' => $_POST['title'] ?? '',
 							'gender' => $_POST['gender'] ?? '',
-							'organization' => $_POST['organization'] ?? '',
+							'organization' => stripslashes($_POST['organization'] ?? ''),
 							'email' => $_POST['email'],
 							'phone' => $_POST['phone'] ?? '',
-							'socials-title' => $_POST['socials-title'] ?? '',
+							'socials-title' => stripslashes($_POST['socials-title'] ?? ''),
 							'socials-url' => $_POST['socials-url'] ?? '',
-							'about' => $_POST['about'] ?? '',
+							'about' => stripslashes($_POST['about'] ?? ''),
 							'public_email' => $_POST['public_email'],
 							'public_phone' => $_POST['public_phone'],
 							'new_profile_picture' => $new_profile_picture
@@ -536,8 +539,7 @@ class PolicyCloud_Marketplace_Public
 						http_response_code(200);
 						if ($is_admin && $visiting) {
 							die();
-						}
-						else {
+						} else {
 							die(json_encode($updated_token));
 						}
 					}
@@ -877,7 +879,7 @@ class PolicyCloud_Marketplace_Public
 		));
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		object_creation_html($error_message ?? '');
+		asset_creation_html($error_message ?? '');
 	}
 
 	/**

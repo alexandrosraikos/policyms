@@ -529,7 +529,7 @@ function read_single_html($description_object, $args)
     }
 }
 
-function object_creation_html(string $error = null)
+function asset_creation_html(string $error = null)
 {
     if (!empty($error)) {
         show_alert($error);
@@ -774,7 +774,7 @@ function account_html(array $information, $picture, array $statistics, array $as
                     <?php
                     if (!$args['visiting'] && $args['is_admin']) {
                     ?>
-                        <button class="tactile" id="policycloud-account-asset-approvals">Approvals</button>
+                        <button class="tactile" id="policycloud-account-approvals">Approvals</button>
                     <?php
                     }
                     ?>
@@ -914,9 +914,8 @@ function account_html(array $information, $picture, array $statistics, array $as
                     </section>
                     <?php
                     if (!$args['visiting'] && $args['is_admin']) {
-                        // TODO @alexandrosraikos: Check filters and pagination (waiting on @vkoukos).
                     ?>
-                        <section class="policycloud-account-asset-approvals">
+                        <section class="policycloud-account-approvals">
                             <?php
                             asset_viewer_html('approvals', $approvals, $args, function ($approval) use ($args) {
                             ?>
@@ -954,7 +953,7 @@ function account_html(array $information, $picture, array $statistics, array $as
                             }
                             ?>
                         </header>
-                        <form id="policycloud-marketplace-account-edit" action="">
+                        <form id="policycloud-marketplace-account-edit" accept-charset="utf8" action="">
                             <table class="information">
                                 <?php
                                 if ($args['is_admin'] || !$args['visiting']) {
