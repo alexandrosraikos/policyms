@@ -140,7 +140,7 @@ function account_authorization_html($registration_url, $logged_in)
     }
 }
 
-function read_multiple_html($description_objects, $args)
+function assets_archive_html($description_objects, $args)
 {
     /** 
      * TODO @elefkour: Create filter queries in form.
@@ -284,7 +284,7 @@ function read_multiple_html($description_objects, $args)
     }
 }
 
-function read_single_html($description_object, $args)
+function asset_html($description_object, $args)
 {
     // TODO @elefkour: Remove comments, use PHP - check IFs for empty fields.
 

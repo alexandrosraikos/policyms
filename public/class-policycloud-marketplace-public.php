@@ -734,7 +734,7 @@ class PolicyCloud_Marketplace_Public
 	 * @since 	1.0.0
 	 * @author 	Alexandros Raikos <araikos@unipi.gr>
 	 */
-	public static function asset_archive_shortcode()
+	public static function assets_archive_shortcode()
 	{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
@@ -757,7 +757,7 @@ class PolicyCloud_Marketplace_Public
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 
 
-		read_multiple_html($descriptions, [
+		assets_archive_html($descriptions, [
 			"authenticated" => $authenticated ?? false,
 			"description_url" => $options['description_page'],
 			"error" => $error ?? null,
@@ -797,7 +797,7 @@ class PolicyCloud_Marketplace_Public
 			'description_id' => $_GET['did']
 		));
 
-		read_single_html($description, [
+		asset_html($description, [
 			"authenticated" => !empty($token ?? null),
 			"is_owner" => $owner ?? false,
 			"error" => $error ?? '',
