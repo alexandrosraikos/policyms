@@ -523,7 +523,7 @@ class PolicyCloud_Marketplace_Public
 							'organization' => stripslashes($_POST['organization'] ?? ''),
 							'email' => $_POST['email'],
 							'phone' => $_POST['phone'] ?? '',
-							'socials-title' => stripslashes($_POST['socials-title'] ?? ''),
+							'socials-title' => $_POST['socials-title'] ?? '',
 							'socials-url' => $_POST['socials-url'] ?? '',
 							'about' => stripslashes($_POST['about'] ?? ''),
 							'public_email' => $_POST['public_email'],

@@ -142,8 +142,6 @@ function account_authorization_html($registration_url, $logged_in)
 
 function read_multiple_html($description_objects, $args)
 {
-    // TODO @alexandrosraikos: Rename and clean up shortcode (after the account page).
-
     /** 
      * TODO @elefkour: Create filter queries in form.
      * + add submit button
@@ -167,21 +165,20 @@ function read_multiple_html($description_objects, $args)
         echo  '<div class="error-msg1"><i class="fa fa-times-circle"></i>Error message: No description objects were found.</div>';
     } else {
     ?>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" type="text/css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" type="text/css">
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-
+     
         <ul class="sidenav">
             <a style="pointer-events: none; cursor: default;">Filter by</a>
             <form action="" method="get">
                 <input type="text" style="width:100%;" name="search" placeholder="Search..">
             </form>
-            <a class="dropdown-btn1">Asset Types
-                <i class="fa fa-caret-down"></i>
-            </a>
-            <div class="dropdown-container">
-                <form id="checkbox1" action="">
+           Asset Types
+               
+         
+            
+                <form action="">
+               
+                    <button style="background-color:inherit;color:black;border-color: black;" class="pcnav1" data-type-filter="algorithms">algorithms</button>
+    
                     <input type="checkbox" id="vehicle1" name="type[]" value="algorithms">
                     <label class="pccheckbox" for="vehicle1"> Algorithms </label> <br>
                     <input type="checkbox" id="vehicle2" name="type[]" value="tools">
@@ -204,11 +201,10 @@ function read_multiple_html($description_objects, $args)
 
 
 
-            </div>
             <a class="dropdown-btn1">Filter by Owner
-                <i class="fa fa-caret-down"></i>
+               
             </a>
-            <div class="dropdown-container">
+          
                 <br>
 
                 <input type="checkbox" id="owner1" name="owner[]" value="university1">
@@ -220,23 +216,6 @@ function read_multiple_html($description_objects, $args)
 
                 </form>
 
-            </div>
-
-            <a class="dropdown-btn1">Advanced search
-                <i class="fa fa-caret-down"></i>
-            </a>
-            <div class="dropdown-container">
-                <span style="color:white;">Choose a name and his value </span>
-                <div class="col-1">
-                    <div class="form" action="">
-                        <input type="text" class="myinp" placeholder="Add Key"> <input class="myinp" type="text" placeholder="Value">
-                        <button class="btn btn-primary add_field_button"><i>+</i> Add More</button>
-                    </div>
-                </div>
-                <div class="input_fields_wrap">
-                    <!-- Dynamic Fields go here -->
-                </div>
-            </div>
 
             <a style="pointer-events: none; cursor: default;"> Filter by Views</a>
             <span style="color:white;" id="slider_value"></span>
@@ -283,19 +262,16 @@ function read_multiple_html($description_objects, $args)
                                     <img class="category__01" src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8Mnx8fGVufDB8fHx8&w=1000&q=80" alt="" />
                             </picture>
                             <div class="card-content">
-                                <p class="category1 category__01_plaisio"> <?php echo  $description['collection']; ?></p>
-                                <br>
-
-                                <span style="color:gray;font-size:12px;"> <i><img class="policy-cloud-eye-img" style="color:gray;width:15px;height:22px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/eye.svg') ?>" /> </i> 100 | <i><img class="policy-cloud-eye-img" style="color:gray;width:15px;height:12px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/calendar.svg') ?>" /></i> 2.23.2021</span>
                                 <h1 class="title1"> <b><?php echo  $description['info']['title']; ?></b></h1>
                                 <p class="h6"> <?php echo $description['info']['short_desc']; ?></p>
                             </div><!-- .card-content -->
                             <footer class="footer1">
+                            <span ><?php echo  $description['info']['owner']; ?></span>
                                 <div class="post-meta1">
-
+                                <span style="color:gray;font-size:12px;"> <i class="fa fa-star" aria-hidden="true">5.2</i>2.23.2021</span>
                                     <span class="views1"><span class="policy-cloud-approve-img-i" style="color:gray;font-size:12px;height:12px;"><img class="policy-cloud-approve-img" style="width:10px;height:10px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/folder.svg') ?>" /> <a style="height:8px;" href="#"> <?php echo  $description['collection']; ?></a> </span>
-                                        <span class="policy-cloud-approve-img-i" style="color:gray;font-size:12px;height:12px;"><img class="policy-cloud-approve-img" style="width:10px;height:10px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/user.svg') ?>" /> <a style="height:8px;" href="#"> <?php echo  $description['info']['owner']; ?></a> </span> </span>
-
+<br>
+                                    <span class="views1"> <a id="col-card" ><?php echo $description['collection']; ?></a> <a id="col-card" ><?php echo $description['collection']; ?></a></span>
                                 </div>
                             </footer>
                         </article>
@@ -310,7 +286,7 @@ function read_multiple_html($description_objects, $args)
 
 function read_single_html($description_object, $args)
 {
-    // TODO @alexandrosraikos: Rename and clean up shortcode (after the account & assets page).
+    // TODO @elefkour: Remove comments, use PHP - check IFs for empty fields.
 
     //echo 'Hello ' . htmlspecialchars($_GET["did"]) . '!';
     // echo $args['description'];
@@ -692,8 +668,12 @@ function account_html(array $information, $picture, array $statistics, array $as
                         <option value="oldest" <?php echo (($_GET['sort_by'] ?? '' == 'oldest') ? "selected" : "") ?>>Oldest</option>
                         <option value="rating-asc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-asc') ? "selected" : "") ?>>Highest rated</option>
                         <option value="rating-desc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-desc') ? "selected" : "") ?>>Lowest rated</option>
+                        <?php
+                        if ($id == 'assets') {
+                        ?>
                         <option value="views-asc" <?php echo (($_GET['sort_by'] ?? '' == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
                         <option value="views-desc" <?php echo (($_GET['sort_by'] ?? '' == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
+                        <?php } ?>
                         <option value="title" <?php echo (($_GET['sort_by'] ?? '' == 'title') ? "selected" : "") ?>>Title</option>
                     </select>
                     <label for="items-per-page">Items per page</label>

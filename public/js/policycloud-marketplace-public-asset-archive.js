@@ -21,16 +21,7 @@
     */
   $(document).ready(() => {
     /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
-    $(".dropdown-btn1").on("click", function () {
-      $(this).toggleClass("active");
 
-      var dropdownContent = this.nextElementSibling;
-      if (dropdownContent.style.display === "block") {
-        dropdownContent.style.display = "none";
-      } else {
-        dropdownContent.style.display = "block";
-      }
-    });
     $("body").on("focus", ".datepicker", function () {
       $(this).datepicker();
     });

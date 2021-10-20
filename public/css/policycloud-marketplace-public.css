@@ -173,34 +173,34 @@ input[type="text"] {
   z-index: 1;
   top: 9;
   left: 0;
-  background-color: #000080;
+  background-color: gray;
   max-height: calc(100vh - 9rem);
   overflow-y: auto;
   overflow-x: hidden;
 }
-
-/* Style the sidenav links and the dropdown button */
-.sidenav a,
-.dropdown-btn {
-  padding: 6px 8px 6px 16px;
+button.pcnac1 {
+  background-color: gray;
+  padding: 4px 8px;
+  margin: 0 5px 5px 0;
+  background: transparent !important;
+  font-size: 100%;
+  border: 2px solid rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
   text-decoration: none;
-  font-size: 20px;
-  color: white;
-  display: block;
-  border: none;
-  background: none;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  outline: none;
+  color: gray !important;
+  text-transform: unset;
+  transition: all 0.2s ease-in-out;
 }
-
-/* On mouse-over */
-.sidenav a:hover,
-.dropdown-btn:hover {
-  color: none;
+a#col-card {
+  color: inherit;
+  display: inline-block !important;
+  font-size: 90%;
+  font-weight: 500;
+  padding: 0 10px;
+  border-color: black;
+  background-color: var(--policycloud-border-color-light);
+  border-radius: 100px;
 }
-
 /* Main content */
 .main {
   margin-left: 150px;
@@ -396,11 +396,10 @@ TODO @elefkour: Rename generic selectors.
 
 .sidenav a,
 .dropdown-btn1 {
-  background-color: #4682b4;
   padding: 6px 8px 6px 16px;
   text-decoration: none;
-  font-size: 20px;
-  color: white;
+  font-size: 16px;
+  color: #000000;
   display: block;
   border: none;
   background: none;
@@ -423,11 +422,6 @@ ul#policy-cloud-icons-discover li {
   display: inline-block !important;
 }
 
-.li1 {
-  background: url("https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/User_font_awesome.svg/512px-User_font_awesome.svg.png")
-    50% 50% no-repeat no-repeat;
-  padding-left: 5px;
-}
 /*option for user labe*/
 .pcowneroption {
   color: white;
@@ -442,22 +436,14 @@ ul#policy-cloud-icons-discover li {
 }
 
 .pccheckbox {
+  font-size: 16px;
   cursor: pointer;
   padding: 6px 8px 6px 16px;
-  color: white;
+  color: #000000;
 }
-.pccheckbox :hover {
-  color: #4682b4;
-}
+
 /* On mouse-over */
-.sidenav a:hover,
-.dropdown-btn1:hover {
-  color: none;
-  background-color: #4682b4;
-}
-.dropdown-btn1 a {
-  background-color: #4682b4;
-}
+
 /* Main content */
 .main {
   margin-left: 150px;
@@ -492,8 +478,7 @@ ul.sidenav {
   margin: 0;
   padding: 0;
   width: 25%;
-  background-image: url("https://nkfitness.gr/wp-content/uploads/2017/07/photo-placeholder-1.jpg");
-  background-color: #4682b4;
+  background-color: #f7f7f7;
   position: fixed;
   height: 100%;
   overflow: auto;
@@ -554,10 +539,15 @@ img {
   height: auto;
 }
 .title1 {
-  color: #4682b4;
+  color: black;
   margin: 2rem 0 0.5rem;
   font-size: 1.4rem;
   font-weight: 400;
+}
+.downer {
+  color: black;
+  font-size: 1.4rem;
+  margin-top: auto;
 }
 .cards {
   display: grid;
@@ -599,8 +589,8 @@ img {
   /* fill: #c7c4c4;*/
   height: 200px;
   width: 100%;
-  padding: 1.5rem;
-  object-fit: scale-down;
+
+  /* object-fit: scale-down;*/
 }
 
 .card-content {
@@ -634,9 +624,9 @@ img {
 }
 
 .footer1 {
-  border-top: 2px solid #e7e7e7;
+  border-top: 1px;
   margin: 0.5rem 0 0;
-  min-height: 30px;
+  min-height: 10px;
   font-size: 1.2rem;
   margin-top: auto;
 }

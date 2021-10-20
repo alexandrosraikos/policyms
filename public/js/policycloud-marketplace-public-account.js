@@ -74,6 +74,7 @@
     /**
      * Rearranges all the assets (as list items) into new lists,
      * based on the properties of the shortcode's Assets section.
+     *
      * @param {String} category The category of list items to rearrange.
      * @param {Boolean} rememberPage Pass *true* to stay on the same page after
      * the rearrangement.
@@ -302,7 +303,6 @@
       $("#policycloud-account-content nav.pagination button").removeClass(
         "active"
       );
-      console.log($(this).data("category"));
       $(
         "#policycloud-account-content section ul." + $(this).data("category")
       ).removeClass("visible");
@@ -517,6 +517,8 @@
               if (data.hasOwnProperty("message")) {
                 if (data.message != "completed") {
                   setAuthorizedToken(data);
+                } else {
+                  showAlert(data.message);
                 }
               } else {
                 setAuthorizedToken(data);
