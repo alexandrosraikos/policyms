@@ -192,7 +192,7 @@ function assets_grid_html($assets, $asset_url)
                     </div>
                 </a>
             </li>
-        <?php
+    <?php
         }
         echo '</ul>';
         echo '</div>';
@@ -212,76 +212,110 @@ function assets_grid_html($assets, $asset_url)
  */
 function assets_archive_html($assets, $args)
 {
+
+    // TODO @alexandrosraikos: CSS mockup alignment.
     if (!empty($args['error']))  echo show_alert($args['error']);
     if (!empty($args['notice'])) echo show_alert($args['notice'], false, 'notice');
-    if (empty($assets)) {
-        echo  show_alert('No assets found.', false, 'notice');
-    } else {
-        ?>
-        <div class="policycloud-marketplace" id="policycloud-marketplace-asset-archive">
-            <div class="filters">
-                <h2>Filters</h2>
-                <p>Select the options below to narrow your search.</p>
-                <form>
-                    <fieldset>
-                        <input type="text" name="search" placeholder="Search assets" />
-                    </fieldset>
-                    <fieldset>
-                        <h3>Types</h3>
-                        <?php // TODO: @alexandrosraikos Add type checkbox buttons. (waiting on @vkoukos)
+    ?>
+    <div class="policycloud-marketplace inspect" id="policycloud-marketplace-asset-archive">
+        <div class="filters">
+            <h2>Filters</h2>
+            <p>Select the options below to narrow your search.</p>
+            <form>
+                <fieldset>
+                    <input type="text" name="search" placeholder="Search assets" value="<?php echo $_GET['search'] ?? '' ?>" />
+                </fieldset>
+                <fieldset>
+                    <h3>Types</h3>
+                    <?php // TODO: @alexandrosraikos Add type checkbox buttons.
+                    ?>
+                </fieldset>
+                <fieldset>
+                    <h3>Provider</h3>
+                    <?php // TODO: @alexandrosraikos Add owner checkboxes. (waiting on @vkoukos)
+                    ?>
+                </fieldset>
+                <fieldset>
+                    <h3>Views</h3>
+                    <div class="views">
+                        <div>
+                            <input type="number" name="views_gte" value="<?php echo $_GET['views_gte'] ?? '0' ?>" />
+                        </div>
+                        <div>
+                            <input type="number" name="views_lte" placeholder="" value="<?php echo $_GET['views_lte'] ?? '0' ?>" />
+                            <?php // TODO: @alexandrosraikos Add max views. (waiting on @vkoukos)
+                            ?>
+                        </div>
+                        <?php // TODO: Add visual range selector 
                         ?>
-                    </fieldset>
-                    <fieldset>
-                        <h3>Owner</h3>
-                        <?php // TODO: @alexandrosraikos Add owner checkboxes. (waiting on @vkoukos)
-                        ?>
-                    </fieldset>
-                    <fieldset>
-                        <h3>Views</h3>
-                        <input type="number" name="views_gte" placeholder="0" />
-                        <input type="number" name="views_lte" placeholder="<?php
-                                                                            // TODO @alexandrosraikos: Calculate max views. (waiting on @vkoukos)
-                                                                            ?>" />
-                        <?php // TODO: @alexandrosraikos Add visual range selector 
-                        ?>
-                    </fieldset>
-                    <fieldset>
-                        <h3>Date</h3>
-                        <input type="date" name="update_date_gte" placeholder="0" />
-                        <input type="date" name="update_date_lte" placeholder="<?php
-                                                                                // TODO @alexandrosraikos: Add latest update date. (waiting on @vkoukos)
-                                                                                ?>" />
-                    </fieldset>
-                    <button type="submit">Apply filters</button>
-                </form>
-            </div>
-            <div class="content">
-                <header>
-                    <button class="toggle">
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                    </button>
-                    <form action="" class="selector">
-                        <label for="sort-by">Sort by</label>
-                        <select name="sort-by">
-                            <option value="newest" <?php echo ((($_GET['sort_by'] ?? '' == 'newest') || empty($_GET['sort_by'])) ? "selected" : "") ?>>Newest</option>
-                            <option value="oldest" <?php echo (($_GET['sort_by'] ?? '' == 'oldest') ? "selected" : "") ?>>Oldest</option>
-                            <option value="rating-asc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-asc') ? "selected" : "") ?>>Highest rated</option>
-                            <option value="rating-desc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-desc') ? "selected" : "") ?>>Lowest rated</option>
-                            <option value="views-asc" <?php echo (($_GET['sort_by'] ?? '' == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
-                            <option value="views-desc" <?php echo (($_GET['sort_by'] ?? '' == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
-                            <option value="title" <?php echo (($_GET['sort_by'] ?? '' == 'title') ? "selected" : "") ?>>Title</option>
-                        </select>
-                    </form>
-                </header>
-                <div class="gallery">
-                    <?php assets_grid_html($assets['results'][0], $args['asset_url']) ?>
-                </div>
-            </div>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <h3>Date</h3>
+                    <div class="dates">
+                        <div>
+                            <?php // TODO: @alexandrosraikos Add oldest date. (waiting on @vkoukos)
+                            ?>
+                            <label for="update_date_gte">From</label>
+                            <input type="date" onfocus="(this.type='date')" name="update_date_gte" placeholder="0" value="<?php echo $_GET['update_date_gte'] ?? '0' ?>" />
+                        </div>
+                        <div>
+                            <label for="update_date_lte">To</label>
+                            <input type="date" name="update_date_lte" placeholder="" />
+                        </div>
+                    </div>
+                </fieldset>
+                <button type="submit" class="action">Apply filters</button>
+            </form>
         </div>
+        <div class="content">
+            <header>
+                <button class="filters-toggle tactile">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </button>
+                <?php // TODO @alexandrosraikos: Enable sorting (waiting on @vkoukos)
+                ?>
+                <?php // TODO @alexandrosraikos: Add and enable page size.
+                ?>
+                <form action="" class="selector">
+                    <label for="sort-by">Sort by</label>
+                    <select name="sort-by">
+                        <option value="newest" <?php echo ((($_GET['sort_by'] ?? '' == 'newest') || empty($_GET['sort_by'])) ? "selected" : "") ?>>Newest</option>
+                        <option value="oldest" <?php echo (($_GET['sort_by'] ?? '' == 'oldest') ? "selected" : "") ?>>Oldest</option>
+                        <option value="rating-asc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-asc') ? "selected" : "") ?>>Highest rated</option>
+                        <option value="rating-desc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-desc') ? "selected" : "") ?>>Lowest rated</option>
+                        <option value="views-asc" <?php echo (($_GET['sort_by'] ?? '' == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
+                        <option value="views-desc" <?php echo (($_GET['sort_by'] ?? '' == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
+                        <option value="title" <?php echo (($_GET['sort_by'] ?? '' == 'title') ? "selected" : "") ?>>Title</option>
+                    </select>
+                </form>
+            </header>
+            <div class="gallery">
+                <?php
+                if (empty($assets['results'])) {
+                    echo show_alert('No assets found', false, 'notice');
+                } else {
+                    foreach ($assets['results'] as $page) {
+                        assets_grid_html($page, $args['asset_url']);
+                    }
+                }
+                ?>
+            </div>
+            <nav class="pagination">
+                <?php
+                if (!empty($assets['pages'])) {
+                    for ($page = 0; $page < $assets['pages']; $page++) {
+                        $activePage = $_GET['asset-page'] ?? 0;
+                        echo '<button class="page-selector ' . (($activePage == ($page + 1)) ? 'active' : '') . '" data-page-number="' . $page + 1 . '">' . ($page + 1) . '</button>';
+                    }
+                }
+                ?>
+            </nav>
+        </div>
+    </div>
     <?php
-    }
 }
 
 
@@ -310,6 +344,16 @@ function asset_html($asset, $args)
     }
 }
 
+
+/**
+ * Print the asset HTML.
+ * 
+ * @param   array $asset The PolicyCloud Marketplace API asset.
+ * @param   array $args Various printing arguments.
+ *
+ * @since   1.0.0
+ * @author  Alexandros Raikos <araikos@unipi.gr>
+ */
 function asset_creation_html(string $error = null)
 {
     if (!empty($error)) {

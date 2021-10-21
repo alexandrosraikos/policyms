@@ -1,5 +1,7 @@
 <?php
 
+// TODO @alexandrosraikos: Work on hotfixes https://github.com/alexandrosraikos/policycloud-marketplace/projects/1#card-71161144
+
 require_once plugin_dir_path(dirname(__FILE__)) . 'partials/vendor/autoload.php';
 
 use Firebase\JWT\BeforeValidException;

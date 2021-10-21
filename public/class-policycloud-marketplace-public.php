@@ -741,7 +741,7 @@ class PolicyCloud_Marketplace_Public
 
 		try {
 			// Retrieve all public descriptions based on GET parameter filtering.
-			$descriptions = get_assets($_GET);
+			$assets = get_assets($_GET);
 		} catch (ErrorException $e) {
 			$notice = $e->getMessage();
 		} catch (Exception $e) {
@@ -756,8 +756,7 @@ class PolicyCloud_Marketplace_Public
 		wp_enqueue_script("policycloud-marketplace-asset-archive");
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 
-
-		assets_archive_html($descriptions, [
+		assets_archive_html($assets ?? [], [
 			"authenticated" => $authenticated ?? false,
 			"asset_url" => $options['description_page'],
 			"error" => $error ?? null,

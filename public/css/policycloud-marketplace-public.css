@@ -583,7 +583,8 @@
 #policycloud-marketplace-asset-archive {
   /* Display & Box Model */
   display: flex;
-  max-width: 90%;
+  width: 100%;
+  max-width: 100%;
 }
 
 /**
@@ -592,9 +593,22 @@
 
 #policycloud-marketplace-asset-archive > .filters {
   /* Display & Box Model */
-  flex: 25% 0 0;
+  display: none;
+  flex-grow: 0;
   padding: 33px;
+  border-right: 1px solid transparent;
+  transition: all 0.2s ease-in-out;
+}
+
+#policycloud-marketplace-asset-archive.inspect > .filters {
+  /* Display & Box Model */
+  display: block;
+  flex-grow: 25%;
   border-right: 1px solid var(--policycloud-border-color-light);
+
+  /* Other */
+  opacity: 1;
+  transition: all 0.2s ease-in-out;
 }
 
 #policycloud-marketplace-asset-archive > .filters > p {
@@ -612,10 +626,33 @@
   border: unset;
 }
 
+#policycloud-marketplace-asset-archive > .filters > form fieldset label {
+  float: unset;
+}
+
+#policycloud-marketplace-asset-archive > .filters > form fieldset .views,
+#policycloud-marketplace-asset-archive > .filters > form fieldset .dates {
+  /* Display & Box Model */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+#policycloud-marketplace-asset-archive > .filters > form fieldset .dates div,
+#policycloud-marketplace-asset-archive > .filters > form fieldset .views div {
+  width: 48%;
+}
+
 #policycloud-marketplace-asset-archive > .content {
   /* Display & Box Model */
-  flex: 75% 0 0;
+  flex: 1 0 0;
   padding: 0;
+}
+
+#policycloud-marketplace-asset-archive.inspect > .content {
+  /* Display & Box Model */
+  flex: 75% 0 0;
 }
 
 #policycloud-marketplace-asset-archive > .content > header {
@@ -627,6 +664,29 @@
   border-bottom: 1px solid var(--policycloud-border-color-light);
 }
 
+#policycloud-marketplace-asset-archive > .content > header .filters-toggle {
+  /* Display & Box Model */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 34px;
+  width: 42px;
+  padding: 10px 10px;
+  box-sizing: border-box;
+}
+
+#policycloud-marketplace-asset-archive > .content > header .filters-toggle div {
+  /* Display & Box Model */
+  width: 30px;
+  height: 2px;
+  border-radius: 2px;
+  margin: 0;
+
+  /* Other */
+  background-color: var(--policycloud-text-color);
+}
+
 #policycloud-marketplace-asset-archive > .content > header > form {
   /* Display & Box Model */
   display: flex;
@@ -635,6 +695,10 @@
 
 #policycloud-marketplace-asset-archive > .content > header > form > * {
   margin: 0;
+}
+
+#policycloud-marketplace-asset-archive > .content > .gallery {
+  padding: 10px;
 }
 
 /*

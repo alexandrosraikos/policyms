@@ -20,22 +20,22 @@ if (!function_exists("policyCloudMarketplaceAPIRequest")) {
 function get_assets(array $args)
 {
     $filters = '?' . http_build_query([
-        'info.owner' => $args['owner'] ?? null,
-        'info.title' => $args['title'] ?? $args['search'] ?? null,
-        'info.type.in' => (empty($args['type'])) ? null : implode(',', ($args['type'] ?? [])),
-        'info.subtype' => $args['subtype'] ?? null,
-        'info.comments.in' => $args['comments'] ?? null,
-        'info.contact' => $args['contact'] ?? null,
-        'info.description.in' => $args['description'] ?? $args['search'] ?? null,
-        'info.fieldOfUse' => $args['field_of_use'] ?? null,
-        'metadata.provider' => $args['provider'] ?? null,
-        'metadata.uploadDate.gte' => $args['upload_date_gte'] ?? null,
-        'metadata.uploadDate.lte' => $args['upload_date_lte'] ?? null,
-        'metadata.last_updated_by' => $args['last_updated_by'] ?? null,
-        'metadata.views.gte' => $args['views_gte'] ?? null,
-        'metadata.views.lte' => $args['views_lte'] ?? null,
-        'metadata.updateDate.gte' => $args['update_date_gte'] ?? null,
-        'metadata.updateDate.lte' => $args['update_date_lte'] ?? null
+        'info.owner' => !empty($args['owner']) ? $args['owner'] : null,
+        'info.title' => !empty($args['search']) ? $args['search'] : null,
+        'info.type.in' => !empty($args['type']) ? $args['type'] : null,
+        'info.subtype' => !empty($args['subtype']) ? $args['subtype'] : null,
+        'info.comments.in' => !empty($args['comments']) ? $args['comments'] : null,
+        'info.contact' => !empty($args['contact']) ? $args['contact'] : null,
+        'info.description.in' => !empty($args['search']) ? $args['search'] : null,
+        'info.fieldOfUse' => !empty($args['field_of_use']) ? $args['field_of_use'] : null,
+        'metadata.provider' => !empty($args['provider']) ? $args['provider'] : null,
+        'metadata.uploadDate.gte' => !empty($args['upload_date_gte']) ? $args['upload_date_gte'] : null,
+        'metadata.uploadDate.lte' => !empty($args['upload_date_lte']) ? $args['upload_date_lte'] : null,
+        'metadata.last_updated_by' => !empty($args['last_updated_by']) ? $args['last_updated_by'] : null,
+        'metadata.views.gte' => !empty($args['views_gte']) ? $args['views_gte'] : null,
+        'metadata.views.lte' => !empty($args['views_lte']) ? $args['views_lte'] : null,
+        'metadata.updateDate.gte' => !empty($args['update_date_gte']) ? $args['update_date_gte'] : null,
+        'metadata.updateDate.lte' => !empty($args['update_date_lte']) ? $args['update_date_lte'] : null
     ]);
 
     // Get all descriptions.
