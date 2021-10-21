@@ -134,175 +134,171 @@ function account_authorization_html($registration_url, $logged_in)
                 <p>Don't have an account yet? You can <a href="<?php echo $registration_url ?>">register</a> now to obtain full access to the Marketplace.</p>
             </form>
         </div>
-    <?php
+        <?php
     } else {
         show_alert("You're already logged in.", false, 'notice');
     }
 }
 
-function assets_archive_html($description_objects, $args)
+/**
+ * 
+ * Print the assets grid HTML.
+ * 
+ * @param   array $assets The PolicyCloud Marketplace API assets.
+ * @param   string $asset_url The asset page URL.
+ * 
+ * @since   1.0.0 
+ * @author  Alexandros Raikos <araikos@unipi.gr>
+ * @author  Eleftheria Kouremenou <elkour@unipi.gr>
+ */
+function assets_grid_html($assets, $asset_url)
 {
-    /** 
-     * TODO @elefkour: Create filter queries in form.
-     * + add submit button
-     * + fix views range
-     * + fix date range
-     * 
-     * The filter names: 
-     *  owner, search, title, type[], subtype, comments, contact, description, field_of_use, provider, upload_date_gte, upload_date_lte, last_updated_by, views_gte, views_lte, update_date_gte, update_date_lte
-     * 
-     * gte = greater than = date from / views from
-     * lte = less than = date until / views up to
-     * 
-     */
-
-    // TODO @elefkour: Cleanup scripts & <link>.
-
-    if (!empty($args['error'])) {
-        echo  '<div class="error-msg1"><i class="fa fa-times-circle"></i>Error message: ' . $args['error'] . '</div>';
+    if (empty($asset_url)) {
+        echo show_alert('No asset page has been defined in the WordPress settings.');
     }
-    if (empty($description_objects)) {
-        echo  '<div class="error-msg1"><i class="fa fa-times-circle"></i>Error message: No description objects were found.</div>';
+    if (empty($assets)) {
+        echo show_alert('No assets found.', false, 'notice');
     } else {
-    ?>
-     
-        <ul class="sidenav">
-            <a style="pointer-events: none; cursor: default;">Filter by</a>
-            <form action="" method="get">
-                <input type="text" style="width:100%;" name="search" placeholder="Search..">
-            </form>
-           Asset Types
-               
-         
-            
-                <form action="">
-               
-                    <button style="background-color:inherit;color:black;border-color: black;" class="pcnav1" data-type-filter="algorithms">algorithms</button>
-    
-                    <input type="checkbox" id="vehicle1" name="type[]" value="algorithms">
-                    <label class="pccheckbox" for="vehicle1"> Algorithms </label> <br>
-                    <input type="checkbox" id="vehicle2" name="type[]" value="tools">
-                    <label class="pccheckbox" for="vehicle2"> Tools</label> <br>
-                    <input type="checkbox" id="vehicle3" name="type[]" value="datasets">
-                    <label class="pccheckbox" for="vehicle3"> Datasets </label> <br>
-                    <input type="checkbox" id="vehicle4" name="type[]" value="documents">
-                    <label class="pccheckbox" for="vehicle4"> Documents</label> <br>
-                    <input type="checkbox" id="vehicle5" name="type[]" value="webinars">
-                    <label class="pccheckbox" for="vehicle5"> Webinars</label> <br>
-                    <input type="checkbox" id="vehicle6" name="type[]" value="tutorials">
-                    <label class="pccheckbox" for="vehicle6"> Tutorials</label> <br>
-                    <input type="checkbox" id="vehicle6" name="type[]" value="presentations">
-                    <label class="pccheckbox" for="vehicle6"> Presentations</label> <br>
-                    <input type="checkbox" id="vehicle6" name="type[]" value="externals">
-                    <label class="pccheckbox" for="vehicle6"> Externals</label><br>
-                    <input type="checkbox" id="vehicle6" name="type[]" value="other">
-                    <label class="pccheckbox" for="vehicle6"> Other</label> <br>
-                    <br>
+        echo '<div class="policycloud-marketplace" id="policycloud-marketplace-assets-grid">';
+        echo '<ul>';
+        foreach ($assets as $asset) {
+        ?>
+            <li>
+                <a href="<?php echo $asset_url . '?did=' . $asset['id'] ?>">
+                    <div class="cover">
+                        <img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/placeholder.jpg') ?>" alt="" />
+                        <div class="content">
+                            <h4><?php echo $asset['info']['title'] ?></h4>
+                            <p><?php echo $asset['info']['short_desc'] ?></p>
+                        </div>
+                    </div>
+                    <div class="metadata">
+                        <div>
+                            <div class="owner"><?php echo $asset['metadata']['provider'] ?></div>
+                            <div class="last-updated">Updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($asset['metadata']['uploadDate']))) ?></div>
+                        </div>
+                        <div>
+                            <span class="reviews"><span class="fas fa-star"></span> <?php echo $asset['metadata']['reviews']['average_rating'] . ' (' . $asset['metadata']['reviews']['no_reviews'] . ' reviews)' ?></span>
+                            <span class="views"><span class="fas fa-eye"></span> <?php echo $asset['metadata']['views'] ?> views</span>
+                        </div>
+                        <div>
+                            <span class="type pill"><?php echo $asset['info']['type']  ?></span>
+                            <?php
+                            if (!empty($asset['info']['subtype'])) {
+                            ?>
+                                <span class="sub-type pill"><?php echo $asset['info']['subtype']  ?></span>
+                            <?php } ?>
+                        </div>
+                    </div>
+                </a>
+            </li>
+        <?php
+        }
+        echo '</ul>';
+        echo '</div>';
+    }
+}
 
 
-
-            <a class="dropdown-btn1">Filter by Owner
-               
-            </a>
-          
-                <br>
-
-                <input type="checkbox" id="owner1" name="owner[]" value="university1">
-                <label class="pccheckbox" for="owner1"> University 1</label> <br>
-                <input type="checkbox" id="owner2" name="owner[]" value="university2">
-                <label class="pccheckbox" for="owner2"> University 2</label> <br>
-                <input type="checkbox" id="owner3" name="owner[]" value="university3">
-                <label class="pccheckbox" for="owner3"> University 3</label>
-
+/**
+ * Print the assets archive HTML.
+ * 
+ * @param   array $assets The PolicyCloud Marketplace API assets.
+ * @param   array $args Various printing arguments.
+ *
+ * @since   1.0.0
+ * @author  Alexandros Raikos <araikos@unipi.gr>
+ * @author  Eleftheria Kouremenou <elkour@unipi.gr>
+ */
+function assets_archive_html($assets, $args)
+{
+    if (!empty($args['error']))  echo show_alert($args['error']);
+    if (!empty($args['notice'])) echo show_alert($args['notice'], false, 'notice');
+    if (empty($assets)) {
+        echo  show_alert('No assets found.', false, 'notice');
+    } else {
+        ?>
+        <div class="policycloud-marketplace" id="policycloud-marketplace-asset-archive">
+            <div class="filters">
+                <h2>Filters</h2>
+                <p>Select the options below to narrow your search.</p>
+                <form>
+                    <fieldset>
+                        <input type="text" name="search" placeholder="Search assets" />
+                    </fieldset>
+                    <fieldset>
+                        <h3>Types</h3>
+                        <?php // TODO: @alexandrosraikos Add type checkbox buttons. (waiting on @vkoukos)
+                        ?>
+                    </fieldset>
+                    <fieldset>
+                        <h3>Owner</h3>
+                        <?php // TODO: @alexandrosraikos Add owner checkboxes. (waiting on @vkoukos)
+                        ?>
+                    </fieldset>
+                    <fieldset>
+                        <h3>Views</h3>
+                        <input type="number" name="views_gte" placeholder="0" />
+                        <input type="number" name="views_lte" placeholder="<?php
+                                                                            // TODO @alexandrosraikos: Calculate max views. (waiting on @vkoukos)
+                                                                            ?>" />
+                        <?php // TODO: @alexandrosraikos Add visual range selector 
+                        ?>
+                    </fieldset>
+                    <fieldset>
+                        <h3>Date</h3>
+                        <input type="date" name="update_date_gte" placeholder="0" />
+                        <input type="date" name="update_date_lte" placeholder="<?php
+                                                                                // TODO @alexandrosraikos: Add latest update date. (waiting on @vkoukos)
+                                                                                ?>" />
+                    </fieldset>
+                    <button type="submit">Apply filters</button>
                 </form>
-
-
-            <a style="pointer-events: none; cursor: default;"> Filter by Views</a>
-            <span style="color:white;" id="slider_value"></span>
-            <input type="range" style="color:white;" id="slider" value="50" min="1" max="100" step="1" />
-            <input type="text" name="mindate" id="mindate" value="1">
-            <br />
-
-            <br>
-            <a style="pointer-events: none; cursor: default;">Choose Dates</a>
-            <div id="date-center">
-
-                <input type="date" class="pocdate" id="datemin" name="datemin" min="2000-01-02">
-
-                <input type="date" class="pocdate" id="datemax" name="datemax" max="1979-12-31">
-                <br />
-                <br />
-                <input type="submit" style="background-color:white;color:black;" value="submit">
-
             </div>
-
+            <div class="content">
+                <header>
+                    <button class="toggle">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </button>
+                    <form action="" class="selector">
+                        <label for="sort-by">Sort by</label>
+                        <select name="sort-by">
+                            <option value="newest" <?php echo ((($_GET['sort_by'] ?? '' == 'newest') || empty($_GET['sort_by'])) ? "selected" : "") ?>>Newest</option>
+                            <option value="oldest" <?php echo (($_GET['sort_by'] ?? '' == 'oldest') ? "selected" : "") ?>>Oldest</option>
+                            <option value="rating-asc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-asc') ? "selected" : "") ?>>Highest rated</option>
+                            <option value="rating-desc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-desc') ? "selected" : "") ?>>Lowest rated</option>
+                            <option value="views-asc" <?php echo (($_GET['sort_by'] ?? '' == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
+                            <option value="views-desc" <?php echo (($_GET['sort_by'] ?? '' == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
+                            <option value="title" <?php echo (($_GET['sort_by'] ?? '' == 'title') ? "selected" : "") ?>>Title</option>
+                        </select>
+                    </form>
+                </header>
+                <div class="gallery">
+                    <?php assets_grid_html($assets['results'][0], $args['asset_url']) ?>
+                </div>
             </div>
-        </ul>
-
-        <div class="content">
-            <!-- Content -->
-            <select class="pcfiltersup">
-                <option>Filterby</option>
-                <option>Recent</option>
-                <option>Most Liked</option>
-                <option>Most Views</option>
-                <option>Popular</option>
-            </select>
-
-            <h1></h1>
-            <section class="cards">
-                <?php
-                if (!empty($description_objects)) {
-                    foreach ($description_objects as $description) {
-                ?>
-                        <!--   card 1 -->
-                        <article class="card1">
-                            <picture class="thumbnail1">
-                                <a style="color:gray;" href="<?php echo $args['description_url'] . '?did=' . $description['id'] ?>">
-                                    <img class="category__01" src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8Mnx8fGVufDB8fHx8&w=1000&q=80" alt="" />
-                            </picture>
-                            <div class="card-content">
-                                <h1 class="title1"> <b><?php echo  $description['info']['title']; ?></b></h1>
-                                <p class="h6"> <?php echo $description['info']['short_desc']; ?></p>
-                            </div><!-- .card-content -->
-                            <footer class="footer1">
-                            <span ><?php echo  $description['info']['owner']; ?></span>
-                                <div class="post-meta1">
-                                <span style="color:gray;font-size:12px;"> <i class="fa fa-star" aria-hidden="true">5.2</i>2.23.2021</span>
-                                    <span class="views1"><span class="policy-cloud-approve-img-i" style="color:gray;font-size:12px;height:12px;"><img class="policy-cloud-approve-img" style="width:10px;height:10px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/folder.svg') ?>" /> <a style="height:8px;" href="#"> <?php echo  $description['collection']; ?></a> </span>
-<br>
-                                    <span class="views1"> <a id="col-card" ><?php echo $description['collection']; ?></a> <a id="col-card" ><?php echo $description['collection']; ?></a></span>
-                                </div>
-                            </footer>
-                        </article>
-                <?php
-                    }
-                } ?>
-            </section>
         </div>
     <?php
     }
 }
 
-function asset_html($description_object, $args)
+
+
+
+/**
+ * Print the asset HTML.
+ * 
+ * @param   array $asset The PolicyCloud Marketplace API asset.
+ * @param   array $args Various printing arguments.
+ *
+ * @since   1.0.0
+ * @author  Alexandros Raikos <araikos@unipi.gr>
+ * @author  Eleftheria Kouremenou <elkour@unipi.gr>
+ */
+function asset_html($asset, $args)
 {
-    // TODO @elefkour: Remove comments, use PHP - check IFs for empty fields.
-
-    //echo 'Hello ' . htmlspecialchars($_GET["did"]) . '!';
-    // echo $args['description'];
-    //$description[]=$args['description_object'];
-    //echo ($description_object->info->collection[$_GET["did"]]);
-    //$description[]=get_specific_description($_GET["did"]);
-
-    $ownerbutton = true;
-    $isuserlogin = false;;
-
-    if (!empty($args['is_owner'])) {
-        $ownerbutton = true;
-    }
-    if (!empty($args['authenticated'])) {
-        $isuserlogin = true;
-    }
     if (!empty($args['error'])) {
         echo 'Error: ' . $args['error'];
         echo  '<div class="error-msg1"><i class="fa fa-times-circle"></i>Error message' . $args['error'] . '</div>';
@@ -311,197 +307,6 @@ function asset_html($description_object, $args)
     if (empty($description_object)) {
         echo  '<div class="error-msg1"><i class="fa fa-times-circle"></i>The description is Empty</div>';
     } else {
-    ?>
-        <section style="width: 1349px; left: 0px;">
-            <form id="pform">
-                <div class="parent">
-                    <?php //only login user can see this 
-                    if ($isuserlogin) { ?>
-                        <div class="column">
-                            <div class="tabs">
-                                <ul id="tabs-nav">
-                                    <li><a href="#tab1"><i class="fas fa-file-alt"></i> Files</a></li>
-                                    <li><a href="#tab2"><i class="fas fa-file-download"> Gallery</i></a></li>
-                                    <li><a href="#tab3"><i class="fas fa-comments"></i> Comments</a></li>
-                                </ul> <!-- END tabs-nav -->
-                                <div id="tabs-content">
-                                    <div id="tab1" class="tab-content">
-                                        <div class="accordion">Algorithm</div>
-                                        <div class="panel">
-                                            <table style="width: 100%;">
-                                                <tbody>
-                                                    <tr>
-                                                        <th>Asset Name</th>
-                                                        <th>Version</th>
-                                                        <th>Size</th>
-                                                        <th>Modified on</th>
-                                                        <th>Action</th>
-                                                    </tr>
-                                                    <?php if (!empty($description_object)) {
-                                                        foreach ($description_object['assets']['files'] as $file) {
-                                                    ?>
-                                                            <tr>
-
-                                                                <td class="pctablename"><?php echo $file['filename'];
-                                                                                        ?>2.0</td>
-                                                                <td><?php //echo $file['version'];
-                                                                    ?>2.1</td>
-                                                                <td><?php //echo $file['size'];
-                                                                    ?>2.2</td>
-                                                                <td><?php //echo $file['updateDate'];
-                                                                    ?>2.2 </td>
-                                                                <td>
-                                                                    <a><?php echo $file['downloads'];
-                                                                        ?> <i class="fas fa-download" aria-hidden="true"></i> </a>
-                                                                    &nbsp;
-                                                                    <a class="edit2"><i class="fas fa-pencil-alt"></i></a>
-                                                                </td>
-                                                            </tr>
-                                                    <?php }
-                                                    }
-                                                    ?>
-
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <div class="accordion">Videos</div>
-                                        <div class="panel">
-                                            <br>
-                                            <iframe width="420" height="345" src="https://www.youtube.com/embed/tgbNymZ7vqY">
-                                            </iframe>
-
-                                        </div>
-                                    </div>
-                                    <div id="tab2" class="tab-content">
-                                        <h1>Images</h1>
-                                        <div id="slideshow">
-                                            <div class="slide-tab">
-                                                <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/seattle.jpg">
-                                            </div>
-                                            <div class="slide-tab">
-                                                <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/nightportrait.jpg">
-                                            </div>
-                                            <div class="slide-tab">
-                                                <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/6lifeftw.jpg">
-                                            </div>
-                                            <div class="slide-tab">
-                                                <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/mountain.jpg">
-                                            </div>
-                                            <div class="slide-tab">
-                                                <img src="https://res.cloudinary.com/trobes/image/upload/v1547224649/bird.jpg">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div id="tab3" class="tab-content">
-                                        <h2>Randall Graves</h2>
-                                    </div>
-                                </div> <!-- END tabs-content -->
-                            </div> <!-- END tabs -->
-                        </div>
-                    <?php
-                    } ?>
-                    <div class="column">
-                        <div class="main-display">
-                            <h2 id="description-title" class="h2title"> <?php if (!empty($description_object['info']['title'])) {
-                                                                            echo $description_object['info']['title'];
-                                                                        }             ?></h2>
-                            <span class="card-link" style="font-size:12px;">
-                                <?php if ($isuserlogin)
-                                    if (!empty($description_object['info']['owner']))
-                                        echo '<i >'; ?>
-                                <img class="policy-cloud-eye-img" style="width:20px;height:15px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/user.svg') ?>" />
-                                <?php echo '</i> ' . $description_object['info']['owner'] . '|';
-                                ?> <i> <img class="policy-cloud-eye-img" style="width:20px;height:15px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/eye.svg') ?>" /></i> <?php //echo $description_object['metadata']['views']; 
-                                                                                                                                                                                                                                ?>
-
-                                100 |
-                                <?php if (!empty($description_object['metadata']['uploadDate'])) ?>
-                                <i> <img class="policy-cloud-eye-img" style="width:20px;height:15px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/calendar.svg') ?>" />
-
-                                    <?php echo  $description_object['metadata']['uploadDate'];
-                                    echo "</i>";
-                                    ?>
-                                    | <i class="fa fa-download">
-                                        <?php //echo $description_object['metadata']['downloads']'
-                                        ?> 20</i>
-                                    <?php if ($ownerbutton) {
-                                        if ($description_object['metadata']['approved'] == 1) { ?>
-                                            <i>approved <img class="policy-cloud-eye-img" style="width:20px;height:15px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/check.svg') ?>" /></i>
-                                        <?php
-                                        } else { ?>
-
-
-                                            <i> pending<img id="policy-cloud-eye-img" style="width:20px;height:15px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/pending.drawio.svg') ?>" /></i>
-
-
-                                    <?php    }
-                                    } ?>
-                            </span>
-                            <h6><b><?php if (!empty($description_object['info']['type']))
-                                        print ucfirst($description_object['info']['type']);
-
-
-                                    if ($description['info']['subtype'] = !"") {
-                                        echo  '</b>|<b>' . $description_object['info']['subtype'] . '</b>';
-                                    }
-                                    ?>
-                                    <br /><?php
-                                            if (!empty($description_object['info']['fieldOfUse'])) {
-                                                foreach ($description_object['info']['fieldOfUse'] as $fieldofuse) {
-                                                    echo '</b>|<b>' . $fieldofuse . '</b>';
-                                                }
-                                            }
-                                            ?>
-
-                                    <b></b> </h6>
-                            <a style="color:blue;font-size:15px;"> <i class="fas fa-envelope"></i> example@gmail.com</a>
-                            <br>
-                        </div>
-                        <?php
-                        if ($isuserlogin) { ?>
-
-                            <p id="descp"><?php
-                                            if (!empty($description_object['info']['description'])) {
-                                                echo $description_object['info']['description'];
-                                            } ?> </p>
-
-                        <?php   } else { ?>
-
-                            <p id="descs"><?php //echo description[info][short_desc];
-                                            ?>I am text block. Click edit button to change this text. Lor
-                                em ipsum dolor sit amet, consectetur adipiscing elit. Ut elit te
-                                llus, luctus nec ullamcorper mattis, pulvinar dapibus leo.</p>
-                        <?php }
-                        ?>
-
-                        <div id="pguest" class="hidden">
-                            <input id="submit1" type="submit" value="Submit"> <a style="color:red;" href="#" id="pcdelete"><b>X</b> Cancel</a>
-                            <br>
-
-                        </div>
-            </form>
-            <?php if ($ownerbutton) { ?>
-                <a href="#" id="edit1">Edit</a>
-                <br>
-                <?php if ($description_object['metadata']['approved'] == 1) { ?>
-                    <ul id="policy-cloud-icons">
-                        <li>approved</li>
-                        <li> <img id="policy-cloud-approve-img" style="width:20px;height:15px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/check.svg') ?>" /></li>
-                    </ul>
-                <?php
-                } else { ?>
-                    <ul id="policy-cloud-icons">
-                        <li>Pending</li>
-                        <li> <img id="policy-cloud-approve-img" style="width:20px;height:15px;" src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/pending.drawio.svg') ?>" /></li>
-                    </ul>
-
-            <?php    }
-            } ?>
-            </div>
-            </div>
-            </div>
-        </section>
-    <?php
     }
 }
 
@@ -671,8 +476,8 @@ function account_html(array $information, $picture, array $statistics, array $as
                         <?php
                         if ($id == 'assets') {
                         ?>
-                        <option value="views-asc" <?php echo (($_GET['sort_by'] ?? '' == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
-                        <option value="views-desc" <?php echo (($_GET['sort_by'] ?? '' == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
+                            <option value="views-asc" <?php echo (($_GET['sort_by'] ?? '' == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
+                            <option value="views-desc" <?php echo (($_GET['sort_by'] ?? '' == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
                         <?php } ?>
                         <option value="title" <?php echo (($_GET['sort_by'] ?? '' == 'title') ? "selected" : "") ?>>Title</option>
                     </select>
@@ -759,8 +564,8 @@ function account_html(array $information, $picture, array $statistics, array $as
                     }
                     ?>
                     <button class="tactile" id="policycloud-account-information">Information</button>
-                    <?php if(!$args['visiting']) { ?>
-                    <button class="tactile policycloud-logout">Log out</button>
+                    <?php if (!$args['visiting']) { ?>
+                        <button class="tactile policycloud-logout">Log out</button>
                     <?php } ?>
                 </nav>
             </div>

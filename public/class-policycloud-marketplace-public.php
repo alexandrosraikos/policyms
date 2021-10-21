@@ -759,7 +759,7 @@ class PolicyCloud_Marketplace_Public
 
 		assets_archive_html($descriptions, [
 			"authenticated" => $authenticated ?? false,
-			"description_url" => $options['description_page'],
+			"asset_url" => $options['description_page'],
 			"error" => $error ?? null,
 			"notice" => $notice ?? null
 		]);

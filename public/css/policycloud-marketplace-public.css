@@ -1,1030 +1,3 @@
-/**
- * All of the CSS for your public-facing functionality should be
- * included in this file.
- */
-.divider-text {
-  position: relative;
-  text-align: center;
-  margin-top: 15px;
-  margin-bottom: 15px;
-}
-.divider-text span {
-  padding: 7px;
-  font-size: 12px;
-  position: relative;
-  z-index: 2;
-}
-.divider-text:after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  border-bottom: 1px solid #ddd;
-  top: 55%;
-  left: 0;
-  z-index: 1;
-}
-
-.btn-facebook {
-  background-color: #405d9d;
-  color: #fff;
-}
-.btn-twitter {
-  background-color: #42aeec;
-  color: #fff;
-}
-
-.registration-error,
-.login-error {
-  color: red;
-  text-align: center;
-  font-weight: bold;
-  margin: 20px 0;
-}
-
-.submit-registration.loading,
-.submit-login.loading {
-  opacity: 0.7;
-  cursor: wait;
-  pointer-events: none;
-}
-
-.fa-user-o {
-  margin-left: 300px;
-}
-
-.grid-container {
-  column-gap: 4px;
-  display: grid;
-  margin-top: 30px;
-  grid-template-columns: auto auto auto;
-  background-color: white;
-  padding: 30px;
-}
-
-.card {
-  font-size: 15px;
-
-  width: 325px;
-  background: #fff;
-  transition: box-shadow 0.3s ease-in-out;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-  margin-top: 30px;
-
-  border: 1px solid rgb(0 0 0 / 13%);
-
-  overflow: hidden;
-}
-
-.text-block {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  background-color: black;
-  color: white;
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-.container1 {
-  position: relative;
-  font-family: Arial;
-}
-
-.photo {
-  height: 200px;
-  width: 100%;
-}
-
-.photo img {
-  height: 100%;
-  width: 100%;
-}
-
-.photos {
-  width: 50%;
-  height: 30px;
-  background-color: #000080;
-  color: white;
-  position: relative;
-  top: -30px;
-  padding-left: 10px;
-  font-size: 20px;
-}
-
-.like {
-  float: right;
-  font-size: 22px;
-  position: relative;
-  top: 20px;
-  color: #333333;
-}
-
-.fa-gratipay {
-  margin-right: 10px;
-  transition: 0.5s;
-}
-
-.txt3 {
-  color: gray;
-  position: relative;
-  top: 18px;
-  font-size: 14px;
-}
-
-.comments {
-  float: right;
-  cursor: pointer;
-}
-
-.fa-clock,
-.fa-comments {
-  margin-right: 7px;
-}
-
-.container {
-  overflow: hidden;
-  padding: 2px 16px;
-}
-
-body {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-input[type="text"] {
-  box-sizing: border-box;
-  border: 2px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-  background-color: white;
-  background-image: url("searchicon.png");
-  background-position: 10px 10px;
-  background-repeat: no-repeat;
-  padding: 12px 20px 12px 40px;
-  -webkit-transition: width 0.4s ease-in-out;
-
-  transition: width 0.4s ease-in-out;
-}
-
-/* Fixed sidenav, full height */
-.sidenav {
-  height: 100%;
-  width: 325px;
-  position: fixed;
-  z-index: 1;
-  top: 9;
-  left: 0;
-  background-color: gray;
-  max-height: calc(100vh - 9rem);
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-button.pcnac1 {
-  background-color: gray;
-  padding: 4px 8px;
-  margin: 0 5px 5px 0;
-  background: transparent !important;
-  font-size: 100%;
-  border: 2px solid rgba(0, 0, 0, 0.5);
-  border-radius: 8px;
-  text-decoration: none;
-  color: gray !important;
-  text-transform: unset;
-  transition: all 0.2s ease-in-out;
-}
-a#col-card {
-  color: inherit;
-  display: inline-block !important;
-  font-size: 90%;
-  font-weight: 500;
-  padding: 0 10px;
-  border-color: black;
-  background-color: var(--policycloud-border-color-light);
-  border-radius: 100px;
-}
-/* Main content */
-.main {
-  margin-left: 150px;
-  /* Same as the width of the sidenav */
-  font-size: 20px;
-  /* Increased text to enable scrolling */
-  padding: 0px 10px;
-}
-
-/* Add an active class to the active dropdown button */
-.active {
-  color: white;
-}
-
-/* Dropdown container (hidden by default). Optional: add a lighter background color and some left padding to change the design of the dropdown content */
-.dropdown-container {
-  display: none;
-  background-color: none;
-  padding-left: 8px;
-}
-
-/* Optional: Style the caret down icon */
-.fa-caret-down {
-  float: right;
-  padding-right: 8px;
-}
-
-.remove {
-  background-color: none;
-  border: none;
-  color: white;
-  padding-top: 10px;
-  padding: 10px 10px;
-  font-size: 8px;
-  cursor: pointer;
-}
-
-.add {
-  background-color: none;
-  border: none;
-  color: white;
-  padding: 10px 10px;
-  font-size: 8px;
-  cursor: pointer;
-}
-
-/* Some media queries for responsiveness */
-@media screen and (max-height: 450px) {
-  .sidenav {
-    padding-top: 15px;
-  }
-
-  .sidenav a {
-    font-size: 18px;
-  }
-}
-body {
-  font-family: Arial;
-}
-.containert {
-  height: 100%;
-  width: 600px;
-  top: 10;
-  left: 0;
-}
-/* Style the tab */
-.tabs {
-  width: 600px;
-  background-color: rgba(163, 159, 159, 0.692);
-  border-radius: 5px 5px 5px 5px;
-}
-ul#tabs-nav {
-  list-style: none;
-  margin: 0;
-  padding: 5px;
-  overflow: auto;
-}
-ul#tabs-nav li {
-  float: left;
-  font-weight: bold;
-  margin-right: 2px;
-  padding: 8px 10px;
-  border-radius: 5px 5px 5px 5px;
-  /*border: 1px solid #d5d5de;
-  border-bottom: none;*/
-  cursor: pointer;
-}
-ul#tabs-nav li:hover,
-ul#tabs-nav li.active {
-  background-color: rgba(0, 0, 0, 0.329);
-}
-#tabs-nav li a {
-  text-decoration: none;
-  color: #fff;
-}
-.tab-content {
-  padding: 10px;
-  border: 5px solid #fdfafa;
-  background-color: #fff;
-}
-
-/* Just for CodePen styling - don't include if you copy paste */
-/*style accordion*/
-.w3-container {
-  width: 30%;
-}
-.accordion {
-  background-color: #eee;
-  color: black;
-  cursor: pointer;
-  padding: 18px;
-  width: 100%;
-  border: solid;
-  border-color: white;
-  text-align: left;
-  outline: none;
-  font-size: 15px;
-  transition: 0.4s;
-}
-
-.active,
-.accordion:hover {
-  background-color: #ccc;
-}
-.panel {
-  padding: 0 18px;
-  background-color: white;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.2s ease-out;
-}
-/*slideshow in the ta1 style */
-#slideshow {
-  margin: 50px auto;
-  position: relative;
-  width: 500px;
-  height: 500px;
-  padding: 10px;
-}
-
-#slideshow > div {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  right: 10px;
-  bottom: 10px;
-}
-.main-display {
-  margin-right: 50px;
-  /* Same as the width of the sidenav */
-  /*  font-size: 20px;
-            /* Increased text to enable scrolling */
-  padding: 15px 15px;
-}
-.h1 {
-  font-size: 30px;
-  color: black;
-}
-.h2title {
-  color: #000000;
-  font-size: 40px;
-  font-weight: 600;
-  text-shadow: 4px 0px 3px rgb(0 0 0 / 30%);
-}
-input[name="dtitle"] {
-  color: #000000;
-  font-size: 40px;
-  font-weight: 600;
-  text-shadow: 4px 0px 3px rgb(0 0 0 / 30%);
-}
-.h2 input {
-  color: #000000;
-  font-size: 65px !important;
-  font-weight: 600 !important;
-  text-shadow: 4px 0px 3px rgb(0 0 0 / 30%);
-}
-.parent {
-  display: flex;
-  flex-direction: row;
-}
-
-.column {
-  flex: 1 1 0px;
-  border: 1px solid white;
-}
-
-/*   multi    */
-/*dropdown sidebar style*/
-
-/*
-TODO @elefkour: Rename generic selectors.
-*/
-
-.sidenav a,
-.dropdown-btn1 {
-  padding: 6px 8px 6px 16px;
-  text-decoration: none;
-  font-size: 16px;
-  color: #000000;
-  display: block;
-  border: none;
-  background: none;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  outline: none;
-}
-/*policycloudtitleviews*/
-.policycloudtitleviews {
-  font-size: 20px !important;
-  color: white !important;
-}
-/*icon setings */
-ul#policy-cloud-icons li {
-  display: inline-block !important;
-}
-ul#policy-cloud-icons-discover li {
-  margin-left: 0.5rem !important;
-  display: inline-block !important;
-}
-
-/*option for user labe*/
-.pcowneroption {
-  color: white;
-  font-size: 18px;
-  width: 100%;
-  text-align: center;
-}
-.pcdate {
-}
-/*check box*/
-.checkbox {
-}
-
-.pccheckbox {
-  font-size: 16px;
-  cursor: pointer;
-  padding: 6px 8px 6px 16px;
-  color: #000000;
-}
-
-/* On mouse-over */
-
-/* Main content */
-.main {
-  margin-left: 150px;
-  /* Same as the width of the sidenav */
-  font-size: 20px;
-  /* Increased text to enable scrolling */
-  padding: 0px 10px;
-}
-
-/* Add an active class to the active dropdown button */
-.active {
-  background-color: #4682b4;
-  color: white;
-}
-
-/* Dropdown container (hidden by default). Optional: add a lighter background color and some left padding to change the design of the dropdown content */
-.dropdown-container {
-  display: none;
-  background-color: none;
-  padding-left: 8px;
-}
-
-/* Optional: Style the caret down icon */
-.fa-caret-down {
-  float: right;
-  padding-right: 8px;
-}
-
-/*sidebar the list*/
-ul.sidenav {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  width: 25%;
-  background-color: #f7f7f7;
-  position: fixed;
-  height: 100%;
-  overflow: auto;
-}
-
-ul.sidenav li a {
-  display: block;
-  color: white;
-  padding: 8px 16px;
-  background-color: #4682b4;
-  text-decoration: none;
-}
-
-ul.sidenav li a.active {
-  background-color: #4682b4;
-  color: white;
-}
-
-ul.sidenav li a:hover:not(.active) {
-  background-color: #4682b4;
-  color: white;
-}
-
-div.content {
-  margin-left: 25%;
-  padding: 1px 16px;
-  height: 1000px;
-}
-
-@media screen and (max-width: 900px) {
-  ul.sidenav {
-    width: 100%;
-    height: auto;
-    position: relative;
-  }
-
-  ul.sidenav li a {
-    float: left;
-    padding: 15px;
-  }
-
-  div.content {
-    margin-left: 0;
-  }
-}
-
-@media screen and (max-width: 400px) {
-  ul.sidenav li a {
-    text-align: center;
-    float: none;
-  }
-}
-/***************************           Cards            *******************************/
-img {
-  display: block;
-  border: 0;
-  width: 100%;
-  height: auto;
-}
-.title1 {
-  color: black;
-  margin: 2rem 0 0.5rem;
-  font-size: 1.4rem;
-  font-weight: 400;
-}
-.downer {
-  color: black;
-  font-size: 1.4rem;
-  margin-top: auto;
-}
-.cards {
-  display: grid;
-  grid-template-columns: repeat(
-    auto-fill,
-    minmax(250px, 4fr)
-  ); /* see notes below */
-  grid-auto-rows: minmax(200px, auto);
-  grid-gap: 1rem;
-  font-family: "Montserrat";
-}
-
-.card1 {
-  max-width: 95%;
-  /*height: 200px;*/
-  /*background: red;*/
-  border: 2px solid #e7e7e7;
-  border-radius: 4px;
-  padding: 0.5rem;
-  -webkit-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.15);
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.15);
-  display: flex;
-  /* -webkit-box-orient: vertical; */
-  /* -webkit-box-direction: normal; */
-  -ms-flex-direction: column;
-  flex-direction: column;
-  position: relative;
-  color: #5d5e5e;
-} /* li item */
-@import url("https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700");
-
-* {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-.thumbnail1 .category__01 {
-  /* fill: #c7c4c4;*/
-  height: 200px;
-  width: 100%;
-
-  /* object-fit: scale-down;*/
-}
-
-.card-content {
-  font-size: 0.75rem;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-.panel.card1-panel .panel-header {
-  background-color: #ffffff;
-  font-size: 0.75rem;
-  font-weight: 400;
-  height: 25px !important;
-}
-
-.panel.card1-panel .panel-content {
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-.category {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-}
-
-.footer1 {
-  border-top: 1px;
-  margin: 0.5rem 0 0;
-  min-height: 10px;
-  font-size: 1.2rem;
-  margin-top: auto;
-}
-
-.category1 {
-  position: absolute;
-  top: 160px;
-  left: 3;
-  color: #fff;
-  background: #e74c3c;
-  padding: 12px 15px;
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.category__01 {
-  /*background-color: #cccccc;*/
-  /*background-color: #50c6db;*/
-}
-.category__01_plaisio {
-  background-color: #006489;
-}
-.category__02 {
-  background-color: #5d5e5e;
-}
-
-.category__03 {
-  background-color: #51bb7b;
-}
-
-.category__04 {
-  background-color: #f47820;
-}
-
-.category__05 {
-  background-color: #8350a0;
-}
-
-.post-meta1 {
-  margin-top: 0.5rem;
-}
-
-.comments1 {
-  margin-left: 0.5rem;
-}
-.views1 {
-  font-style: inherit;
-  margin-top: 0.5rem;
-  display: inline-block !important;
-  margin-left: 0.5rem;
-}
-.views1 .policy-cloud-approve-img-i {
-  float: none;
-}
-.views1 policy-cloud-approve-img {
-  margin-top: 0.5rem;
-  float: none;
-  position: absolute !important;
-  margin-left: 0.5rem;
-
-  display: inline-block !important;
-}
-input#mindate {
-  display: block;
-  float: left;
-  font-size: 14px;
-  font-weight: 700;
-  margin: 0;
-  padding: 4px;
-  width: 40px;
-  height: 20px;
-  line-height: 20px;
-  border-width: 1px;
-  border-style: solid;
-  outline: 0;
-  text-align: center;
-  vertical-align: text-bottom;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  -webkit-box-sizing: content-box;
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
-}
-input#datemin {
-  margin: auto;
-}
-input#datemax {
-  margin: auto;
-}
-#date-center {
-  width: 80%;
-  margin: auto;
-}
-.policy-cloud-eye-img {
-  display: inline-block !important;
-}
-.policy-cloud-approve {
-  display: inline-block !important;
-}
-/*koubia */
-.myinp {
-  width: 30.33%;
-}
-/*-------------------sigle css------------*/
-.hidden {
-  display: none;
-}
-/*error message bar*/
-.error-msg1 {
-  width: 100%;
-  color: #d8000c;
-  background-color: #ffbaba;
-  margin: 10px 0;
-  padding: 10px;
-  border-radius: 4px 4px 4px 4px;
-  text-align: center;
-}
-/*close button*/
-.close {
-  cursor: pointer;
-  position: absolute;
-  top: 50%;
-  right: 0%;
-  padding: 12px 16px;
-  transform: translate(0%, -50%);
-}
-
-.close:hover {
-  background: #bbb;
-}
-
-/*edit accordition button*/
-.edit2 {
-  color: black;
-  background: none;
-  border: none;
-  color: black;
-  padding: 12px 16px;
-  font-size: 16px;
-  cursor: pointer;
-}
-/*range inputs */
-
-/** UPLOAD FORM **/
-
-.container-fluid {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-}
-.container-fluid .card {
-  width: 100%;
-}
-html {
-  height: 100%;
-}
-
-p {
-  color: grey;
-}
-
-#heading {
-  margin: auto;
-  text-transform: uppercase;
-  color: #4966cb;
-  font-weight: normal;
-}
-select#type.type-create {
-  padding: 8px 15px 8px 15px;
-  border: 1px solid #ccc;
-  border-radius: 0px;
-  margin-bottom: 25px;
-  margin-top: 2px;
-  width: 100%;
-  box-sizing: border-box;
-  font-family: montserrat;
-  color: #2c3e50;
-  background-color: #eceff1;
-  font-size: 16px;
-  letter-spacing: 1px;
-}
-#policycloud-marketplace-description-create {
-  width: 500px;
-  margin: 50px auto;
-  text-align: center;
-  position: relative;
-}
-
-#policycloud-marketplace-description-create fieldset {
-  background: white;
-  border: 0 none;
-  border-radius: 3px;
-  box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.4);
-  padding: 20px 30px;
-  box-sizing: border-box;
-  width: 80%;
-  margin: 0 10%;
-
-  /*stacking fieldsets above each other*/
-  position: relative;
-}
-
-.form-card {
-  text-align: left;
-}
-
-#policycloud-marketplace-description-create fieldset:not(:first-of-type) {
-  display: none;
-}
-
-#policycloud-marketplace-description-create input,
-#policycloud-marketplace-description-create textarea {
-  padding: 8px 15px 8px 15px;
-  border: 1px solid #ccc;
-  border-radius: 0px;
-  margin-bottom: 25px;
-  margin-top: 2px;
-  width: 100%;
-  box-sizing: border-box;
-  font-family: montserrat;
-  color: #2c3e50;
-  background-color: #eceff1;
-  font-size: 16px;
-  letter-spacing: 1px;
-}
-
-#policycloud-marketplace-description-create input:focus,
-#policycloud-marketplace-description-create textarea:focus {
-  -moz-box-shadow: none !important;
-  -webkit-box-shadow: none !important;
-  box-shadow: none !important;
-  border: 1px solid #673ab7;
-  outline-width: 0;
-}
-
-#policycloud-marketplace-description-create .action-button {
-  width: 100px;
-  background: #4966cb;
-  font-weight: bold;
-  color: white;
-  border: 0 none;
-  border-radius: 0px;
-  cursor: pointer;
-  padding: 10px 5px;
-  margin: 10px 0px 10px 5px;
-  float: right;
-}
-
-#policycloud-marketplace-description-create .action-button:hover,
-#policycloud-marketplace-description-create .action-button:focus {
-  background-color: #4966cb;
-}
-
-#policycloud-marketplace-description-create .action-button-previous {
-  width: 100px;
-  background: #616161;
-  font-weight: bold;
-  color: white;
-  border: 0 none;
-  border-radius: 0px;
-  cursor: pointer;
-  padding: 10px 5px;
-  margin: 10px 5px 10px 0px;
-  float: right;
-}
-
-#policycloud-marketplace-description-create .action-button-previous:hover,
-#policycloud-marketplace-description-create .action-button-previous:focus {
-  background-color: #000000;
-}
-
-.form-card {
-  z-index: 0;
-  border: none;
-  position: relative;
-}
-
-.fs-title {
-  font-size: 25px;
-  color: #4966cb;
-  margin-bottom: 15px;
-  font-weight: normal;
-  text-align: left;
-}
-
-.purple-text {
-  color: #4966cb;
-  font-weight: normal;
-}
-
-.steps {
-  font-size: 25px;
-  color: gray;
-  margin-bottom: 10px;
-  font-weight: normal;
-  text-align: right;
-}
-
-.fieldlabels {
-  color: gray;
-  text-align: left;
-}
-
-#progressbar {
-  margin-bottom: 30px;
-  overflow: hidden;
-  color: lightgrey;
-}
-
-#progressbar .active {
-  color: #4966cb;
-}
-
-#progressbar li {
-  list-style-type: none;
-  font-size: 15px;
-  width: 25%;
-  float: left;
-  position: relative;
-  font-weight: 400;
-}
-
-#progressbar #account:before {
-}
-
-#progressbar #personal:before {
-}
-
-#progressbar #payment:before {
-}
-
-#progressbar #confirm:before {
-  fill: gray;
-}
-#progressbar #confirm .img:before {
-  fill: gray;
-}
-#progressbar li:before {
-  width: 50px;
-  height: 50px;
-  line-height: 45px;
-  display: block;
-  font-size: 20px;
-  color: #ffffff;
-  background: lightgray;
-  border-radius: 50%;
-  margin: 0 auto 10px auto;
-  padding: 2px;
-}
-
-#progressbar li:after {
-  content: "";
-  width: 100%;
-  height: 2px;
-  background: lightgray;
-  position: absolute;
-  left: 0;
-  top: 25px;
-  z-index: -1;
-}
-
-#progressbar li.active:before,
-#progressbar li.active:after {
-  color: #4966cb;
-}
-#progressbar li.active {
-  background-color: white !important;
-}
-
-.progress {
-  height: 20px;
-}
-
-.progress-bar {
-  background-color: #673ab7;
-}
-
-.fit-image {
-  width: 100%;
-}
-@import url(https://fonts.googleapis.com/css?family=Montserrat);
-
-/*basic reset*/
-* {
-  margin: 0;
-  padding: 0;
-}
-
-/*image approve css */
-.img policy-cloud-approve {
-  display: inline-block !important;
-}
-.policy-cloud-approve-img {
-  display: inline-block !important;
-}
-
 /*
 *
 * Generic
@@ -1043,6 +16,7 @@ select#type.type-create {
   --policycloud-highlight-color-mid: #005cf9;
   --policycloud-highlight-color-light: #00bdf5;
   --policycloud-border-color-light: rgba(0, 0, 0, 0.1);
+  --policycloud-background-color: rgba(253, 253, 253);
   --policycloud-background-notice: lightblue;
   --policycloud-background-notice-outline: rgb(52, 111, 131);
   --policycloud-background-failure: #ffe8e8;
@@ -1055,6 +29,7 @@ select#type.type-create {
 
 .policycloud-marketplace a {
   display: inline !important;
+  text-decoration: none !important;
   font-size: inherit;
   font-weight: bold;
   color: var(--policycloud-text-color);
@@ -1062,6 +37,7 @@ select#type.type-create {
 }
 
 .policycloud-marketplace a:hover {
+  text-decoration: none !important;
   display: inline;
   color: var(--policycloud-highlight-color-mid);
   transition: color 0.2s ease-in-out;
@@ -1162,13 +138,36 @@ select#type.type-create {
   transition: all 0.1s ease-in-out;
 }
 
-.policycloud-marketplace a.pill {
+.policycloud-marketplace a.pill,
+.policycloud-marketplace span.pill {
   display: inline-block !important;
   font-size: 90%;
   font-weight: 500;
   padding: 0 10px;
   background-color: var(--policycloud-border-color-light);
   border-radius: 100px;
+}
+
+.policycloud-marketplace h2 {
+  /* Other */
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.policycloud-marketplace h3 {
+  /* Other */
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.policycloud-marketplace h4 {
+  /* Other */
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.policycloud-marketplace p {
+  line-height: 1.3em;
 }
 
 .policycloud-marketplace span.label {
@@ -1427,6 +426,225 @@ select#type.type-create {
   background-color: black;
   height: 5px;
 }
+
+/*
+* ---------------------
+* Assets
+* ---------------------
+*
+* These are the styles for the assets related shortcodes.
+*
+*/
+
+/*
+* 
+* Assets grid
+* ---------------------
+*
+* These are the styles for the asset grid.
+*
+*/
+
+#policycloud-marketplace-assets-grid > ul {
+  /* Display & Box Model */
+  display: flex;
+  flex-wrap: wrap;
+  padding: 24px;
+
+  /* Other */
+  list-style-type: none;
+}
+
+#policycloud-marketplace-assets-grid > ul > li {
+  /* Display & Box Model */
+  flex: 1 0 300px;
+  margin: 10px;
+  padding: 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+
+  /* Other */
+  background-color: var(--policycloud-background-color);
+  transition: all 0.2s ease-in-out;
+}
+
+#policycloud-marketplace-assets-grid > ul > li > a {
+  /* Display & Box Model */
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  height: 100%;
+}
+
+#policycloud-marketplace-assets-grid > ul > li > a > *:not(.cover) {
+  /* Display & Box Model */
+  margin: 10px 15px;
+
+  /* Other */
+  font-weight: normal;
+}
+
+#policycloud-marketplace-assets-grid > ul > li > a > .cover > div {
+  /* Display & Box Model */
+  margin: 10px 15px;
+
+  /* Other */
+  font-weight: normal;
+}
+
+#policycloud-marketplace-assets-grid > ul > li:hover {
+  /* Positioning */
+  transform: scale(0.985);
+
+  /* Other */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out;
+}
+
+#policycloud-marketplace-assets-grid > ul > li > a:hover {
+  /* Other */
+  color: inherit !important;
+}
+
+#policycloud-marketplace-assets-grid > ul > li > a img {
+  /* Display & Box Model */
+  max-height: 150px;
+  width: 100%;
+
+  /* Other */
+  object-fit: cover;
+}
+
+#policycloud-marketplace-assets-grid > ul > li > a h4 {
+  /* Display & Box Model */
+  margin-top: 10px;
+}
+
+#policycloud-marketplace-assets-grid > ul > li > a p {
+  /* Display & Box Model */
+  margin: 10px 0;
+
+  /* Other */
+  color: var(--policycloud-text-color-secondary);
+  font-size: 16px;
+}
+
+#policycloud-marketplace-assets-grid > ul > li > a > .metadata {
+  /* Display & Box Model */
+  margin-top: 0;
+  width: 100%;
+}
+
+#policycloud-marketplace-assets-grid > ul > li > a > .metadata > * {
+  /* Display & Box Model */
+  margin: 0;
+}
+
+#policycloud-marketplace-assets-grid > ul > li > a .owner {
+  /* Other */
+  font-size: 14px;
+  font-weight: 500;
+}
+
+#policycloud-marketplace-assets-grid > ul > li > a .last-updated {
+  /* Other */
+  font-size: 12px;
+  color: var(--policycloud-text-color-secondary);
+}
+
+#policycloud-marketplace-assets-grid > ul > li > a .reviews {
+  /* Other */
+  font-size: 14px;
+}
+
+#policycloud-marketplace-assets-grid > ul > li > a .views {
+  /* Other */
+  font-size: 14px;
+}
+
+#policycloud-marketplace-assets-grid > ul > li > a .type,
+#policycloud-marketplace-assets-grid > ul > li > a .sub-type {
+  /* Other */
+  font-size: 14px;
+}
+
+/*
+* 
+* Assets archive
+* ---------------------
+*
+* These are the styles for the 
+* [policycloud-marketplace-read-multiple] shortcode.
+*
+*/
+
+#policycloud-marketplace-asset-archive {
+  /* Display & Box Model */
+  display: flex;
+  max-width: 90%;
+}
+
+/**
+* Assets archive filters
+*/
+
+#policycloud-marketplace-asset-archive > .filters {
+  /* Display & Box Model */
+  flex: 25% 0 0;
+  padding: 33px;
+  border-right: 1px solid var(--policycloud-border-color-light);
+}
+
+#policycloud-marketplace-asset-archive > .filters > p {
+  /* Display & Box Model */
+  margin: 15px 0;
+
+  /* Other */
+  color: var(--policycloud-text-color-secondary);
+}
+
+#policycloud-marketplace-asset-archive > .filters > form fieldset {
+  /* Display & Box Model */
+  padding: 0;
+  margin: 15px 0;
+  border: unset;
+}
+
+#policycloud-marketplace-asset-archive > .content {
+  /* Display & Box Model */
+  flex: 75% 0 0;
+  padding: 0;
+}
+
+#policycloud-marketplace-asset-archive > .content > header {
+  /* Display & Box Model */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 17px 17px 17px;
+  border-bottom: 1px solid var(--policycloud-border-color-light);
+}
+
+#policycloud-marketplace-asset-archive > .content > header > form {
+  /* Display & Box Model */
+  display: flex;
+  align-items: center;
+}
+
+#policycloud-marketplace-asset-archive > .content > header > form > * {
+  margin: 0;
+}
+
+/*
+* ---------------------
+* Accounts
+* ---------------------
+*
+* These are the styles for the accounts related shortcodes.
+*
+*/
 
 /*
 *
