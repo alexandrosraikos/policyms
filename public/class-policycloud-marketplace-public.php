@@ -779,14 +779,24 @@ class PolicyCloud_Marketplace_Public
 			// Get specific Description data for authorized users.
 			$token = retrieve_token(true);
 			if (!empty($token)) {
-				$description = get_asset($_GET['did'], $token['encoded']);
+				$asset = get_asset($_GET['did'], $token['encoded']);
 
 				// Specify Description ownership.
-				$owner = ($description['info']['provider'] == $token['decoded']['username']);
-			} else $description = get_asset($_GET['did']);
+				$owner = ($asset['results'][0][0]['metadata']['provider'] == $token['decoded']['username']);
+			} else $asset = get_asset($_GET['did']);
 		} catch (Exception $e) {
 			$error = $e->getMessage();
+			try {
+				$asset = get_asset($_GET['did']);
+			} catch (Exception $e) {
+				$error = $e->getMessage();
+			}
 		}
+		
+		// Retrieve login page URL.
+		$options = get_option('policycloud_marketplace_plugin_settings');
+		if (empty($options['login_page'])) $error = "You have not set a log in page in your PolicyCloud Marketplace settings.";
+		if (empty($options['account_page'])) $error = "You have not set an account page in your PolicyCloud Marketplace settings.";
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 		wp_enqueue_script('policycloud-marketplace-asset');
@@ -796,9 +806,11 @@ class PolicyCloud_Marketplace_Public
 			'description_id' => $_GET['did']
 		));
 
-		asset_html($description, [
-			"authenticated" => !empty($token ?? null),
+		asset_html($asset['results'][0][0] ?? [], [
+			"is_authenticated" => !empty($token ?? null),
 			"is_owner" => $owner ?? false,
+			"login_page" => $options['login_page'] ?? "",
+			"account_page" => $options['account_page'] ?? "",
 			"error" => $error ?? '',
 		]);
 	}

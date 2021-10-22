@@ -89,6 +89,21 @@ function showAlert(
 }
 
 /**
+ * Refreshes with a new page query.
+ *
+ * @param {Event} e The click event
+ *
+ * @author Alexandros Raikos <araikos@unipi.gr>
+ * @author Eleftheria Kouremenou <elkour@unipi.gr>
+ */
+function toggleFileList(e) {
+  e.preventDefault();
+  $(this)
+    .closest(".policycloud-marketplace.file-viewer")
+    .toggleClass("collapsed");
+}
+
+/**
  * Handle the response after requesting via WP ajax.
  *
  * @param {Object} response The raw response AJAX object.

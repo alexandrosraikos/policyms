@@ -333,14 +333,156 @@ function assets_archive_html($assets, $args)
  */
 function asset_html($asset, $args)
 {
-    if (!empty($args['error'])) {
-        echo 'Error: ' . $args['error'];
-        echo  '<div class="error-msg1"><i class="fa fa-times-circle"></i>Error message' . $args['error'] . '</div>';
+
+    /**
+     * Print the locked content notification.
+     * 
+     * @param   array $login_page The login page defined in the WordPress Settings.
+     * @param   array $message The lowercase message indicating the desired action.
+     *
+     * @since   1.0.0
+     * @author  Alexandros Raikos <araikos@unipi.gr>
+     * @author  Eleftheria Kouremenou <elkour@unipi.gr>
+     */
+    function show_lock($login_page, $message)
+    {
+        echo '<div class="lock"><img src="' . get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/lock.svg') . '" /><p>Please <a href="' . $login_page . '">log in</a> to ' . $message . '.</p></div>';
     }
 
-    if (empty($description_object)) {
-        echo  '<div class="error-msg1"><i class="fa fa-times-circle"></i>The description is Empty</div>';
+
+    /**
+     * Print the file viewer table.
+     * 
+     * @param   string $title The title of the collection.
+     * @param   string $id The id of the collection.
+     * @param   array $files A collection of files.
+     * @param   bool $collapsed Whether the view is collapsed by default.
+     *
+     * @since   1.0.0
+     * @author  Alexandros Raikos <araikos@unipi.gr>
+     * @author  Eleftheria Kouremenou <elkour@unipi.gr>
+     */
+    function file_viewer($title, $id, $files, $collapsed = false)
+    {
+        if (empty($title)) {
+            show_alert("Please initialise the file viewer.", false, 'notice');
+        } else {
+    ?>
+            <div class="policycloud-marketplace file-viewer <?php echo ($collapsed) ? 'collapsed' : '' ?>">
+                <button data-files-category="<?php echo $id ?>" class="action"><?php echo $title ?></button>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Version</th>
+                        <th>Size</th>
+                        <th>Added</th>
+                    </tr>
+                    <?php
+                    if (!empty($files)) {
+                        foreach ($files as $file) {
+                    ?>
+                            <tr>
+                                <td><a href=""><?php echo $file['filename'] ?></a></td>
+                                <td><?php echo $file['version'] ?></td>
+                                <td><?php echo $file['size'] ?></td>
+                                <td><?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($file['updateDate']))) ?></td>
+                            </tr>
+                    <?php
+                        }
+                    } else {
+                        echo '<tr><td colspan="4">';
+                        show_alert("No " . $id . " found.", false, 'notice');
+                        echo '</td></tr>';
+                    }
+                    ?>
+                </table>
+            </div>
+        <?php
+        }
+    }
+
+    if (!empty($args['error'])) {
+        show_alert($args['error']);
+    }
+    if (empty($asset)) {
+        show_alert("This asset was not found.");
     } else {
+        ?>
+        <div class="policycloud-marketplace" id="policycloud-marketplace-asset">
+            <header>
+                <h1><?php echo $asset['info']['title'] ?></h1>
+                <div class="metadata">
+                    <span class="provider"><a href="<?php echo $args['account_page'] . '?user=' . $asset['metadata']['provider'] ?>"><?php echo $asset['metadata']['provider'] ?></a></span>
+                    <?php if (!empty($asset['info']['owner'])) { ?>
+                        <span class="owner">&copy; <?php echo $asset['info']['owner'] ?></span>
+                    <?php } ?>
+                    <span class="type pill"><a href=""><?php echo $asset['info']['type'] ?></a></span>
+                    <?php if (!empty($asset['info']['subtype'])) {
+                        if ($asset['info']['subtype'] != '-') { ?>
+                            <span class="sub-type pill"><a href=""><?php echo $asset['info']['subtype'] ?></a></span>
+                        <?php }
+                    }
+                    if (!empty($asset['info']['fieldOfUse'])) { ?>
+                        <span class="fields-of-use">
+                            <?php
+                            foreach ($asset['info']['fieldOfUse'] as $field_of_use) {
+                                echo '<span>' . $field_of_use . '</span>';
+                            }
+                            ?>
+                        </span>
+                    <?php } ?>
+                    <span class="reviews"><span class="fas fa-star"></span> <?php echo $asset['metadata']['reviews']['average_rating'] . ' (' . $asset['metadata']['reviews']['no_reviews'] . ' reviews)' ?></span>
+                    <span class="views"><?php echo $asset['metadata']['views'] ?> views</span>
+                    <span class="last-update-date">Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($asset['metadata']['uploadDate']))) ?></span>
+                </div>
+            </header>
+            <div class="content">
+                <div class="files <?php echo ($args['is_authenticated']) ? '' : 'locked' ?>">
+                    <h2>Uploads</h2>
+                    <?php
+                    if ($args['is_authenticated']) {
+                        file_viewer('Files', 'files', $asset['assets']['files'], (empty($asset['assets']['files'])));
+                        file_viewer('Images', 'images', $asset['assets']['images'], (empty($asset['assets']['images'])));
+                        file_viewer('Videos', 'videos', $asset['assets']['videos'], (empty($asset['assets']['videos'])));
+                    } else show_lock($args['login_page'], 'view and download files');
+                    if ($args['is_owner']) {
+                    ?>
+                        <div class="comments">
+                            <h2>Private comments</h2>
+                            <p><?php echo $asset['info']['comments'] ?></p>
+                        </div>
+                    <?php
+                    }
+                    ?>
+                </div>
+                <div class="information">
+                    <h2>Description</h2>
+                    <div class="description">
+                        <p>
+                            <?php
+                            if ($args['is_authenticated']) echo $asset['info']['description'];
+                            else echo $asset['info']['short_desc'];
+                            ?>
+                        </p>
+                    </div>
+                    <div class="gallery <?php echo ($args['is_authenticated']) ? '' : 'locked' ?>">
+                        <h2>Gallery</h2>
+                        <?php if ($args['is_authenticated']) {
+                            if (!empty($asset['assets']['images'])) {
+                                // TODO @alexandrosraikos: Pull image data.
+                                foreach ($asset['assets']['images'] as $image) {
+                                    echo '<img src="" />';
+                                }
+                            } else {
+                                show_alert('No images or videos were found.', false, 'notice');
+                            }
+                        } else show_lock($args['login_page'], 'view the image gallery');
+                        ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php
     }
 }
 

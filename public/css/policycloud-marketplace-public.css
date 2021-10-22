@@ -148,6 +148,12 @@
   border-radius: 100px;
 }
 
+.policycloud-marketplace h1 {
+  /* Other */
+  font-size: 40px;
+  font-weight: bold;
+}
+
 .policycloud-marketplace h2 {
   /* Other */
   font-size: 28px;
@@ -298,6 +304,80 @@
   margin: 20px auto;
   max-width: 60%;
   color: var(--policycloud-text-color-secondary);
+}
+
+/* Locked content */
+.policycloud-marketplace .lock {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--policycloud-border-color-light);
+  border-radius: 12px;
+}
+
+.policycloud-marketplace .lock > img {
+  margin-bottom: 10px;
+  width: 60px;
+}
+
+.policycloud-marketplace .lock > p {
+  margin-top: 10px;
+  text-align: center;
+  width: 80%;
+}
+
+/* File viewer */
+
+.policycloud-marketplace .file-viewer {
+  margin: 10px;
+  width: 100%;
+}
+
+.policycloud-marketplace .file-viewer > button {
+  width: 100%;
+}
+
+.policycloud-marketplace .file-viewer > table {
+  box-sizing: border-box;
+  display: block;
+  margin: 0 10px 10px 10px;
+  width: 95%;
+  border-radius: 12px;
+  border: 1px solid vaR(--policycloud-border-color-light);
+  overflow: hidden;
+  padding-top: 30px;
+  margin-top: -30px;
+
+  /* Other */
+  font-size: 14px;
+  border-collapse: collapse;
+}
+
+.policycloud-marketplace .file-viewer.collapsed > table {
+  display: none;
+}
+
+.policycloud-marketplace .file-viewer > table tbody {
+  display: table;
+  min-width: 100%;
+}
+
+.policycloud-marketplace .file-viewer > table td,
+.policycloud-marketplace .file-viewer > table th {
+  max-width: 150px;
+  word-wrap: break-word;
+  vertical-align: top;
+  border-top: unset;
+  border-bottom: 1px solid var(--policycloud-border-color-light) !important;
+  border-left: 1px solid var(--policycloud-border-color-light) !important;
+  border-right: 1px solid var(--policycloud-border-color-light) !important;
+  padding: 5px 7px;
+}
+
+.policycloud-marketplace .file-viewer > table td:not(:first-of-type) {
+  text-align: right;
 }
 
 /* File editor */
@@ -699,6 +779,111 @@
 
 #policycloud-marketplace-asset-archive > .content > .gallery {
   padding: 10px;
+}
+
+/*
+* 
+* Asset
+* ---------------------
+*
+* These are the styles for the 
+* [policycloud-marketplace-read-single] shortcode.
+*
+*/
+
+#policycloud-marketplace-asset {
+  /* Display & Box Model */
+  width: 95%;
+  max-width: 1200px;
+}
+
+#policycloud-marketplace-asset h2 {
+  margin-bottom: 10px;
+}
+
+/**
+* Asset header
+*/
+
+#policycloud-marketplace-asset > header {
+  /* Display & Box Model */
+  border-bottom: 1px solid var(--policycloud-border-color-light);
+}
+
+#policycloud-marketplace-asset > header > .metadata {
+  /* Display & Box Model */
+  margin: 20px 0;
+
+  /* Other */
+  font-size: 16px;
+}
+
+#policycloud-marketplace-asset > header > .metadata > span:not(:last-of-type) {
+  /* Display & Box Model */
+  padding-right: 15px;
+  border-right: 1px solid var(--policycloud-border-color-light);
+  margin-right: 10px;
+}
+
+#policycloud-marketplace-asset > header > .metadata > .provider {
+  /* Other */
+  font-size: 22px;
+  font-weight: 500;
+}
+
+#policycloud-marketplace-asset > header > .metadata > .type,
+#policycloud-marketplace-asset > header > .metadata > .sub-type {
+  /* Display & Box Model */
+  padding-right: 10px !important;
+
+  /* Other */
+  font-size: 14px;
+}
+
+#policycloud-marketplace-asset > header > .metadata > .fields-of-use > span {
+  /* Display & Box Model */
+  margin-right: 10px;
+
+  /* Other */
+  font-size: 16px;
+  text-decoration: underline;
+}
+
+/**
+* Asset content
+*/
+
+#policycloud-marketplace-asset > .content {
+  /* Display & Box Model */
+  display: flex;
+}
+
+#policycloud-marketplace-asset > .content > * {
+  /* Display & Box Model */
+  padding: 20px 20px 0 20px;
+}
+
+#policycloud-marketplace-asset > .content > .files {
+  /* Display & Box Model */
+  flex: 0.5;
+  border-right: 1px solid var(--policycloud-border-color-light);
+}
+
+#policycloud-marketplace-asset > .content > .files > .comments {
+  /* Display & Box Model */
+  margin-top: 20px;
+}
+
+#policycloud-marketplace-asset > .content > .information {
+  /* Display & Box Model */
+  flex: 1;
+}
+
+#policycloud-marketplace-asset > .content > .information > .description {
+  margin-bottom: 20px;
+}
+
+#policycloud-marketplace-asset > .content > .information > .gallery {
 }
 
 /*

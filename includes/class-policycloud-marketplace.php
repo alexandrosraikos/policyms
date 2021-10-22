@@ -179,6 +179,10 @@ class PolicyCloud_Marketplace
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
 		$this->loader->add_action('wp_head', $plugin_public, 'enqueue_head_scripts');
 
+		// TODO @alexandrosraikos: Rename assets to descriptions (after all).
+		// TODO @alexandrosraikos: Rename files to assets (after all).
+		// TODO @alexandrosraikos: Add priv ajax handlers.
+
 		// Support for user accounts.
 		$this->loader->add_action('init', $plugin_public, 'add_accounts_shortcodes');
 		$this->loader->add_filter('wp_nav_menu_items', $plugin_public, 'add_conditional_access_menu_item', 10, 2);
