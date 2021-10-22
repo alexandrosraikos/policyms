@@ -220,6 +220,33 @@ function get_asset(string $did, string $token = null)
     );
 }
 
+/**
+ * Get an asset's image data.
+ * 
+ * @param   string $id The unique ID of the asset.
+ * @param   array $token The encoded access token of the requesting user.
+ * 
+ * @uses    policyCloudMarketplaceAPIRequest()
+ * 
+ * @since	1.0.0
+ * @author Alexandros Raikos <araikos@unipi.gr>
+ */
+function get_asset_image($id, $token)
+{
+    $response = policyCloudMarketplaceAPIRequest(
+        'GET',
+        '/images/' . $id,
+        [],
+        $token,
+        [
+            'Content-Type: application/octet-stream',
+            (!empty($token) ? ('x-access-token: ' . $token) : null)
+        ],
+    );
+
+    return $response;
+}
+
 
 /**
  * Create an asset using the PolicyCloud Marketplace API. For more info visit:

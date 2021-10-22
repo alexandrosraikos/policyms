@@ -331,7 +331,7 @@ function assets_archive_html($assets, $args)
  * @author  Alexandros Raikos <araikos@unipi.gr>
  * @author  Eleftheria Kouremenou <elkour@unipi.gr>
  */
-function asset_html($asset, $args)
+function asset_html($asset, $images, $args)
 {
 
     /**
@@ -410,7 +410,22 @@ function asset_html($asset, $args)
         ?>
         <div class="policycloud-marketplace" id="policycloud-marketplace-asset">
             <header>
-                <h1><?php echo $asset['info']['title'] ?></h1>
+                <div class="title">
+                    <h1><?php echo $asset['info']['title'] ?>
+                        <?php
+                        if ($args['is_owner']) {
+                        ?>
+                            <span class="status label <?php echo ($asset['metadata']['approved'] == 1) ? 'success' : 'notice' ?>"><?php echo ($asset['metadata']['approved'] == 1) ? 'Approved' : 'Pending' ?></span>
+                        <?php
+                        }
+                        ?>
+                    </h1>
+                    <?php
+                    if ($args['is_owner']) {
+                        echo '<button class="outlined show-editor-modal"><span class="fas fa-pen"></span> Edit</button>';
+                    }
+                    ?>
+                </div>
                 <div class="metadata">
                     <span class="provider"><a href="<?php echo $args['account_page'] . '?user=' . $asset['metadata']['provider'] ?>"><?php echo $asset['metadata']['provider'] ?></a></span>
                     <?php if (!empty($asset['info']['owner'])) { ?>
@@ -467,20 +482,121 @@ function asset_html($asset, $args)
                     </div>
                     <div class="gallery <?php echo ($args['is_authenticated']) ? '' : 'locked' ?>">
                         <h2>Gallery</h2>
-                        <?php if ($args['is_authenticated']) {
-                            if (!empty($asset['assets']['images'])) {
-                                // TODO @alexandrosraikos: Pull image data.
-                                foreach ($asset['assets']['images'] as $image) {
-                                    echo '<img src="" />';
+                        <div class="slider">
+                            <?php if ($args['is_authenticated']) {
+                                if (!empty($images)) {
+                                    foreach ($images as $image) {
+                                        echo '<img src="data:image/*;base64,' . base64_encode($image) . '" draggable="false" />';
+                                    }
+                                } else {
+                                    show_alert('No images or videos were found.', false, 'notice');
                                 }
-                            } else {
-                                show_alert('No images or videos were found.', false, 'notice');
-                            }
-                        } else show_lock($args['login_page'], 'view the image gallery');
-                        ?>
+                            } else show_lock($args['login_page'], 'view the image gallery');
+                            ?>
+                        </div>
                     </div>
                 </div>
             </div>
+            <?php 
+            if ($args['is_owner']) {
+            ?>
+            <div class="modal editing-form hidden">
+                <button class="close"><span class="fas fa-times"></span></button>
+                <form id="policycloud-marketplace-asset-editing" action="">
+                    <fieldset name="basic-information">
+                        <h2>Basic information</h2>
+                        <p>To create a new Marketplace asset, the following fields represent basic information that will be visible to others.</p>
+                        <label for="title">Title *</label>
+                        <input required name="title" placeholder="Insert a title" type="text" value="<?php echo $asset['info']['title'] ?>" />
+                        <label for="type">Primary collection type *</label>
+                        <select name="type" required>
+                            <option value="algorithms" <?php echo ($asset['info']['type'] == "algorithms") ? 'selected' : '' ?>>Algorithms</option>
+                            <option value="tools" <?php echo ($asset['info']['type'] == "tools") ? 'selected' : '' ?>>Tools</option>
+                            <option value="policies" <?php echo ($asset['info']['type'] == "policies") ? 'selected' : '' ?>>Policies</option>
+                            <option value="datasets" <?php echo ($asset['info']['type'] == "datasets") ? 'selected' : '' ?>>Datasets</option>
+                            <option value="webinars" <?php echo ($asset['info']['type'] == "webinars") ? 'selected' : '' ?>>Webinars</option>
+                            <option value="tutorials" <?php echo ($asset['info']['type'] == "tutorials") ? 'selected' : '' ?>>Tutorials</option>
+                            <option value="documents" <?php echo ($asset['info']['type'] == "documents") ? 'selected' : '' ?>>Documents</option>
+                            <option value="externals" <?php echo ($asset['info']['type'] == "externals") ? 'selected' : '' ?>>Externals</option>
+                            <option value="other" <?php echo ($asset['info']['type'] == "other") ? 'selected' : '' ?>>Other</option>
+                        </select>
+                        <label for="subtype">Secondary collection type</label>
+                        <input name="subtype" placeholder="Insert a secondary category" type="text" value="<?php echo empty($asset['info']['subtype']) ? '' : $asset['info']['subtype'] ?>" />
+                        <label for="owner">Legal owner *</label>
+                        <input required name="owner" placeholder="Insert the legal owner of the object" type="text" value="<?php echo empty($asset['info']['owner']) ? '' : $asset['info']['owner'] ?>" />
+                        <label for="description">Description *</label>
+                        <textarea name="description" placeholder="Insert a detailed description" style="resize:vertical"><?php echo empty($asset['info']['description']) ? '' : $asset['info']['description'] ?></textarea>
+                    </fieldset>
+                    <fieldset name="internal-information">
+                        <h2>Internal information</h2>
+                        <p>You can include internal private comments and the asset's field of use for management purposes. These fields are optional.</p>
+                        <label for="field-of-use">Fields of usage</label>
+                        <textarea name="field-of-use" placeholder="Separate multiple fields of usage using a comma (lorem, ipsum, etc.)"><?php echo empty($asset['info']['fieldOfUse']) ? '' : implode(', ', $asset['info']['fieldOfUse']) ?></textarea>
+                        <label for="comments">Comments (Private)</label>
+                        <textarea name="comments" placeholder="Insert any additional comments"><?php echo empty($asset['info']['comments']) ? '' : $asset['info']['comments'] ?></textarea>
+                    </fieldset>
+                    <fieldset name="uploads">
+                        <h2>Uploads</h2>
+                        <p>Manage your content and upload new files, images and videos.</p>
+                        <h3>Files</h3>
+                        <?php
+                        if (!empty($asset['assets']['files'])) {
+                            foreach ($asset['assets']['files'] as $file) {
+                        ?>
+                                <div class="file">
+                                    <div>
+                                        <button class="delete"><span class="fas fa-times"></span></button>
+                                        <?php echo $file['filename'] . ' (' . $file['size'] . ')' ?>
+                                    </div>
+                                    <input type="file" name="<?php $file['id'] ?>" accept="image/png, image/jpeg" multiple />
+                                </div>
+                        <?php
+                            }
+                        }
+                        ?>
+                        <input type="file" name="files" accept="image/png, image/jpeg" multiple />
+                        <h3>Images</h3>
+                        <?php
+                        if (!empty($asset['assets']['images'])) {
+                            foreach ($asset['assets']['images'] as $file) {
+                        ?>
+                                <div class="file">
+                                    <div>
+                                        <button class="delete"><span class="fas fa-times"></span></button>
+                                        <?php echo $file['filename'] . ' (' . $file['size'] . ')' ?>
+                                    </div>
+                                    <input type="file" name="<?php $file['id'] ?>" multiple />
+                                </div>
+                        <?php
+                            }
+                        }
+                        ?>
+                        <input type="file" name="images" accept="image/png, image/jpeg" multiple />
+                        <h3>Videos</h3>
+                        <?php
+                        if (!empty($asset['assets']['videos'])) {
+                            foreach ($asset['assets']['videos'] as $file) {
+                        ?>
+                                <div class="file">
+                                    <div>
+                                        <button class="delete"><span class="fas fa-times"></span></button>
+                                        <?php echo $file['filename'] . ' (' . $file['size'] . ')' ?>
+                                    </div>
+                                    <input type="file" name="<?php $file['id'] ?>" accept="image/png, image/jpeg" multiple />
+                                </div>
+                        <?php
+                            }
+                        }
+                        ?>
+                        <input type="file" name="videos" accept="image/png, image/jpeg" multiple />
+                    </fieldset>
+                    <div class="error"></div>
+                    <button type="submit" class="action">Submit</button>
+                </form>
+            </div>
+            <?php 
+            }
+            ?>
         </div>
     <?php
     }
@@ -711,12 +827,13 @@ function account_html(array $information, $picture, array $statistics, array $as
     }
 
     // Check for any errors regarding authorization.
-    if (!empty($args['error'])) {
-        show_alert(($args['error'] == 'not-logged-in') ? 'You are not logged in, please <a href="' . $args['login_page'] . '">log in</a> to your account. Don\'t have an account yet? You can <a href="' . $args['registration_page'] . '">register</a> here.' : $args['error']);
+    if (!empty($args['notice'])) {
+        show_alert(($args['notice'] == 'not-logged-in') ? 'You are not logged in, please <a href="' . $args['login_page'] . '">log in</a> to your account. Don\'t have an account yet? You can <a href="' . $args['registration_page'] . '">register</a> here.' : $args['notice'], false, 'notice');
     }
 
-    if (!empty($information)) {
+    if (!empty($args['error'])) show_alert($args['error']);
 
+    if (!empty($information)) {
         // Check for any notices.
         if (!empty($args['notice'])) {
             show_alert($args['notice'], true, 'notice');

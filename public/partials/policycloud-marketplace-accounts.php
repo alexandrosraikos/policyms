@@ -105,15 +105,15 @@ function retrieve_token(bool $decode = false)
         try {
             $decoded_token = JWT::decode($token, $options['jwt_key'], array('HS256'));
         } catch (InvalidArgumentException $e) {
-            throw new JsonException();
+            throw new JsonException("Your session has expired.");
         } catch (UnexpectedValueException $e) {
-            throw new JsonException();
+            throw new JsonException("Your session has expired.");
         } catch (SignatureInvalidException $e) {
-            throw new JsonException();
+            throw new JsonException("Your session has expired.");
         } catch (BeforeValidException $e) {
-            throw new JsonException();
+            throw new JsonException("Your session has expired.");
         } catch (ExpiredException $e) {
-            throw new JsonException();
+            throw new JsonException("Your session has expired.");
         }
 
         return ($decode) ? [
@@ -142,7 +142,7 @@ function marketplace_username_exists($username)
 {
     $response = policyCloudMarketplaceAPIRequest(
         'GET',
-        '/accounts/username_availability',
+        '/accounts/username/availability',
         [],
         null,
         ["username: " . $username],
@@ -417,7 +417,8 @@ function get_user_picture($id, $token)
         [],
         $token,
         [
-            'Content-Type: application/octet-stream'
+            'Content-Type: application/octet-stream',
+            (!empty($token) ? ('x-access-token: ' . $token) : null)
         ],
     );
 }

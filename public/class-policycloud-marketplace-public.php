@@ -411,12 +411,12 @@ class PolicyCloud_Marketplace_Public
 						$approvals = get_pending_assets($token['encoded']);
 					}
 				}
-			} else $error = "not-logged-in";
+			} else $notice = "not-logged-in";
 			if (!empty($account_information)) {
 				$statistics = get_user_statistics(($visiting) ? $_GET['user'] : $token['decoded']['username'], $token['encoded'] ?? null);
 			}
 		} catch (Exception $e) {
-			$error = $e->getMessage();
+			$notice = "not-logged-in";
 		}
 
 		// Retrieve credentials.
@@ -785,14 +785,25 @@ class PolicyCloud_Marketplace_Public
 				$owner = ($asset['results'][0][0]['metadata']['provider'] == $token['decoded']['username']);
 			} else $asset = get_asset($_GET['did']);
 		} catch (Exception $e) {
-			$error = $e->getMessage();
 			try {
 				$asset = get_asset($_GET['did']);
 			} catch (Exception $e) {
 				$error = $e->getMessage();
 			}
 		}
-		
+
+		// Get asset images.
+		try {
+			if (!empty($token)) {
+				$images = [];
+				foreach ($asset['results'][0][0]['assets']['images'] as $image) {
+					array_push($images, get_asset_image($image['id'], $token['encoded']));
+				}
+			}
+		} catch (Exception $e) {
+			$error = $e->getMessage();
+		}
+
 		// Retrieve login page URL.
 		$options = get_option('policycloud_marketplace_plugin_settings');
 		if (empty($options['login_page'])) $error = "You have not set a log in page in your PolicyCloud Marketplace settings.";
@@ -806,7 +817,7 @@ class PolicyCloud_Marketplace_Public
 			'description_id' => $_GET['did']
 		));
 
-		asset_html($asset['results'][0][0] ?? [], [
+		asset_html($asset['results'][0][0] ?? [], $images ?? [], [
 			"is_authenticated" => !empty($token ?? null),
 			"is_owner" => $owner ?? false,
 			"login_page" => $options['login_page'] ?? "",
