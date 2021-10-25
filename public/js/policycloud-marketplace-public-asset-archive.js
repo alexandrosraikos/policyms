@@ -79,12 +79,12 @@
      * Generic interface actions & event listeners.
      *
      */
-    $("#policycloud-marketplace-asset-archive header .filters-toggle").click(
-      (e) => {
-        e.preventDefault();
-        $("#policycloud-marketplace-asset-archive").toggleClass("inspect");
-      }
-    );
+
+    // Toggle the filter view.
+    $("#policycloud-marketplace-asset-archive .filters-toggle").click((e) => {
+      e.preventDefault();
+      $("#policycloud-marketplace-asset-archive").toggleClass("inspect");
+    });
 
     $(
       "#policycloud-marketplace-asset-archive .content nav.pagination button"

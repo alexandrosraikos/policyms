@@ -19,6 +19,7 @@ if (!function_exists("policyCloudMarketplaceAPIRequest")) {
  */
 function get_assets(array $args)
 {
+
     $filters = '?' . http_build_query([
         'page' => !empty($args['assets-page']) ? $args['assets-page'] : 1,
         'sortBy' => !empty($args['sort-by']) ? $args['sort-by'] : 'newest',
@@ -30,7 +31,7 @@ function get_assets(array $args)
         'info.contact' => !empty($args['contact']) ? $args['contact'] : null,
         'info.description.in' => !empty($args['search']) ? $args['search'] : null,
         'info.fieldOfUse' => !empty($args['field_of_use']) ? $args['field_of_use'] : null,
-        'metadata.provider' => !empty($args['provider']) ? $args['provider'] : null,
+        'metadata.provider' => !empty($args['provider']) ? join(",",$args['provider']) : null,
         'metadata.uploadDate.gte' => !empty($args['upload_date_gte']) ? $args['upload_date_gte'] : null,
         'metadata.uploadDate.lte' => !empty($args['upload_date_lte']) ? $args['upload_date_lte'] : null,
         'metadata.last_updated_by' => !empty($args['last_updated_by']) ? $args['last_updated_by'] : null,

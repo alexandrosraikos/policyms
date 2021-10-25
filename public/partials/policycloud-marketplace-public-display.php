@@ -26,7 +26,7 @@
  */
 function account_registration_html($authorization_url, $logged_in, $tos_url, $error)
 {
-    if(!empty($error)) {
+    if (!empty($error)) {
         show_alert($error);
     }
     if ($logged_in) {
@@ -100,7 +100,7 @@ function account_registration_html($authorization_url, $logged_in, $tos_url, $er
                 <div class="error"></div>
                 <button type="submit" class="action ">Create account</button>
                 <p>By submitting this form, you agree to our <a href="<?php echo $tos_url ?>">Terms of Service</a>.
-                Already have an account? Please <a href="<?php echo $authorization_url ?>">Log in</a>.</p>
+                    Already have an account? Please <a href="<?php echo $authorization_url ?>">Log in</a>.</p>
             </form>
         </div>
     <?php
@@ -220,9 +220,9 @@ function assets_archive_html($assets, $filters, $args)
     if (!empty($args['error']))  echo show_alert($args['error']);
     if (!empty($args['notice'])) echo show_alert($args['notice'], false, 'notice');
     ?>
-    <div class="policycloud-marketplace inspect" id="policycloud-marketplace-asset-archive">
+    <div class="policycloud-marketplace" id="policycloud-marketplace-asset-archive">
         <div class="filters">
-            <button class="close"> Cl
+            <button class="close outlined filters-toggle">Close</button>
             <h2>Filters</h2>
             <?php
             if (empty($filters)) {
@@ -280,7 +280,7 @@ function assets_archive_html($assets, $filters, $args)
                         <div class="providers">
                             <?php
                             foreach ($filters['providers'] as $provider) {
-                                echo '<span><input type="checkbox" name="provider[]" value="' . $provider . '"/><label for="provider[]">' . $provider . '</label></span>';
+                                echo '<span><input type="checkbox" name="provider[]" value="' . $provider . '"/ ' . ((in_array($provider, $_GET['provider'] ?? [])) ? 'checked' : '') . '><label for="provider[]">' . $provider . '</label></span>';
                             }
                             ?>
                         </div>
@@ -360,9 +360,9 @@ function assets_archive_html($assets, $filters, $args)
             <nav class="pagination">
                 <?php
                 if (!empty($assets['pages'])) {
-                    for ($page = 0; $page < $assets['pages']; $page++) {
-                        $activePage = $_GET['assets-page'] ?? 0;
-                        echo '<button class="page-selector ' . (($activePage == ($page + 1)) ? 'active' : '') . '" data-page-number="' . $page + 1 . '">' . ($page + 1) . '</button>';
+                    for ($page = 1; $page < $assets['pages'] + 1; $page++) {
+                        $activePage = $_GET['assets-page'] ?? 1;
+                        echo '<button class="page-selector ' . (($activePage == ($page)) ? 'active' : '') . '" data-page-number="' . $page . '">' . ($page) . '</button>';
                     }
                 }
                 ?>
@@ -882,7 +882,7 @@ function account_html(array $information, $picture, array $statistics, array $as
 
     // Check for any errors regarding authorization.
     if (!empty($args['notice'])) {
-        show_alert(($args['notice'] == 'not-logged-in') ? 'You are not logged in, please <a href="' . $args['login_page'] . '">log in</a> to your account. Don\'t have an account yet? You can <a href="' . $args['registration_page'] . '">register</a> here.' : $args['notice'], false, 'notice');
+        show_alert($args['notice'], false, 'notice');
     }
 
     if (!empty($args['error'])) show_alert($args['error']);

@@ -231,7 +231,7 @@
 
 .policycloud-marketplace
   form
-  *:not(input[type="radio"], input[type="checkbox"], button, svg, table, tbody, tr, td, span, h1, h2, h3, h4, h5, h6, p) {
+  *:not(input[type="radio"], input[type="checkbox"], button, svg, table, tbody, tr, td, span, h1, h2, h3, h4, h5, h6, p, img) {
   display: block;
   margin: 0 auto 10px auto;
   width: 100%;
@@ -665,6 +665,15 @@
   font-size: 14px;
 }
 
+@media screen and (max-width: 650px) {
+  #policycloud-marketplace-assets-grid > ul {
+    padding: 0;
+  }
+  #policycloud-marketplace-assets-grid > ul > li {
+    margin: 0;
+  }
+}
+
 /*
 * 
 * Assets archive
@@ -696,6 +705,11 @@
   transition: all 0.2s ease-in-out;
 }
 
+#policycloud-marketplace-asset-archive > .filters > .close {
+  float: right;
+  display: none;
+}
+
 #policycloud-marketplace-asset-archive.inspect > .filters {
   /* Display & Box Model */
   display: block;
@@ -720,6 +734,10 @@
   padding: 0;
   margin: 15px 0;
   border: unset;
+}
+
+#policycloud-marketplace-asset-archive > .filters > form fieldset label {
+  margin: 0;
 }
 
 #policycloud-marketplace-asset-archive > .filters > form fieldset * {
@@ -853,6 +871,29 @@
     z-index: 10000;
     overflow-y: auto;
     height: 100%;
+    width: 100%;
+  }
+
+  #policycloud-marketplace-asset-archive > .filters > .close {
+    float: right;
+    display: block;
+  }
+}
+
+@media screen and (max-width: 650px) {
+  #policycloud-marketplace-asset-archive > .content > .gallery {
+    width: 90%;
+    margin: 0 auto;
+  }
+
+  #policycloud-marketplace-asset-archive > .content > header {
+    display: block;
+  }
+
+  #policycloud-marketplace-asset-archive > .content > header form {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-end;
   }
 }
 

@@ -357,6 +357,18 @@ class PolicyCloud_Marketplace_Public
 	{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 
+		// Retrieve credentials.
+		$options = get_option('policycloud_marketplace_plugin_settings');
+		if (
+			empty($options['login_page']) ||
+			empty($options['registration_page']) ||
+			empty($options['description_page']) ||
+			empty($options['archive_page']) ||
+			empty($options['upload_page'])
+		) {
+			$error = 'Please update your PolicyCloud Marketplace settings in the WordPress Dashboard.';
+		}
+
 		try {
 			// Authorize.
 			$token = retrieve_token(true);
@@ -413,24 +425,12 @@ class PolicyCloud_Marketplace_Public
 						$approvals = get_pending_assets($token['encoded']);
 					}
 				}
-			} else $notice = "not-logged-in";
+			} else $notice = 'You are not logged in, please <a href="' . $options['login_page'] . '">log in</a> to your account. Don\'t have an account yet? You can <a href="' . $options['registration_page'] . '">register</a> here.';
 			if (!empty($account_information)) {
 				$statistics = get_user_statistics(($visiting) ? $_GET['user'] : $token['decoded']['username'], $token['encoded'] ?? null);
 			}
 		} catch (Exception $e) {
-			$notice = "not-logged-in";
-		}
-
-		// Retrieve credentials.
-		$options = get_option('policycloud_marketplace_plugin_settings');
-		if (
-			empty($options['login_page']) ||
-			empty($options['registration_page']) ||
-			empty($options['description_page']) ||
-			empty($options['archive_page']) ||
-			empty($options['upload_page'])
-		) {
-			$error = 'Please update your PolicyCloud Marketplace settings in the WordPress Dashboard.';
+			$error = $e->getMessage();
 		}
 
 		// Localize script.
@@ -456,8 +456,6 @@ class PolicyCloud_Marketplace_Public
 				"visiting" => $visiting ?? false,
 				"error" => $error ?? '',
 				"notice" => $notice ?? '',
-				"login_page" => $options['login_page'],
-				"registration_page" => $options['registration_page'],
 				"description_page" => $options['description_page'],
 				"archive_page" => $options['archive_page'],
 				"upload_page" => $options['upload_page']

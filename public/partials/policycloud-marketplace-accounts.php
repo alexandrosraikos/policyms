@@ -46,7 +46,7 @@ function policyCloudMarketplaceAPIRequest($http_method, $uri, $data = [], $token
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => $http_method,
         CURLOPT_POSTFIELDS => (!empty($data)) ?  $data : null,
-        CURLOPT_HTTPHEADER => $headers ?? ['Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null), 'x-more-time: '.$options['api_access_token']]
+        CURLOPT_HTTPHEADER => $headers ?? ['Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null), 'x-more-time: ' . $options['api_access_token']]
     ]);
 
     // Get the data.
@@ -59,12 +59,12 @@ function policyCloudMarketplaceAPIRequest($http_method, $uri, $data = [], $token
 
     curl_close($curl);
     if (isset($response)) {
-        if (!is_bool($response)) {
-            if (is_string($response)) {
-                $response = json_decode($response, true);
-                if ($response['_status'] == 'successful' && curl_getinfo($curl, CURLINFO_HTTP_CODE) == 200) {
-                    return $response;
-                } else throw new ErrorException($response['message']);
+        if (is_string($response)) {
+            $decoded = json_decode($response, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                if ($decoded['_status'] == 'successful' && curl_getinfo($curl, CURLINFO_HTTP_CODE) == 200) {
+                    return $decoded;
+                } else throw new ErrorException($decoded['message']);
             } else {
                 return $response;
             }
@@ -543,7 +543,7 @@ function account_edit($data, $uid, $token)
     // Check and retrieve saved encryption key.
     $options = get_option('policycloud_marketplace_plugin_settings');
     if (empty($options['encryption_key'])) throw new InvalidArgumentException("No PolicyCloud Marketplace encryption key was defined in WordPress settings.");
-    
+
     // Information validation checks and errors.
     if (empty($data['email']) || empty($data['name']) || empty($data['surname'])) throw new RuntimeException('Please fill all required fields!');
     if (!filter_var($data["email"], FILTER_VALIDATE_EMAIL)) throw new RuntimeException("Please enter a valid email.");
