@@ -1,7 +1,5 @@
 <?php
 
-// TODO @alexandrosraikos: Work on hotfixes https://github.com/alexandrosraikos/policycloud-marketplace/projects/1#card-71161144
-
 require_once plugin_dir_path(dirname(__FILE__)) . 'partials/vendor/autoload.php';
 
 use Firebase\JWT\BeforeValidException;
@@ -30,6 +28,7 @@ function policyCloudMarketplaceAPIRequest($http_method, $uri, $data = [], $token
     // Retrieve hostname URL.
     $options = get_option('policycloud_marketplace_plugin_settings');
     if (empty($options['marketplace_host'])) throw new InvalidArgumentException("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
+    if (empty($options['api_access_token'])) throw new InvalidArgumentException("No PolicyCloud Marketplace API access key was defined in WordPress settings.");
 
     if (!empty($data)) {
         $data = ($skip_encoding) ?  $data : json_encode($data);
@@ -47,7 +46,7 @@ function policyCloudMarketplaceAPIRequest($http_method, $uri, $data = [], $token
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => $http_method,
         CURLOPT_POSTFIELDS => (!empty($data)) ?  $data : null,
-        CURLOPT_HTTPHEADER => $headers ?? ['Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null), 'x-more-time: 1']
+        CURLOPT_HTTPHEADER => $headers ?? ['Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null), 'x-more-time: '.$options['api_access_token']]
     ]);
 
     // Get the data.
@@ -61,12 +60,12 @@ function policyCloudMarketplaceAPIRequest($http_method, $uri, $data = [], $token
     curl_close($curl);
     if (isset($response)) {
         if (!is_bool($response)) {
-            if (in_array('Content-Type: application/json', $headers ?? ['Content-Type: application/json'])) {
+            if (is_string($response)) {
                 $response = json_decode($response, true);
                 if ($response['_status'] == 'successful' && curl_getinfo($curl, CURLINFO_HTTP_CODE) == 200) {
                     return $response;
                 } else throw new ErrorException($response['message']);
-            } elseif (in_array('Content-Type: application/octet-stream', $headers)) {
+            } else {
                 return $response;
             }
         }
@@ -385,8 +384,6 @@ function verify_user(string $verification_code)
  */
 function get_user_information($uid, $token)
 {
-    // TODO @alexandrosraikos: Support getting the profile picture (waiting on @vkoukos).
-
     $response = policyCloudMarketplaceAPIRequest(
         'GET',
         '/accounts/users/information/' . $uid,
@@ -439,6 +436,9 @@ function get_user_picture($id, $token)
  */
 function set_user_picture($path, $type, $username, $token)
 {
+    $options = get_option('policycloud_marketplace_plugin_settings');
+    if (empty($options['api_access_token'])) throw new InvalidArgumentException("No PolicyCloud Marketplace API access key was defined in WordPress settings.");
+
     $file = new CURLFile($path, $type, $username);
     $response = policyCloudMarketplaceAPIRequest(
         'PUT',
@@ -448,9 +448,9 @@ function set_user_picture($path, $type, $username, $token)
         ],
         $token,
         [
-            'x-file-type: ' . $type,
+            'x-image-mimetype: ' . $type,
             'x-access-token: ' . $token,
-            'x-more-time: 1'
+            'x-more-time: ' . $options['api_access_token']
         ],
         true
     );

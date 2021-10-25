@@ -76,9 +76,10 @@ class PolicyCloud_Marketplace_Admin
 	}
 
 	function policycloud_marketplace_validate_plugin_settings( $input ) {
+		$output['marketplace_host'] = sanitize_text_field( $input['marketplace_host']);
+		$output['api_access_token'] = sanitize_text_field( $input['api_access_token']);
 		$output['jwt_key'] = sanitize_text_field( $input['jwt_key'] );
 		$output['encryption_key'] = sanitize_text_field( $input['encryption_key'] );
-		$output['marketplace_host'] = sanitize_text_field( $input['marketplace_host']);
 		$output['login_page'] = esc_url($input['login_page']);
 		$output['registration_page'] = esc_url($input['registration_page']);
 		$output['account_page'] = esc_url($input['account_page']);
@@ -110,6 +111,14 @@ class PolicyCloud_Marketplace_Admin
 		  'marketplace_host',
 		  'Marketplace Host',
 		  'policycloud_marketplace_plugin_host',
+		  'policycloud_marketplace_plugin',
+		  'section_one'
+		);
+
+		add_settings_field(
+		  'api_access_token',
+		  'Marketplace API Access Token',
+		  'policycloud_marketplace_plugin_api_access_token',
 		  'policycloud_marketplace_plugin',
 		  'section_one'
 		);

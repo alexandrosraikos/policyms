@@ -20,9 +20,11 @@ if (!function_exists("policyCloudMarketplaceAPIRequest")) {
 function get_assets(array $args)
 {
     $filters = '?' . http_build_query([
+        'page' => !empty($args['assets-page']) ? $args['assets-page'] : 1,
+        'sortBy' => !empty($args['sort-by']) ? $args['sort-by'] : 'newest',
+        'itemsPerPage' => !empty($args['items-per-page']) ? $args['items-per-page'] : 10,
         'info.owner' => !empty($args['owner']) ? $args['owner'] : null,
         'info.title' => !empty($args['search']) ? $args['search'] : null,
-        'info.type.in' => !empty($args['type']) ? $args['type'] : null,
         'info.subtype' => !empty($args['subtype']) ? $args['subtype'] : null,
         'info.comments.in' => !empty($args['comments']) ? $args['comments'] : null,
         'info.contact' => !empty($args['contact']) ? $args['contact'] : null,
@@ -39,7 +41,7 @@ function get_assets(array $args)
     ]);
 
     // Get all descriptions.
-    if (!isset($args['collections'])) {
+    if (!isset($args['type'])) {
         return policyCloudMarketplaceAPIRequest(
             'GET',
             '/descriptions/all' . $filters,
@@ -48,12 +50,10 @@ function get_assets(array $args)
 
     // Filtering by collection.
     else {
-        return array_map(function ($collection) use ($filters) {
-            return policyCloudMarketplaceAPIRequest(
-                'GET',
-                '/descriptions/' . $collection . $filters
-            );
-        }, (is_array($args['collection']) ? $args['collection'] : [$args['collection']]));
+        return policyCloudMarketplaceAPIRequest(
+            'GET',
+            '/descriptions/' . $args['type'] . $filters
+        );
     }
 }
 
@@ -144,6 +144,26 @@ function get_account_assets(string $uid, string $token = null, array $args = [])
         [],
         $token
     );
+}
+
+/**
+ * Retrieve max filtering values stemming from all
+ * assets.
+ * 
+ * To learn more about the Marketplace API data schema for retrieving filtering values:
+ * https://documenter.getpostman.com/view/16776360/TzsZs8kn#d95083ac-dd22-448b-bd7c-aeb106e5e42c
+ * 
+ * @uses    policyCloudMarketplaceAPIRequest()
+ * 
+ * @since   1.0.0
+ * @author  Alexandros Raikos <araikos@unipi.gr>
+ */
+function get_filtering_values() {
+    return policyCloudMarketplaceAPIRequest(
+        'GET',
+        '/descriptions/statistics/filtering',
+        []
+    )['results'];
 }
 
 /**

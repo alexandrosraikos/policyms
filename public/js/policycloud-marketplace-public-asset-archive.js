@@ -37,6 +37,44 @@
     }
 
     /**
+     * Refreshes with a new view sorting query.
+     *
+     * @param {Event} e The click event
+     *
+     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Eleftheria Kouremenou <elkour@unipi.gr>
+     */
+    function addSortFilter(e) {
+      e.preventDefault();
+      var url = new URL(window.location.href);
+      if (url.searchParams.has("sort-by")) {
+        url.searchParams.set("sort-by", $(this).val());
+      } else {
+        url.searchParams.append("sort-by", $(this).val());
+      }
+      window.location.href = url.href;
+    }
+
+    /**
+     * Refreshes with a new view sizing query.
+     *
+     * @param {Event} e The click event
+     *
+     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Eleftheria Kouremenou <elkour@unipi.gr>
+     */
+    function addSizeFilter(e) {
+      e.preventDefault();
+      var url = new URL(window.location.href);
+      if (url.searchParams.has("items-per-page")) {
+        url.searchParams.set("items-per-page", $(this).val());
+      } else {
+        url.searchParams.append("items-per-page", $(this).val());
+      }
+      window.location.href = url.href;
+    }
+
+    /**
      *
      * Generic interface actions & event listeners.
      *
@@ -51,5 +89,13 @@
     $(
       "#policycloud-marketplace-asset-archive .content nav.pagination button"
     ).click(switchPage);
+
+    $(
+      '#policycloud-marketplace-asset-archive header select[name="sort-by"]'
+    ).change(addSortFilter);
+
+    $(
+      '#policycloud-marketplace-asset-archive header select[name="items-per-page"]'
+    ).change(addSizeFilter);
   });
 })(jQuery);

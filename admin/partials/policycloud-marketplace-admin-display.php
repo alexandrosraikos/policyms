@@ -42,6 +42,15 @@ function policycloud_marketplace_plugin_host()
 <?php
 }
 
+function policycloud_marketplace_plugin_api_access_token()
+{
+    $options = get_option('policycloud_marketplace_plugin_settings');
+?>
+    <input type="text" name="policycloud_marketplace_plugin_settings[api_access_token]" value="<?php echo ((!empty($options['api_access_token'])) ? $options['api_access_token'] : '') ?>" />
+    <p>The Marketplace server address endpoint.</p>
+<?php
+}
+
 function policycloud_marketplace_plugin_jwt_key()
 {
     $options = get_option('policycloud_marketplace_plugin_settings');

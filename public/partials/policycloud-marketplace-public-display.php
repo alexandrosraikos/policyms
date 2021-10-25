@@ -210,9 +210,8 @@ function assets_grid_html($assets, $asset_url)
  * @author  Alexandros Raikos <araikos@unipi.gr>
  * @author  Eleftheria Kouremenou <elkour@unipi.gr>
  */
-function assets_archive_html($assets, $args)
+function assets_archive_html($assets, $filters, $args)
 {
-
     // TODO @alexandrosraikos: CSS mockup alignment.
     if (!empty($args['error']))  echo show_alert($args['error']);
     if (!empty($args['notice'])) echo show_alert($args['notice'], false, 'notice');
@@ -220,6 +219,12 @@ function assets_archive_html($assets, $args)
     <div class="policycloud-marketplace inspect" id="policycloud-marketplace-asset-archive">
         <div class="filters">
             <h2>Filters</h2>
+            <?php
+            if (empty($filters)) {
+                show_alert('Unable to retrieve the filtering data.');
+            }
+            else {
+            ?>
             <p>Select the options below to narrow your search.</p>
             <form>
                 <fieldset>
@@ -227,24 +232,32 @@ function assets_archive_html($assets, $args)
                 </fieldset>
                 <fieldset>
                     <h3>Types</h3>
-                    <?php // TODO: @alexandrosraikos Add type checkbox buttons.
-                    ?>
+                    <input type="radio" name="type" value="algorithms" <?php echo (($_GET['type'] ?? '') == 'algorithms') ? 'checked' : '' ?> >Algorithms</input>
+                    <input type="radio" name="type" value="tools" <?php echo (($_GET['type'] ?? '') == 'tools') ? 'checked' : '' ?>>Tools</input>
+                    <input type="radio" name="type" value="policies" <?php echo (($_GET['type'] ?? '') == 'policies') ? 'checked' : '' ?>>Policies</input>
+                    <input type="radio" name="type" value="datasets" <?php echo (($_GET['type'] ?? '') == 'datasets') ? 'checked' : '' ?>>Datasets</input>
+                    <input type="radio" name="type" value="webinars" <?php echo (($_GET['type'] ?? '') == 'webinars') ? 'checked' : '' ?>>Webinars</input>
+                    <input type="radio" name="type" value="tutorials" <?php echo (($_GET['type'] ?? '') == 'tutorials') ? 'checked' : '' ?>>Tutorials</input>
+                    <input type="radio" name="type" value="documents" <?php echo (($_GET['type'] ?? '') == 'documents') ? 'checked' : '' ?>>Documents</input>
+                    <input type="radio" name="type" value="externals" <?php echo (($_GET['type'] ?? '') == 'externals') ? 'checked' : '' ?>>Externals</input>
+                    <input type="radio" name="type" value="other" <?php echo (($_GET['type'] ?? '') == 'other') ? 'checked' : '' ?>>Other</input>
                 </fieldset>
                 <fieldset>
                     <h3>Provider</h3>
-                    <?php // TODO: @alexandrosraikos Add owner checkboxes. (waiting on @vkoukos)
+                    <?php 
+                    foreach($filters['providers'] as $provider) {
+                        echo '<input type="checkbox" value="'.$provider.'">'.$provider.'</input>';
+                    }
                     ?>
                 </fieldset>
                 <fieldset>
                     <h3>Views</h3>
                     <div class="views">
                         <div>
-                            <input type="number" name="views_gte" value="<?php echo $_GET['views_gte'] ?? '0' ?>" />
+                            <input type="number" name="views_gte" placeholder="0" value="<?php echo $_GET['views_gte'] ?? '' ?>" min="0"/>
                         </div>
                         <div>
-                            <input type="number" name="views_lte" placeholder="" value="<?php echo $_GET['views_lte'] ?? '0' ?>" />
-                            <?php // TODO: @alexandrosraikos Add max views. (waiting on @vkoukos)
-                            ?>
+                            <input type="number" name="views_lte" placeholder="<?php echo $filters['max_views'] ?>" value="<?php echo $_GET['views_lte'] ?? "" ?>" max="<?php echo $filters['max_views'] ?>" />
                         </div>
                         <?php // TODO: Add visual range selector 
                         ?>
@@ -254,19 +267,18 @@ function assets_archive_html($assets, $args)
                     <h3>Date</h3>
                     <div class="dates">
                         <div>
-                            <?php // TODO: @alexandrosraikos Add oldest date. (waiting on @vkoukos)
-                            ?>
                             <label for="update_date_gte">From</label>
-                            <input type="date" onfocus="(this.type='date')" name="update_date_gte" placeholder="0" value="<?php echo $_GET['update_date_gte'] ?? '0' ?>" />
+                            <input type="date" onfocus="(this.type='date')" name="update_date_gte" placeholder="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>" value="<?php echo $_GET['update_date_gte'] ?? '' ?>" min="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>"/>
                         </div>
                         <div>
                             <label for="update_date_lte">To</label>
-                            <input type="date" name="update_date_lte" placeholder="" />
+                            <input type="date" name="update_date_lte" placeholder="<?php echo date("Y-m-d") ?>" value="<?php echo $_GET['update_date_lte'] ?? '' ?>" max="<?php echo date("Y-m-d") ?>" />
                         </div>
                     </div>
                 </fieldset>
                 <button type="submit" class="action">Apply filters</button>
             </form>
+            <?php } ?>
         </div>
         <div class="content">
             <header>
@@ -275,20 +287,23 @@ function assets_archive_html($assets, $args)
                     <div></div>
                     <div></div>
                 </button>
-                <?php // TODO @alexandrosraikos: Enable sorting (waiting on @vkoukos)
-                ?>
-                <?php // TODO @alexandrosraikos: Add and enable page size.
-                ?>
-                <form action="" class="selector">
+                <form action="" class="sorting-selector">
                     <label for="sort-by">Sort by</label>
                     <select name="sort-by">
-                        <option value="newest" <?php echo ((($_GET['sort_by'] ?? '' == 'newest') || empty($_GET['sort_by'])) ? "selected" : "") ?>>Newest</option>
-                        <option value="oldest" <?php echo (($_GET['sort_by'] ?? '' == 'oldest') ? "selected" : "") ?>>Oldest</option>
-                        <option value="rating-asc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-asc') ? "selected" : "") ?>>Highest rated</option>
-                        <option value="rating-desc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-desc') ? "selected" : "") ?>>Lowest rated</option>
-                        <option value="views-asc" <?php echo (($_GET['sort_by'] ?? '' == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
-                        <option value="views-desc" <?php echo (($_GET['sort_by'] ?? '' == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
-                        <option value="title" <?php echo (($_GET['sort_by'] ?? '' == 'title') ? "selected" : "") ?>>Title</option>
+                        <option value="newest" <?php echo (((($_GET['sort-by'] ?? '') == 'newest') || empty($_GET['sort-by'])) ? "selected" : "") ?>>Newest</option>
+                        <option value="oldest" <?php echo ((($_GET['sort-by'] ?? '') == 'oldest') ? "selected" : "") ?>>Oldest</option>
+                        <option value="rating-desc" <?php echo ((($_GET['sort-by'] ?? '') == 'rating-desc') ? "selected" : "") ?>>Highest rated</option>
+                        <option value="rating-asc" <?php echo ((($_GET['sort-by'] ?? '') == 'rating-asc') ? "selected" : "") ?>>Lowest rated</option>
+                        <option value="views-asc" <?php echo ((($_GET['sort-by'] ?? '') == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
+                        <option value="views-desc" <?php echo ((($_GET['sort-by'] ?? '') == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
+                        <option value="title" <?php echo ((($_GET['sort-by'] ?? '') == 'title') ? "selected" : "") ?>>Title</option>
+                    </select>
+                    <label for="items-per-page">Items per page</label>
+                    <select name="items-per-page">
+                        <option value="10" <?php echo (((($_GET['items-per-page'] ?? '') == 10) || empty($_GET['sort-by'])) ? "selected" : "") ?>>10</option>
+                        <option value="25" <?php echo ((($_GET['items-per-page'] ?? '') == '25') ? "selected" : "") ?>>25</option>
+                        <option value="50" <?php echo ((($_GET['items-per-page'] ?? '') == '50') ? "selected" : "") ?>>50</option>
+                        <option value="100" <?php echo ((($_GET['items-per-page'] ?? '') == '100') ? "selected" : "") ?>>100</option>
                     </select>
                 </form>
             </header>
@@ -307,7 +322,7 @@ function assets_archive_html($assets, $args)
                 <?php
                 if (!empty($assets['pages'])) {
                     for ($page = 0; $page < $assets['pages']; $page++) {
-                        $activePage = $_GET['asset-page'] ?? 0;
+                        $activePage = $_GET['assets-page'] ?? 0;
                         echo '<button class="page-selector ' . (($activePage == ($page + 1)) ? 'active' : '') . '" data-page-number="' . $page + 1 . '">' . ($page + 1) . '</button>';
                     }
                 }
