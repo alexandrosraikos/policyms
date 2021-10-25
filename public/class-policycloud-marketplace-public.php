@@ -197,11 +197,13 @@ class PolicyCloud_Marketplace_Public
 			$options = get_option('policycloud_marketplace_plugin_settings');
 			if (empty($options['account_page'])) throw new Exception("There is no account page set in the PolicyCloud Marketplace settings, please contact your administrator.");
 			if (empty($options['login_page'])) throw new Exception("There is no log in page set in the PolicyCloud Marketplace settings, please contact your administrator.");
+			if (empty($options['tos_url'])) throw new Exception("There is no Terms of Service URL set in the PolicyCloud Marketplace settings, please contact your administrator.");
 			if (retrieve_token()) {
 				$logged_in = true;
 			}
 		} catch (\Exception $e) {
 			$logged_in = false;
+			$error = $e->getMessage();
 		}
 
 		wp_enqueue_script("policycloud-marketplace-account-registration");
@@ -212,7 +214,7 @@ class PolicyCloud_Marketplace_Public
 		));
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-		account_registration_html($options['login_page'], $logged_in ?? false);
+		account_registration_html($options['login_page'], $logged_in ?? false, $options['tos_url'] ?? '', $error ?? '');
 	}
 
 	/**

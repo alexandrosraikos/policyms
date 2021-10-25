@@ -24,8 +24,11 @@
  *
  * @since    1.0.0
  */
-function account_registration_html($authorization_url, $logged_in)
+function account_registration_html($authorization_url, $logged_in, $tos_url, $error)
 {
+    if(!empty($error)) {
+        show_alert($error);
+    }
     if ($logged_in) {
         show_alert("You're already logged in.", false, 'notice');
     } else {
@@ -96,7 +99,8 @@ function account_registration_html($authorization_url, $logged_in)
                 </fieldset>
                 <div class="error"></div>
                 <button type="submit" class="action ">Create account</button>
-                <p>Already have an account? Please <a href="<?php echo $authorization_url ?>">Log in</a>.</p>
+                <p>By submitting this form, you agree to our <a href="<?php echo $tos_url ?>">Terms of Service</a>.
+                Already have an account? Please <a href="<?php echo $authorization_url ?>">Log in</a>.</p>
             </form>
         </div>
     <?php
@@ -218,66 +222,97 @@ function assets_archive_html($assets, $filters, $args)
     ?>
     <div class="policycloud-marketplace inspect" id="policycloud-marketplace-asset-archive">
         <div class="filters">
+            <button class="close"> Cl
             <h2>Filters</h2>
             <?php
             if (empty($filters)) {
                 show_alert('Unable to retrieve the filtering data.');
-            }
-            else {
+            } else {
             ?>
-            <p>Select the options below to narrow your search.</p>
-            <form>
-                <fieldset>
-                    <input type="text" name="search" placeholder="Search assets" value="<?php echo $_GET['search'] ?? '' ?>" />
-                </fieldset>
-                <fieldset>
-                    <h3>Types</h3>
-                    <input type="radio" name="type" value="algorithms" <?php echo (($_GET['type'] ?? '') == 'algorithms') ? 'checked' : '' ?> >Algorithms</input>
-                    <input type="radio" name="type" value="tools" <?php echo (($_GET['type'] ?? '') == 'tools') ? 'checked' : '' ?>>Tools</input>
-                    <input type="radio" name="type" value="policies" <?php echo (($_GET['type'] ?? '') == 'policies') ? 'checked' : '' ?>>Policies</input>
-                    <input type="radio" name="type" value="datasets" <?php echo (($_GET['type'] ?? '') == 'datasets') ? 'checked' : '' ?>>Datasets</input>
-                    <input type="radio" name="type" value="webinars" <?php echo (($_GET['type'] ?? '') == 'webinars') ? 'checked' : '' ?>>Webinars</input>
-                    <input type="radio" name="type" value="tutorials" <?php echo (($_GET['type'] ?? '') == 'tutorials') ? 'checked' : '' ?>>Tutorials</input>
-                    <input type="radio" name="type" value="documents" <?php echo (($_GET['type'] ?? '') == 'documents') ? 'checked' : '' ?>>Documents</input>
-                    <input type="radio" name="type" value="externals" <?php echo (($_GET['type'] ?? '') == 'externals') ? 'checked' : '' ?>>Externals</input>
-                    <input type="radio" name="type" value="other" <?php echo (($_GET['type'] ?? '') == 'other') ? 'checked' : '' ?>>Other</input>
-                </fieldset>
-                <fieldset>
-                    <h3>Provider</h3>
-                    <?php 
-                    foreach($filters['providers'] as $provider) {
-                        echo '<input type="checkbox" value="'.$provider.'">'.$provider.'</input>';
-                    }
-                    ?>
-                </fieldset>
-                <fieldset>
-                    <h3>Views</h3>
-                    <div class="views">
-                        <div>
-                            <input type="number" name="views_gte" placeholder="0" value="<?php echo $_GET['views_gte'] ?? '' ?>" min="0"/>
+                <p>Select the options below to narrow your search.</p>
+                <form>
+                    <fieldset>
+                        <input type="text" name="search" placeholder="Search assets" value="<?php echo $_GET['search'] ?? '' ?>" />
+                    </fieldset>
+                    <fieldset>
+                        <h3>Types</h3>
+                        <div class="types">
+                            <span>
+                                <input type="radio" name="type" value="algorithms" <?php echo (($_GET['type'] ?? '') == 'algorithms') ? 'checked' : '' ?> />
+                                <label for="type">Algorithms</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="type" value="tools" <?php echo (($_GET['type'] ?? '') == 'tools') ? 'checked' : '' ?> />
+                                <label for="type">Tools</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="type" value="policies" <?php echo (($_GET['type'] ?? '') == 'policies') ? 'checked' : '' ?> />
+                                <label for="type">Policies</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="type" value="datasets" <?php echo (($_GET['type'] ?? '') == 'datasets') ? 'checked' : '' ?> />
+                                <label for="type">Datasets</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="type" value="webinars" <?php echo (($_GET['type'] ?? '') == 'webinars') ? 'checked' : '' ?> />
+                                <label for="type">Webinars</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="type" value="tutorials" <?php echo (($_GET['type'] ?? '') == 'tutorials') ? 'checked' : '' ?> />
+                                <label for="type">Tutorials</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="type" value="documents" <?php echo (($_GET['type'] ?? '') == 'documents') ? 'checked' : '' ?> />
+                                <label for="type">Documents</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="type" value="externals" <?php echo (($_GET['type'] ?? '') == 'externals') ? 'checked' : '' ?> />
+                                <label for="type">Externals</label>
+                            </span>
+                            <span>
+                                <input type="radio" name="type" value="other" <?php echo (($_GET['type'] ?? '') == 'other') ? 'checked' : '' ?> />
+                                <label for="type">Other</label>
+                            </span>
                         </div>
-                        <div>
-                            <input type="number" name="views_lte" placeholder="<?php echo $filters['max_views'] ?>" value="<?php echo $_GET['views_lte'] ?? "" ?>" max="<?php echo $filters['max_views'] ?>" />
+                    </fieldset>
+                    <fieldset>
+                        <h3>Provider</h3>
+                        <div class="providers">
+                            <?php
+                            foreach ($filters['providers'] as $provider) {
+                                echo '<span><input type="checkbox" name="provider[]" value="' . $provider . '"/><label for="provider[]">' . $provider . '</label></span>';
+                            }
+                            ?>
                         </div>
-                        <?php // TODO: Add visual range selector 
-                        ?>
-                    </div>
-                </fieldset>
-                <fieldset>
-                    <h3>Date</h3>
-                    <div class="dates">
-                        <div>
-                            <label for="update_date_gte">From</label>
-                            <input type="date" onfocus="(this.type='date')" name="update_date_gte" placeholder="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>" value="<?php echo $_GET['update_date_gte'] ?? '' ?>" min="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>"/>
+                    </fieldset>
+                    <fieldset>
+                        <h3>Views</h3>
+                        <div class="views">
+                            <div>
+                                <input type="number" name="views_gte" placeholder="0" value="<?php echo $_GET['views_gte'] ?? '' ?>" min="0" />
+                            </div>
+                            <div>
+                                <input type="number" name="views_lte" placeholder="<?php echo $filters['max_views'] ?>" value="<?php echo $_GET['views_lte'] ?? "" ?>" max="<?php echo $filters['max_views'] ?>" />
+                            </div>
+                            <?php // TODO: Add visual range selector 
+                            ?>
                         </div>
-                        <div>
-                            <label for="update_date_lte">To</label>
-                            <input type="date" name="update_date_lte" placeholder="<?php echo date("Y-m-d") ?>" value="<?php echo $_GET['update_date_lte'] ?? '' ?>" max="<?php echo date("Y-m-d") ?>" />
+                    </fieldset>
+                    <fieldset>
+                        <h3>Date</h3>
+                        <div class="dates">
+                            <div>
+                                <label for="update_date_gte">From</label>
+                                <input type="date" onfocus="(this.type='date')" name="update_date_gte" placeholder="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>" value="<?php echo $_GET['update_date_gte'] ?? '' ?>" min="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>" />
+                            </div>
+                            <div>
+                                <label for="update_date_lte">To</label>
+                                <input type="date" name="update_date_lte" placeholder="<?php echo date("Y-m-d") ?>" value="<?php echo $_GET['update_date_lte'] ?? '' ?>" max="<?php echo date("Y-m-d") ?>" />
+                            </div>
                         </div>
-                    </div>
-                </fieldset>
-                <button type="submit" class="action">Apply filters</button>
-            </form>
+                    </fieldset>
+                    <button type="submit" class="action">Apply filters</button>
+                </form>
             <?php } ?>
         </div>
         <div class="content">
@@ -288,23 +323,27 @@ function assets_archive_html($assets, $filters, $args)
                     <div></div>
                 </button>
                 <form action="" class="sorting-selector">
-                    <label for="sort-by">Sort by</label>
-                    <select name="sort-by">
-                        <option value="newest" <?php echo (((($_GET['sort-by'] ?? '') == 'newest') || empty($_GET['sort-by'])) ? "selected" : "") ?>>Newest</option>
-                        <option value="oldest" <?php echo ((($_GET['sort-by'] ?? '') == 'oldest') ? "selected" : "") ?>>Oldest</option>
-                        <option value="rating-desc" <?php echo ((($_GET['sort-by'] ?? '') == 'rating-desc') ? "selected" : "") ?>>Highest rated</option>
-                        <option value="rating-asc" <?php echo ((($_GET['sort-by'] ?? '') == 'rating-asc') ? "selected" : "") ?>>Lowest rated</option>
-                        <option value="views-asc" <?php echo ((($_GET['sort-by'] ?? '') == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
-                        <option value="views-desc" <?php echo ((($_GET['sort-by'] ?? '') == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
-                        <option value="title" <?php echo ((($_GET['sort-by'] ?? '') == 'title') ? "selected" : "") ?>>Title</option>
-                    </select>
-                    <label for="items-per-page">Items per page</label>
-                    <select name="items-per-page">
-                        <option value="10" <?php echo (((($_GET['items-per-page'] ?? '') == 10) || empty($_GET['sort-by'])) ? "selected" : "") ?>>10</option>
-                        <option value="25" <?php echo ((($_GET['items-per-page'] ?? '') == '25') ? "selected" : "") ?>>25</option>
-                        <option value="50" <?php echo ((($_GET['items-per-page'] ?? '') == '50') ? "selected" : "") ?>>50</option>
-                        <option value="100" <?php echo ((($_GET['items-per-page'] ?? '') == '100') ? "selected" : "") ?>>100</option>
-                    </select>
+                    <fieldset>
+                        <label for="sort-by">Sort by</label>
+                        <select name="sort-by">
+                            <option value="newest" <?php echo (((($_GET['sort-by'] ?? '') == 'newest') || empty($_GET['sort-by'])) ? "selected" : "") ?>>Newest</option>
+                            <option value="oldest" <?php echo ((($_GET['sort-by'] ?? '') == 'oldest') ? "selected" : "") ?>>Oldest</option>
+                            <option value="rating-desc" <?php echo ((($_GET['sort-by'] ?? '') == 'rating-desc') ? "selected" : "") ?>>Highest rated</option>
+                            <option value="rating-asc" <?php echo ((($_GET['sort-by'] ?? '') == 'rating-asc') ? "selected" : "") ?>>Lowest rated</option>
+                            <option value="views-asc" <?php echo ((($_GET['sort-by'] ?? '') == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
+                            <option value="views-desc" <?php echo ((($_GET['sort-by'] ?? '') == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
+                            <option value="title" <?php echo ((($_GET['sort-by'] ?? '') == 'title') ? "selected" : "") ?>>Title</option>
+                        </select>
+                    </fieldset>
+                    <fieldset>
+                        <label for="items-per-page">Items per page</label>
+                        <select name="items-per-page">
+                            <option value="10" <?php echo (((($_GET['items-per-page'] ?? '') == 10) || empty($_GET['sort-by'])) ? "selected" : "") ?>>10</option>
+                            <option value="25" <?php echo ((($_GET['items-per-page'] ?? '') == '25') ? "selected" : "") ?>>25</option>
+                            <option value="50" <?php echo ((($_GET['items-per-page'] ?? '') == '50') ? "selected" : "") ?>>50</option>
+                            <option value="100" <?php echo ((($_GET['items-per-page'] ?? '') == '100') ? "selected" : "") ?>>100</option>
+                        </select>
+                    </fieldset>
                 </form>
             </header>
             <div class="gallery">
@@ -512,104 +551,104 @@ function asset_html($asset, $images, $args)
                     </div>
                 </div>
             </div>
-            <?php 
+            <?php
             if ($args['is_owner']) {
             ?>
-            <div class="modal editing-form hidden">
-                <button class="close"><span class="fas fa-times"></span></button>
-                <form id="policycloud-marketplace-asset-editing" action="">
-                    <fieldset name="basic-information">
-                        <h2>Basic information</h2>
-                        <p>To create a new Marketplace asset, the following fields represent basic information that will be visible to others.</p>
-                        <label for="title">Title *</label>
-                        <input required name="title" placeholder="Insert a title" type="text" value="<?php echo $asset['info']['title'] ?>" />
-                        <label for="type">Primary collection type *</label>
-                        <select name="type" required>
-                            <option value="algorithms" <?php echo ($asset['info']['type'] == "algorithms") ? 'selected' : '' ?>>Algorithms</option>
-                            <option value="tools" <?php echo ($asset['info']['type'] == "tools") ? 'selected' : '' ?>>Tools</option>
-                            <option value="policies" <?php echo ($asset['info']['type'] == "policies") ? 'selected' : '' ?>>Policies</option>
-                            <option value="datasets" <?php echo ($asset['info']['type'] == "datasets") ? 'selected' : '' ?>>Datasets</option>
-                            <option value="webinars" <?php echo ($asset['info']['type'] == "webinars") ? 'selected' : '' ?>>Webinars</option>
-                            <option value="tutorials" <?php echo ($asset['info']['type'] == "tutorials") ? 'selected' : '' ?>>Tutorials</option>
-                            <option value="documents" <?php echo ($asset['info']['type'] == "documents") ? 'selected' : '' ?>>Documents</option>
-                            <option value="externals" <?php echo ($asset['info']['type'] == "externals") ? 'selected' : '' ?>>Externals</option>
-                            <option value="other" <?php echo ($asset['info']['type'] == "other") ? 'selected' : '' ?>>Other</option>
-                        </select>
-                        <label for="subtype">Secondary collection type</label>
-                        <input name="subtype" placeholder="Insert a secondary category" type="text" value="<?php echo empty($asset['info']['subtype']) ? '' : $asset['info']['subtype'] ?>" />
-                        <label for="owner">Legal owner *</label>
-                        <input required name="owner" placeholder="Insert the legal owner of the object" type="text" value="<?php echo empty($asset['info']['owner']) ? '' : $asset['info']['owner'] ?>" />
-                        <label for="description">Description *</label>
-                        <textarea name="description" placeholder="Insert a detailed description" style="resize:vertical"><?php echo empty($asset['info']['description']) ? '' : $asset['info']['description'] ?></textarea>
-                    </fieldset>
-                    <fieldset name="internal-information">
-                        <h2>Internal information</h2>
-                        <p>You can include internal private comments and the asset's field of use for management purposes. These fields are optional.</p>
-                        <label for="field-of-use">Fields of usage</label>
-                        <textarea name="field-of-use" placeholder="Separate multiple fields of usage using a comma (lorem, ipsum, etc.)"><?php echo empty($asset['info']['fieldOfUse']) ? '' : implode(', ', $asset['info']['fieldOfUse']) ?></textarea>
-                        <label for="comments">Comments (Private)</label>
-                        <textarea name="comments" placeholder="Insert any additional comments"><?php echo empty($asset['info']['comments']) ? '' : $asset['info']['comments'] ?></textarea>
-                    </fieldset>
-                    <fieldset name="uploads">
-                        <h2>Uploads</h2>
-                        <p>Manage your content and upload new files, images and videos.</p>
-                        <h3>Files</h3>
-                        <?php
-                        if (!empty($asset['assets']['files'])) {
-                            foreach ($asset['assets']['files'] as $file) {
-                        ?>
-                                <div class="file">
-                                    <div>
-                                        <button class="delete"><span class="fas fa-times"></span></button>
-                                        <?php echo $file['filename'] . ' (' . $file['size'] . ')' ?>
+                <div class="modal editing-form hidden">
+                    <button class="close"><span class="fas fa-times"></span></button>
+                    <form id="policycloud-marketplace-asset-editing" action="">
+                        <fieldset name="basic-information">
+                            <h2>Basic information</h2>
+                            <p>To create a new Marketplace asset, the following fields represent basic information that will be visible to others.</p>
+                            <label for="title">Title *</label>
+                            <input required name="title" placeholder="Insert a title" type="text" value="<?php echo $asset['info']['title'] ?>" />
+                            <label for="type">Primary collection type *</label>
+                            <select name="type" required>
+                                <option value="algorithms" <?php echo ($asset['info']['type'] == "algorithms") ? 'selected' : '' ?>>Algorithms</option>
+                                <option value="tools" <?php echo ($asset['info']['type'] == "tools") ? 'selected' : '' ?>>Tools</option>
+                                <option value="policies" <?php echo ($asset['info']['type'] == "policies") ? 'selected' : '' ?>>Policies</option>
+                                <option value="datasets" <?php echo ($asset['info']['type'] == "datasets") ? 'selected' : '' ?>>Datasets</option>
+                                <option value="webinars" <?php echo ($asset['info']['type'] == "webinars") ? 'selected' : '' ?>>Webinars</option>
+                                <option value="tutorials" <?php echo ($asset['info']['type'] == "tutorials") ? 'selected' : '' ?>>Tutorials</option>
+                                <option value="documents" <?php echo ($asset['info']['type'] == "documents") ? 'selected' : '' ?>>Documents</option>
+                                <option value="externals" <?php echo ($asset['info']['type'] == "externals") ? 'selected' : '' ?>>Externals</option>
+                                <option value="other" <?php echo ($asset['info']['type'] == "other") ? 'selected' : '' ?>>Other</option>
+                            </select>
+                            <label for="subtype">Secondary collection type</label>
+                            <input name="subtype" placeholder="Insert a secondary category" type="text" value="<?php echo empty($asset['info']['subtype']) ? '' : $asset['info']['subtype'] ?>" />
+                            <label for="owner">Legal owner *</label>
+                            <input required name="owner" placeholder="Insert the legal owner of the object" type="text" value="<?php echo empty($asset['info']['owner']) ? '' : $asset['info']['owner'] ?>" />
+                            <label for="description">Description *</label>
+                            <textarea name="description" placeholder="Insert a detailed description" style="resize:vertical"><?php echo empty($asset['info']['description']) ? '' : $asset['info']['description'] ?></textarea>
+                        </fieldset>
+                        <fieldset name="internal-information">
+                            <h2>Internal information</h2>
+                            <p>You can include internal private comments and the asset's field of use for management purposes. These fields are optional.</p>
+                            <label for="field-of-use">Fields of usage</label>
+                            <textarea name="field-of-use" placeholder="Separate multiple fields of usage using a comma (lorem, ipsum, etc.)"><?php echo empty($asset['info']['fieldOfUse']) ? '' : implode(', ', $asset['info']['fieldOfUse']) ?></textarea>
+                            <label for="comments">Comments (Private)</label>
+                            <textarea name="comments" placeholder="Insert any additional comments"><?php echo empty($asset['info']['comments']) ? '' : $asset['info']['comments'] ?></textarea>
+                        </fieldset>
+                        <fieldset name="uploads">
+                            <h2>Uploads</h2>
+                            <p>Manage your content and upload new files, images and videos.</p>
+                            <h3>Files</h3>
+                            <?php
+                            if (!empty($asset['assets']['files'])) {
+                                foreach ($asset['assets']['files'] as $file) {
+                            ?>
+                                    <div class="file">
+                                        <div>
+                                            <button class="delete"><span class="fas fa-times"></span></button>
+                                            <?php echo $file['filename'] . ' (' . $file['size'] . ')' ?>
+                                        </div>
+                                        <input type="file" name="<?php $file['id'] ?>" accept="image/png, image/jpeg" multiple />
                                     </div>
-                                    <input type="file" name="<?php $file['id'] ?>" accept="image/png, image/jpeg" multiple />
-                                </div>
-                        <?php
+                            <?php
+                                }
                             }
-                        }
-                        ?>
-                        <input type="file" name="files" accept="image/png, image/jpeg" multiple />
-                        <h3>Images</h3>
-                        <?php
-                        if (!empty($asset['assets']['images'])) {
-                            foreach ($asset['assets']['images'] as $file) {
-                        ?>
-                                <div class="file">
-                                    <div>
-                                        <button class="delete"><span class="fas fa-times"></span></button>
-                                        <?php echo $file['filename'] . ' (' . $file['size'] . ')' ?>
+                            ?>
+                            <input type="file" name="files" accept="image/png, image/jpeg" multiple />
+                            <h3>Images</h3>
+                            <?php
+                            if (!empty($asset['assets']['images'])) {
+                                foreach ($asset['assets']['images'] as $file) {
+                            ?>
+                                    <div class="file">
+                                        <div>
+                                            <button class="delete"><span class="fas fa-times"></span></button>
+                                            <?php echo $file['filename'] . ' (' . $file['size'] . ')' ?>
+                                        </div>
+                                        <input type="file" name="<?php $file['id'] ?>" multiple />
                                     </div>
-                                    <input type="file" name="<?php $file['id'] ?>" multiple />
-                                </div>
-                        <?php
+                            <?php
+                                }
                             }
-                        }
-                        ?>
-                        <input type="file" name="images" accept="image/png, image/jpeg" multiple />
-                        <h3>Videos</h3>
-                        <?php
-                        if (!empty($asset['assets']['videos'])) {
-                            foreach ($asset['assets']['videos'] as $file) {
-                        ?>
-                                <div class="file">
-                                    <div>
-                                        <button class="delete"><span class="fas fa-times"></span></button>
-                                        <?php echo $file['filename'] . ' (' . $file['size'] . ')' ?>
+                            ?>
+                            <input type="file" name="images" accept="image/png, image/jpeg" multiple />
+                            <h3>Videos</h3>
+                            <?php
+                            if (!empty($asset['assets']['videos'])) {
+                                foreach ($asset['assets']['videos'] as $file) {
+                            ?>
+                                    <div class="file">
+                                        <div>
+                                            <button class="delete"><span class="fas fa-times"></span></button>
+                                            <?php echo $file['filename'] . ' (' . $file['size'] . ')' ?>
+                                        </div>
+                                        <input type="file" name="<?php $file['id'] ?>" accept="image/png, image/jpeg" multiple />
                                     </div>
-                                    <input type="file" name="<?php $file['id'] ?>" accept="image/png, image/jpeg" multiple />
-                                </div>
-                        <?php
+                            <?php
+                                }
                             }
-                        }
-                        ?>
-                        <input type="file" name="videos" accept="image/png, image/jpeg" multiple />
-                    </fieldset>
-                    <div class="error"></div>
-                    <button type="submit" class="action">Submit</button>
-                </form>
-            </div>
-            <?php 
+                            ?>
+                            <input type="file" name="videos" accept="image/png, image/jpeg" multiple />
+                        </fieldset>
+                        <div class="error"></div>
+                        <button type="submit" class="action">Submit</button>
+                    </form>
+                </div>
+            <?php
             }
             ?>
         </div>

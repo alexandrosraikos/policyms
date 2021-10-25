@@ -111,6 +111,7 @@ function policycloud_marketplace_plugin_registration_page_selector()
 <?php
 }
 
+
 function policycloud_marketplace_plugin_account_page_selector()
 {
     $options = get_option('policycloud_marketplace_plugin_settings');
@@ -148,6 +149,15 @@ function policycloud_marketplace_plugin_menu_selector()
 function policycloud_marketplace_plugin_section_three()
 {
     echo '<p>Select your preferred operating settings.</p>';
+}
+
+function policycloud_marketplace_plugin_tos_url()
+{
+    $options = get_option('policycloud_marketplace_plugin_settings');
+?>
+    <input type="text" name="policycloud_marketplace_plugin_settings[tos_url]" value="<?php echo ((!empty($options['tos_url'])) ? $options['tos_url'] : '') ?>" />
+    <p>The Terms of Use page URL for the registration process.</p>
+<?php
 }
 
 function policycloud_marketplace_plugin_description_page_selector()

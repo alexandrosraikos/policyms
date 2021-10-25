@@ -82,6 +82,7 @@ class PolicyCloud_Marketplace_Admin
 		$output['encryption_key'] = sanitize_text_field( $input['encryption_key'] );
 		$output['login_page'] = esc_url($input['login_page']);
 		$output['registration_page'] = esc_url($input['registration_page']);
+		$output['tos_url'] = esc_url($input['tos_url']);
 		$output['account_page'] = esc_url($input['account_page']);
 		$output['selected_menu'] = sanitize_text_field($input['selected_menu']);
 		$output['description_page'] = esc_url($input['description_page']);
@@ -91,8 +92,6 @@ class PolicyCloud_Marketplace_Admin
 	}
 
 	function register_settings() {
-
-		// TODO (consideration): Update all selectors to use page id instead of raw link.
 		
 		register_setting(
 		  'policycloud_marketplace_plugin_settings',
@@ -183,6 +182,14 @@ class PolicyCloud_Marketplace_Admin
 		  'Content Settings',
 		  'policycloud_marketplace_plugin_section_three',
 		  'policycloud_marketplace_plugin'
+		);
+
+		add_settings_field(
+			'tos_url',
+			'Terms of Service URL',
+			'policycloud_marketplace_plugin_tos_url',
+			'policycloud_marketplace_plugin',
+			'section_three'
 		);
 
 		add_settings_field(
