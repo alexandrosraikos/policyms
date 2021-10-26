@@ -82,6 +82,30 @@ function policyCloudMarketplaceAPIRequest($http_method, $uri, $data = [], $token
 
 
 /**
+ * Return the error message derived from a file upload error code.
+ *
+ * @uses 	PolicyCloud_Marketplace_Public::account_registration()
+ * 
+ * @since	1.0.0
+ * @author 	Alexandros Raikos <araikos@unipi.gr>
+ */
+function fileUploadErrorInterpreter($code)
+{
+    $errors = array(
+        0 => 'There is no error, the file uploaded with success',
+        1 => 'The uploaded file exceeds the upload_max_filesize directive.',
+        2 => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form',
+        3 => 'The uploaded file was only partially uploaded',
+        4 => 'No file was uploaded',
+        6 => 'Missing a temporary folder',
+        7 => 'Failed to write file to disk.',
+        8 => 'A PHP extension stopped the file upload.',
+    );
+    return $errors[$code] ?? $code;
+}
+
+
+/**
  * Retrieve and decrypt the token from the user.
  * @param	bool $decode Pass `true` if the token must be returned decoded as well.
  * @return	string|array|bool Returns the token or an array with `encoded` (string) and `decoded` (array) tokens. Returns *false* if there is no token.
@@ -452,11 +476,11 @@ function set_user_picture($path, $type, $username, $token)
         'PUT',
         '/accounts/users/image',
         [
-            'image' => $file
+            'asset' => $file
         ],
         $token,
         [
-            'x-image-mimetype: ' . $type,
+            'x-mimetype: ' . $type,
             'x-access-token: ' . $token,
             'x-more-time: ' . $options['api_access_token']
         ],
@@ -545,12 +569,52 @@ function get_user_statistics($uid, $token)
  * @since	1.0.0
  * @author  Alexandros Raikos <araikos@unipi.gr>
  */
-function account_edit($data, $uid, $token)
+function account_edit($uid, $token)
 {
 
     // Check and retrieve saved encryption key.
     $options = get_option('policycloud_marketplace_plugin_settings');
     if (empty($options['encryption_key'])) throw new InvalidArgumentException("No PolicyCloud Marketplace encryption key was defined in WordPress settings.");
+
+    // Check for uploaded file.
+    if (!empty($_FILES['profile_picture'])) {
+        if ($_FILES['profile_picture']['error'] == 0) {
+            if (
+                $_FILES['profile_picture']['type'] != 'image/jpeg' &&
+                $_FILES['profile_picture']['type'] != 'image/png'
+            ) {
+                throw new RuntimeException("Supported formats for  profile pictures are .png and .jpg/.jpeg.");
+            }
+            if ($_FILES['profile_picture']['size'] > 1000000) {
+                throw new RuntimeException("The image file is too large. Please upload a file less than 1MB in size.");
+            }
+            $new_profile_picture = true;
+        } elseif ($_FILES['profile_picture']['error'] == 4);
+        else {
+            throw new RuntimeException(fileUploadErrorInterpreter($_FILES['profile_picture']['error']));
+        }
+    } else {
+        $new_profile_picture = false;
+    }
+
+    $data = [
+        'password' => stripslashes($_POST['password'] ?? ''),
+        'password-confirm' => stripslashes($_POST['password-confirm'] ?? ''),
+        'current-password' => stripslashes($_POST['current-password'] ?? ''),
+        'name' => stripslashes($_POST['name']),
+        'surname' => stripslashes($_POST['surname']),
+        'title' => $_POST['title'] ?? '',
+        'gender' => $_POST['gender'] ?? '',
+        'organization' => stripslashes($_POST['organization'] ?? ''),
+        'email' => $_POST['email'],
+        'phone' => $_POST['phone'] ?? '',
+        'socials-title' => $_POST['socials-title'] ?? '',
+        'socials-url' => $_POST['socials-url'] ?? '',
+        'about' => stripslashes($_POST['about'] ?? ''),
+        'public_email' => $_POST['public_email'],
+        'public_phone' => $_POST['public_phone'],
+        'new_profile_picture' => $new_profile_picture
+    ];
 
     // Information validation checks and errors.
     if (empty($data['email']) || empty($data['name']) || empty($data['surname'])) throw new RuntimeException('Please fill all required fields!');

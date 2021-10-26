@@ -50,7 +50,7 @@
         complete: (response) => {
           handleAJAXResponse(
             response,
-            "#policycloud-marketplace-asset-creation",
+            "#policycloud-marketplace-asset-creation button[type=submit]",
             (data) => {
               window.location.replace(
                 ajax_properties_asset_creation.description_page +

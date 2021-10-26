@@ -101,30 +101,6 @@ class PolicyCloud_Marketplace_Public
 		wp_register_script("policycloud-marketplace-asset-creation", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-asset-creation.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
 	}
 
-
-	/**
-	 * Return the error message derived from a file upload error code.
-	 *
-	 * @uses 	PolicyCloud_Marketplace_Public::account_registration()
-	 * 
-	 * @since	1.0.0
-	 * @author 	Alexandros Raikos <araikos@unipi.gr>
-	 */
-	public function fileUploadErrorInterpreter($code)
-	{
-		$errors = array(
-			0 => 'There is no error, the file uploaded with success',
-			1 => 'The uploaded file exceeds the upload_max_filesize directive.',
-			2 => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form',
-			3 => 'The uploaded file was only partially uploaded',
-			4 => 'No file was uploaded',
-			6 => 'Missing a temporary folder',
-			7 => 'Failed to write file to disk.',
-			8 => 'A PHP extension stopped the file upload.',
-		);
-		return $errors[$code];
-	}
-
 	/**
 	 * 
 	 * Accounts
@@ -489,47 +465,8 @@ class PolicyCloud_Marketplace_Public
 
 				if (!empty($_POST['subsequent_action'])) {
 					if ($_POST['subsequent_action'] == 'edit_account') {
-
-						// Check for uploaded file.
-						if (!empty($_FILES['profile_picture'])) {
-							if ($_FILES['profile_picture']['error'] == 0) {
-								if (
-									$_FILES['profile_picture']['type'] != 'image/jpeg' &&
-									$_FILES['profile_picture']['type'] != 'image/png'
-								) {
-									throw new RuntimeException("Supported formats for  profile pictures are .png and .jpg/.jpeg.");
-								}
-								if ($_FILES['profile_picture']['size'] > 1000000) {
-									throw new RuntimeException("The image file is too large. Please upload a file less than 1MB in size.");
-								}
-								$new_profile_picture = true;
-							} elseif ($_FILES['profile_picture']['error'] == 4);
-							else {
-								throw new RuntimeException($this->fileUploadErrorInterpreter($_FILES['profile_picture']['error']));
-							}
-						} else {
-							$new_profile_picture = false;
-						}
-
 						// Respond with data.
-						$updated_token = account_edit([
-							'password' => stripslashes($_POST['password'] ?? ''),
-							'password-confirm' => stripslashes($_POST['password-confirm'] ?? ''),
-							'current-password' => stripslashes($_POST['current-password'] ?? ''),
-							'name' => stripslashes($_POST['name']),
-							'surname' => stripslashes($_POST['surname']),
-							'title' => $_POST['title'] ?? '',
-							'gender' => $_POST['gender'] ?? '',
-							'organization' => stripslashes($_POST['organization'] ?? ''),
-							'email' => $_POST['email'],
-							'phone' => $_POST['phone'] ?? '',
-							'socials-title' => $_POST['socials-title'] ?? '',
-							'socials-url' => $_POST['socials-url'] ?? '',
-							'about' => stripslashes($_POST['about'] ?? ''),
-							'public_email' => $_POST['public_email'],
-							'public_phone' => $_POST['public_phone'],
-							'new_profile_picture' => $new_profile_picture
-						], $_POST['username'], $token['encoded']);
+						$updated_token = account_edit($_POST['username'], $token['encoded']);
 						http_response_code(200);
 						if ($is_admin && $visiting) die();
 						else die(json_encode($updated_token));
@@ -809,13 +746,14 @@ class PolicyCloud_Marketplace_Public
 		$options = get_option('policycloud_marketplace_plugin_settings');
 		if (empty($options['login_page'])) $error = "You have not set a log in page in your PolicyCloud Marketplace settings.";
 		if (empty($options['account_page'])) $error = "You have not set an account page in your PolicyCloud Marketplace settings.";
+		if (empty($options['archive_page'])) $error = "You have not set an archive page in your PolicyCloud Marketplace settings.";
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 		wp_enqueue_script('policycloud-marketplace-asset');
 		wp_localize_script('policycloud-marketplace-asset', 'ajax_properties_description_editing', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce('ajax_policycloud_description_editing_verification'),
-			'description_id' => $_GET['did']
+			'asset_id' => $_GET['did']
 		));
 
 		asset_html($asset['results'][0][0] ?? [], $images ?? [], [
@@ -823,6 +761,7 @@ class PolicyCloud_Marketplace_Public
 			"is_owner" => $owner ?? false,
 			"login_page" => $options['login_page'] ?? "",
 			"account_page" => $options['account_page'] ?? "",
+			"archive_page" => $options['archive_page'] ?? "",
 			"error" => $error ?? '',
 		]);
 	}
@@ -839,19 +778,33 @@ class PolicyCloud_Marketplace_Public
 	{
 
 		// Verify WordPress generated nonce.
-		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_asset_editing_verification')) {
+		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_description_editing_verification')) {
 			http_response_code(403);
 			die("Unverified request to edit this asset.");
 		}
-
-		// TODO @alexandrosraikos: Check all $_POST fields (waiting on asset editing form).
 
 		try {
 			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 			$token = retrieve_token();
 			if (!empty($token)) {
 				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
-				if (edit_asset($_POST['id'], $_POST, $token)) http_response_code(200);
+
+				if (!empty($_POST['subsequent_action'])) { 
+					if ($_POST['subsequent_action'] == "asset-editing") {
+						// Forward editing request and respond.
+						$response = edit_asset($_POST['asset_id'], $_POST, $token); http_response_code(200);
+						die(json_encode($response));
+					}
+					if ($_POST['subsequent_action'] == "file-deletion") {
+						if (!empty($_POST['file-type'])) {
+							if (delete_asset_file($_POST['file-type'], $_POST['file-identifier'], $token)) {
+								http_response_code(200);
+								die();
+							}
+						}
+						else throw new RuntimeException('No file type was defined.');
+					}
+				}
 			} else {
 				http_response_code(404);
 				die("User token not found.");

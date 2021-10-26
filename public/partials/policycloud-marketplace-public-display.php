@@ -30,7 +30,7 @@ function account_registration_html($authorization_url, $logged_in, $tos_url, $er
         show_alert($error);
     }
     if ($logged_in) {
-        show_alert("You're already logged in.", false, 'notice');
+        show_alert("You're already logged in.", 'notice');
     } else {
 ?>
         <div class="policycloud-marketplace">
@@ -140,7 +140,7 @@ function account_authorization_html($registration_url, $logged_in)
         </div>
         <?php
     } else {
-        show_alert("You're already logged in.", false, 'notice');
+        show_alert("You're already logged in.", 'notice');
     }
 }
 
@@ -161,7 +161,7 @@ function assets_grid_html($assets, $asset_url)
         echo show_alert('No asset page has been defined in the WordPress settings.');
     }
     if (empty($assets)) {
-        echo show_alert('No assets found.', false, 'notice');
+        echo show_alert('No assets found.', 'notice');
     } else {
         echo '<div class="policycloud-marketplace" id="policycloud-marketplace-assets-grid">';
         echo '<ul>';
@@ -217,7 +217,7 @@ function assets_grid_html($assets, $asset_url)
 function assets_archive_html($assets, $filters, $args)
 {
     if (!empty($args['error']))  echo show_alert($args['error']);
-    if (!empty($args['notice'])) echo show_alert($args['notice'], false, 'notice');
+    if (!empty($args['notice'])) echo show_alert($args['notice'], 'notice');
     ?>
     <div class="policycloud-marketplace" id="policycloud-marketplace-asset-archive">
         <div class="filters">
@@ -348,7 +348,7 @@ function assets_archive_html($assets, $filters, $args)
             <div class="gallery">
                 <?php
                 if (empty($assets['results'])) {
-                    echo show_alert('No assets found', false, 'notice');
+                    echo show_alert('No assets found', 'notice');
                 } else {
                     foreach ($assets['results'] as $page) {
                         assets_grid_html($page, $args['asset_url']);
@@ -418,7 +418,7 @@ function asset_html($asset, $images, $args)
     function file_viewer($title, $id, $files, $collapsed = false)
     {
         if (empty($title)) {
-            show_alert("Please initialise the file viewer.", false, 'notice');
+            show_alert("Please initialise the file viewer.", 'notice');
         } else {
     ?>
             <div class="policycloud-marketplace file-viewer <?php echo ($collapsed) ? 'collapsed' : '' ?>">
@@ -444,7 +444,7 @@ function asset_html($asset, $images, $args)
                         }
                     } else {
                         echo '<tr><td colspan="4">';
-                        show_alert("No " . $id . " found.", false, 'notice');
+                        show_alert("No " . $id . " found.", 'notice');
                         echo '</td></tr>';
                     }
                     ?>
@@ -494,7 +494,9 @@ function asset_html($asset, $images, $args)
                         <span class="fields-of-use">
                             <?php
                             foreach ($asset['info']['fieldOfUse'] as $field_of_use) {
-                                echo '<span>' . $field_of_use . '</span>';
+                                if (!empty($field_of_use)) {
+                                    echo '<span>' . $field_of_use . '</span>';
+                                }
                             }
                             ?>
                         </span>
@@ -517,7 +519,13 @@ function asset_html($asset, $images, $args)
                     ?>
                         <div class="comments">
                             <h2>Private comments</h2>
-                            <p><?php echo $asset['info']['comments'] ?></p>
+                            <?php
+                            if (!empty($asset['info']['comments'])) {
+                                echo '<p>' . $asset['info']['comments'] . '</p>';
+                            } else {
+                                show_alert("No private comments.", 'notice');
+                            }
+                            ?>
                         </div>
                     <?php
                     }
@@ -542,7 +550,7 @@ function asset_html($asset, $images, $args)
                                         echo '<img src="data:image/*;base64,' . base64_encode($image) . '" draggable="false" />';
                                     }
                                 } else {
-                                    show_alert('No images or videos were found.', false, 'notice');
+                                    show_alert('No images or videos were found.', 'notice');
                                 }
                             } else show_lock($args['login_page'], 'view the image gallery');
                             ?>
@@ -554,7 +562,7 @@ function asset_html($asset, $images, $args)
             if ($args['is_owner']) {
             ?>
                 <div class="modal editing-form hidden">
-                    <button class="close"><span class="fas fa-times"></span></button>
+                    <button class="close tactile"><span class="fas fa-times"></span></button>
                     <form id="policycloud-marketplace-asset-editing" action="">
                         <fieldset name="basic-information">
                             <h2>Basic information</h2>
@@ -579,12 +587,12 @@ function asset_html($asset, $images, $args)
                             <input required name="owner" placeholder="Insert the legal owner of the object" type="text" value="<?php echo empty($asset['info']['owner']) ? '' : $asset['info']['owner'] ?>" />
                             <label for="description">Description *</label>
                             <textarea name="description" placeholder="Insert a detailed description" style="resize:vertical"><?php echo empty($asset['info']['description']) ? '' : $asset['info']['description'] ?></textarea>
+                            <label for="fields-of-use">Fields of usage</label>
+                            <textarea name="fields-of-use" placeholder="Separate multiple fields of usage using a comma (lorem, ipsum, etc.)"><?php echo empty($asset['info']['fieldOfUse']) ? '' : implode(', ', $asset['info']['fieldOfUse']) ?></textarea>
                         </fieldset>
                         <fieldset name="internal-information">
                             <h2>Internal information</h2>
-                            <p>You can include internal private comments and the asset's field of use for management purposes. These fields are optional.</p>
-                            <label for="field-of-use">Fields of usage</label>
-                            <textarea name="field-of-use" placeholder="Separate multiple fields of usage using a comma (lorem, ipsum, etc.)"><?php echo empty($asset['info']['fieldOfUse']) ? '' : implode(', ', $asset['info']['fieldOfUse']) ?></textarea>
+                            <p>You can include internal private comments for management purposes. This field is optional.</p>
                             <label for="comments">Comments (Private)</label>
                             <textarea name="comments" placeholder="Insert any additional comments"><?php echo empty($asset['info']['comments']) ? '' : $asset['info']['comments'] ?></textarea>
                         </fieldset>
@@ -596,52 +604,56 @@ function asset_html($asset, $images, $args)
                             if (!empty($asset['assets']['files'])) {
                                 foreach ($asset['assets']['files'] as $file) {
                             ?>
-                                    <div class="file">
+                                    <div class="file" data-file-type="files" data-file-identifier="<?php echo $file['id'] ?>">
                                         <div>
                                             <button class="delete"><span class="fas fa-times"></span></button>
                                             <?php echo $file['filename'] . ' (' . $file['size'] . ')' ?>
                                         </div>
-                                        <input type="file" name="<?php $file['id'] ?>" accept="image/png, image/jpeg" multiple />
+                                        <label for="file-<?php echo $file['id'] ?>">Replace file (supported file types: jpg, png):</label>
+                                        <input type="file" name="file-<?php echo $file['id'] ?>" multiple />
                                     </div>
                             <?php
                                 }
                             }
                             ?>
-                            <input type="file" name="files" accept="image/png, image/jpeg" multiple />
+                            <label for="file-<?php $file['id'] ?>">Upload new file (supported file types: jpg, png):</label>
+                            <input type="file" name="files[]" multiple />
                             <h3>Images</h3>
                             <?php
                             if (!empty($asset['assets']['images'])) {
                                 foreach ($asset['assets']['images'] as $file) {
                             ?>
-                                    <div class="file">
+                                    <div class="file" data-file-type="images" data-file-identifier="<?php echo $file['id'] ?>">
                                         <div>
                                             <button class="delete"><span class="fas fa-times"></span></button>
                                             <?php echo $file['filename'] . ' (' . $file['size'] . ')' ?>
                                         </div>
-                                        <input type="file" name="<?php $file['id'] ?>" multiple />
+                                        <label for="image-<?php echo $file['id'] ?>">Replace image</label>
+                                        <input type="file" name="image-<?php echo $file['id'] ?>" accept="image/png, image/jpeg" />
                                     </div>
                             <?php
                                 }
                             }
                             ?>
-                            <input type="file" name="images" accept="image/png, image/jpeg" multiple />
+                            <input type="file" name="images[]" accept="image/png, image/jpeg" multiple />
                             <h3>Videos</h3>
                             <?php
                             if (!empty($asset['assets']['videos'])) {
                                 foreach ($asset['assets']['videos'] as $file) {
                             ?>
-                                    <div class="file">
+                                    <div class="file" data-file-type="videos" data-file-identifier="<?php echo $file['id'] ?>">
                                         <div>
                                             <button class="delete"><span class="fas fa-times"></span></button>
                                             <?php echo $file['filename'] . ' (' . $file['size'] . ')' ?>
                                         </div>
-                                        <input type="file" name="<?php $file['id'] ?>" accept="image/png, image/jpeg" multiple />
+                                        <label for="video-<?php echo $file['id'] ?>">Replace video</label>
+                                        <input type="file" name="video-<?php echo $file['id'] ?>" accept="image/png, image/jpeg" multiple />
                                     </div>
                             <?php
                                 }
                             }
                             ?>
-                            <input type="file" name="videos" accept="image/png, image/jpeg" multiple />
+                            <input type="file" name="videos[]" accept="image/png, image/jpeg" multiple />
                         </fieldset>
                         <div class="error"></div>
                         <button type="submit" class="action">Submit</button>
@@ -691,7 +703,7 @@ function asset_creation_html(string $error = null)
                         <option value="other">Other</option>
                     </select>
                     <label for="subtype">Secondary collection type</label>
-                    <input type="text" placeholder="Insert a secondary collection type" name="subtype"/>
+                    <input type="text" placeholder="Insert a secondary collection type" name="subtype" />
                     <label for="fields-of-use">Fields of usage</label>
                     <textarea name="fields-of-use" placeholder="Separate multiple fields of usage using a comma (lorem, ipsum, etc.)"></textarea>
                     <label for="owner">Legal owner *</label>
@@ -724,9 +736,9 @@ function asset_creation_html(string $error = null)
  * 
  * @since 1.0.0
  */
-function show_alert(string $message, bool $dismissable = false, string $type = 'error')
+function show_alert(string $message, string $type = 'error')
 {
-    echo  '<div class="policycloud-marketplace-' . $type . ' ' . ($dismissable ? 'dismissable' : '') . '"><span>' . $message . '</span></div>';
+    echo  '<div class="policycloud-marketplace-' . $type . ' "><span>' . $message . '</span></div>';
 }
 
 
@@ -851,7 +863,7 @@ function account_html(array $information, $picture, array $statistics, array $as
                     echo '</ul>';
                 }
             } else {
-                show_alert('This user does not have any ' . $id . '.', false, 'notice');
+                show_alert('This user does not have any ' . $id . '.', 'notice');
             } ?>
             <nav class="pagination">
                 <?php
@@ -867,7 +879,7 @@ function account_html(array $information, $picture, array $statistics, array $as
 
     // Check for any errors regarding authorization.
     if (!empty($args['notice'])) {
-        show_alert($args['notice'], false, 'notice');
+        show_alert($args['notice'], 'notice');
     }
 
     if (!empty($args['error'])) show_alert($args['error']);
@@ -875,13 +887,13 @@ function account_html(array $information, $picture, array $statistics, array $as
     if (!empty($information)) {
         // Check for any notices.
         if (!empty($args['notice'])) {
-            show_alert($args['notice'], true, 'notice');
+            show_alert($args['notice'], 'notice');
         }
 
         // Show account verification notice.
         if (!empty($information['account']['verified'])) {
             if ($information['account']['verified'] !== '1') {
-                show_alert('Your account is still unverified, please check your email inbox or spam folder for a verification email. You can <a id="policycloud-marketplace-resend-verification-email">resend</a> it if you can\'t find it.', false, 'notice');
+                show_alert('Your account is still unverified, please check your email inbox or spam folder for a verification email. You can <a id="policycloud-marketplace-resend-verification-email">resend</a> it if you can\'t find it.', 'notice');
             }
         } else show_alert("Your account verification status couldn't be accessed.");
     ?>
@@ -988,7 +1000,7 @@ function account_html(array $information, $picture, array $statistics, array $as
                             </table>
                         <?php
                         } else {
-                            show_alert("Statistics for this user are currently unavailable.", false, 'notice');
+                            show_alert("Statistics for this user are currently unavailable.", 'notice');
                         }
                         ?>
                     </section>
