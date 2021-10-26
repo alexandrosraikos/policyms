@@ -1,77 +1,77 @@
-// TODO @alexandrosraikos: Clean up, comment and claim.
+/**
+ * @file Provides dynamic fields and handles the AJAX request
+ * for the asset creation form.
+ *
+ * @author Alexandros Raikos <araikos@unipi.gr>
+ */
 
 (function ($) {
   "use strict";
   $(document).ready(function () {
-    $(
-      "#policycloud-object-create select[name=type], #policycloud-object-create select[name=subtype]"
-    ).change(() => {});
+    /**
+     * Generic
+     *
+     * This section includes generic functionality
+     * regarding the usage of the account shortcode.
+     *
+     */
 
-    /*
-      ------------------------
-      AJAX Object Creation
-      ------------------------
-    */
-    $("#policycloud-object-create").submit((e) => {
+    /**
+     * Prepare and submit via AJAX the edited information fields.
+     *
+     * @param {Event} e
+     *
+     * @author Alexandros Raikos <araikos@unipi.gr>
+     */
+    function createAsset(e) {
       e.preventDefault();
-      $("#policycloud-object-create button[type=submit]").addClass("loading");
+
+      // Add loading class.
+      $("#policycloud-marketplace-asset-creation button[type=submit]").addClass(
+        "loading"
+      );
+
+      // Prepare form data.
+      var formData = new FormData(
+        $("#policycloud-marketplace-asset-creation")[0]
+      );
+      formData.append("action", "policycloud_marketplace_asset_creation");
+      formData.append("nonce", ajax_properties_asset_creation.nonce);
 
       // Perform AJAX request.
       $.ajax({
         url: ajax_properties_asset_creation.ajax_url,
         type: "post",
-        data: {
-          action: "policycloud_marketplace_asset_creation",
-          nonce: ajax_properties_object_creation.nonce,
-          title: $("input[name=title]").val(),
-          type: $("input[name=type]").val(),
-          subtype: $("input[name=subtype]").val(),
-          owner: $("input[name=owner]").val(),
-          description: $("textarea[name=description]").val(),
-          field_of_use: $("input[name=field-of-use]").val(),
-          comment: $("input[name=comment]").val(),
-        },
-
-        // Handle response.
-        complete: function (response) {
-          try {
-            var response_data = JSON.parse(response.responseText);
-            if (response_data != null) {
-              if (response_data.status === "success") {
-                window.location.replace(
-                  ajax_properties_object_creation.account_page
-                );
-              } else {
-                $("#policycloud-marketplace-description-create .error").html(
-                  response_data.data
-                );
-                $(
-                  "#policycloud-marketplace-description-create .error"
-                ).addClass("visible");
-              }
-            }
-            if (response.status != 200) {
-              $("#policycloud-marketplace-description-create .error").html(
-                "HTTP Error " + response.status + ": " + response.statusText
-              );
-              $("#policycloud-marketplace-description-create .error").addClass(
-                "visible"
-              );
-            }
-            $(
-              "#policycloud-marketplace-description-create input[type=submit]"
-            ).removeClass("loading");
-          } catch (objError) {
-            $("#policycloud-marketplace-description-create .error").html(
-              "Invalid response: " + response.responseText
-            );
-            $("#policycloud-marketplace-description-create .error").addClass(
-              "visible"
-            );
-          }
-        },
+        processData: false,
+        contentType: false,
+        data: formData,
+        cache: false,
         dataType: "json",
+        complete: (response) => {
+          handleAJAXResponse(
+            response,
+            "#policycloud-marketplace-asset-creation",
+            (data) => {
+              window.location.replace(
+                ajax_properties_asset_creation.description_page +
+                  "/?did=" +
+                  data
+              );
+            }
+          );
+        },
       });
-    });
+    }
+
+    /**
+     *
+     * Generic interface actions & event listeners.
+     *
+     */
+
+    // Submit the asset.
+    $("#policycloud-marketplace-asset-creation button[type=submit]").click(
+      createAsset
+    );
   });
 })(jQuery);

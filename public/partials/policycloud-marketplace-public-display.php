@@ -216,7 +216,6 @@ function assets_grid_html($assets, $asset_url)
  */
 function assets_archive_html($assets, $filters, $args)
 {
-    // TODO @alexandrosraikos: CSS mockup alignment.
     if (!empty($args['error']))  echo show_alert($args['error']);
     if (!empty($args['notice'])) echo show_alert($args['notice'], false, 'notice');
     ?>
@@ -671,12 +670,9 @@ function asset_creation_html(string $error = null)
     if (!empty($error)) {
         show_alert($error);
     } else {
-        // TODO @alexandrosraikos: Move Fields of use outside of internal information.
-        // TODO @alexandrosraikos: Comma-separated fields of use.
-        // TODO @alexandrosraikos: Write subtype as a custom text field.
     ?>
         <div class="policycloud-marketplace">
-            <form id="policycloud-object-create" action="">
+            <form id="policycloud-marketplace-asset-creation" action="">
                 <fieldset name="basic-information">
                     <h2>Basic information</h2>
                     <p>To create a new Marketplace asset, the following fields represent basic information that will be visible to others.</p>
@@ -695,18 +691,9 @@ function asset_creation_html(string $error = null)
                         <option value="other">Other</option>
                     </select>
                     <label for="subtype">Secondary collection type</label>
-                    <select name="subtype">
-                        <option value="" selected>-</option>
-                        <option value="algorithms">Algorithms</option>
-                        <option value="tools">Tools</option>
-                        <option value="policies">Policies</option>
-                        <option value="datasets">Datasets</option>
-                        <option value="webinars">Webinars</option>
-                        <option value="tutorials">Tutorials</option>
-                        <option value="documents">Documents</option>
-                        <option value="externals">Externals</option>
-                        <option value="other">Other</option>
-                    </select>
+                    <input type="text" placeholder="Insert a secondary collection type" name="subtype"/>
+                    <label for="fields-of-use">Fields of usage</label>
+                    <textarea name="fields-of-use" placeholder="Separate multiple fields of usage using a comma (lorem, ipsum, etc.)"></textarea>
                     <label for="owner">Legal owner *</label>
                     <input required name="owner" placeholder="Insert the legal owner of the object" type="text" />
                     <label for="description">Description *</label>
@@ -714,14 +701,12 @@ function asset_creation_html(string $error = null)
                 </fieldset>
                 <fieldset name="internal-information">
                     <h2>Internal information</h2>
-                    <p>You can include internal private comments and the asset's field of use for management purposes. These fields are optional.</p>
-                    <label for="field-of-use">Fields of usage</label>
-                    <textarea name="field-of-use" placeholder="Separate multiple fields of usage using a comma (lorem, ipsum, etc.)"></textarea>
-                    <label for="comments">Comments</label>
-                    <textarea name="comments" placeholder="Insert any additional comments"></textarea>
+                    <p>You can include internal private comments for management purposes. This field is optional.</p>
+                    <label for="private-comments">Comments</label>
+                    <textarea name="private-comments" placeholder="Insert any additional private comments"></textarea>
                 </fieldset>
                 <div class="error"></div>
-                <button type="submit" class="action ">Create object</button>
+                <button type="submit" class="action ">Create</button>
             </form>
         </div>
     <?php

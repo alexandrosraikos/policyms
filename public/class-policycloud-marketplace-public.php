@@ -879,7 +879,6 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public static function asset_creation_shortcode()
 	{
-
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 
 		try {
@@ -892,13 +891,13 @@ class PolicyCloud_Marketplace_Public
 
 		// Retrieve description page URL.
 		$options = get_option('policycloud_marketplace_plugin_settings');
-		if (empty($options['account_page'])) $error_message = "You have not set an account page in your PolicyCloud Marketplace settings.";
+		if (empty($options['description_page'])) $error_message = "You have not set an asset page in your PolicyCloud Marketplace settings.";
 
 		wp_enqueue_script("policycloud-marketplace-asset-creation");
 		wp_localize_script('policycloud-marketplace-asset-creation', 'ajax_properties_asset_creation', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce('ajax_policycloud_asset_creation_verification'),
-			'account_page' => $options['account_page']
+			'description_page' => $options['description_page']
 		));
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
@@ -920,17 +919,27 @@ class PolicyCloud_Marketplace_Public
 			http_response_code(403);
 			die("Unverified request to create an asset.");
 		}
-
-		// TODO @alexandrosraikos: Check all $_POST fields. (waiting on asset creation form).
-
+		
 		try {
 			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 			$token = retrieve_token();
 			if (!empty($token)) {
 				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
-				$asset_id = create_asset($_POST, $token);
+
+				$data = [
+					"title" => sanitize_text_field($_POST['title']),
+					"type" => sanitize_text_field($_POST['type']),
+					"subtype" => sanitize_text_field($_POST['subtype'] ?? ''),
+					"owner" => sanitize_text_field($_POST['owner'] ?? ''),
+					"description" => sanitize_text_field($_POST['description']),
+					"fieldOfUse" => explode(", ", $_POST['fields-of-use'] ?? []),
+					"comments" => sanitize_text_field($_POST['private-comments'] ?? '')
+				];
+
+				// Prepare data
+				$id = create_asset($data, $token);
 				http_response_code(200);
-				die(json_encode($asset_id));
+				die(json_encode($id));
 			} else {
 				http_response_code(404);
 				die("User token not found.");

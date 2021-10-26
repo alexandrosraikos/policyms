@@ -285,12 +285,14 @@ function get_asset_image($id, $token)
  */
 function create_asset($data, $token)
 {
-    return policyCloudMarketplaceAPIRequest(
+    $response = policyCloudMarketplaceAPIRequest(
         'POST',
         '/descriptions/' . $data['type'],
         $data,
         $token
     );
+
+    return $response['id'];
 }
 
 

@@ -57,19 +57,27 @@ function policyCloudMarketplaceAPIRequest($http_method, $uri, $data = [], $token
         throw new Exception("Unable to reach the Marketplace server. More details: " . curl_error($curl));
     }
 
-    curl_close($curl);
     if (isset($response)) {
         if (is_string($response)) {
             $decoded = json_decode($response, true);
             if (json_last_error() === JSON_ERROR_NONE) {
-                if ($decoded['_status'] == 'successful' && curl_getinfo($curl, CURLINFO_HTTP_CODE) == 200) {
+                $curl_http = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                if ($decoded['_status'] == 'successful' && ($curl_http == 200 || $curl_http == 201)) {
+                    curl_close($curl);
                     return $decoded;
-                } else throw new ErrorException($decoded['message']);
+                } else {
+                    curl_close($curl);
+                    throw new ErrorException($decoded['message']);
+                }
             } else {
+                curl_close($curl);
                 return $response;
             }
         }
-    } else throw new ErrorException("There was no response.");
+    } else {
+        curl_close($curl);
+        throw new ErrorException("There was no response.");
+    };
 }
 
 
