@@ -157,6 +157,8 @@ function account_authorization_html($registration_url, $logged_in)
  */
 function assets_grid_html($assets, $asset_url)
 {
+    // TODO @alexandrosraikos: Correct gallery formatting (#17, #16, #11). 
+
     if (empty($asset_url)) {
         echo show_alert('No asset page has been defined in the WordPress settings.');
     }
@@ -216,6 +218,11 @@ function assets_grid_html($assets, $asset_url)
  */
 function assets_archive_html($assets, $filters, $args)
 {
+    // TODO @alexandrosraikos: Add oldest date limit on date filter. (#15)
+    // TODO @alexandrosraikos: Show filters sidebar by default on desktop, find another way to hide on mobile. (#14)
+    // TODO @alexandrosraikos: Add 'All' radio button to filters. (#13)
+    // TODO @alexandrosraikos: Rename sorting labels to match with functionality. (#12)
+
     if (!empty($args['error']))  echo show_alert($args['error']);
     if (!empty($args['notice'])) echo show_alert($args['notice'], 'notice');
     ?>
@@ -386,6 +393,13 @@ function assets_archive_html($assets, $filters, $args)
  */
 function asset_html($asset, $images, $args)
 {
+    // TODO @alexandrosraikos: Fix editing modal width (#26).
+    // TODO @alexandrosraikos: Create file download sequence (#25).
+    // TODO @alexandrosraikos: Allow admin to edit and approve (#24, #25).
+    // TODO @alexandrosraikos: Rename 'Images' to 'Gallery' and move to bottom (#22).
+    // TODO @alexandrosraikos: Add modal controls to gallery (#21).
+    // TODO @alexandrosraikos: Publicize and check comments (#20, #19).
+    // TODO @alexandrosraikos: Add meta links to article header (#18).
 
     /**
      * Print the locked content notification.
@@ -801,6 +815,10 @@ function time_elapsed_string($datetime, $full = false)
  */
 function account_html(array $information, $picture, array $statistics, array $assets, array $reviews, array $approvals = [], array $args = [])
 {
+    // TODO @alexandrosraikos: Restyle asset list header for mobile (#10).
+    // TODO @alexandrosraikos: Rename 'Information' to 'Profile'. (#8)
+    // TODO @alexandrosraikos: Fix and test account editing. (#7, #5)
+
     /**
      * Display a list of assets with filtering, sorting and custom pagination. 
      * 

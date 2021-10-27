@@ -134,6 +134,8 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public static function add_conditional_access_menu_item($items, $args)
 	{
+		// TODO @alexandrosraikos: Fix menu not showing on certain themes (with @elefkour).
+
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 
 		// Retrieve credentials.

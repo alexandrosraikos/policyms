@@ -5,6 +5,8 @@
  * @author Alexandros Raikos <araikos@unipi.gr>
  */
 
+// TODO @alexandrosraikos: Fix asset rearrangement formatting. (#6)
+
 (function ($) {
   "use strict";
   $(document).ready(function () {
