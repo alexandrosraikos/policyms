@@ -157,8 +157,6 @@ function account_authorization_html($registration_url, $logged_in)
  */
 function assets_grid_html($assets, $asset_url)
 {
-    // TODO @alexandrosraikos: Correct gallery formatting (#17, #16, #11). 
-
     if (empty($asset_url)) {
         echo show_alert('No asset page has been defined in the WordPress settings.');
     }
@@ -218,15 +216,10 @@ function assets_grid_html($assets, $asset_url)
  */
 function assets_archive_html($assets, $filters, $args)
 {
-    // TODO @alexandrosraikos: Add oldest date limit on date filter. (#15)
-    // TODO @alexandrosraikos: Show filters sidebar by default on desktop, find another way to hide on mobile. (#14)
-    // TODO @alexandrosraikos: Add 'All' radio button to filters. (#13)
-    // TODO @alexandrosraikos: Rename sorting labels to match with functionality. (#12)
-
     if (!empty($args['error']))  echo show_alert($args['error']);
     if (!empty($args['notice'])) echo show_alert($args['notice'], 'notice');
     ?>
-    <div class="policycloud-marketplace" id="policycloud-marketplace-asset-archive">
+    <div class="policycloud-marketplace inspect" id="policycloud-marketplace-asset-archive">
         <div class="filters">
             <button class="close outlined filters-toggle">Close</button>
             <h2>Filters</h2>
@@ -243,6 +236,10 @@ function assets_archive_html($assets, $filters, $args)
                     <fieldset>
                         <h3>Types</h3>
                         <div class="types">
+                            <span>
+                                <input type="radio" name="type" value="" <?php echo (empty($_GET['type'])) ? 'checked' : '' ?> />
+                                <label for="type">All</label>
+                            </span>
                             <span>
                                 <input type="radio" name="type" value="algorithms" <?php echo (($_GET['type'] ?? '') == 'algorithms') ? 'checked' : '' ?> />
                                 <label for="type">Algorithms</label>
@@ -300,8 +297,6 @@ function assets_archive_html($assets, $filters, $args)
                             <div>
                                 <input type="number" name="views_lte" placeholder="<?php echo $filters['max_views'] ?>" value="<?php echo $_GET['views_lte'] ?? "" ?>" max="<?php echo $filters['max_views'] ?>" />
                             </div>
-                            <?php // TODO: Add visual range selector 
-                            ?>
                         </div>
                     </fieldset>
                     <fieldset>
@@ -309,11 +304,11 @@ function assets_archive_html($assets, $filters, $args)
                         <div class="dates">
                             <div>
                                 <label for="update_date_gte">From</label>
-                                <input type="date" onfocus="(this.type='date')" name="update_date_gte" placeholder="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>" value="<?php echo $_GET['update_date_gte'] ?? '' ?>" min="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>" />
+                                <input type="date" onfocus="(this.type='date')" name="update_date_gte" placeholder="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>" value="<?php echo $_GET['update_date_gte'] ?? '' ?>" min="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>" max="<?php echo date("Y-m-d") ?>" />
                             </div>
                             <div>
                                 <label for="update_date_lte">To</label>
-                                <input type="date" name="update_date_lte" placeholder="<?php echo date("Y-m-d") ?>" value="<?php echo $_GET['update_date_lte'] ?? '' ?>" max="<?php echo date("Y-m-d") ?>" />
+                                <input type="date" name="update_date_lte" placeholder="<?php echo date("Y-m-d") ?>" value="<?php echo $_GET['update_date_lte'] ?? '' ?>" min="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>" max="<?php echo date("Y-m-d") ?>" />
                             </div>
                         </div>
                     </fieldset>
@@ -336,8 +331,8 @@ function assets_archive_html($assets, $filters, $args)
                             <option value="oldest" <?php echo ((($_GET['sort-by'] ?? '') == 'oldest') ? "selected" : "") ?>>Oldest</option>
                             <option value="rating-desc" <?php echo ((($_GET['sort-by'] ?? '') == 'rating-desc') ? "selected" : "") ?>>Highest rated</option>
                             <option value="rating-asc" <?php echo ((($_GET['sort-by'] ?? '') == 'rating-asc') ? "selected" : "") ?>>Lowest rated</option>
-                            <option value="views-asc" <?php echo ((($_GET['sort-by'] ?? '') == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
-                            <option value="views-desc" <?php echo ((($_GET['sort-by'] ?? '') == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
+                            <option value="views-desc" <?php echo ((($_GET['sort-by'] ?? '') == 'views-desc') ? "selected" : "") ?>>Most viewed</option>
+                            <option value="views-asc" <?php echo ((($_GET['sort-by'] ?? '') == 'views-asc') ? "selected" : "") ?>>Least viewed</option>
                             <option value="title" <?php echo ((($_GET['sort-by'] ?? '') == 'title') ? "selected" : "") ?>>Title</option>
                         </select>
                     </fieldset>

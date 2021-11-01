@@ -84,6 +84,11 @@
     $("#policycloud-marketplace-asset-archive .filters-toggle").click((e) => {
       e.preventDefault();
       $("#policycloud-marketplace-asset-archive").toggleClass("inspect");
+      if (!$("#policycloud-marketplace-asset-archive").hasClass("inspect")) {
+        $("body").css("overflowY", "hidden");
+      } else {
+        $("body").css("overflowY", "auto");
+      }
     });
 
     $(

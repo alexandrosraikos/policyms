@@ -542,9 +542,11 @@
 
 #policycloud-marketplace-assets-grid > ul {
   /* Display & Box Model */
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   flex-wrap: wrap;
   padding: 24px;
+  justify-content: flex-start;
 
   /* Other */
   list-style-type: none;
@@ -552,12 +554,14 @@
 
 #policycloud-marketplace-assets-grid > ul > li {
   /* Display & Box Model */
-  flex: 1 0 300px;
+  flex-basis: 300px;
+  flex-grow: 0;
   margin: 10px;
   padding: 0;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   overflow: hidden;
+  justify-self: flex-start;
 
   /* Other */
   background-color: var(--policycloud-background-color);
@@ -670,7 +674,8 @@
     padding: 0;
   }
   #policycloud-marketplace-assets-grid > ul > li {
-    margin: 0;
+    flex: 1 0 100%;
+    margin: 10px 0;
   }
 }
 
@@ -863,7 +868,19 @@
 }
 
 @media screen and (max-width: 820px) {
+  #policycloud-marketplace-asset-archive.inspect > .filters {
+    /* Display & Box Model */
+    display: none;
+  }
+
+  /** 
+  * NOTE: Flip the inspecting properties of desktop and mobile,
+  * so that the fitlers sidebar is shown by default.
+  */
   #policycloud-marketplace-asset-archive > .filters {
+    /* Display & Box Model */
+    display: block;
+    flex-basis: 100px;
     position: fixed;
     top: 0;
     left: 0;

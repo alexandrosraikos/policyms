@@ -45,7 +45,7 @@ function get_assets(array $args)
     ]);
 
     // Get all descriptions.
-    if (!isset($args['type'])) {
+    if (empty($args['type'])) {
         return policyCloudMarketplaceAPIRequest(
             'GET',
             '/descriptions/all' . $filters,
