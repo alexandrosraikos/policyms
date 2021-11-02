@@ -176,7 +176,7 @@ function marketplace_username_exists($username)
         '/accounts/username/availability',
         [],
         null,
-        ["username: " . $username],
+        ["x-username: " . $username],
     );
 
     // Return status.
@@ -207,7 +207,6 @@ function account_registration($data)
 {
     // Retrieve API credentials and check for registered settings.
     $options = get_option('policycloud_marketplace_plugin_settings');
-    if (empty($options['marketplace_host'])) throw new InvalidArgumentException("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
     if (empty($options['jwt_key'])) throw new InvalidArgumentException("No PolicyCloud Marketplace API key was defined in WordPress settings.");
     if (empty($options['encryption_key'])) throw new InvalidArgumentException("No PolicyCloud Marketplace encryption key was defined in WordPress settings.");
 
@@ -237,7 +236,7 @@ function account_registration($data)
     }
 
     // Username availability check.
-    if (!marketplace_username_exists($options['marketplace_host'], $data['username'])) throw new RuntimeException("Username already exists.");
+    if (!marketplace_username_exists($data['username'])) throw new RuntimeException("Username already exists.");
 
     if (!is_array($data['social-title']) || !is_array($data['social-url'])) {
         $data['social-title'] = [$data['social-title']];

@@ -26,9 +26,6 @@
  */
 function account_registration_html($authorization_url, $logged_in, $tos_url, $error)
 {
-
-    // TODO @alexandrosraikos: Fix 'Username is missing' error (#5).
-
     if (!empty($error)) {
         show_alert($error);
     }
@@ -398,6 +395,7 @@ function asset_html($asset, $images, $args)
     // TODO @alexandrosraikos: Add modal controls to gallery (#21).
     // TODO @alexandrosraikos: Publicize and check comments (#20, #19).
     // TODO @alexandrosraikos: Add meta links to article header (#18).
+    // TODO @alexandrosraikos: Create review views and editing.
 
     /**
      * Print the locked content notification.
@@ -920,13 +918,13 @@ function account_html(array $information, $picture, array $statistics, array $as
                 ?>
                 <nav>
                     <button class="tactile" id="policycloud-marketplace-account-overview" class="active">Overview</button>
-                    <button class="tactile" id="policycloud-marketplace-account-assets">Assets <span class="pill"><?php echo (count($assets['results']) == 0) ? "" : count($assets['results']) ?></span></button>
-                    <button class="tactile" id="policycloud-marketplace-account-reviews">Reviews <span class="pill"><?php echo (count($reviews['results']) == 0) ? "" : count($reviews['results']) ?></span></button>
+                    <button class="tactile" id="policycloud-marketplace-account-assets">Assets <span class="pill"><?php echo (count($assets['results'] ?? []) == 0) ? "" : count($assets['results']) ?></span></button>
+                    <button class="tactile" id="policycloud-marketplace-account-reviews">Reviews <span class="pill"><?php echo (count($reviews['results'] ?? []) == 0 ?? 0) ? "" : count($reviews['results']) ?></span></button>
                     <?php
                     if (!$args['visiting'] && $args['is_admin']) {
                     ?>
                         <hr />
-                        <button class="tactile" id="policycloud-marketplace-account-approvals">Approvals <span class="pill"><?php echo (count($approvals['results']) == 0) ? "" : count($approvals['results']) ?></span></button>
+                        <button class="tactile" id="policycloud-marketplace-account-approvals">Approvals <span class="pill"><?php echo (count($approvals['results'] ?? []) == 0) ? "" : count($approvals['results']) ?></span></button>
                         <hr />
                     <?php
                     }
