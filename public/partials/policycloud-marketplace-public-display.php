@@ -26,6 +26,9 @@
  */
 function account_registration_html($authorization_url, $logged_in, $tos_url, $error)
 {
+
+    // TODO @alexandrosraikos: Fix 'Username is missing' error (#5).
+
     if (!empty($error)) {
         show_alert($error);
     }
@@ -810,10 +813,6 @@ function time_elapsed_string($datetime, $full = false)
  */
 function account_html(array $information, $picture, array $statistics, array $assets, array $reviews, array $approvals = [], array $args = [])
 {
-    // TODO @alexandrosraikos: Restyle asset list header for mobile (#10).
-    // TODO @alexandrosraikos: Rename 'Information' to 'Profile'. (#8)
-    // TODO @alexandrosraikos: Fix and test account editing. (#7, #5)
-
     /**
      * Display a list of assets with filtering, sorting and custom pagination. 
      * 
@@ -910,8 +909,8 @@ function account_html(array $information, $picture, array $statistics, array $as
             }
         } else show_alert("Your account verification status couldn't be accessed.");
     ?>
-        <div id="policycloud-account" class="policycloud-marketplace">
-            <div id="policycloud-account-sidebar">
+        <div id="policycloud-marketplace-account" class="policycloud-marketplace">
+            <div id="policycloud-marketplace-account-sidebar">
                 <?php
                 if (!empty($picture)) {
                     echo '<img src="data:image/*;base64,' . base64_encode($picture) . '" draggable="false" />';
@@ -920,24 +919,26 @@ function account_html(array $information, $picture, array $statistics, array $as
                 }
                 ?>
                 <nav>
-                    <button class="tactile" id="policycloud-account-overview" class="active">Overview</button>
-                    <button class="tactile" id="policycloud-account-assets">Assets</button>
-                    <button class="tactile" id="policycloud-account-reviews">Reviews</button>
+                    <button class="tactile" id="policycloud-marketplace-account-overview" class="active">Overview</button>
+                    <button class="tactile" id="policycloud-marketplace-account-assets">Assets <span class="pill"><?php echo (count($assets['results']) == 0) ? "" : count($assets['results']) ?></span></button>
+                    <button class="tactile" id="policycloud-marketplace-account-reviews">Reviews <span class="pill"><?php echo (count($reviews['results']) == 0) ? "" : count($reviews['results']) ?></span></button>
                     <?php
                     if (!$args['visiting'] && $args['is_admin']) {
                     ?>
-                        <button class="tactile" id="policycloud-account-approvals">Approvals</button>
+                        <hr />
+                        <button class="tactile" id="policycloud-marketplace-account-approvals">Approvals <span class="pill"><?php echo (count($approvals['results']) == 0) ? "" : count($approvals['results']) ?></span></button>
+                        <hr />
                     <?php
                     }
                     ?>
-                    <button class="tactile" id="policycloud-account-information">Information</button>
+                    <button class="tactile" id="policycloud-marketplace-account-profile">Profile</button>
                     <?php if (!$args['visiting']) { ?>
                         <button class="tactile policycloud-logout">Log out</button>
                     <?php } ?>
                 </nav>
             </div>
-            <div id="policycloud-account-content">
-                <div class="policycloud-account-title">
+            <div id="policycloud-marketplace-account-content">
+                <div class="policycloud-marketplace-account-title">
                     <h2>
                         <?php
                         echo ($information['info']['title'] ?? '') . ' ' . $information['info']['name'] . ' ' . $information['info']['surname'];
@@ -950,7 +951,7 @@ function account_html(array $information, $picture, array $statistics, array $as
                     </div>
                 </div>
                 <div>
-                    <section class="policycloud-account-overview focused">
+                    <section class="policycloud-marketplace-account-overview focused">
                         <header>
                             <h3>Overview</h3>
                         </header>
@@ -1017,7 +1018,7 @@ function account_html(array $information, $picture, array $statistics, array $as
                         }
                         ?>
                     </section>
-                    <section class="policycloud-account-assets">
+                    <section class="policycloud-marketplace-account-assets">
                         <?php
                         asset_viewer_html('assets', $assets, $args, function ($asset) use ($args) {
                         ?>
@@ -1041,7 +1042,7 @@ function account_html(array $information, $picture, array $statistics, array $as
                         });
                         ?>
                     </section>
-                    <section class="policycloud-account-reviews">
+                    <section class="policycloud-marketplace-account-reviews">
                         <?php
                         asset_viewer_html('reviews', $reviews, $args, function ($review) use ($args) {
                         ?>
@@ -1067,7 +1068,7 @@ function account_html(array $information, $picture, array $statistics, array $as
                     <?php
                     if (!$args['visiting'] && $args['is_admin']) {
                     ?>
-                        <section class="policycloud-account-approvals">
+                        <section class="policycloud-marketplace-account-approvals">
                             <?php
                             asset_viewer_html('approvals', $approvals, $args, function ($approval) use ($args) {
                             ?>
@@ -1094,7 +1095,7 @@ function account_html(array $information, $picture, array $statistics, array $as
                     <?php
                     }
                     ?>
-                    <section class="policycloud-account-information">
+                    <section class="policycloud-marketplace-account-profile">
                         <header>
                             <h3>Information</h3>
                             <?php
@@ -1270,7 +1271,7 @@ function account_html(array $information, $picture, array $statistics, array $as
                                     <td>
                                         <span class="folding visible">
                                             <?php
-                                            echo ($information['info']['gender'] ?? '-');
+                                            echo (ucfirst($information['info']['gender'] ?? '-'));
                                             ?>
                                         </span>
                                         <?php

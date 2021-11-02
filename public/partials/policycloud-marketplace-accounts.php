@@ -571,12 +571,15 @@ function get_user_statistics($uid, $token)
  */
 function account_edit($uid, $token)
 {
+    /**
+     * Data fulfillment checking.
+     */
 
     // Check and retrieve saved encryption key.
     $options = get_option('policycloud_marketplace_plugin_settings');
     if (empty($options['encryption_key'])) throw new InvalidArgumentException("No PolicyCloud Marketplace encryption key was defined in WordPress settings.");
 
-    // Check for uploaded file.
+    // Upload new profile picture.
     if (!empty($_FILES['profile_picture'])) {
         if ($_FILES['profile_picture']['error'] == 0) {
             if (
@@ -588,15 +591,19 @@ function account_edit($uid, $token)
             if ($_FILES['profile_picture']['size'] > 1000000) {
                 throw new RuntimeException("The image file is too large. Please upload a file less than 1MB in size.");
             }
-            $new_profile_picture = true;
+            $profile_picture_response = set_user_picture(
+                $_FILES['profile_picture']['tmp_name'],
+                $_FILES['profile_picture']['type'],
+                $uid,
+                $token
+            );
         } elseif ($_FILES['profile_picture']['error'] == 4);
         else {
             throw new RuntimeException(fileUploadErrorInterpreter($_FILES['profile_picture']['error']));
         }
-    } else {
-        $new_profile_picture = false;
     }
 
+    // Prepare and check new account information.
     $data = [
         'password' => stripslashes($_POST['password'] ?? ''),
         'password-confirm' => stripslashes($_POST['password-confirm'] ?? ''),
@@ -611,9 +618,8 @@ function account_edit($uid, $token)
         'socials-title' => $_POST['socials-title'] ?? '',
         'socials-url' => $_POST['socials-url'] ?? '',
         'about' => stripslashes($_POST['about'] ?? ''),
-        'public_email' => $_POST['public_email'],
-        'public_phone' => $_POST['public_phone'],
-        'new_profile_picture' => $new_profile_picture
+        'public-email' => $_POST['public-email'],
+        'public-phone' => $_POST['public-phone'],
     ];
 
     // Information validation checks and errors.
@@ -626,18 +632,8 @@ function account_edit($uid, $token)
         if (!in_array($data['gender'], ['male', 'female', 'transgender', 'genderqueer', 'questioning', '-'])) throw new RuntimeException("Please select a gender from the list.");
     }
 
-    if ($data['new_profile_picture']) {
-        $profile_picture_response = set_user_picture(
-            $_FILES['profile_picture']['tmp_name'],
-            $_FILES['profile_picture']['type'],
-            $uid,
-            $token
-        );
-    }
-
     // Contact the PolicyCloud Marketplace API for password change.
     if (!empty($data['password'])) {
-
         if (!empty($data['password-confirm'])) {
             if ($data['password'] !== $data['password-confirm']) throw new RuntimeException('Password and password confirmation should match!');
             if (
@@ -664,10 +660,17 @@ function account_edit($uid, $token)
         }
     }
 
-    if (!is_array($data['social-title']) || !is_array($data['social-url'])) {
-        $data['social-title'] = [$data['social-title']];
-        $data['social-url'] = [$data['social-url']];
+    // Format the social media fields appropriately.
+    if (!is_array($data['socials-title']) || !is_array($data['socials-url'])) {
+        $data['socials-title'] = [$data['socials-title']];
+        $data['socials-url'] = [$data['socials-url']];
     }
+    $social_counter = 0;
+    $data['socials'] = (empty($data['socials-title'][0]) || empty($data['socials-url'][0])) ? [''] : array_map(function ($v) use ($data, $social_counter) {
+        $social = $v . ":" . $data['socials-url'][$social_counter];
+        $social_counter += 1;
+        return $social;
+    }, $data['socials-title']);
 
     try {
         $information_response = policyCloudMarketplaceAPIRequest(
@@ -682,9 +685,7 @@ function account_edit($uid, $token)
                     'organization' => $data['organization'],
                     'email' => $data['email'],
                     'phone' => $data['phone'],
-                    'social' => (empty($data['social-title'][0]) || empty($data['social-url'][0])) ? [''] : array_map(function ($k, $v) use ($data) {
-                        return $v . ":" . $data['social-url'][$k];
-                    }, $data['social-title']),
+                    'social' => $data['socials'],
                     'about' => $data['about']
                 ],
                 'profile_parameters' => [

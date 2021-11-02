@@ -5,8 +5,6 @@
  * @author Alexandros Raikos <araikos@unipi.gr>
  */
 
-// TODO @alexandrosraikos: Fix asset rearrangement formatting. (#6)
-
 (function ($) {
   "use strict";
   $(document).ready(function () {
@@ -25,9 +23,9 @@
      */
     function switchTab(e) {
       e.preventDefault();
-      $("#policycloud-account section").removeClass("focused");
+      $("#policycloud-marketplace-account section").removeClass("focused");
       $("section." + $(this).attr("id")).addClass("focused");
-      $("#policycloud-account nav button").removeClass("active");
+      $("#policycloud-marketplace-account nav button").removeClass("active");
       $(this).addClass("active");
       var hashPrepare = $(this).attr("id").split("-");
       window.location.hash = "#" + hashPrepare[hashPrepare.length - 1];
@@ -46,7 +44,7 @@
 
     // Change account navigation tab.
     $(
-      "button#policycloud-account-overview, button#policycloud-account-assets, button#policycloud-account-reviews, button#policycloud-account-approvals, button#policycloud-account-information"
+      "button#policycloud-marketplace-account-overview, button#policycloud-marketplace-account-assets, button#policycloud-marketplace-account-reviews, button#policycloud-marketplace-account-approvals, button#policycloud-marketplace-account-profile"
     ).click(switchTab);
 
     // Hash determines active tab?
@@ -56,11 +54,12 @@
       window.location.hash == "#approvals" ||
       window.location.hash == "#information"
     ) {
-      $("button#policycloud-account-" + window.location.hash.substr(1)).trigger(
-        "click"
-      );
+      $(
+        "button#policycloud-marketplace-account-" +
+          window.location.hash.substr(1)
+      ).trigger("click");
     } else {
-      $("button#policycloud-account-overview").trigger("click");
+      $("button#policycloud-marketplace-account-overview").trigger("click");
     }
 
     /**
@@ -91,12 +90,12 @@
       category,
       rememberPage = false,
       itemsPerPage = $(
-        ".policycloud-account-" +
+        ".policycloud-marketplace-account-" +
           category +
           " form.selector select[name=items-per-page]"
       ).val(),
       sortBy = $(
-        ".policycloud-account-" +
+        ".policycloud-marketplace-account-" +
           category +
           " form.selector select[name=sort-by]"
       ).val()
@@ -247,7 +246,7 @@
     function applyFilters(category, collection) {
       // Highlight active button.
       $(
-        '#policycloud-account-content .collection-filters[data-category="' +
+        '#policycloud-marketplace-account-content .collection-filters[data-category="' +
           category +
           '"] button[data-type-filter="' +
           collection +
@@ -302,15 +301,16 @@
      */
     function changePage(e) {
       e.preventDefault();
-      $("#policycloud-account-content nav.pagination button").removeClass(
-        "active"
-      );
       $(
-        "#policycloud-account-content section ul." + $(this).data("category")
+        "#policycloud-marketplace-account-content nav.pagination button"
+      ).removeClass("active");
+      $(
+        "#policycloud-marketplace-account-content section ul." +
+          $(this).data("category")
       ).removeClass("visible");
       $(this).addClass("active");
       $(
-        "#policycloud-account-content section ul[data-page='" +
+        "#policycloud-marketplace-account-content section ul[data-page='" +
           $(this).data($(this).data("category") + "-page") +
           "']." +
           $(this).data("category")
@@ -329,7 +329,9 @@
     calculateCollectionFilters("approval");
 
     // Select different sorting.
-    $("#policycloud-account-content form.selector select[name=sort-by]").change(
+    $(
+      "#policycloud-marketplace-account-content form.selector select[name=sort-by]"
+    ).change(
       /**
        * Rearranges the list on sorting value change.
        *
@@ -346,7 +348,7 @@
 
     // Select different page size.
     $(
-      "#policycloud-account-content form.selector select[name=items-per-page]"
+      "#policycloud-marketplace-account-content form.selector select[name=items-per-page]"
     ).change(
       /**
        * Rearranges the list on page size value change.
@@ -365,7 +367,7 @@
     // Filter by collection.
     $(document).on(
       "click",
-      "#policycloud-account-content .collection-filters button",
+      "#policycloud-marketplace-account-content .collection-filters button",
       (e) => {
         e.preventDefault();
         applyFilters(
@@ -378,7 +380,7 @@
     // Change page.
     $(document).on(
       "click",
-      "#policycloud-account-content nav.pagination button",
+      "#policycloud-marketplace-account-content nav.pagination button",
       changePage
     );
 
@@ -664,7 +666,7 @@
                 "id",
                 "policycloud-marketplace-download-data-copy"
               );
-              $("section.policycloud-account-information").append(a);
+              $("section.policycloud-marketplace-account-profile").append(a);
               $("#policycloud-marketplace-download-data-copy").get(0).click();
             }
           );
