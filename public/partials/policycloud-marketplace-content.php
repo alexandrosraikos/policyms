@@ -603,7 +603,7 @@ function edit_asset($did, $data, $token)
         "owner" => sanitize_text_field($_POST['owner'] ?? ''),
         "description" => sanitize_text_field($_POST['description']),
         "fieldOfUse" => explode(", ", $_POST['fields-of-use'] ?? []),
-        "comments" => sanitize_text_field($_POST['private-comments'] ?? '')
+        "comments" => sanitize_text_field($_POST['comments'] ?? '')
     ];
 
     // Update information
@@ -628,5 +628,34 @@ function edit_asset($did, $data, $token)
         ];
     } elseif (!empty($update_info_error)) {
         throw new RuntimeException($update_info_error);
+    }
+}
+
+
+/**
+ * Create an asset using the PolicyCloud Marketplace API. For more info visit:
+ * https://documenter.getpostman.com/view/16776360/TzsZs8kn#122ea00c-6ad4-4b34-8a05-8ca3e2b77171
+ * 
+ * @param	string $did The relevant description ID.
+ * @param	string $approval The approval option.
+ * @param	string $token The user's access token used for authorization (encoded).
+ * @uses    policyCloudMarketplaceAPIRequest()
+ * 
+ * @since   1.0.0
+ * @author  Alexandros Raikos <araikos@unipi.gr>
+ */
+function approve_asset($did, $approval, $token)
+{
+    if(policyCloudMarketplaceAPIRequest(
+        'POST',
+        '/descriptions/permit/all/'.$did,
+        [],
+        $token,
+        [
+          'x-access-token: '. $token,
+          'x-permission: '.$approval
+        ]
+    )) {
+        return true;
     }
 }

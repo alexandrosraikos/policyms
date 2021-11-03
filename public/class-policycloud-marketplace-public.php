@@ -723,8 +723,10 @@ class PolicyCloud_Marketplace_Public
 
 				// Specify Description ownership.
 				$owner = ($asset['results'][0][0]['metadata']['provider'] == $token['decoded']['username']);
+				$admin = (($token['decoded']['account']['role'] ?? '') == 'admin');
 			} else $asset = get_asset($_GET['did']);
 		} catch (Exception $e) {
+			$error = $e->getMessage();
 			try {
 				$asset = get_asset($_GET['did']);
 			} catch (Exception $e) {
@@ -733,15 +735,17 @@ class PolicyCloud_Marketplace_Public
 		}
 
 		// Get asset images.
-		try {
-			if (!empty($token)) {
-				$images = [];
-				foreach ($asset['results'][0][0]['assets']['images'] as $image) {
-					array_push($images, get_asset_image($image['id'], $token['encoded']));
+		if (!empty($asset)) {
+			try {
+				if (!empty($token)) {
+					$images = [];
+					foreach ($asset['results'][0][0]['assets']['images'] as $image) {
+						array_push($images, get_asset_image($image['id'], $token['encoded']));
+					}
 				}
+			} catch (Exception $e) {
+				$error = $e->getMessage();
 			}
-		} catch (Exception $e) {
-			$error = $e->getMessage();
 		}
 
 		// Retrieve login page URL.
@@ -761,6 +765,7 @@ class PolicyCloud_Marketplace_Public
 		asset_html($asset['results'][0][0] ?? [], $images ?? [], [
 			"is_authenticated" => !empty($token ?? null),
 			"is_owner" => $owner ?? false,
+			"is_admin" => $admin ?? false,
 			"login_page" => $options['login_page'] ?? "",
 			"account_page" => $options['account_page'] ?? "",
 			"archive_page" => $options['archive_page'] ?? "",
@@ -806,6 +811,51 @@ class PolicyCloud_Marketplace_Public
 						}
 						else throw new RuntimeException('No file type was defined.');
 					}
+				}
+			} else {
+				http_response_code(404);
+				die("User token not found.");
+			}
+		} catch (RuntimeException $e) {
+			http_response_code(400);
+			die($e->getMessage());
+		} catch (InvalidArgumentException $e) {
+			http_response_code(404);
+			die($e->getMessage());
+		} catch (JsonException $e) {
+			http_response_code(440);
+			die();
+		} catch (ErrorException $e) {
+			http_response_code(500);
+			die($e->getMessage());
+		}
+	}
+
+	/**
+	 * Handle description approval AJAX requests.
+	 *
+	 * @uses	PolicyCloud_Marketplace_Public::description_approval()
+	 *
+	 * @since	1.0.0
+	 * @author	Alexandros Raikos <araikos@unipi.gr>
+	 */
+	function asset_approval_handler() {
+		// Verify WordPress generated nonce.
+		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_description_editing_verification')) {
+			http_response_code(403);
+			die("Unverified request to approve this asset.");
+		}
+
+		try {
+			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+			$token = retrieve_token();
+			if (!empty($token)) {
+				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
+				$approval = $_POST['approval'] ?? '';
+				$did = $_POST['did'] ?? '';
+				if (approve_asset($did, $approval, $token)) {
+					http_response_code(200);
+					die();
 				}
 			} else {
 				http_response_code(404);
@@ -888,7 +938,7 @@ class PolicyCloud_Marketplace_Public
 					"owner" => sanitize_text_field($_POST['owner'] ?? ''),
 					"description" => sanitize_text_field($_POST['description']),
 					"fieldOfUse" => explode(", ", $_POST['fields-of-use'] ?? []),
-					"comments" => sanitize_text_field($_POST['private-comments'] ?? '')
+					"comments" => sanitize_text_field($_POST['comments'] ?? '')
 				];
 
 				// Prepare data

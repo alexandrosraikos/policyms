@@ -144,6 +144,58 @@
     }
 
     /**
+     * Show password prompt and verify the deletion request
+     * before sending via AJAX.
+     *
+     * @param {Event} e
+     *
+     * @author Alexandros Raikos <araikos@unipi.gr>
+     */
+    function approvalRequest(e) {
+      e.preventDefault();
+
+      var confirmed = false;
+      if ($(this).data("response") === "disapprove") {
+        var confirmed = window.confirm(
+          "Are you sure you want to delete this asset?"
+        );
+      } else confirmed = true;
+
+      // Perform the AJAX request for a present password value.
+      if (confirmed) {
+        // Add loading class
+        $(
+          "#policycloud-marketplace-asset-approval button[data-response=" +
+            $(this).data("response") +
+            "]"
+        ).addClass("loading");
+
+        $.ajax({
+          url: ajax_properties_description_editing.ajax_url,
+          type: "post",
+          data: {
+            action: "policycloud_marketplace_asset_approval",
+            nonce: ajax_properties_description_editing.nonce,
+            did: ajax_properties_description_editing.asset_id,
+            approval: $(this).data("response"),
+          },
+          dataType: "json",
+          complete: (response) => {
+            handleAJAXResponse(
+              response,
+              "#policycloud-marketplace-asset-approval button[data-response=" +
+                $(this).data("response") +
+                "]",
+              () => {
+                location.reload();
+              }
+            );
+          },
+        });
+      }
+    }
+
+    /**
      * Prepare and submit via AJAX the edited asset fields.
      *
      * @param {Event} e
@@ -153,40 +205,45 @@
     function deleteFile(e) {
       e.preventDefault();
 
-      // Add loading class.
-      $(this).addClass("loading");
+      if (window.confirm("Are you sure you want to delete?")) {
+        // Add loading class.
+        $(this).addClass("loading");
 
-      const type = $(this).closest(".file").data("file-type");
-      const fileIdentifier = $(this).closest(".file").data("file-identifier");
+        const type = $(this).closest(".file").data("file-type");
+        const fileIdentifier = $(this).closest(".file").data("file-identifier");
 
-      // Prepare form data.
-      var formData = new FormData();
-      formData.append("action", "policycloud_marketplace_asset_editing");
-      formData.append("nonce", ajax_properties_description_editing.nonce);
-      formData.append("asset_id", ajax_properties_description_editing.asset_id);
-      formData.append("subsequent_action", "file-deletion");
-      formData.append("file-type", type);
-      formData.append("file-identifier", fileIdentifier);
+        // Prepare form data.
+        var formData = new FormData();
+        formData.append("action", "policycloud_marketplace_asset_editing");
+        formData.append("nonce", ajax_properties_description_editing.nonce);
+        formData.append(
+          "asset_id",
+          ajax_properties_description_editing.asset_id
+        );
+        formData.append("subsequent_action", "file-deletion");
+        formData.append("file-type", type);
+        formData.append("file-identifier", fileIdentifier);
 
-      // Perform AJAX request.
-      $.ajax({
-        url: ajax_properties_description_editing.ajax_url,
-        type: "post",
-        processData: false,
-        contentType: false,
-        data: formData,
-        cache: false,
-        dataType: "json",
-        complete: (response) => {
-          handleAJAXResponse(
-            response,
-            "#policycloud-marketplace-asset-editing button[type=submit]",
-            (data) => {
-              $(this).closest(".file").remove();
-            }
-          );
-        },
-      });
+        // Perform AJAX request.
+        $.ajax({
+          url: ajax_properties_description_editing.ajax_url,
+          type: "post",
+          processData: false,
+          contentType: false,
+          data: formData,
+          cache: false,
+          dataType: "json",
+          complete: (response) => {
+            handleAJAXResponse(
+              response,
+              "#policycloud-marketplace-asset-editing button[type=submit]",
+              (data) => {
+                $(this).closest(".file").remove();
+              }
+            );
+          },
+        });
+      }
     }
 
     /**
@@ -212,5 +269,8 @@
     $("#policycloud-marketplace-asset-editing .file button.delete").click(
       deleteFile
     );
+
+    // Approve description (admin)
+    $("#policycloud-marketplace-asset-approval button").click(approvalRequest);
   });
 })(jQuery);

@@ -388,14 +388,8 @@ function assets_archive_html($assets, $filters, $args)
  */
 function asset_html($asset, $images, $args)
 {
-    // TODO @alexandrosraikos: Fix editing modal width (#26).
     // TODO @alexandrosraikos: Create file download sequence (#25).
-    // TODO @alexandrosraikos: Allow admin to edit and approve (#24, #25).
-    // TODO @alexandrosraikos: Rename 'Images' to 'Gallery' and move to bottom (#22).
     // TODO @alexandrosraikos: Add modal controls to gallery (#21).
-    // TODO @alexandrosraikos: Publicize and check comments (#20, #19).
-    // TODO @alexandrosraikos: Add meta links to article header (#18).
-    // TODO @alexandrosraikos: Create review views and editing.
 
     /**
      * Print the locked content notification.
@@ -411,7 +405,6 @@ function asset_html($asset, $images, $args)
     {
         echo '<div class="lock"><img src="' . get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/lock.svg') . '" /><p>Please <a href="' . $login_page . '">log in</a> to ' . $message . '.</p></div>';
     }
-
 
     /**
      * Print the file viewer table.
@@ -464,27 +457,34 @@ function asset_html($asset, $images, $args)
         }
     }
 
-    if (!empty($args['error'])) {
-        show_alert($args['error']);
-    }
-    if (empty($asset)) {
-        show_alert("This asset was not found.");
-    } else {
+    if (!empty($args['error'])) show_alert($args['error']);
+    if (!empty($asset)) {
         ?>
         <div class="policycloud-marketplace" id="policycloud-marketplace-asset">
+            <?php
+            if ($args['is_admin'] && $asset['metadata']['approved'] == "0") {
+            ?>
+                <div class="policycloud-marketplace-notice" id="policycloud-marketplace-asset-approval">
+                    <p>This asset is not yet accessible from other authorized Marketplace users.</p>
+                    <button class="action productive" data-response="approve">Approve</button>
+                    <button class="action destructive" data-response="disapprove">Delete</button>
+                </div>
+            <?php
+            }
+            ?>
             <header>
                 <div class="title">
                     <h1><?php echo $asset['info']['title'] ?>
                         <?php
-                        if ($args['is_owner']) {
+                        if ($args['is_owner'] || $args['is_admin']) {
                         ?>
-                            <span class="status label <?php echo ($asset['metadata']['approved'] == 1) ? 'success' : 'notice' ?>"><?php echo ($asset['metadata']['approved'] == 1) ? 'Approved' : 'Pending' ?></span>
+                            <span class="status label <?php echo ($asset['metadata']['approved'] == "1") ? 'success' : 'notice' ?>"><?php echo ($asset['metadata']['approved'] == "1") ? 'Approved' : 'Pending' ?></span>
                         <?php
                         }
                         ?>
                     </h1>
                     <?php
-                    if ($args['is_owner']) {
+                    if ($args['is_owner'] || $args['is_admin']) {
                         echo '<button class="outlined show-editor-modal"><span class="fas fa-pen"></span> Edit</button>';
                     }
                     ?>
@@ -494,10 +494,10 @@ function asset_html($asset, $images, $args)
                     <?php if (!empty($asset['info']['owner'])) { ?>
                         <span class="owner">&copy; <?php echo $asset['info']['owner'] ?></span>
                     <?php } ?>
-                    <span class="type pill"><a href=""><?php echo $asset['info']['type'] ?></a></span>
+                    <span class="type pill"><a href="<?php echo $args['archive_page']."?type=".$asset['info']['type'] ?>"><?php echo $asset['info']['type'] ?></a></span>
                     <?php if (!empty($asset['info']['subtype'])) {
                         if ($asset['info']['subtype'] != '-') { ?>
-                            <span class="sub-type pill"><a href=""><?php echo $asset['info']['subtype'] ?></a></span>
+                            <span class="sub-type pill"><a href="<?php echo $args['archive_page']."?subtype=".$asset['info']['subtype'] ?>"><?php echo $asset['info']['subtype'] ?></a></span>
                         <?php }
                     }
                     if (!empty($asset['info']['fieldOfUse'])) { ?>
@@ -522,18 +522,18 @@ function asset_html($asset, $images, $args)
                     <?php
                     if ($args['is_authenticated']) {
                         file_viewer('Files', 'files', $asset['assets']['files'], (empty($asset['assets']['files'])));
-                        file_viewer('Images', 'images', $asset['assets']['images'], (empty($asset['assets']['images'])));
-                        file_viewer('Videos', 'videos', $asset['assets']['videos'], (empty($asset['assets']['videos'])));
+                        file_viewer('Video', 'video', $asset['assets']['videos'], (empty($asset['assets']['videos'])));
+                        file_viewer('Images (Gallery)', 'images', $asset['assets']['images'], (empty($asset['assets']['images'])));
                     } else show_lock($args['login_page'], 'view and download files');
-                    if ($args['is_owner']) {
+                    if ($args['is_authenticated']) {
                     ?>
                         <div class="comments">
-                            <h2>Private comments</h2>
+                            <h2>Additional information</h2>
                             <?php
                             if (!empty($asset['info']['comments'])) {
                                 echo '<p>' . $asset['info']['comments'] . '</p>';
                             } else {
-                                show_alert("No private comments.", 'notice');
+                                show_alert("No additional information.", 'notice');
                             }
                             ?>
                         </div>
@@ -569,7 +569,7 @@ function asset_html($asset, $images, $args)
                 </div>
             </div>
             <?php
-            if ($args['is_owner']) {
+            if ($args['is_owner'] || $args['is_admin']) {
             ?>
                 <div class="modal editing-form hidden">
                     <button class="close tactile"><span class="fas fa-times"></span></button>
@@ -601,9 +601,9 @@ function asset_html($asset, $images, $args)
                             <textarea name="fields-of-use" placeholder="Separate multiple fields of usage using a comma (lorem, ipsum, etc.)"><?php echo empty($asset['info']['fieldOfUse']) ? '' : implode(', ', $asset['info']['fieldOfUse']) ?></textarea>
                         </fieldset>
                         <fieldset name="internal-information">
-                            <h2>Internal information</h2>
-                            <p>You can include internal private comments for management purposes. This field is optional.</p>
-                            <label for="comments">Comments (Private)</label>
+                            <h2>Additional information</h2>
+                            <p>You can include additional comments for authorized visitors. This field is optional.</p>
+                            <label for="comments">Comments</label>
                             <textarea name="comments" placeholder="Insert any additional comments"><?php echo empty($asset['info']['comments']) ? '' : $asset['info']['comments'] ?></textarea>
                         </fieldset>
                         <fieldset name="uploads">
@@ -722,10 +722,10 @@ function asset_creation_html(string $error = null)
                     <textarea name="description" placeholder="Insert a detailed description" style="resize:vertical"></textarea>
                 </fieldset>
                 <fieldset name="internal-information">
-                    <h2>Internal information</h2>
-                    <p>You can include internal private comments for management purposes. This field is optional.</p>
-                    <label for="private-comments">Comments</label>
-                    <textarea name="private-comments" placeholder="Insert any additional private comments"></textarea>
+                    <h2>Additional information</h2>
+                    <p>You can include additional comments for authorized visitors. This field is optional.</p>
+                    <label for="comments">Comments</label>
+                    <textarea name="comments" placeholder="Insert any additional comments"></textarea>
                 </fieldset>
                 <div class="error"></div>
                 <button type="submit" class="action ">Create</button>

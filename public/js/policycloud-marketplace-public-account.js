@@ -719,7 +719,7 @@
               "#policycloud-marketplace-delete-account button[type=submit]",
               () => {
                 removeAuthorization();
-                window.reload();
+                location.reload();
               }
             );
           },

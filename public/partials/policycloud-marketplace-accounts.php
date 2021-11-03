@@ -62,7 +62,7 @@ function policyCloudMarketplaceAPIRequest($http_method, $uri, $data = [], $token
             $decoded = json_decode($response, true);
             if (json_last_error() === JSON_ERROR_NONE) {
                 $curl_http = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-                if ($decoded['_status'] == 'successful' && ($curl_http == 200 || $curl_http == 201)) {
+                if ($decoded['_status'] == 'successful' && ($curl_http == 200 || $curl_http == 201 || $curl_http == 406 )) {
                     curl_close($curl);
                     return $decoded;
                 } else {
