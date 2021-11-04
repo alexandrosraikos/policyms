@@ -438,7 +438,7 @@ function asset_html($asset, $images, $args)
                         foreach ($files as $file) {
                     ?>
                             <tr>
-                                <td><a href=""><?php echo $file['filename'] ?></a></td>
+                                <td><a class="download" data-file-id="<?php echo $file['id'] ?>" data-type="<?php echo $id ?>"><?php echo $file['filename'] ?></a></td>
                                 <td><?php echo $file['version'] ?></td>
                                 <td><?php echo $file['size'] ?></td>
                                 <td><?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($file['updateDate']))) ?></td>

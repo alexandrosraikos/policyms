@@ -272,6 +272,18 @@ function get_asset_image($id, $token)
     return $response;
 }
 
+function get_asset_file_url($type, $id, $token) {
+    $response = policyCloudMarketplaceAPIRequest(
+        'GET',
+        '/assets/'.$type.'/'.$id,
+        [],
+        $token
+    );
+
+    // TODO @alexandrosraikos: Wait for @vkoukos implementation.
+    return $response['result'];
+} 
+
 /**
  * Delete an asset's.
  * 

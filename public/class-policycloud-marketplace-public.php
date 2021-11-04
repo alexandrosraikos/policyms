@@ -811,6 +811,13 @@ class PolicyCloud_Marketplace_Public
 						}
 						else throw new RuntimeException('No file type was defined.');
 					}
+					if ($_POST['subsequent_action'] == "file-download") {
+						if (!empty($_POST['file-type'])) {
+							$download_url = get_asset_file_url($_POST['file-type'], $_POST['file-identifier'], $token);
+							http_response_code(200);
+							die(json_encode($download_url));
+						}
+					}
 				}
 			} else {
 				http_response_code(404);

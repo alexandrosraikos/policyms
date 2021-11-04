@@ -246,6 +246,54 @@
       }
     }
 
+    function downloadFile(e) {
+      e.preventDefault();
+
+      // Add loading class.
+      $(this).addClass("loading");
+
+      const type = $(this).data("type");
+      const fileIdentifier = $(this).data("file-id");
+
+      // Prepare form data.
+      var formData = new FormData();
+      formData.append("action", "policycloud_marketplace_asset_editing");
+      formData.append("nonce", ajax_properties_description_editing.nonce);
+      formData.append("asset_id", ajax_properties_description_editing.asset_id);
+      formData.append("subsequent_action", "file-download");
+      formData.append("file-type", type);
+      formData.append("file-identifier", fileIdentifier);
+
+      // Perform AJAX request.
+      $.ajax({
+        url: ajax_properties_description_editing.ajax_url,
+        type: "post",
+        processData: false,
+        contentType: false,
+        data: formData,
+        cache: false,
+        dataType: "json",
+        complete: (response) => {
+          handleAJAXResponse(
+            response,
+            "#policycloud-marketplace-asset-editing button[type=submit]",
+            (data) => {
+              $("section.policycloud-marketplace-account-profile").append(
+                `<a id="policycloud-marketplace-file-` +
+                  id +
+                  `-download" style="display:none" href="` +
+                  data +
+                  `" download />`
+              );
+              $("#policycloud-marketplace-file-" + id + "-download")
+                .get(0)
+                .click();
+            }
+          );
+        },
+      });
+    }
+
     /**
      *
      * Asset editing interface actions & event listeners.
@@ -272,5 +320,10 @@
 
     // Approve description (admin)
     $("#policycloud-marketplace-asset-approval button").click(approvalRequest);
+
+    // Download file.
+    $("#policycloud-marketplace-asset .file-viewer .download").click(
+      downloadFile
+    );
   });
 })(jQuery);
