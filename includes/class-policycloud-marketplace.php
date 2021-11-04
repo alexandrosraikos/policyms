@@ -204,6 +204,8 @@ class PolicyCloud_Marketplace
 		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_asset_creation', $plugin_public, 'asset_creation_handler');
 		$this->loader->add_action('wp_ajax_policycloud_marketplace_asset_editing', $plugin_public, 'asset_editing_handler');
 		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_asset_editing', $plugin_public, 'asset_editing_handler');
+		$this->loader->add_action('wp_ajax_policycloud_marketplace_asset_approval', $plugin_public, 'asset_approval_handler');
+		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_asset_approval', $plugin_public, 'asset_approval_handler');
 	}
 
 	/**
