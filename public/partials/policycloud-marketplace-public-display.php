@@ -17,6 +17,101 @@
 
 
 /**
+ * 
+ * Prints an auto-disappearing error or notice box.
+ * The close button is handled @see policycloud-marketplace-public.js
+ * 
+ * @param string $message The message to be shown.
+ * @param bool $dismissable Whether the alert is dismissable or not.
+ * @param string $type The type of message, a 'notice' or an 'error'.
+ * 
+ * @since 1.0.0
+ */
+function show_alert(string $message, string $type = 'error')
+{
+    echo  '<div class="policycloud-marketplace-' . $type . ' "><span>' . $message . '</span></div>';
+}
+
+/**
+ * 
+ * Prints a hidden modal with controls and a close button.
+ * The visibility is handled @see policycloud-marketplace-public.js.
+ * 
+ * @param callable $inner_html The modal content (return null if managed by jQuery).
+ * @param bool $controls Whether the modal has next/previous controls.
+ * 
+ * @since 1.0.0
+ */
+function show_modal($inner_html, $controls = false)
+{
+?>
+    <div id="policycloud-marketplace-modal" class="hidden">
+        <button class="close tactile"><span class="fas fa-times"></span></button>
+        <div class="container">
+            <?php
+            if ($controls) {
+            ?>
+                <button class="previous tactile" disabled><span class="fas fa-chevron-left"></span></button>
+            <?php
+            }
+            ?>
+            <div class="content">
+                <?php $inner_html() ?>
+            </div>
+            <?php
+            if ($controls) {
+            ?>
+                <button class="next tactile"><span class="fas fa-chevron-right"></span></button>
+            <?php
+            }
+            ?>
+        </div>
+    </div>
+    <?php
+}
+
+
+/**
+ * 
+ * Formats a datetime string to show time passed since.
+ * 
+ * @param string $datetime The string depicting the date time information.
+ * @param bool $full Display the full elapsed time since the specified date.
+ * 
+ * @since 1.0.0 
+ */
+function time_elapsed_string($datetime, $full = false)
+{
+    $now = new DateTime;
+    $ago = new DateTime($datetime);
+    $diff = $now->diff($ago);
+
+    $diff->w = floor($diff->d / 7);
+    $diff->d -= $diff->w * 7;
+
+    $string = array(
+        'y' => 'year',
+        'm' => 'month',
+        'w' => 'week',
+        'd' => 'day',
+        'h' => 'hour',
+        'i' => 'minute',
+        's' => 'second',
+    );
+    foreach ($string as $k => &$v) {
+        if ($diff->$k) {
+            $v = $diff->$k . ' ' . $v . ($diff->$k > 1 ? 's' : '');
+        } else {
+            unset($string[$k]);
+        }
+    }
+
+    if (!$full) $string = array_slice($string, 0, 1);
+    return $string ? implode(', ', $string) . ' ago' : 'just now';
+}
+
+
+/**
  * Print the account registration form.
  * 
  * @param   string $authorization_url The url that redirects to the log in page.
@@ -32,7 +127,7 @@ function account_registration_html($authorization_url, $logged_in, $tos_url, $er
     if ($logged_in) {
         show_alert("You're already logged in.", 'notice');
     } else {
-?>
+    ?>
         <div class="policycloud-marketplace">
             <form id="policycloud-registration" action="">
                 <fieldset name="account-credentials">
@@ -388,9 +483,6 @@ function assets_archive_html($assets, $filters, $args)
  */
 function asset_html($asset, $images, $args)
 {
-    // TODO @alexandrosraikos: Create file download sequence (#25).
-    // TODO @alexandrosraikos: Add modal controls to gallery (#21).
-
     /**
      * Print the locked content notification.
      * 
@@ -457,12 +549,114 @@ function asset_html($asset, $images, $args)
         }
     }
 
-    if (!empty($args['error'])) show_alert($args['error']);
-    if (!empty($asset)) {
+    function asset_editing_form_html($asset)
+    {
         ?>
+        <div id="policycloud-marketplace-asset-editing" class="policycloud-marketplace modal-content">
+            <form action="">
+                <fieldset name="basic-information">
+                    <h2>Basic information</h2>
+                    <p>To create a new Marketplace asset, the following fields represent basic information that will be visible to others.</p>
+                    <label for="title">Title *</label>
+                    <input required name="title" placeholder="Insert a title" type="text" value="<?php echo $asset['info']['title'] ?>" />
+                    <label for="type">Primary collection type *</label>
+                    <select name="type" required>
+                        <option value="algorithms" <?php echo ($asset['info']['type'] == "algorithms") ? 'selected' : '' ?>>Algorithms</option>
+                        <option value="tools" <?php echo ($asset['info']['type'] == "tools") ? 'selected' : '' ?>>Tools</option>
+                        <option value="policies" <?php echo ($asset['info']['type'] == "policies") ? 'selected' : '' ?>>Policies</option>
+                        <option value="datasets" <?php echo ($asset['info']['type'] == "datasets") ? 'selected' : '' ?>>Datasets</option>
+                        <option value="webinars" <?php echo ($asset['info']['type'] == "webinars") ? 'selected' : '' ?>>Webinars</option>
+                        <option value="tutorials" <?php echo ($asset['info']['type'] == "tutorials") ? 'selected' : '' ?>>Tutorials</option>
+                        <option value="documents" <?php echo ($asset['info']['type'] == "documents") ? 'selected' : '' ?>>Documents</option>
+                        <option value="externals" <?php echo ($asset['info']['type'] == "externals") ? 'selected' : '' ?>>Externals</option>
+                        <option value="other" <?php echo ($asset['info']['type'] == "other") ? 'selected' : '' ?>>Other</option>
+                    </select>
+                    <label for="subtype">Secondary collection type</label>
+                    <input name="subtype" placeholder="Insert a secondary category" type="text" value="<?php echo empty($asset['info']['subtype']) ? '' : $asset['info']['subtype'] ?>" />
+                    <label for="owner">Legal owner *</label>
+                    <input required name="owner" placeholder="Insert the legal owner of the object" type="text" value="<?php echo empty($asset['info']['owner']) ? '' : $asset['info']['owner'] ?>" />
+                    <label for="description">Description *</label>
+                    <textarea name="description" placeholder="Insert a detailed description" style="resize:vertical"><?php echo empty($asset['info']['description']) ? '' : $asset['info']['description'] ?></textarea>
+                    <label for="fields-of-use">Fields of usage</label>
+                    <textarea name="fields-of-use" placeholder="Separate multiple fields of usage using a comma (lorem, ipsum, etc.)"><?php echo empty($asset['info']['fieldOfUse']) ? '' : implode(', ', $asset['info']['fieldOfUse']) ?></textarea>
+                </fieldset>
+                <fieldset name="internal-information">
+                    <h2>Additional information</h2>
+                    <p>You can include additional comments for authorized visitors. This field is optional.</p>
+                    <label for="comments">Comments</label>
+                    <textarea name="comments" placeholder="Insert any additional comments"><?php echo empty($asset['info']['comments']) ? '' : $asset['info']['comments'] ?></textarea>
+                </fieldset>
+                <fieldset name="uploads">
+                    <h2>Uploads</h2>
+                    <p>Manage your content and upload new files, images and videos.</p>
+                    <h3>Files</h3>
+                    <?php
+                    if (!empty($asset['assets']['files'])) {
+                        foreach ($asset['assets']['files'] as $file) {
+                    ?>
+                            <div class="file" data-file-type="files" data-file-identifier="<?php echo $file['id'] ?>">
+                                <div>
+                                    <button class="delete"><span class="fas fa-times"></span></button>
+                                    <?php echo $file['filename'] . ' (' . $file['size'] . ')' ?>
+                                </div>
+                                <label for="file-<?php echo $file['id'] ?>">Replace file (supported file types: jpg, png):</label>
+                                <input type="file" name="file-<?php echo $file['id'] ?>" multiple />
+                            </div>
+                    <?php
+                        }
+                    }
+                    ?>
+                    <label for="file-<?php $file['id'] ?>">Upload new file (supported file types: jpg, png):</label>
+                    <input type="file" name="files[]" multiple />
+                    <h3>Images</h3>
+                    <?php
+                    if (!empty($asset['assets']['images'])) {
+                        foreach ($asset['assets']['images'] as $file) {
+                    ?>
+                            <div class="file" data-file-type="images" data-file-identifier="<?php echo $file['id'] ?>">
+                                <div>
+                                    <button class="delete"><span class="fas fa-times"></span></button>
+                                    <?php echo $file['filename'] . ' (' . $file['size'] . ')' ?>
+                                </div>
+                                <label for="image-<?php echo $file['id'] ?>">Replace image</label>
+                                <input type="file" name="image-<?php echo $file['id'] ?>" accept="image/png, image/jpeg" />
+                            </div>
+                    <?php
+                        }
+                    }
+                    ?>
+                    <input type="file" name="images[]" accept="image/png, image/jpeg" multiple />
+                    <h3>Videos</h3>
+                    <?php
+                    if (!empty($asset['assets']['videos'])) {
+                        foreach ($asset['assets']['videos'] as $file) {
+                    ?>
+                            <div class="file" data-file-type="videos" data-file-identifier="<?php echo $file['id'] ?>">
+                                <div>
+                                    <button class="delete"><span class="fas fa-times"></span></button>
+                                    <?php echo $file['filename'] . ' (' . $file['size'] . ')' ?>
+                                </div>
+                                <label for="video-<?php echo $file['id'] ?>">Replace video</label>
+                                <input type="file" name="video-<?php echo $file['id'] ?>" accept="image/png, image/jpeg" multiple />
+                            </div>
+                    <?php
+                        }
+                    }
+                    ?>
+                    <input type="file" name="videos[]" accept="image/png, image/jpeg" multiple />
+                </fieldset>
+                <div class="error"></div>
+                <button type="submit" class="action">Submit</button>
+            </form>
+        </div><?php
+            }
+
+            if (!empty($args['error'])) show_alert($args['error']);
+            if (!empty($asset)) {
+                ?>
         <div class="policycloud-marketplace" id="policycloud-marketplace-asset">
             <?php
-            if ($args['is_admin'] && $asset['metadata']['approved'] == "0") {
+                if ($args['is_admin'] && $asset['metadata']['approved'] == "0") {
             ?>
                 <div class="policycloud-marketplace-notice" id="policycloud-marketplace-asset-approval">
                     <p>This asset is not yet accessible from other authorized Marketplace users.</p>
@@ -470,7 +664,7 @@ function asset_html($asset, $images, $args)
                     <button class="action destructive" data-response="disapprove">Delete</button>
                 </div>
             <?php
-            }
+                }
             ?>
             <header>
                 <div class="title">
@@ -494,10 +688,10 @@ function asset_html($asset, $images, $args)
                     <?php if (!empty($asset['info']['owner'])) { ?>
                         <span class="owner">&copy; <?php echo $asset['info']['owner'] ?></span>
                     <?php } ?>
-                    <span class="type pill"><a href="<?php echo $args['archive_page']."?type=".$asset['info']['type'] ?>"><?php echo $asset['info']['type'] ?></a></span>
+                    <span class="type pill"><a href="<?php echo $args['archive_page'] . "?type=" . $asset['info']['type'] ?>"><?php echo $asset['info']['type'] ?></a></span>
                     <?php if (!empty($asset['info']['subtype'])) {
                         if ($asset['info']['subtype'] != '-') { ?>
-                            <span class="sub-type pill"><a href="<?php echo $args['archive_page']."?subtype=".$asset['info']['subtype'] ?>"><?php echo $asset['info']['subtype'] ?></a></span>
+                            <span class="sub-type pill"><a href="<?php echo $args['archive_page'] . "?subtype=" . $asset['info']['subtype'] ?>"><?php echo $asset['info']['subtype'] ?></a></span>
                         <?php }
                     }
                     if (!empty($asset['info']['fieldOfUse'])) { ?>
@@ -556,8 +750,8 @@ function asset_html($asset, $images, $args)
                         <div class="slider">
                             <?php if ($args['is_authenticated']) {
                                 if (!empty($images)) {
-                                    foreach ($images as $image) {
-                                        echo '<img src="data:image/*;base64,' . base64_encode($image) . '" draggable="false" />';
+                                    foreach ($images as $key => $image) {
+                                        echo '<img src="data:image/*;base64,' . base64_encode($image) . '" data-image-id="' . $asset['assets']['images'][$key]['id'] . '" draggable="false" />';
                                     }
                                 } else {
                                     show_alert('No images or videos were found.', 'notice');
@@ -567,522 +761,316 @@ function asset_html($asset, $images, $args)
                         </div>
                     </div>
                 </div>
-            </div>
-            <?php
-            if ($args['is_owner'] || $args['is_admin']) {
-            ?>
-                <div class="modal editing-form hidden">
-                    <button class="close tactile"><span class="fas fa-times"></span></button>
-                    <form id="policycloud-marketplace-asset-editing" action="">
-                        <fieldset name="basic-information">
-                            <h2>Basic information</h2>
-                            <p>To create a new Marketplace asset, the following fields represent basic information that will be visible to others.</p>
-                            <label for="title">Title *</label>
-                            <input required name="title" placeholder="Insert a title" type="text" value="<?php echo $asset['info']['title'] ?>" />
-                            <label for="type">Primary collection type *</label>
-                            <select name="type" required>
-                                <option value="algorithms" <?php echo ($asset['info']['type'] == "algorithms") ? 'selected' : '' ?>>Algorithms</option>
-                                <option value="tools" <?php echo ($asset['info']['type'] == "tools") ? 'selected' : '' ?>>Tools</option>
-                                <option value="policies" <?php echo ($asset['info']['type'] == "policies") ? 'selected' : '' ?>>Policies</option>
-                                <option value="datasets" <?php echo ($asset['info']['type'] == "datasets") ? 'selected' : '' ?>>Datasets</option>
-                                <option value="webinars" <?php echo ($asset['info']['type'] == "webinars") ? 'selected' : '' ?>>Webinars</option>
-                                <option value="tutorials" <?php echo ($asset['info']['type'] == "tutorials") ? 'selected' : '' ?>>Tutorials</option>
-                                <option value="documents" <?php echo ($asset['info']['type'] == "documents") ? 'selected' : '' ?>>Documents</option>
-                                <option value="externals" <?php echo ($asset['info']['type'] == "externals") ? 'selected' : '' ?>>Externals</option>
-                                <option value="other" <?php echo ($asset['info']['type'] == "other") ? 'selected' : '' ?>>Other</option>
-                            </select>
-                            <label for="subtype">Secondary collection type</label>
-                            <input name="subtype" placeholder="Insert a secondary category" type="text" value="<?php echo empty($asset['info']['subtype']) ? '' : $asset['info']['subtype'] ?>" />
-                            <label for="owner">Legal owner *</label>
-                            <input required name="owner" placeholder="Insert the legal owner of the object" type="text" value="<?php echo empty($asset['info']['owner']) ? '' : $asset['info']['owner'] ?>" />
-                            <label for="description">Description *</label>
-                            <textarea name="description" placeholder="Insert a detailed description" style="resize:vertical"><?php echo empty($asset['info']['description']) ? '' : $asset['info']['description'] ?></textarea>
-                            <label for="fields-of-use">Fields of usage</label>
-                            <textarea name="fields-of-use" placeholder="Separate multiple fields of usage using a comma (lorem, ipsum, etc.)"><?php echo empty($asset['info']['fieldOfUse']) ? '' : implode(', ', $asset['info']['fieldOfUse']) ?></textarea>
-                        </fieldset>
-                        <fieldset name="internal-information">
-                            <h2>Additional information</h2>
-                            <p>You can include additional comments for authorized visitors. This field is optional.</p>
-                            <label for="comments">Comments</label>
-                            <textarea name="comments" placeholder="Insert any additional comments"><?php echo empty($asset['info']['comments']) ? '' : $asset['info']['comments'] ?></textarea>
-                        </fieldset>
-                        <fieldset name="uploads">
-                            <h2>Uploads</h2>
-                            <p>Manage your content and upload new files, images and videos.</p>
-                            <h3>Files</h3>
-                            <?php
-                            if (!empty($asset['assets']['files'])) {
-                                foreach ($asset['assets']['files'] as $file) {
-                            ?>
-                                    <div class="file" data-file-type="files" data-file-identifier="<?php echo $file['id'] ?>">
-                                        <div>
-                                            <button class="delete"><span class="fas fa-times"></span></button>
-                                            <?php echo $file['filename'] . ' (' . $file['size'] . ')' ?>
-                                        </div>
-                                        <label for="file-<?php echo $file['id'] ?>">Replace file (supported file types: jpg, png):</label>
-                                        <input type="file" name="file-<?php echo $file['id'] ?>" multiple />
-                                    </div>
-                            <?php
-                                }
-                            }
-                            ?>
-                            <label for="file-<?php $file['id'] ?>">Upload new file (supported file types: jpg, png):</label>
-                            <input type="file" name="files[]" multiple />
-                            <h3>Images</h3>
-                            <?php
-                            if (!empty($asset['assets']['images'])) {
-                                foreach ($asset['assets']['images'] as $file) {
-                            ?>
-                                    <div class="file" data-file-type="images" data-file-identifier="<?php echo $file['id'] ?>">
-                                        <div>
-                                            <button class="delete"><span class="fas fa-times"></span></button>
-                                            <?php echo $file['filename'] . ' (' . $file['size'] . ')' ?>
-                                        </div>
-                                        <label for="image-<?php echo $file['id'] ?>">Replace image</label>
-                                        <input type="file" name="image-<?php echo $file['id'] ?>" accept="image/png, image/jpeg" />
-                                    </div>
-                            <?php
-                                }
-                            }
-                            ?>
-                            <input type="file" name="images[]" accept="image/png, image/jpeg" multiple />
-                            <h3>Videos</h3>
-                            <?php
-                            if (!empty($asset['assets']['videos'])) {
-                                foreach ($asset['assets']['videos'] as $file) {
-                            ?>
-                                    <div class="file" data-file-type="videos" data-file-identifier="<?php echo $file['id'] ?>">
-                                        <div>
-                                            <button class="delete"><span class="fas fa-times"></span></button>
-                                            <?php echo $file['filename'] . ' (' . $file['size'] . ')' ?>
-                                        </div>
-                                        <label for="video-<?php echo $file['id'] ?>">Replace video</label>
-                                        <input type="file" name="video-<?php echo $file['id'] ?>" accept="image/png, image/jpeg" multiple />
-                                    </div>
-                            <?php
-                                }
-                            }
-                            ?>
-                            <input type="file" name="videos[]" accept="image/png, image/jpeg" multiple />
-                        </fieldset>
-                        <div class="error"></div>
-                        <button type="submit" class="action">Submit</button>
-                    </form>
-                </div>
-            <?php
-            }
-            ?>
-        </div>
-    <?php
-    }
-}
-
-
-/**
- * Print the asset HTML.
- * 
- * @param   array $asset The PolicyCloud Marketplace API asset.
- * @param   array $args Various printing arguments.
- *
- * @since   1.0.0
- * @author  Alexandros Raikos <araikos@unipi.gr>
- */
-function asset_creation_html(string $error = null)
-{
-    if (!empty($error)) {
-        show_alert($error);
-    } else {
-    ?>
-        <div class="policycloud-marketplace">
-            <form id="policycloud-marketplace-asset-creation" action="">
-                <fieldset name="basic-information">
-                    <h2>Basic information</h2>
-                    <p>To create a new Marketplace asset, the following fields represent basic information that will be visible to others.</p>
-                    <label for="title">Title *</label>
-                    <input required name="title" placeholder="Insert a title" type="text" />
-                    <label for="type">Primary collection type *</label>
-                    <select name="type" required>
-                        <option value="algorithms" selected>Algorithms</option>
-                        <option value="tools">Tools</option>
-                        <option value="policies">Policies</option>
-                        <option value="datasets">Datasets</option>
-                        <option value="webinars">Webinars</option>
-                        <option value="tutorials">Tutorials</option>
-                        <option value="documents">Documents</option>
-                        <option value="externals">Externals</option>
-                        <option value="other">Other</option>
-                    </select>
-                    <label for="subtype">Secondary collection type</label>
-                    <input type="text" placeholder="Insert a secondary collection type" name="subtype" />
-                    <label for="fields-of-use">Fields of usage</label>
-                    <textarea name="fields-of-use" placeholder="Separate multiple fields of usage using a comma (lorem, ipsum, etc.)"></textarea>
-                    <label for="owner">Legal owner *</label>
-                    <input required name="owner" placeholder="Insert the legal owner of the object" type="text" />
-                    <label for="description">Description *</label>
-                    <textarea name="description" placeholder="Insert a detailed description" style="resize:vertical"></textarea>
-                </fieldset>
-                <fieldset name="internal-information">
-                    <h2>Additional information</h2>
-                    <p>You can include additional comments for authorized visitors. This field is optional.</p>
-                    <label for="comments">Comments</label>
-                    <textarea name="comments" placeholder="Insert any additional comments"></textarea>
-                </fieldset>
-                <div class="error"></div>
-                <button type="submit" class="action ">Create</button>
-            </form>
-        </div>
-    <?php
-    }
-}
-
-/**
- * 
- * Prints an error or notice box with a close button.
- * The close button is handled @see policycloud-marketplace-public.js
- * 
- * @param string $message The message to be shown.
- * @param bool $dismissable Whether the alert is dismissable or not.
- * @param string $type The type of message, a 'notice' or an 'error'.
- * 
- * @since 1.0.0
- */
-function show_alert(string $message, string $type = 'error')
-{
-    echo  '<div class="policycloud-marketplace-' . $type . ' "><span>' . $message . '</span></div>';
-}
-
-
-/**
- * 
- * Formats a datetime string to show time passed since.
- * 
- * @param string $datetime The string depicting the date time information.
- * @param bool $full Display the full elapsed time since the specified date.
- * 
- * @since 1.0.0 
- */
-function time_elapsed_string($datetime, $full = false)
-{
-    $now = new DateTime;
-    $ago = new DateTime($datetime);
-    $diff = $now->diff($ago);
-
-    $diff->w = floor($diff->d / 7);
-    $diff->d -= $diff->w * 7;
-
-    $string = array(
-        'y' => 'year',
-        'm' => 'month',
-        'w' => 'week',
-        'd' => 'day',
-        'h' => 'hour',
-        'i' => 'minute',
-        's' => 'second',
-    );
-    foreach ($string as $k => &$v) {
-        if ($diff->$k) {
-            $v = $diff->$k . ' ' . $v . ($diff->$k > 1 ? 's' : '');
-        } else {
-            unset($string[$k]);
-        }
-    }
-
-    if (!$full) $string = array_slice($string, 0, 1);
-    return $string ? implode(', ', $string) . ' ago' : 'just now';
-}
-
-
-/**
- * Display the account page HTML for authenticated users.
- *
- * @param   array $information The user information array.
- * @param   array $item The assets connected to this account.
- * @param   array $statistics The statistics connected to this account.
- * @param   array $reviews The asset reviews connected to this account.
- * @param   array $args An array of arguments.
- * 
- * @uses    show_alert()
- * @uses    time_elapsed_string()
- * 
- * @usedby  PolicyCloud_Marketplace_Public::account_shortcode()
- * 
- * @since   1.0.0
- * @author  Alexandros Raikos <araikos@unipi.gr>
- */
-function account_html(array $information, $picture, array $statistics, array $assets, array $reviews, array $approvals = [], array $args = [])
-{
-    /**
-     * Display a list of assets with filtering, sorting and custom pagination. 
-     * 
-     * @param string $id The identifier for the viewer.
-     * @param array $content The asset structure to be displayed.
-     * @param callable $inner_html The callback that prints the list item HTML.
-     * @param array $args The arguments of the parent function
-     * 
-     * @since   1.0.0
-     * @author  Alexandros Raikos <araikos@unipi.gr>
-     * 
-     */
-    function asset_viewer_html(string $id, array $content, array $args, callable $inner_html)
-    {
-    ?>
-        <header>
-            <h3><?php echo ucfirst($id) ?></h3>
-            <div class="actions">
-                <form action="" class="selector">
-                    <label for="sort-by">Sort by</label>
-                    <select name="sort-by" data-category="<?php echo $id ?>">
-                        <option value="newest" <?php echo ((($_GET['sort_by'] ?? '' == 'newest') || empty($_GET['sort_by'])) ? "selected" : "") ?>>Newest</option>
-                        <option value="oldest" <?php echo (($_GET['sort_by'] ?? '' == 'oldest') ? "selected" : "") ?>>Oldest</option>
-                        <option value="rating-asc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-asc') ? "selected" : "") ?>>Highest rated</option>
-                        <option value="rating-desc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-desc') ? "selected" : "") ?>>Lowest rated</option>
-                        <?php
-                        if ($id == 'assets') {
-                        ?>
-                            <option value="views-asc" <?php echo (($_GET['sort_by'] ?? '' == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
-                            <option value="views-desc" <?php echo (($_GET['sort_by'] ?? '' == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
-                        <?php } ?>
-                        <option value="title" <?php echo (($_GET['sort_by'] ?? '' == 'title') ? "selected" : "") ?>>Title</option>
-                    </select>
-                    <label for="items-per-page">Items per page</label>
-                    <select name="items-per-page" data-category="<?php echo $id ?>">
-                        <option value="5" <?php echo ((($_GET['items_per_page'] ?? '' == '5') || empty($_GET['items_per_page'])) ? "selected" : "") ?>>5</option>
-                        <option value="10" <?php echo (($_GET['items_per_page'] ?? '' == '10') ? "selected" : "") ?>>10</option>
-                        <option value="25" <?php echo (($_GET['items_per_page'] ?? '' == '25') ? "selected" : "") ?>>25</option>
-                        <option value="50" <?php echo (($_GET['items_per_page'] ?? '' == '50') ? "selected" : "") ?>>50</option>
-                        <option value="100" <?php echo (($_GET['items_per_page'] ?? '' == '100') ? "selected" : "") ?>>100</option>
-                    </select>
-                </form>
                 <?php
-                if (!$args['visiting'] && $id == 'assets') {
-                ?>
-                    <a id="policycloud-upload" href="<?php echo $args['upload_page'] ?>" title="Create new"><span class="fas fa-plus"></span> Create new</a>
-                <?php } ?>
-            </div>
-        </header>
-        <div class="collection-filters" data-category="<?php echo $id ?>">
-            <div>Filter by type:</div>
-        </div>
-        <div class="paginated-list" data-category="<?php echo $id ?>">
-            <?php
-            if (!empty($content['results'])) {
-                foreach ($content['results'] as $page => $page_items) {
-                    echo '<ul data-page="' . ($page + 1) . '" class="page ' . $id . ' ' . ($page == 0 ? 'visible' : '') . '">';
-                    if (!empty($content)) foreach ($page_items as $item) $inner_html($item);
-                    else show_alert("You don't have any " . $id . " yet.");
-                    echo '</ul>';
+                if ($args['is_owner'] || $args['is_admin']) {
+                    asset_editing_form_html($asset);
                 }
+                ?>
+            </div>
+        <?php
+            }
+        }
+
+
+        /**
+         * Print the asset HTML.
+         * 
+         * @param   array $asset The PolicyCloud Marketplace API asset.
+         * @param   array $args Various printing arguments.
+         *
+         * @since   1.0.0
+         * @author  Alexandros Raikos <araikos@unipi.gr>
+         */
+        function asset_creation_html(string $error = null)
+        {
+            if (!empty($error)) {
+                show_alert($error);
             } else {
-                show_alert('This user does not have any ' . $id . '.', 'notice');
-            } ?>
-            <nav class="pagination">
-                <?php
-                if (count($content['results'] ?? []) > 1) {
-                    foreach ($content['results'] as $page => $page_items) {
-                        echo '<button data-category="' . $id . '" class="page-selector ' . (($page == ($_GET['page'] ?? 0)) ? 'active' : '') . '" data-' . $id . '-page="' . $page + 1 . '">' . ($page + 1) . '</button>';
-                    }
-                } ?>
-            </nav>
-        </div>
-    <?php
-    }
-
-    // Check for any errors regarding authorization.
-    if (!empty($args['notice'])) {
-        show_alert($args['notice'], 'notice');
-    }
-
-    if (!empty($args['error'])) show_alert($args['error']);
-
-    if (!empty($information)) {
-        // Check for any notices.
-        if (!empty($args['notice'])) {
-            show_alert($args['notice'], 'notice');
+        ?>
+            <div class="policycloud-marketplace">
+                <form id="policycloud-marketplace-asset-creation" action="">
+                    <fieldset name="basic-information">
+                        <h2>Basic information</h2>
+                        <p>To create a new Marketplace asset, the following fields represent basic information that will be visible to others.</p>
+                        <label for="title">Title *</label>
+                        <input required name="title" placeholder="Insert a title" type="text" />
+                        <label for="type">Primary collection type *</label>
+                        <select name="type" required>
+                            <option value="algorithms" selected>Algorithms</option>
+                            <option value="tools">Tools</option>
+                            <option value="policies">Policies</option>
+                            <option value="datasets">Datasets</option>
+                            <option value="webinars">Webinars</option>
+                            <option value="tutorials">Tutorials</option>
+                            <option value="documents">Documents</option>
+                            <option value="externals">Externals</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <label for="subtype">Secondary collection type</label>
+                        <input type="text" placeholder="Insert a secondary collection type" name="subtype" />
+                        <label for="fields-of-use">Fields of usage</label>
+                        <textarea name="fields-of-use" placeholder="Separate multiple fields of usage using a comma (lorem, ipsum, etc.)"></textarea>
+                        <label for="owner">Legal owner *</label>
+                        <input required name="owner" placeholder="Insert the legal owner of the object" type="text" />
+                        <label for="description">Description *</label>
+                        <textarea name="description" placeholder="Insert a detailed description" style="resize:vertical"></textarea>
+                    </fieldset>
+                    <fieldset name="internal-information">
+                        <h2>Additional information</h2>
+                        <p>You can include additional comments for authorized visitors. This field is optional.</p>
+                        <label for="comments">Comments</label>
+                        <textarea name="comments" placeholder="Insert any additional comments"></textarea>
+                    </fieldset>
+                    <div class="error"></div>
+                    <button type="submit" class="action ">Create</button>
+                </form>
+            </div>
+        <?php
+            }
         }
 
-        // Show account verification notice.
-        if (!empty($information['account']['verified'])) {
-            if ($information['account']['verified'] !== '1') {
-                show_alert('Your account is still unverified, please check your email inbox or spam folder for a verification email. You can <a id="policycloud-marketplace-resend-verification-email">resend</a> it if you can\'t find it.', 'notice');
-            }
-        } else show_alert("Your account verification status couldn't be accessed.");
-    ?>
-        <div id="policycloud-marketplace-account" class="policycloud-marketplace">
-            <div id="policycloud-marketplace-account-sidebar">
-                <?php
-                if (!empty($picture)) {
-                    echo '<img src="data:image/*;base64,' . base64_encode($picture) . '" draggable="false" />';
-                } else {
-                    echo '<img src="' . get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/user.svg') . '" draggable="false" />';
-                }
-                ?>
-                <nav>
-                    <button class="tactile" id="policycloud-marketplace-account-overview" class="active">Overview</button>
-                    <button class="tactile" id="policycloud-marketplace-account-assets">Assets <span class="pill"><?php echo (count($assets['results'] ?? []) == 0) ? "" : count($assets['results']) ?></span></button>
-                    <button class="tactile" id="policycloud-marketplace-account-reviews">Reviews <span class="pill"><?php echo (count($reviews['results'] ?? []) == 0 ?? 0) ? "" : count($reviews['results']) ?></span></button>
+
+        /**
+         * Display the account page HTML for authenticated users.
+         *
+         * @param   array $information The user information array.
+         * @param   array $item The assets connected to this account.
+         * @param   array $statistics The statistics connected to this account.
+         * @param   array $reviews The asset reviews connected to this account.
+         * @param   array $args An array of arguments.
+         * 
+         * @uses    show_alert()
+         * @uses    time_elapsed_string()
+         * 
+         * @usedby  PolicyCloud_Marketplace_Public::account_shortcode()
+         * 
+         * @since   1.0.0
+         * @author  Alexandros Raikos <araikos@unipi.gr>
+         */
+        function account_html(array $information, $picture, array $statistics, array $assets, array $reviews, array $approvals = [], array $args = [])
+        {
+            /**
+             * Display a list of assets with filtering, sorting and custom pagination. 
+             * 
+             * @param string $id The identifier for the viewer.
+             * @param array $content The asset structure to be displayed.
+             * @param callable $inner_html The callback that prints the list item HTML.
+             * @param array $args The arguments of the parent function
+             * 
+             * @since   1.0.0
+             * @author  Alexandros Raikos <araikos@unipi.gr>
+             * 
+             */
+            function asset_viewer_html(string $id, array $content, array $args, callable $inner_html)
+            {
+        ?>
+            <header>
+                <h3><?php echo ucfirst($id) ?></h3>
+                <div class="actions">
+                    <form action="" class="selector">
+                        <label for="sort-by">Sort by</label>
+                        <select name="sort-by" data-category="<?php echo $id ?>">
+                            <option value="newest" <?php echo ((($_GET['sort_by'] ?? '' == 'newest') || empty($_GET['sort_by'])) ? "selected" : "") ?>>Newest</option>
+                            <option value="oldest" <?php echo (($_GET['sort_by'] ?? '' == 'oldest') ? "selected" : "") ?>>Oldest</option>
+                            <option value="rating-asc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-asc') ? "selected" : "") ?>>Highest rated</option>
+                            <option value="rating-desc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-desc') ? "selected" : "") ?>>Lowest rated</option>
+                            <?php
+                            if ($id == 'assets') {
+                            ?>
+                                <option value="views-asc" <?php echo (($_GET['sort_by'] ?? '' == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
+                                <option value="views-desc" <?php echo (($_GET['sort_by'] ?? '' == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
+                            <?php } ?>
+                            <option value="title" <?php echo (($_GET['sort_by'] ?? '' == 'title') ? "selected" : "") ?>>Title</option>
+                        </select>
+                        <label for="items-per-page">Items per page</label>
+                        <select name="items-per-page" data-category="<?php echo $id ?>">
+                            <option value="5" <?php echo ((($_GET['items_per_page'] ?? '' == '5') || empty($_GET['items_per_page'])) ? "selected" : "") ?>>5</option>
+                            <option value="10" <?php echo (($_GET['items_per_page'] ?? '' == '10') ? "selected" : "") ?>>10</option>
+                            <option value="25" <?php echo (($_GET['items_per_page'] ?? '' == '25') ? "selected" : "") ?>>25</option>
+                            <option value="50" <?php echo (($_GET['items_per_page'] ?? '' == '50') ? "selected" : "") ?>>50</option>
+                            <option value="100" <?php echo (($_GET['items_per_page'] ?? '' == '100') ? "selected" : "") ?>>100</option>
+                        </select>
+                    </form>
                     <?php
-                    if (!$args['visiting'] && $args['is_admin']) {
+                    if (!$args['visiting'] && $id == 'assets') {
                     ?>
-                        <hr />
-                        <button class="tactile" id="policycloud-marketplace-account-approvals">Approvals <span class="pill"><?php echo (count($approvals['results'] ?? []) == 0) ? "" : count($approvals['results']) ?></span></button>
-                        <hr />
-                    <?php
-                    }
-                    ?>
-                    <button class="tactile" id="policycloud-marketplace-account-profile">Profile</button>
-                    <?php if (!$args['visiting']) { ?>
-                        <button class="tactile policycloud-logout">Log out</button>
+                        <a id="policycloud-upload" href="<?php echo $args['upload_page'] ?>" title="Create new"><span class="fas fa-plus"></span> Create new</a>
                     <?php } ?>
+                </div>
+            </header>
+            <div class="collection-filters" data-category="<?php echo $id ?>">
+                <div>Filter by type:</div>
+            </div>
+            <div class="paginated-list" data-category="<?php echo $id ?>">
+                <?php
+                if (!empty($content['results'])) {
+                    foreach ($content['results'] as $page => $page_items) {
+                        echo '<ul data-page="' . ($page + 1) . '" class="page ' . $id . ' ' . ($page == 0 ? 'visible' : '') . '">';
+                        if (!empty($content)) foreach ($page_items as $item) $inner_html($item);
+                        else show_alert("You don't have any " . $id . " yet.");
+                        echo '</ul>';
+                    }
+                } else {
+                    show_alert('This user does not have any ' . $id . '.', 'notice');
+                } ?>
+                <nav class="pagination">
+                    <?php
+                    if (count($content['results'] ?? []) > 1) {
+                        foreach ($content['results'] as $page => $page_items) {
+                            echo '<button data-category="' . $id . '" class="page-selector ' . (($page == ($_GET['page'] ?? 0)) ? 'active' : '') . '" data-' . $id . '-page="' . $page + 1 . '">' . ($page + 1) . '</button>';
+                        }
+                    } ?>
                 </nav>
             </div>
-            <div id="policycloud-marketplace-account-content">
-                <div class="policycloud-marketplace-account-title">
-                    <h2>
+        <?php
+            }
+
+            // Check for any errors regarding authorization.
+            if (!empty($args['notice'])) {
+                show_alert($args['notice'], 'notice');
+            }
+
+            if (!empty($args['error'])) show_alert($args['error']);
+
+            if (!empty($information)) {
+                // Check for any notices.
+                if (!empty($args['notice'])) {
+                    show_alert($args['notice'], 'notice');
+                }
+
+                // Show account verification notice.
+                if (!empty($information['account']['verified'])) {
+                    if ($information['account']['verified'] !== '1') {
+                        show_alert('Your account is still unverified, please check your email inbox or spam folder for a verification email. You can <a id="policycloud-marketplace-resend-verification-email">resend</a> it if you can\'t find it.', 'notice');
+                    }
+                } else show_alert("Your account verification status couldn't be accessed.");
+        ?>
+            <div id="policycloud-marketplace-account" class="policycloud-marketplace">
+                <div id="policycloud-marketplace-account-sidebar">
+                    <?php
+                    if (!empty($picture)) {
+                        echo '<img src="data:image/*;base64,' . base64_encode($picture) . '" draggable="false" />';
+                    } else {
+                        echo '<img src="' . get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/user.svg') . '" draggable="false" />';
+                    }
+                    ?>
+                    <nav>
+                        <button class="tactile" id="policycloud-marketplace-account-overview" class="active">Overview</button>
+                        <button class="tactile" id="policycloud-marketplace-account-assets">Assets <span class="pill"><?php echo (count($assets['results'] ?? []) == 0) ? "" : count($assets['results']) ?></span></button>
+                        <button class="tactile" id="policycloud-marketplace-account-reviews">Reviews <span class="pill"><?php echo (count($reviews['results'] ?? []) == 0 ?? 0) ? "" : count($reviews['results']) ?></span></button>
                         <?php
-                        echo ($information['info']['title'] ?? '') . ' ' . $information['info']['name'] . ' ' . $information['info']['surname'];
+                        if (!$args['visiting'] && $args['is_admin']) {
                         ?>
-                    </h2>
-                    <div>
+                            <hr />
+                            <button class="tactile" id="policycloud-marketplace-account-approvals">Approvals <span class="pill"><?php echo (count($approvals['results'] ?? []) == 0) ? "" : count($approvals['results']) ?></span></button>
+                            <hr />
                         <?php
-                        echo ($information['info']['organization'] ?? '');
-                        ?>
-                    </div>
-                </div>
-                <div>
-                    <section class="policycloud-marketplace-account-overview focused">
-                        <header>
-                            <h3>Overview</h3>
-                        </header>
-                        <div>
-                            <h4>About</h4>
-                            <p>
-                                <?php echo $information['info']['about'] ?? '' ?>
-                            </p>
-                            <?php
-                            if (!empty($information['info']['social'][0])) {
-                            ?>
-                                <ul>
-                                    <?php
-                                    foreach ($information['info']['social'] as $link) {
-                                        echo '<li><a href="' . explode(':', $link, 2)[1] . '" target="blank">' . explode(':', $link, 2)[0] . '</a></li>';
-                                    }
-                                    ?>
-                                </ul>
-                            <?php } ?>
-                        </div>
-                        <?php if (!empty($statistics)) { ?>
-                            <h4>Statistics</h4>
-                            <table class="statistics">
-                                <tr>
-                                    <td>
-                                        <div class="large-figure"><span class="fas fa-list"></span> <?php echo $statistics['total_descriptions'] ?></div>
-                                        <div class="assets-caption">Total descriptions</div>
-                                    </td>
-                                    <td>
-                                        <div class="large-figure"><span class="fas fa-check"></span> <?php echo $statistics['approved_descriptions'] ?></div>
-                                        <div class="assets-caption">Approved descriptions</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="large-figure"><span class="fas fa-download"></span> <?php echo $statistics['total_downloads'] ?></div>
-                                        <div class="assets-caption">Total downloads</div>
-                                    </td>
-                                    <td>
-                                        <div class="large-figure"><span class="fas fa-file"></span> <?php echo $statistics['assets_uploaded'] ?></div>
-                                        <div>Assets uploaded</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="large-figure"><span class="fas fa-comment"></span> <?php echo $statistics['total_reviews'] ?></div>
-                                        <div class="assets-caption">Total reviews</div>
-                                    </td>
-                                    <td>
-                                        <div class="large-figure"><span class="fas fa-star"></span> <?php echo $statistics['average_rating'] ?></div>
-                                        <div class="assets-caption">Average rating</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="large-figure"><span class="fas fa-eye"></span> <?php echo $statistics['total_views'] ?></div>
-                                        <div class="assets-caption">Total views</div>
-                                    </td>
-                                </tr>
-                            </table>
-                        <?php
-                        } else {
-                            show_alert("Statistics for this user are currently unavailable.", 'notice');
                         }
                         ?>
-                    </section>
-                    <section class="policycloud-marketplace-account-assets">
-                        <?php
-                        asset_viewer_html('assets', $assets, $args, function ($asset) use ($args) {
-                        ?>
-                            <li data-type-filter="<?php echo $asset['info']['type'] ?>" data-date-updated="<?php echo strtotime($asset['metadata']['uploadDate']) ?>" data-rating="<?php echo $asset['metadata']['reviews']['average_rating'] ?>" data-total-views="<?php echo $asset['metadata']['views'] ?>" class="visible">
-                                <div class="description">
-                                    <a href="<?php echo $args['description_page'] . "?did=" . $asset['id'] ?>">
-                                        <h4><?php echo $asset['info']['title'] ?></h4>
-                                    </a>
-                                    <p><?php echo $asset['info']['short_desc'] ?></p>
-                                    <div class="metadata">
-                                        <a class="pill"><?php echo $asset['info']['type']  ?></a>
-                                        <a class="pill"><?php echo $asset['info']['subtype']  ?></a>
-                                        <span><span class="fas fa-star"></span> <?php echo $asset['metadata']['reviews']['average_rating'] . ' (' . $asset['metadata']['reviews']['no_reviews'] . ' reviews)' ?></span>
-                                        <span><span class="fas fa-eye"></span> <?php echo $asset['metadata']['views'] ?> views</span>
-                                        <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($asset['metadata']['uploadDate']))) ?></span>
-                                        <span class="label <?php echo ($asset['metadata']['approved'] == 1) ? 'success' : 'notice' ?>"><?php echo ($asset['metadata']['approved'] == 1) ? 'Approved' : 'Pending' ?></span>
-                                    </div>
-                                </div>
-                            </li>
-                        <?php
-                        });
-                        ?>
-                    </section>
-                    <section class="policycloud-marketplace-account-reviews">
-                        <?php
-                        asset_viewer_html('reviews', $reviews, $args, function ($review) use ($args) {
-                        ?>
-                            <li data-type-filter="<?php echo $review['collection'] ?>" data-date-updated="<?php echo strtotime($review['updated_review_date']) ?>" data-rating="<?php echo $review['rating'] ?>" class="visible">
-                                <div class="review">
-                                    <div class="rating">
-                                        <span><span class="fas fa-star"></span> <?php echo $review['rating'] ?></span>
-                                        <span>Posted <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($review['updated_review_date']))) ?></span>
-                                    </div>
-                                    <p>"<?php echo $review['comment'] ?>"</p>
-                                    <a href="<?php echo $args['description_page'] . "?did=" . $review['did'] ?>">
-                                        <h4><?php echo $review['title'] ?></h4>
-                                    </a>
-                                    <div class="metadata">
-                                        <a class="pill"><?php echo $review['collection']  ?></a>
-                                    </div>
-                                </div>
-                            </li>
-                        <?php
-                        });
-                        ?>
-                    </section>
-                    <?php
-                    if (!$args['visiting'] && $args['is_admin']) {
-                    ?>
-                        <section class="policycloud-marketplace-account-approvals">
+                        <button class="tactile" id="policycloud-marketplace-account-profile">Profile</button>
+                        <?php if (!$args['visiting']) { ?>
+                            <button class="tactile policycloud-logout">Log out</button>
+                        <?php } ?>
+                    </nav>
+                </div>
+                <div id="policycloud-marketplace-account-content">
+                    <div class="policycloud-marketplace-account-title">
+                        <h2>
                             <?php
-                            asset_viewer_html('approvals', $approvals, $args, function ($approval) use ($args) {
+                            echo ($information['info']['title'] ?? '') . ' ' . $information['info']['name'] . ' ' . $information['info']['surname'];
                             ?>
-                                <li data-type-filter="<?php echo $approval['info']['type'] ?>" data-date-updated="<?php echo strtotime($approval['metadata']['uploadDate']) ?>" data-rating="<?php echo $approval['metadata']['reviews']['average_rating'] ?>" data-total-views="<?php echo $approval['metadata']['views'] ?>" class="visible">
+                        </h2>
+                        <div>
+                            <?php
+                            echo ($information['info']['organization'] ?? '');
+                            ?>
+                        </div>
+                    </div>
+                    <div>
+                        <section class="policycloud-marketplace-account-overview focused">
+                            <header>
+                                <h3>Overview</h3>
+                            </header>
+                            <div>
+                                <h4>About</h4>
+                                <p>
+                                    <?php echo $information['info']['about'] ?? '' ?>
+                                </p>
+                                <?php
+                                if (!empty($information['info']['social'][0])) {
+                                ?>
+                                    <ul>
+                                        <?php
+                                        foreach ($information['info']['social'] as $link) {
+                                            echo '<li><a href="' . explode(':', $link, 2)[1] . '" target="blank">' . explode(':', $link, 2)[0] . '</a></li>';
+                                        }
+                                        ?>
+                                    </ul>
+                                <?php } ?>
+                            </div>
+                            <?php if (!empty($statistics)) { ?>
+                                <h4>Statistics</h4>
+                                <table class="statistics">
+                                    <tr>
+                                        <td>
+                                            <div class="large-figure"><span class="fas fa-list"></span> <?php echo $statistics['total_descriptions'] ?></div>
+                                            <div class="assets-caption">Total descriptions</div>
+                                        </td>
+                                        <td>
+                                            <div class="large-figure"><span class="fas fa-check"></span> <?php echo $statistics['approved_descriptions'] ?></div>
+                                            <div class="assets-caption">Approved descriptions</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="large-figure"><span class="fas fa-download"></span> <?php echo $statistics['total_downloads'] ?></div>
+                                            <div class="assets-caption">Total downloads</div>
+                                        </td>
+                                        <td>
+                                            <div class="large-figure"><span class="fas fa-file"></span> <?php echo $statistics['assets_uploaded'] ?></div>
+                                            <div>Assets uploaded</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="large-figure"><span class="fas fa-comment"></span> <?php echo $statistics['total_reviews'] ?></div>
+                                            <div class="assets-caption">Total reviews</div>
+                                        </td>
+                                        <td>
+                                            <div class="large-figure"><span class="fas fa-star"></span> <?php echo $statistics['average_rating'] ?></div>
+                                            <div class="assets-caption">Average rating</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="large-figure"><span class="fas fa-eye"></span> <?php echo $statistics['total_views'] ?></div>
+                                            <div class="assets-caption">Total views</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            <?php
+                            } else {
+                                show_alert("Statistics for this user are currently unavailable.", 'notice');
+                            }
+                            ?>
+                        </section>
+                        <section class="policycloud-marketplace-account-assets">
+                            <?php
+                            asset_viewer_html('assets', $assets, $args, function ($asset) use ($args) {
+                            ?>
+                                <li data-type-filter="<?php echo $asset['info']['type'] ?>" data-date-updated="<?php echo strtotime($asset['metadata']['uploadDate']) ?>" data-rating="<?php echo $asset['metadata']['reviews']['average_rating'] ?>" data-total-views="<?php echo $asset['metadata']['views'] ?>" class="visible">
                                     <div class="description">
-                                        <a href="<?php echo $args['description_page'] . "?did=" . $approval['id'] ?>">
-                                            <h4><?php echo $approval['info']['title'] ?></h4>
+                                        <a href="<?php echo $args['description_page'] . "?did=" . $asset['id'] ?>">
+                                            <h4><?php echo $asset['info']['title'] ?></h4>
                                         </a>
-                                        <p><?php echo $approval['info']['short_desc'] ?></p>
+                                        <p><?php echo $asset['info']['short_desc'] ?></p>
                                         <div class="metadata">
-                                            <a class="pill"><?php echo $approval['info']['type']  ?></a>
-                                            <a class="pill"><?php echo $approval['info']['subtype']  ?></a>
-                                            <span><span class="fas fa-star"></span> <?php echo $approval['metadata']['reviews']['average_rating'] . ' (' . $approval['metadata']['reviews']['no_reviews'] . ' reviews)' ?></span>
-                                            <span><span class="fas fa-eye"></span> <?php echo $approval['metadata']['views'] ?> views</span>
-                                            <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($approval['metadata']['uploadDate']))) ?></span>
-                                            <span class="label notice">Pending</span>
+                                            <a class="pill"><?php echo $asset['info']['type']  ?></a>
+                                            <a class="pill"><?php echo $asset['info']['subtype']  ?></a>
+                                            <span><span class="fas fa-star"></span> <?php echo $asset['metadata']['reviews']['average_rating'] . ' (' . $asset['metadata']['reviews']['no_reviews'] . ' reviews)' ?></span>
+                                            <span><span class="fas fa-eye"></span> <?php echo $asset['metadata']['views'] ?> views</span>
+                                            <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($asset['metadata']['uploadDate']))) ?></span>
+                                            <span class="label <?php echo ($asset['metadata']['approved'] == 1) ? 'success' : 'notice' ?>"><?php echo ($asset['metadata']['approved'] == 1) ? 'Approved' : 'Pending' ?></span>
                                         </div>
                                     </div>
                                 </li>
@@ -1090,341 +1078,391 @@ function account_html(array $information, $picture, array $statistics, array $as
                             });
                             ?>
                         </section>
-                    <?php
-                    }
-                    ?>
-                    <section class="policycloud-marketplace-account-profile">
-                        <header>
-                            <h3>Information</h3>
+                        <section class="policycloud-marketplace-account-reviews">
                             <?php
-                            if (!$args['visiting'] || $args['is_admin']) {
+                            asset_viewer_html('reviews', $reviews, $args, function ($review) use ($args) {
                             ?>
-                                <button id="policycloud-marketplace-account-edit-toggle"><span class="fas fa-pen"></span> Edit</button>
+                                <li data-type-filter="<?php echo $review['collection'] ?>" data-date-updated="<?php echo strtotime($review['updated_review_date']) ?>" data-rating="<?php echo $review['rating'] ?>" class="visible">
+                                    <div class="review">
+                                        <div class="rating">
+                                            <span><span class="fas fa-star"></span> <?php echo $review['rating'] ?></span>
+                                            <span>Posted <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($review['updated_review_date']))) ?></span>
+                                        </div>
+                                        <p>"<?php echo $review['comment'] ?>"</p>
+                                        <a href="<?php echo $args['description_page'] . "?did=" . $review['did'] ?>">
+                                            <h4><?php echo $review['title'] ?></h4>
+                                        </a>
+                                        <div class="metadata">
+                                            <a class="pill"><?php echo $review['collection']  ?></a>
+                                        </div>
+                                    </div>
+                                </li>
                             <?php
-                            }
+                            });
                             ?>
-                        </header>
-                        <form id="policycloud-marketplace-account-edit" accept-charset="utf8" action="">
-                            <table class="information">
+                        </section>
+                        <?php
+                        if (!$args['visiting'] && $args['is_admin']) {
+                        ?>
+                            <section class="policycloud-marketplace-account-approvals">
                                 <?php
-                                if ($args['is_admin'] || !$args['visiting']) {
+                                asset_viewer_html('approvals', $approvals, $args, function ($approval) use ($args) {
                                 ?>
+                                    <li data-type-filter="<?php echo $approval['info']['type'] ?>" data-date-updated="<?php echo strtotime($approval['metadata']['uploadDate']) ?>" data-rating="<?php echo $approval['metadata']['reviews']['average_rating'] ?>" data-total-views="<?php echo $approval['metadata']['views'] ?>" class="visible">
+                                        <div class="description">
+                                            <a href="<?php echo $args['description_page'] . "?did=" . $approval['id'] ?>">
+                                                <h4><?php echo $approval['info']['title'] ?></h4>
+                                            </a>
+                                            <p><?php echo $approval['info']['short_desc'] ?></p>
+                                            <div class="metadata">
+                                                <a class="pill"><?php echo $approval['info']['type']  ?></a>
+                                                <a class="pill"><?php echo $approval['info']['subtype']  ?></a>
+                                                <span><span class="fas fa-star"></span> <?php echo $approval['metadata']['reviews']['average_rating'] . ' (' . $approval['metadata']['reviews']['no_reviews'] . ' reviews)' ?></span>
+                                                <span><span class="fas fa-eye"></span> <?php echo $approval['metadata']['views'] ?> views</span>
+                                                <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($approval['metadata']['uploadDate']))) ?></span>
+                                                <span class="label notice">Pending</span>
+                                            </div>
+                                        </div>
+                                    </li>
+                                <?php
+                                });
+                                ?>
+                            </section>
+                        <?php
+                        }
+                        ?>
+                        <section class="policycloud-marketplace-account-profile">
+                            <header>
+                                <h3>Information</h3>
+                                <?php
+                                if (!$args['visiting'] || $args['is_admin']) {
+                                ?>
+                                    <button id="policycloud-marketplace-account-edit-toggle"><span class="fas fa-pen"></span> Edit</button>
+                                <?php
+                                }
+                                ?>
+                            </header>
+                            <form id="policycloud-marketplace-account-edit" accept-charset="utf8" action="">
+                                <table class="information">
+                                    <?php
+                                    if ($args['is_admin'] || !$args['visiting']) {
+                                    ?>
+                                        <tr>
+                                            <td class="folding">
+                                                <span>Profile picture</span>
+                                            </td>
+                                            <td class="folding">
+                                                <?php
+                                                if (!empty($picture)) {
+                                                ?>
+                                                    <div class="file-editor" data-name="profile-picture">
+                                                        <img class="file" src="data:image/*;base64,<?php echo base64_encode($picture) ?>" draggable="false" />
+                                                        <button type="button" class="delete"><span class="fas fa-times"></span></button>
+                                                    </div>
+                                                <?php
+                                                }
+                                                if (!$args['is_admin'] && !$args['visiting']) {
+                                                ?>
+                                                    <span class="folding">
+                                                        <input type="file" name="profile_picture" accept="image/png, image/jpeg" />
+                                                        <label for="picture">Please select an image of up to 1MB and over 256x256 for optimal results. Supported file types: jpg, png.</label>
+                                                    </span>
+                                                <?php } ?>
+                                            </td>
+                                        </tr>
+                                    <?php } ?>
                                     <tr>
-                                        <td class="folding">
-                                            <span>Profile picture</span>
+                                        <td>
+                                            Summary
                                         </td>
-                                        <td class="folding">
+                                        <td>
+                                            <span class="folding visible">
+                                                <?php echo $information['info']['about']; ?>
+                                            </span>
                                             <?php
-                                            if (!empty($picture)) {
+                                            if (!$args['visiting'] || $args['is_admin']) {
                                             ?>
-                                                <div class="file-editor" data-name="profile-picture">
-                                                    <img class="file" src="data:image/*;base64,<?php echo base64_encode($picture) ?>" draggable="false" />
-                                                    <button type="button" class="delete"><span class="fas fa-times"></span></button>
+                                                <textarea name="about" class="folding" placeholder="Tell us about yourself" style="resize:vertical"><?php echo $information['info']['about'] ?? ''; ?></textarea>
+                                            <?php
+                                            }
+                                            ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Related links
+                                        </td>
+                                        <td>
+                                            <span class="folding visible">
+                                                <?php
+                                                if (!empty($information['info']['social'][0])) {
+                                                    foreach ($information['info']['social'] as $link) {
+                                                        echo '<a href="' . explode(':', $link, 2)[1] . '" target="blank">' . explode(':', $link, 2)[0] . '</a><br/>';
+                                                    }
+                                                }
+                                                ?>
+                                            </span>
+                                            <?php
+                                            if (!$args['visiting'] || $args['is_admin']) {
+                                            ?>
+                                                <div class="socials folding">
+                                                    <div>
+                                                        <?php
+
+                                                        if (!empty($information['info']['social'][0])) {
+                                                            foreach ($information['info']['social'] as $link) {
+                                                                $link_title = explode(':', $link, 2)[0];
+                                                                $link_url = explode(':', $link, 2)[1];
+                                                        ?>
+                                                                <div>
+                                                                    <input type="text" name="socials-title[]" placeholder="Example" value="<?php echo $link_title ?>" />
+                                                                    <input type="url" name="socials-url[]" placeholder="https://www.example.org/" value="<?php echo $link_url ?>" />
+                                                                    <button class="remove-field" title="Remove this link." <?php if (count($information['info']['social']) == 1) echo 'disabled' ?>><span class="fas fa-times"></span></button>
+                                                                </div>
+                                                        <?php
+                                                            }
+                                                        }
+                                                        ?>
+                                                    </div>
+                                                    <button class="add-field" title="Add another link."><span class="fas fa-plus"></span> Add link</button>
                                                 </div>
                                             <?php
                                             }
-                                            if (!$args['is_admin'] && !$args['visiting']) {
                                             ?>
-                                                <span class="folding">
-                                                    <input type="file" name="profile_picture" accept="image/png, image/jpeg" />
-                                                    <label for="picture">Please select an image of up to 1MB and over 256x256 for optimal results. Supported file types: jpg, png.</label>
-                                                </span>
-                                            <?php } ?>
                                         </td>
                                     </tr>
-                                <?php } ?>
-                                <tr>
-                                    <td>
-                                        Summary
-                                    </td>
-                                    <td>
-                                        <span class="folding visible">
-                                            <?php echo $information['info']['about']; ?>
-                                        </span>
+                                    <tr>
+                                        <td>
+                                            Username
+                                        </td>
+                                        <td>
+                                            <span>
+                                                <?php
+                                                echo ($information['username'] ?? '-');
+                                                ?>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <?php
-                                        if (!$args['visiting'] || $args['is_admin']) {
+                                        if (!$args['visiting']) {
                                         ?>
-                                            <textarea name="about" class="folding" placeholder="Tell us about yourself" style="resize:vertical"><?php echo $information['info']['about'] ?? ''; ?></textarea>
-                                        <?php
-                                        }
-                                        ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Related links
-                                    </td>
-                                    <td>
-                                        <span class="folding visible">
+                                            <td>
+                                                Password
+                                            </td>
+                                            <td>
+                                                <span class="folding visible">*****************</span>
+                                                <input class="folding" type="password" name="password" placeholder="Enter your new password here" />
+                                                <input class="folding" type="password" name="password-confirm" placeholder="Confirm new password here" />
                                             <?php
-                                            if (!empty($information['info']['social'][0])) {
-                                                foreach ($information['info']['social'] as $link) {
-                                                    echo '<a href="' . explode(':', $link, 2)[1] . '" target="blank">' . explode(':', $link, 2)[0] . '</a><br/>';
-                                                }
+                                        }
+                                            ?>
+                                            </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Role
+                                        </td>
+                                        <td>
+                                            <span>
+                                                <?php echo ($information['account']['role'] == 'admin') ? 'Administrator' : 'User'; ?>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Full name
+                                        </td>
+                                        <td>
+                                            <span class="folding visible">
+                                                <?php
+                                                echo ($information['info']['title'] ?? '') . ' ' . ($information['info']['name']) . ' ' . ($information['info']['surname']);
+                                                ?>
+                                            </span>
+                                            <?php
+                                            if (!$args['visiting'] || $args['is_admin']) {
+                                            ?>
+                                                <select class="folding" name="title">
+                                                    <option value="Mr." <?php echo ($information['info']['title'] == 'Mr.' ? 'selected' : '') ?>>Mr.</option>
+                                                    <option value="Ms." <?php echo ($information['info']['title'] == 'Ms.' ? 'selected' : '') ?>>Ms.</option>
+                                                    <option value="Mrs." <?php echo ($information['info']['title'] == 'Mrs.' ? 'selected' : '') ?>>Mrs.</option>
+                                                    <option value="Dr." <?php echo ($information['info']['title'] == 'Dr.' ? 'selected' : '') ?>>Dr.</option>
+                                                    <option value="Prof." <?php echo ($information['info']['title'] == 'Prof.' ? 'selected' : '') ?>>Prof.</option>
+                                                    <option value="Sir" <?php echo ($information['info']['title'] == 'Sir' ? 'selected' : '') ?>>Sir</option>
+                                                    <option value="Miss" <?php echo ($information['info']['title'] == 'Miss' ? 'selected' : '') ?>>Miss</option>
+                                                    <option value="Mx." <?php echo ($information['info']['title'] == 'Mx.' ? 'selected' : '') ?>>Mx.</option>
+                                                    <option value="-" <?php echo ($information['info']['title'] == '-' ? 'selected' : '') ?>>None</option>
+                                                </select>
+                                                <input class="folding" type="text" name="name" placeholder="Name" value="<?php echo ($information['info']['name']); ?>" required />
+                                                <input class="folding" type="text" name="surname" placeholder="Surname" value="<?php echo ($information['info']['surname']); ?>" required />
+                                            <?php
                                             }
                                             ?>
-                                        </span>
-                                        <?php
-                                        if (!$args['visiting'] || $args['is_admin']) {
-                                        ?>
-                                            <div class="socials folding">
-                                                <div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Gender
+                                        </td>
+                                        <td>
+                                            <span class="folding visible">
+                                                <?php
+                                                echo (ucfirst($information['info']['gender'] ?? '-'));
+                                                ?>
+                                            </span>
+                                            <?php
+                                            if (!$args['visiting'] || $args['is_admin']) {
+                                            ?>
+                                                <select name="gender" class="folding">
+                                                    <option value="male" <?php echo ($information['info']['gender'] == 'male' ? 'selected' : '') ?>>Male</option>
+                                                    <option value="female" <?php echo ($information['info']['gender'] == 'female' ? 'selected' : '') ?>>Female</option>
+                                                    <option value="transgender" <?php echo ($information['info']['gender'] == 'transgender' ? 'selected' : '') ?>>Transgender</option>
+                                                    <option value="genderqueer" <?php echo ($information['info']['gender'] == 'genderqueer' ? 'selected' : '') ?>>Genderqueer</option>
+                                                    <option value="questioning" <?php echo ($information['info']['gender'] == 'questioning' ? 'selected' : '') ?>>Questioning</option>
+                                                    <option value="-" <?php echo ($information['info']['gender'] == '-' ? 'selected' : '') ?>>Prefer not to say</option>
+                                                </select>
+                                            <?php
+                                            }
+                                            ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Organization
+                                        </td>
+                                        <td>
+                                            <span class="folding visible">
+                                                <?php
+                                                echo ($information['info']['organization'] ?? '-');
+                                                ?>
+                                            </span>
+                                            <?php
+                                            if (!$args['visiting'] || $args['is_admin']) {
+                                            ?>
+                                                <input class="folding" type="text" name="organization" value="<?php echo ($information['info']['organization'] ?? ''); ?>" placeholder="Insert your organization here" />
+                                            <?php
+                                            }
+                                            ?>
+                                        </td>
+                                    </tr>
+                                    <?php
+                                    if (!empty($information['info']['email']) || !$args['visiting']) {
+                                    ?>
+                                        <tr>
+                                            <td>
+                                                E-mail
+                                            </td>
+                                            <td>
+                                                <span class="folding visible">
                                                     <?php
-
-                                                    if (!empty($information['info']['social'][0])) {
-                                                        foreach ($information['info']['social'] as $link) {
-                                                            $link_title = explode(':', $link, 2)[0];
-                                                            $link_url = explode(':', $link, 2)[1];
+                                                    echo ($information['info']['email']);
+                                                    if ($information['account']['verified'] != '1') {
                                                     ?>
-                                                            <div>
-                                                                <input type="text" name="socials-title[]" placeholder="Example" value="<?php echo $link_title ?>" />
-                                                                <input type="url" name="socials-url[]" placeholder="https://www.example.org/" value="<?php echo $link_url ?>" />
-                                                                <button class="remove-field" title="Remove this link." <?php if (count($information['info']['social']) == 1) echo 'disabled' ?>><span class="fas fa-times"></span></button>
-                                                            </div>
+                                                        <span class="unverified">(Unverified)</span>
+                                                        <button id="policycloud-marketplace-resend-verification-email">Resend verification email</button>
                                                     <?php
+                                                    } else {
+                                                        if (!$args['visiting'] || $args['is_admin']) {
+                                                            echo ' <span class="label ' . (($information['profile_parameters']['public_email'] == 0) ? 'notice' : 'success') . '">' . (($information['profile_parameters']['public_email'] == 0) ? 'Private' : 'Public') . '</span>';
                                                         }
                                                     }
                                                     ?>
-                                                </div>
-                                                <button class="add-field" title="Add another link."><span class="fas fa-plus"></span> Add link</button>
-                                            </div>
-                                        <?php
-                                        }
-                                        ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Username
-                                    </td>
-                                    <td>
-                                        <span>
-                                            <?php
-                                            echo ($information['username'] ?? '-');
-                                            ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <?php
-                                    if (!$args['visiting']) {
-                                    ?>
-                                        <td>
-                                            Password
-                                        </td>
-                                        <td>
-                                            <span class="folding visible">*****************</span>
-                                            <input class="folding" type="password" name="password" placeholder="Enter your new password here" />
-                                            <input class="folding" type="password" name="password-confirm" placeholder="Confirm new password here" />
-                                        <?php
-                                    }
-                                        ?>
-                                        </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Role
-                                    </td>
-                                    <td>
-                                        <span>
-                                            <?php echo ($information['account']['role'] == 'admin') ? 'Administrator' : 'User'; ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Full name
-                                    </td>
-                                    <td>
-                                        <span class="folding visible">
-                                            <?php
-                                            echo ($information['info']['title'] ?? '') . ' ' . ($information['info']['name']) . ' ' . ($information['info']['surname']);
-                                            ?>
-                                        </span>
-                                        <?php
-                                        if (!$args['visiting'] || $args['is_admin']) {
-                                        ?>
-                                            <select class="folding" name="title">
-                                                <option value="Mr." <?php echo ($information['info']['title'] == 'Mr.' ? 'selected' : '') ?>>Mr.</option>
-                                                <option value="Ms." <?php echo ($information['info']['title'] == 'Ms.' ? 'selected' : '') ?>>Ms.</option>
-                                                <option value="Mrs." <?php echo ($information['info']['title'] == 'Mrs.' ? 'selected' : '') ?>>Mrs.</option>
-                                                <option value="Dr." <?php echo ($information['info']['title'] == 'Dr.' ? 'selected' : '') ?>>Dr.</option>
-                                                <option value="Prof." <?php echo ($information['info']['title'] == 'Prof.' ? 'selected' : '') ?>>Prof.</option>
-                                                <option value="Sir" <?php echo ($information['info']['title'] == 'Sir' ? 'selected' : '') ?>>Sir</option>
-                                                <option value="Miss" <?php echo ($information['info']['title'] == 'Miss' ? 'selected' : '') ?>>Miss</option>
-                                                <option value="Mx." <?php echo ($information['info']['title'] == 'Mx.' ? 'selected' : '') ?>>Mx.</option>
-                                                <option value="-" <?php echo ($information['info']['title'] == '-' ? 'selected' : '') ?>>None</option>
-                                            </select>
-                                            <input class="folding" type="text" name="name" placeholder="Name" value="<?php echo ($information['info']['name']); ?>" required />
-                                            <input class="folding" type="text" name="surname" placeholder="Surname" value="<?php echo ($information['info']['surname']); ?>" required />
-                                        <?php
-                                        }
-                                        ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Gender
-                                    </td>
-                                    <td>
-                                        <span class="folding visible">
-                                            <?php
-                                            echo (ucfirst($information['info']['gender'] ?? '-'));
-                                            ?>
-                                        </span>
-                                        <?php
-                                        if (!$args['visiting'] || $args['is_admin']) {
-                                        ?>
-                                            <select name="gender" class="folding">
-                                                <option value="male" <?php echo ($information['info']['gender'] == 'male' ? 'selected' : '') ?>>Male</option>
-                                                <option value="female" <?php echo ($information['info']['gender'] == 'female' ? 'selected' : '') ?>>Female</option>
-                                                <option value="transgender" <?php echo ($information['info']['gender'] == 'transgender' ? 'selected' : '') ?>>Transgender</option>
-                                                <option value="genderqueer" <?php echo ($information['info']['gender'] == 'genderqueer' ? 'selected' : '') ?>>Genderqueer</option>
-                                                <option value="questioning" <?php echo ($information['info']['gender'] == 'questioning' ? 'selected' : '') ?>>Questioning</option>
-                                                <option value="-" <?php echo ($information['info']['gender'] == '-' ? 'selected' : '') ?>>Prefer not to say</option>
-                                            </select>
-                                        <?php
-                                        }
-                                        ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Organization
-                                    </td>
-                                    <td>
-                                        <span class="folding visible">
-                                            <?php
-                                            echo ($information['info']['organization'] ?? '-');
-                                            ?>
-                                        </span>
-                                        <?php
-                                        if (!$args['visiting'] || $args['is_admin']) {
-                                        ?>
-                                            <input class="folding" type="text" name="organization" value="<?php echo ($information['info']['organization'] ?? ''); ?>" placeholder="Insert your organization here" />
-                                        <?php
-                                        }
-                                        ?>
-                                    </td>
-                                </tr>
-                                <?php
-                                if (!empty($information['info']['email']) || !$args['visiting']) {
-                                ?>
-                                    <tr>
-                                        <td>
-                                            E-mail
-                                        </td>
-                                        <td>
-                                            <span class="folding visible">
+                                                </span>
                                                 <?php
-                                                echo ($information['info']['email']);
-                                                if ($information['account']['verified'] != '1') {
+                                                if (!$args['visiting'] || $args['is_admin']) {
                                                 ?>
-                                                    <span class="unverified">(Unverified)</span>
-                                                    <button id="policycloud-marketplace-resend-verification-email">Resend verification email</button>
+                                                    <label for="email" class="folding">Changing this setting will require a verification of the new e-mail address.</label>
+                                                    <input class="folding" type="email" name="email" value="<?php echo $information['info']['email'] ?>" required />
+                                                    <select name="public-email" class="folding">
+                                                        <option value="1" <?php echo ($information['profile_parameters']['public_email'] == 1 ? 'selected' : '') ?>>Public</option>
+                                                        <option value="0" <?php echo ($information['profile_parameters']['public_email'] == 0 ? 'selected' : '') ?>>Private</option>
+                                                    </select>
                                                 <?php
-                                                } else {
-                                                    if (!$args['visiting'] || $args['is_admin']) {
-                                                        echo ' <span class="label ' . (($information['profile_parameters']['public_email'] == 0) ? 'notice' : 'success') . '">' . (($information['profile_parameters']['public_email'] == 0) ? 'Private' : 'Public') . '</span>';
-                                                    }
                                                 }
                                                 ?>
-                                            </span>
-                                            <?php
-                                            if (!$args['visiting'] || $args['is_admin']) {
-                                            ?>
-                                                <label for="email" class="folding">Changing this setting will require a verification of the new e-mail address.</label>
-                                                <input class="folding" type="email" name="email" value="<?php echo $information['info']['email'] ?>" required />
-                                                <select name="public-email" class="folding">
-                                                    <option value="1" <?php echo ($information['profile_parameters']['public_email'] == 1 ? 'selected' : '') ?>>Public</option>
-                                                    <option value="0" <?php echo ($information['profile_parameters']['public_email'] == 0 ? 'selected' : '') ?>>Private</option>
-                                                </select>
-                                            <?php
-                                            }
-                                            ?>
-                                        </td>
-                                    </tr>
-                                <?php
-                                }
-                                if (!empty($information['info']['phone']) || !$args['visiting']) {
-                                ?>
+                                            </td>
+                                        </tr>
+                                    <?php
+                                    }
+                                    if (!empty($information['info']['phone']) || !$args['visiting']) {
+                                    ?>
+                                        <tr>
+                                            <td>
+                                                Phone number
+                                            </td>
+                                            <td>
+                                                <span class="folding visible">
+                                                    <?php
+                                                    if (!empty($information['info']['phone'])) {
+                                                        echo ($information['info']['phone']);
+                                                        if (!$args['visiting'] || $args['is_admin']) {
+                                                            echo ' <span class="label ' . (($information['profile_parameters']['public_phone'] == 0) ? 'notice' : 'success') . '">' . (($information['profile_parameters']['public_phone'] == 0) ? 'Private' : ' Public') . '</span>';
+                                                        }
+                                                    } else echo '-';
+                                                    ?>
+                                                </span>
+                                                <?php
+                                                if (!$args['visiting'] || $args['is_admin']) {
+                                                ?>
+                                                    <input class="folding" type="text" name="phone" value="<?php
+                                                                                                            echo (empty($information['info']['phone']) ? '' : $information['info']['phone']); ?>" placeholder="Insert your phone number here" />
+                                                    <select name="public-phone" class="folding">
+                                                        <option value="1" <?php echo ($information['profile_parameters']['public_phone'] == 1 ? 'selected' : '') ?>>Public</option>
+                                                        <option value="0" <?php echo ($information['profile_parameters']['public_phone'] == 0 ? 'selected' : '') ?>>Private</option>
+                                                    </select>
+                                                <?php
+                                                }
+                                                ?>
+                                            </td>
+                                        </tr>
+                                    <?php
+                                    }
+                                    ?>
                                     <tr>
                                         <td>
-                                            Phone number
+                                            Member since
                                         </td>
                                         <td>
-                                            <span class="folding visible">
-                                                <?php
-                                                if (!empty($information['info']['phone'])) {
-                                                    echo ($information['info']['phone']);
-                                                    if (!$args['visiting'] || $args['is_admin']) {
-                                                        echo ' <span class="label ' . (($information['profile_parameters']['public_phone'] == 0) ? 'notice' : 'success') . '">' . (($information['profile_parameters']['public_phone'] == 0) ? 'Private' : ' Public') . '</span>';
-                                                    }
-                                                } else echo '-';
-                                                ?>
-                                            </span>
                                             <?php
-                                            if (!$args['visiting'] || $args['is_admin']) {
-                                            ?>
-                                                <input class="folding" type="text" name="phone" value="<?php
-                                                                                                        echo (empty($information['info']['phone']) ? '' : $information['info']['phone']); ?>" placeholder="Insert your phone number here" />
-                                                <select name="public-phone" class="folding">
-                                                    <option value="1" <?php echo ($information['profile_parameters']['public_phone'] == 1 ? 'selected' : '') ?>>Public</option>
-                                                    <option value="0" <?php echo ($information['profile_parameters']['public_phone'] == 0 ? 'selected' : '') ?>>Private</option>
-                                                </select>
-                                            <?php
-                                            }
+                                            echo date('d/m/y', strtotime($information['account']['registration_datetime']))
                                             ?>
                                         </td>
                                     </tr>
+                                </table>
+                                <?php
+                                if (!$args['visiting'] || $args['is_admin']) {
+                                ?>
+                                    <div class="folding error"></div>
+                                    <div class="folding notice"></div>
+                                    <div class="critical-action">
+                                        <label for="current-password">Please type your current password to continue.</label>
+                                        <input name="current-password" type="password" placeholder="Insert your current password here">
+                                    </div>
+                                    <button type="submit" class="folding">Submit</button>
                                 <?php
                                 }
                                 ?>
-                                <tr>
-                                    <td>
-                                        Member since
-                                    </td>
-                                    <td>
-                                        <?php
-                                        echo date('d/m/y', strtotime($information['account']['registration_datetime']))
-                                        ?>
-                                    </td>
-                                </tr>
-                            </table>
+                            </form>
                             <?php
-                            if (!$args['visiting'] || $args['is_admin']) {
+                            if (!$args['visiting']) {
                             ?>
-                                <div class="folding error"></div>
-                                <div class="folding notice"></div>
-                                <div class="critical-action">
-                                    <label for="current-password">Please type your current password to continue.</label>
-                                    <input name="current-password" type="password" placeholder="Insert your current password here">
-                                </div>
-                                <button type="submit" class="folding">Submit</button>
+                                <button id="policycloud-marketplace-request-data-copy" class="action">Request data copy</button>
                             <?php
                             }
+                            if (!$args['visiting'] || $args['is_admin']) {
                             ?>
-                        </form>
-                        <?php
-                        if (!$args['visiting']) {
-                        ?>
-                            <button id="policycloud-marketplace-request-data-copy" class="action">Request data copy</button>
-                        <?php
-                        }
-                        if (!$args['visiting'] || $args['is_admin']) {
-                        ?>
-                            <form id="policycloud-marketplace-delete-account">
-                                <div>
-                                    <label for="current-password">Please type your current password to continue.</label>
-                                    <input name="current-password" type="password" placeholder="Insert your current password here">
-                                </div>
-                                <button type="submit" class="action destructive">Delete account</button>
-                            </form>
-                        <?php } ?>
-                    </section>
+                                <form id="policycloud-marketplace-delete-account">
+                                    <div>
+                                        <label for="current-password">Please type your current password to continue.</label>
+                                        <input name="current-password" type="password" placeholder="Insert your current password here">
+                                    </div>
+                                    <button type="submit" class="action destructive">Delete account</button>
+                                </form>
+                            <?php } ?>
+                        </section>
+                    </div>
                 </div>
             </div>
-        </div>
-<?php
-    }
-}
+    <?php
+            }
+        }

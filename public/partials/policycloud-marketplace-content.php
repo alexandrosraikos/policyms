@@ -281,7 +281,7 @@ function get_asset_file_url($type, $id, $token) {
     );
 
     // TODO @alexandrosraikos: Wait for @vkoukos implementation.
-    return $response['result'];
+    return $response['otc'];
 } 
 
 /**

@@ -18,35 +18,12 @@
      *
      */
 
-    /**
-     * Display the gallery image modal.
-     * @param {Event} e
-     *
-     * @author Alexandros Raikos
-     */
-    function showGalleryModal(e) {
-      e.preventDefault();
-      // Create modal.
-      $("html, body").css({ overflow: "hidden" });
-      $("#policycloud-marketplace-asset .gallery").append(
-        '<div class="modal"><button class="close"><span class="fas fa-times"></span></button></div>'
-      );
-
-      // Clone image to modal.
-      $(this)
-        .clone()
-        .appendTo("#policycloud-marketplace-asset .gallery .modal");
-    }
-
-    /**
-     * Destroy the gallery image modal.
-     * @param {Event} e
-     */
-    function hideGalleryModal(e) {
-      e.preventDefault();
-      $("html, body").css({ overflow: "auto" });
-      $("#policycloud-marketplace-asset .gallery .modal").remove();
-    }
+    // Get image id array.
+    const imageReference = Array.from(
+      $("#policycloud-marketplace-asset .gallery img").map((index, element) => {
+        return $(element).data("image-id");
+      })
+    );
 
     /**
      *
@@ -58,12 +35,19 @@
     $(".policycloud-marketplace .file-viewer > button").click(toggleFileList);
 
     // Toggle the gallery modal visibility.
-    $("#policycloud-marketplace-asset .gallery img").click(showGalleryModal);
-    $(document).on(
-      "click",
-      "#policycloud-marketplace-asset .gallery .modal .close, #policycloud-marketplace-asset .gallery .modal *:not(img)",
-      hideGalleryModal
-    );
+    $("#policycloud-marketplace-asset .gallery img").click((e) => {
+      new Modal(
+        "gallery",
+        Array.from(
+          $("#policycloud-marketplace-asset .gallery img").map(
+            (index, element) => {
+              return $(element).clone()[0];
+            }
+          )
+        ),
+        imageReference.indexOf($(e.target).data("image-id"))
+      );
+    });
 
     /**
      * Asset editing
@@ -72,26 +56,6 @@
      * regarding the asset editing aspect of the shortcode.
      *
      */
-
-    /**
-     * Show the asset editing modal.
-     * @param {Event} e
-     */
-    function showAssetEditor(e) {
-      e.preventDefault();
-      $("html, body").css({ overflow: "hidden" });
-      $("#policycloud-marketplace-asset .editing-form").removeClass("hidden");
-    }
-
-    /**
-     * Hide the asset editing modal.
-     * @param {Event} e
-     */
-    function hideAssetEditor(e) {
-      e.preventDefault();
-      $("html, body").css({ overflow: "auto" });
-      $("#policycloud-marketplace-asset .editing-form").addClass("hidden");
-    }
 
     /**
      * Prepare and submit via AJAX the edited asset fields.
@@ -109,9 +73,7 @@
       );
 
       // Prepare form data.
-      var formData = new FormData(
-        $("#policycloud-marketplace-asset-editing")[0]
-      );
+      var formData = new FormData($(e.target)[0]);
       formData.append("action", "policycloud_marketplace_asset_editing");
       formData.append("nonce", ajax_properties_description_editing.nonce);
       formData.append("asset_id", ajax_properties_description_editing.asset_id);
@@ -278,14 +240,19 @@
             response,
             "#policycloud-marketplace-asset-editing button[type=submit]",
             (data) => {
-              $("section.policycloud-marketplace-account-profile").append(
-                `<a id="policycloud-marketplace-file-` +
-                  id +
-                  `-download" style="display:none" href="` +
-                  data +
-                  `" download />`
+              var a = document.createElement("a");
+              a.href = new URL(data.url);
+              a.setAttribute(
+                "id",
+                "policycloud-marketplace-file-" + fileIdentifier + "-download"
               );
-              $("#policycloud-marketplace-file-" + id + "-download")
+              $("#policycloud-marketplace-asset .file-viewer").append(a);
+              $(
+                "a#policycloud-marketplace-file-" + fileIdentifier + "-download"
+              ).attr("download", "");
+              $(
+                "a#policycloud-marketplace-file-" + fileIdentifier + "-download"
+              )
                 .get(0)
                 .click();
             }
@@ -301,28 +268,39 @@
      */
 
     // Toggle asset editor visibility.
-    $("#policycloud-marketplace-asset header .show-editor-modal").click(
-      showAssetEditor
-    );
-    $("#policycloud-marketplace-asset .editing-form .close").click(
-      hideAssetEditor
-    );
+    $("#policycloud-marketplace-asset header .show-editor-modal").click((e) => {
+      e.preventDefault();
+      new Modal(
+        "information-editing",
+        $("#policycloud-marketplace-asset-editing").clone()[0]
+      );
+    });
 
     // Submit the edited information.
-    $("#policycloud-marketplace-asset-editing button[type=submit]").click(
+    $(document).on(
+      "submit",
+      "#policycloud-marketplace-asset-editing form",
       updateAsset
     );
 
     // Delete file.
-    $("#policycloud-marketplace-asset-editing .file button.delete").click(
+    $(document).on(
+      "click",
+      "#policycloud-marketplace-asset-editing .file button.delete",
       deleteFile
     );
 
     // Approve description (admin)
-    $("#policycloud-marketplace-asset-approval button").click(approvalRequest);
+    $(document).on(
+      "click",
+      "#policycloud-marketplace-asset-approval button",
+      approvalRequest
+    );
 
     // Download file.
-    $("#policycloud-marketplace-asset .file-viewer .download").click(
+    $(document).on(
+      "click",
+      "#policycloud-marketplace-asset .file-viewer .download",
       downloadFile
     );
   });

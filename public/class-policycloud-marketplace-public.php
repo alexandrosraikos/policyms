@@ -796,10 +796,11 @@ class PolicyCloud_Marketplace_Public
 			if (!empty($token)) {
 				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
 
-				if (!empty($_POST['subsequent_action'])) { 
+				if (!empty($_POST['subsequent_action'])) {
 					if ($_POST['subsequent_action'] == "asset-editing") {
 						// Forward editing request and respond.
-						$response = edit_asset($_POST['asset_id'], $_POST, $token); http_response_code(200);
+						$response = edit_asset($_POST['asset_id'], $_POST, $token);
+						http_response_code(200);
 						die(json_encode($response));
 					}
 					if ($_POST['subsequent_action'] == "file-deletion") {
@@ -808,14 +809,22 @@ class PolicyCloud_Marketplace_Public
 								http_response_code(200);
 								die();
 							}
-						}
-						else throw new RuntimeException('No file type was defined.');
+						} else throw new RuntimeException('No file type was defined.');
 					}
 					if ($_POST['subsequent_action'] == "file-download") {
 						if (!empty($_POST['file-type'])) {
-							$download_url = get_asset_file_url($_POST['file-type'], $_POST['file-identifier'], $token);
-							http_response_code(200);
-							die(json_encode($download_url));
+							$options = get_option('policycloud_marketplace_plugin_settings');
+							if(empty($options['marketplace_host'])) {
+								throw new RuntimeException("No Marketplace Host was defined in the WordPress Settings.");
+							}
+							else {
+								$download_otc = get_asset_file_url($_POST['file-type'], $_POST['file-identifier'], $token);
+								http_response_code(200);
+								$url = 'https://'.$options['marketplace_host'].'/assets/download/'.$download_otc;
+								die(json_encode([
+									"url" => $url
+								]));
+							}
 						}
 					}
 				}
@@ -846,7 +855,8 @@ class PolicyCloud_Marketplace_Public
 	 * @since	1.0.0
 	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
-	function asset_approval_handler() {
+	function asset_approval_handler()
+	{
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_description_editing_verification')) {
 			http_response_code(403);
@@ -931,7 +941,7 @@ class PolicyCloud_Marketplace_Public
 			http_response_code(403);
 			die("Unverified request to create an asset.");
 		}
-		
+
 		try {
 			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 			$token = retrieve_token();

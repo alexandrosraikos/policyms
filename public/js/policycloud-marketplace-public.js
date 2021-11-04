@@ -2,6 +2,7 @@
  * @file Provides global functions for PolicyCloud Marketplace shortcodes.
  *
  * @author Alexandros Raikos <araikos@unipi.gr>
+ * @since 1.0.0
  */
 
 var $ = jQuery;
@@ -12,6 +13,196 @@ var $ = jQuery;
  * This section includes global functionality.
  *
  */
+
+/**
+ * The Modal class, which refers to the given modal in the DOM.
+ *
+ * For the referring structure:
+ * @see policycloud-marketplace-public-display.php::show_modal()
+ * @since 1.0.0
+ */
+class Modal {
+  /**
+   * The Modal class constructor.
+   * @param {string} type The type of modal.
+   * @param {any} data The modal's data. Will add controls if iterable.
+   */
+  constructor(type, data, index = 0) {
+    // Initialize variables.
+    this.type = type;
+    this.data = data;
+    this.index = index ?? 0;
+    this.iterable = this.data.constructor === Array;
+
+    /**
+     * The modal HTML.
+     */
+    this.HTML = `<div id="policycloud-marketplace-modal" class="policycloud-marketplace ${
+      this.type
+    } hidden">
+        <button class="close tactile"><span class="fas fa-times"></span></button>
+        <div class="container">
+        ${
+          this.iterable
+            ? `<button class="previous tactile" ${
+                this.index - 1 < 0 ? "disabled" : ""
+              }>
+          <span class="fas fa-chevron-left"></span>
+        </button>`
+            : ``
+        }
+            <div class="content">
+            </div>
+            
+        ${
+          this.iterable
+            ? `<button class="next tactile" ${
+                this.index + 2 > this.data.length ? "disabled" : ""
+              }>
+          <span class="fas fa-chevron-right"></span>
+        </button>`
+            : ``
+        }
+        </div>
+    </div>
+    `;
+
+    // Stop body scrolling.
+    $("html, body").css({ overflow: "hidden" });
+
+    // Append to document body.
+    $("body").append(this.HTML);
+
+    // Append data.
+    this.set(this.iterable ? this.data[index] : this.data);
+
+    // Show modal.
+    $("#policycloud-marketplace-modal." + this.type).removeClass("hidden");
+
+    /**
+     * Listeners
+     * ----------
+     */
+
+    // Iterate through content on button click.
+    if (this.iterable) {
+      // Set next on click.
+      this.controls.next().on("click", () => {
+        this.next();
+      });
+      // Set next on right arrow key press.
+      $(document).on("keydown", (e) => {
+        console.log(e);
+        e.preventDefault();
+        if (e.key === "ArrowRight") this.next();
+      });
+
+      // Set next.
+      this.controls.previous().on("click", () => {
+        this.previous();
+      });
+      // Set previous on left arrow key press.
+      $(document).on("keydown", (e) => {
+        e.preventDefault();
+        if (e.key === "ArrowLeft") this.previous();
+      });
+    }
+
+    // Dismiss modal on button click.
+    $("#policycloud-marketplace-modal > .close").on("click", (e) => {
+      e.preventDefault();
+      this.hide();
+    });
+
+    // Dismiss modal on 'Escape' key press.
+    $(document).on("keyup", (e) => {
+      e.preventDefault();
+      if (e.key === "Escape") this.hide();
+    });
+  }
+
+  /**
+   * References
+   * ----------
+   */
+
+  /**
+   * The modal's content reference.
+   */
+  content = () => {
+    return $(
+      "#policycloud-marketplace-modal." + this.type + " > .container > .content"
+    );
+  };
+
+  /**
+   * The modal's controls reference.
+   */
+  controls = {
+    previous: () => {
+      return $(
+        "#policycloud-marketplace-modal." +
+          this.type +
+          " > .container > .previous"
+      );
+    },
+    next: () => {
+      return $(
+        "#policycloud-marketplace-modal." + this.type + " > .container > .next"
+      );
+    },
+  };
+
+  /**
+   * Methods
+   * ----------
+   */
+
+  /**
+   * Adds the `hidden` class to a given modal.
+   * @param {Event} e The event.
+   */
+  hide() {
+    $("#policycloud-marketplace-modal." + this.type).remove();
+    $("html, body").css({ overflow: "auto" });
+  }
+
+  /**
+   * Set the control buttons disabled status.
+   *
+   * @param {Boolean} previousState Whether there is a previous state.
+   * @param {Boolean} nextState Whether there is a next state.
+   */
+  setControls(previousState, nextState) {
+    this.controls.previous().prop("disabled", !previousState);
+    this.controls.next().prop("disabled", !nextState);
+  }
+
+  /**
+   * Clear previous content and append new.
+   *
+   * @param { HTMLElement } content
+   */
+  set(data) {
+    this.content().empty();
+    this.content().append(data);
+  }
+
+  next() {
+    this.index = this.index + 1 > this.data.length - 1 ? 0 : this.index + 1;
+    this.set(this.data[this.index]);
+    this.setControls(
+      this.controls.previous(),
+      this.index + 1 <= this.data.length - 1
+    );
+  }
+
+  previous() {
+    this.index = this.index - 1 < 0 ? this.data.length - 1 : this.index - 1;
+    this.set(this.data[this.index]);
+    this.setControls(this.index - 1 >= 0, this.controls.next());
+  }
+}
 
 /**
  * Store the encrypted token as a cookie
