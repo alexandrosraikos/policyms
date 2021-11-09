@@ -213,6 +213,7 @@ class Modal {
  * @author Alexandros Raikos <araikos@unipi.gr>
  */
 function setAuthorizedToken(encryptedToken) {
+  // TODO @alexandrosraikos: Token must be relative. (#34)
   let date = new Date();
   date.setTime(date.getTime() + 15 * 24 * 60 * 60 * 1000);
   const expires = "expires=" + date.toUTCString();
