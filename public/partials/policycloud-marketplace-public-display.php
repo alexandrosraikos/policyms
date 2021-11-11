@@ -483,8 +483,6 @@ function assets_archive_html($assets, $filters, $args)
  */
 function asset_html($asset, $images, $args)
 {
-    // TODO @alexandrosraikos: Fix blank shortcodes (#32).
-
     /**
      * Print the locked content notification.
      * 
@@ -851,8 +849,6 @@ function asset_html($asset, $images, $args)
          */
         function account_html(array $information, $picture, array $statistics, array $assets, array $reviews, array $approvals = [], array $args = [])
         {
-            // TODO @alexandrosraikos: Correctly sanitize related URLs (#35). - Add `https://` prefix.
-
             /**
              * Display a list of assets with filtering, sorting and custom pagination. 
              * 
@@ -921,7 +917,7 @@ function asset_html($asset, $images, $args)
                     <?php
                     if (count($content['results'] ?? []) > 1) {
                         foreach ($content['results'] as $page => $page_items) {
-                            echo '<button data-category="' . $id . '" class="page-selector ' . (($page == ($_GET['page'] ?? 0)) ? 'active' : '') . '" data-' . $id . '-page="' . $page + 1 . '">' . ($page + 1) . '</button>';
+                            echo '<button data-category="' . $id . '" class="page-selector ' . (($page == ($_GET['page'] ?? 0)) ? 'active' : '') . '" data-' . $id . '-page="' . ($page + 1) . '">' . ($page + 1) . '</button>';
                         }
                     } ?>
                 </nav>

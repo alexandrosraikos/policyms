@@ -87,6 +87,9 @@ class PolicyCloud_Marketplace_Public
 	{
 		// Generic script.
 		wp_enqueue_script("policycloud-marketplace", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public.js', array('jquery'), $this->version, false);
+		wp_localize_script("policycloud-marketplace", 'GlobalProperties', array(
+			"rootURLPath" => (empty(parse_url(get_site_url())['path']) ? "/" : parse_url(get_site_url())['path'])
+		));
 
 		// Accounts related scripts.
 		wp_register_script("policycloud-marketplace-account-registration", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-registration.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
@@ -132,8 +135,6 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public static function add_conditional_access_menu_item($items, $args)
 	{
-		// TODO @alexandrosraikos: Fix menu not showing on certain themes (#4).
-
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
 
 		// Retrieve credentials.

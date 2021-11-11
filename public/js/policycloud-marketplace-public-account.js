@@ -755,6 +755,9 @@
       removeWeblinkField
     );
 
+    // Verify a weblink field.
+    $(document).on("change");
+
     // Show current password field on email editing.
     const initialEmailAddress = $(
       "#policycloud-marketplace-account-edit input[name=email]"

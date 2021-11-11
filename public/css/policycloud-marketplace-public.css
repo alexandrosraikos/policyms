@@ -7,8 +7,6 @@
 *
 */
 
-/* TODO @alexandrosraikos: Correct styling (#29, #30, #31 & #42).
-
 :root {
   --policycloud-text-color: #111111;
   --policycloud-text-color-secondary: #464646;
@@ -29,8 +27,13 @@
 
 /* Links & buttons */
 
+.policycloud-marketplace {
+  margin: 0 auto;
+}
+
 .policycloud-marketplace a {
   display: inline !important;
+  margin: 0 auto;
   text-decoration: none !important;
   font-size: inherit;
   font-weight: bold;
@@ -42,6 +45,7 @@
   text-decoration: none !important;
   display: inline;
   color: var(--policycloud-highlight-color-mid);
+  cursor: pointer !important;
   transition: color 0.2s ease-in-out;
 }
 
@@ -237,6 +241,10 @@
 
 /* Forms */
 
+.policycloud-marketplace form {
+  max-width: 900px;
+}
+
 .policycloud-marketplace
   form
   *:not(input[type="radio"], input[type="checkbox"], input[type="file"], button, svg, table, tbody, tr, td, span, h1, h2, h3, h4, h5, h6, p, img) {
@@ -249,7 +257,7 @@
 .policycloud-marketplace form fieldset {
   border: none;
   padding: none;
-  margin: 0;
+  margin: 0 auto;
 }
 
 .policycloud-marketplace
