@@ -667,12 +667,11 @@ function account_edit($uid, $token)
         $data['socials-title'] = [$data['socials-title']];
         $data['socials-url'] = [esc_url_raw($data['socials-url'])];
     }
-    $social_counter = 0;
-    $data['socials'] = (empty($data['socials-title'][0]) || empty($data['socials-url'][0])) ? [''] : array_map(function ($v) use ($data, $social_counter) {
-        $social = $v . ":" . $data['socials-url'][$social_counter];
-        $social_counter += 1;
+    
+    $data['socials'] = (empty($data['socials-title'][0]) || empty($data['socials-url'][0])) ? [''] : array_map(function ($v, $k) use ($data) {
+        $social = $v . ":" . esc_url_raw($data['socials-url'][$k]);
         return $social;
-    }, $data['socials-title']);
+    }, $data['socials-title'], array_keys($data['socials-title']));
 
     try {
         $information_response = policyCloudMarketplaceAPIRequest(

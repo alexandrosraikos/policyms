@@ -5,8 +5,6 @@
  * @author Alexandros Raikos <araikos@unipi.gr>
  */
 
-// TODO @alexandrosraikos: Fix asset sorting (#36).
-
 (function ($) {
   "use strict";
   $(document).ready(function () {
@@ -114,32 +112,36 @@
       switch (sortBy) {
         case "newest":
           items.sort((a, b) => {
-            return $(a).data("date-updated") < $(b).data("date-updated");
+            return $(a).data("date-updated") < $(b).data("date-updated")
+              ? 1
+              : -1;
           });
           break;
         case "oldest":
           items.sort((a, b) => {
-            return $(a).data("date-updated") > $(b).data("date-updated");
+            return $(a).data("date-updated") > $(b).data("date-updated")
+              ? 1
+              : -1;
           });
           break;
         case "rating-asc":
           items.sort((a, b) => {
-            return $(a).data("rating") < $(b).data("rating");
+            return $(a).data("rating") < $(b).data("rating") ? 1 : -1;
           });
           break;
         case "rating-desc":
           items.sort((a, b) => {
-            return $(a).data("rating") > $(b).data("rating");
+            return $(a).data("rating") > $(b).data("rating") ? 1 : -1;
           });
           break;
         case "views-asc":
           items.sort((a, b) => {
-            return $(a).data("total-views") < $(b).data("total-views");
+            return $(a).data("total-views") < $(b).data("total-views") ? 1 : -1;
           });
           break;
         case "views-desc":
           items.sort((a, b) => {
-            return $(a).data("total-views") > $(b).data("total-views");
+            return $(a).data("total-views") > $(b).data("total-views") ? 1 : -1;
           });
           break;
         case "title":
@@ -489,6 +491,10 @@
     function updateInformation(e) {
       e.preventDefault();
 
+      // // Perform built-in browser validation.
+      // var $this = $(this);
+      // $this.get(0).reportValidity();
+
       // Add loading class.
       $("#policycloud-marketplace-account-edit button[type=submit]").addClass(
         "loading"
@@ -783,9 +789,7 @@
     );
 
     // Submit the updated information.
-    $("#policycloud-marketplace-account-edit button[type=submit]").click(
-      updateInformation
-    );
+    $("#policycloud-marketplace-account-edit").submit(updateInformation);
 
     // Request a copy of the account's data.
     $("button#policycloud-marketplace-request-data-copy").click(
