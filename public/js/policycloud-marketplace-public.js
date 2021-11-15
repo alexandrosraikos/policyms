@@ -92,7 +92,6 @@ class Modal {
       });
       // Set next on right arrow key press.
       $(document).on("keydown", (e) => {
-        console.log(e);
         e.preventDefault();
         if (e.key === "ArrowRight") this.next();
       });

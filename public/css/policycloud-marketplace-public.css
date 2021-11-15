@@ -527,12 +527,21 @@
   z-index: 600;
 
   /* Display & Box Model */
+  width: auto;
   max-width: 60vw;
   min-height: 50px;
   /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);*/
 
   /* Other */
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, calc(-50% - 0.5px));
+}
+
+/**
+* Quick fix or image positioning.
+*/
+#policycloud-marketplace-modal > .container img {
+  /* Positioning */
+  vertical-align: middle !important;
 }
 
 #policycloud-marketplace-modal > .container > .previous,
@@ -715,6 +724,10 @@
 
   /* Other */
   font-weight: normal;
+}
+
+#policycloud-marketplace-assets-grid > ul > li > a > .cover > img {
+  object-fit: contain;
 }
 
 #policycloud-marketplace-assets-grid > ul > li > a > .cover > div {
@@ -978,6 +991,7 @@
   /* Display & Box Model */
   display: flex;
   align-items: center;
+  margin: 0;
 }
 
 #policycloud-marketplace-asset-archive > .content > header > form > fieldset {
