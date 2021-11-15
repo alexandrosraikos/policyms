@@ -966,7 +966,7 @@ function asset_html($asset, $images, $args)
                     ?>
                     <nav>
                         <button class="tactile" id="policycloud-marketplace-account-overview" class="active">Overview</button>
-                        <button class="tactile" id="policycloud-marketplace-account-assets">Assets <span class="pill"><?php echo (!empty($assets_count)) ? "" : $assets_count ?></span></button>
+                        <button class="tactile" id="policycloud-marketplace-account-assets">Assets <span class="pill"><?php echo (empty($assets_count)) ? "" : $assets_count ?></span></button>
                         <button class="tactile" id="policycloud-marketplace-account-reviews">Reviews <span class="pill"><?php echo (empty($reviews_count)) ? "" : $reviews_count ?></span></button>
                         <?php
                         if (!$args['visiting'] && $args['is_admin']) {
