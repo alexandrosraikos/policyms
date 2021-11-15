@@ -227,7 +227,7 @@ function account_registration($data)
         !empty(preg_match('@[^\w]@', $data['password'])) &&
         strlen($data['password']) < 8
     ) throw new RuntimeException('Password should be at least 8 characters and  include at least one uppercase letter, a number, and a special character.');
-    if ($data['username'] <= 2) throw new RuntimeException("Username must be at least 2 characters.");
+    if (strlen($data['username']) <= 2) throw new RuntimeException("Username must be at least 2 characters.");
     if (!empty($data['title'])) {
         if (!in_array($data['title'], ['Mr.', 'Ms.', 'Mrs.', 'Dr.', 'Prof.', 'Sir', 'Miss', 'Mx.', '-'])) throw new InvalidArgumentException("Please select a valid title.");
     }
@@ -630,6 +630,9 @@ function account_edit($uid, $token)
     if (!empty($data['gender'])) {
         if (!in_array($data['gender'], ['male', 'female', 'transgender', 'genderqueer', 'questioning', '-'])) throw new RuntimeException("Please select a gender from the list.");
     }
+    if(!empty($data['about'])) {
+        if(strlen($data['about']) > 500) throw new RuntimeException("The About field should not exceed 500 characters in length.");
+    }
 
     // Contact the PolicyCloud Marketplace API for password change.
     if (!empty($data['password'])) {
@@ -662,14 +665,13 @@ function account_edit($uid, $token)
     // Format the social media fields appropriately.
     if (!is_array($data['socials-title']) || !is_array($data['socials-url'])) {
         $data['socials-title'] = [$data['socials-title']];
-        $data['socials-url'] = [$data['socials-url']];
+        $data['socials-url'] = [esc_url_raw($data['socials-url'])];
     }
-    $social_counter = 0;
-    $data['socials'] = (empty($data['socials-title'][0]) || empty($data['socials-url'][0])) ? [''] : array_map(function ($v) use ($data, $social_counter) {
-        $social = $v . ":" . $data['socials-url'][$social_counter];
-        $social_counter += 1;
+    
+    $data['socials'] = (empty($data['socials-title'][0]) || empty($data['socials-url'][0])) ? [''] : array_map(function ($v, $k) use ($data) {
+        $social = $v . ":" . esc_url_raw($data['socials-url'][$k]);
         return $social;
-    }, $data['socials-title']);
+    }, $data['socials-title'], array_keys($data['socials-title']));
 
     try {
         $information_response = policyCloudMarketplaceAPIRequest(
@@ -699,11 +701,11 @@ function account_edit($uid, $token)
 
     // Return encrypted token.
     try {
-        if (!empty($information_response)) {
+        if (!empty($information_response['token'])) {
             return openssl_encrypt($information_response['token'], "AES-128-ECB", $options['encryption_key']);
-        } elseif (!empty($password_response)) {
+        } elseif (!empty($password_response['token'])) {
             return openssl_encrypt($password_response['token'], "AES-128-ECB", $options['encryption_key']);
-        } elseif (!empty($profile_picture_response)) {
+        } elseif (!empty($profile_picture_response['token'])) {
             return openssl_encrypt($profile_picture_response['token'], "AES-128-ECB", $options['encryption_key']);
         } else {
             throw new ErrorException("Please update the fields before submitting.");

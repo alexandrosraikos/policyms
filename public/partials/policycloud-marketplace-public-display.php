@@ -917,7 +917,7 @@ function asset_html($asset, $images, $args)
                     <?php
                     if (count($content['results'] ?? []) > 1) {
                         foreach ($content['results'] as $page => $page_items) {
-                            echo '<button data-category="' . $id . '" class="page-selector ' . (($page == ($_GET['page'] ?? 0)) ? 'active' : '') . '" data-' . $id . '-page="' . $page + 1 . '">' . ($page + 1) . '</button>';
+                            echo '<button data-category="' . $id . '" class="page-selector ' . (($page == ($_GET['page'] ?? 0)) ? 'active' : '') . '" data-' . $id . '-page="' . ($page + 1) . '">' . ($page + 1) . '</button>';
                         }
                     } ?>
                 </nav>

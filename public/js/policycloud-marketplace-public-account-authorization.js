@@ -49,7 +49,7 @@
             "#policycloud-authorization button[type=submit]",
             (data) => {
               setAuthorizedToken(data);
-              window.location.href = "/";
+              window.location.href = GlobalProperties.rootURLPath;
             }
           );
         },

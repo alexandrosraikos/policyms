@@ -280,7 +280,6 @@ function get_asset_file_url($type, $id, $token) {
         $token
     );
 
-    // TODO @alexandrosraikos: Wait for @vkoukos implementation.
     return $response['otc'];
 } 
 
@@ -550,7 +549,6 @@ function edit_asset($did, $data, $token)
 
         // Check for updated files.
         if (substr($key, 0, 5) === "file-" || substr($key, 0, 6) === "image-" || substr($key, 0, 6) === "video-") {
-            // TODO @alexandrosraikos / @vkoukos: Check files specs.
             if ($value['error'] == 0) {
                 if (substr($key, 0, 5) === "file-") {
                     try {

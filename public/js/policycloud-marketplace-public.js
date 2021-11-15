@@ -216,7 +216,13 @@ function setAuthorizedToken(encryptedToken) {
   let date = new Date();
   date.setTime(date.getTime() + 15 * 24 * 60 * 60 * 1000);
   const expires = "expires=" + date.toUTCString();
-  document.cookie = "ppmapi-token=" + encryptedToken + "; Path=/; " + expires;
+  document.cookie =
+    "ppmapi-token=" +
+    encryptedToken +
+    "; Path=" +
+    GlobalProperties.rootURLPath +
+    "; " +
+    expires;
 }
 
 /**
@@ -229,9 +235,11 @@ function setAuthorizedToken(encryptedToken) {
  */
 function removeAuthorization(reload = false) {
   document.cookie =
-    "ppmapi-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    "ppmapi-token=; Path=" +
+    GlobalProperties.rootURLPath +
+    "; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
   if (reload) window.location.reload();
-  else window.location.href = "/";
+  else window.location.href = GlobalProperties.rootURLPath;
 }
 
 /**

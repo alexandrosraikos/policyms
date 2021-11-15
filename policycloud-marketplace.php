@@ -13,10 +13,10 @@
  * @package           PolicyCloud_Marketplace
  *
  * @wordpress-plugin
- * Plugin Name:       Policy Cloud Marketplace
+ * Plugin Name:       PolicyCloud Marketplace for WordPress
  * Plugin URI:        https://dac.ds.unipi.gr/policycloud-eu/
  * Description:       The official plugin for the PolicyCloud Marketplace, enabling front-end access to the PolicyCloud API.
- * Version:           1.0.0
+ * Version:           1.0.1
  * Author:            University of Piraeus Research Center
  * Author URI:        https://dac.ds.unipi.gr/
  * Text Domain:       policycloud-marketplace
@@ -28,7 +28,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define( 'POLICYCLOUD_MARKETPLACE_VERSION', '1.0.0' );
+define( 'POLICYCLOUD_MARKETPLACE_VERSION', '1.0.1' );
 
 /**
  * The code that runs during plugin activation.
