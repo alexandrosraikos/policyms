@@ -260,13 +260,12 @@ function assets_grid_html($assets, $asset_url)
     } else {
         echo '<div class="policycloud-marketplace" id="policycloud-marketplace-assets-grid">';
         echo '<ul>';
-        // TODO @alexandrosraikos: Switch gallery default pic to the default SVG. (#56)
         foreach ($assets as $asset) {
         ?>
             <li>
                 <a href="<?php echo $asset_url . '?did=' . $asset['id'] ?>">
                     <div class="cover">
-                        <img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/placeholder.jpg') ?>" alt="" />
+                        <img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/marketplace.svg') ?>" alt="" />
                         <div class="content">
                             <h4><?php echo $asset['info']['title'] ?></h4>
                             <p><?php echo $asset['info']['short_desc'] ?></p>
@@ -946,7 +945,15 @@ function asset_html($asset, $images, $args)
                     }
                 } else show_alert("Your account verification status couldn't be accessed.");
 
-                // TODO @alexandrosraikos: Correct count blabels to include assets / reviews instead of their page count (#53). 
+                $assets_count = array_sum(array_map(function ($page) {
+                    return count($page);
+                }, $assets['results'] ?? []));
+                $reviews_count = array_sum(array_map(function ($page) {
+                    return count($page);
+                }, $reviews['results'] ?? []));
+                $approvals_count = array_sum(array_map(function ($page) {
+                    return count($page);
+                }, $approvals['results'] ?? []));
         ?>
             <div id="policycloud-marketplace-account" class="policycloud-marketplace">
                 <div id="policycloud-marketplace-account-sidebar">
@@ -959,13 +966,13 @@ function asset_html($asset, $images, $args)
                     ?>
                     <nav>
                         <button class="tactile" id="policycloud-marketplace-account-overview" class="active">Overview</button>
-                        <button class="tactile" id="policycloud-marketplace-account-assets">Assets <span class="pill"><?php echo (count($assets['results'] ?? []) == 0) ? "" : count($assets['results']) ?></span></button>
-                        <button class="tactile" id="policycloud-marketplace-account-reviews">Reviews <span class="pill"><?php echo (count($reviews['results'] ?? []) == 0 ?? 0) ? "" : count($reviews['results']) ?></span></button>
+                        <button class="tactile" id="policycloud-marketplace-account-assets">Assets <span class="pill"><?php echo (!empty($assets_count)) ? "" : $assets_count ?></span></button>
+                        <button class="tactile" id="policycloud-marketplace-account-reviews">Reviews <span class="pill"><?php echo (empty($reviews_count)) ? "" : $reviews_count ?></span></button>
                         <?php
                         if (!$args['visiting'] && $args['is_admin']) {
                         ?>
                             <hr />
-                            <button class="tactile" id="policycloud-marketplace-account-approvals">Approvals <span class="pill"><?php echo (count($approvals['results'] ?? []) == 0) ? "" : count($approvals['results']) ?></span></button>
+                            <button class="tactile" id="policycloud-marketplace-account-approvals">Approvals <span class="pill"><?php echo (empty($approvals_count)) ? "" : $approvals_count ?></span></button>
                             <hr />
                         <?php
                         }

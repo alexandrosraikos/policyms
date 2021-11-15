@@ -125,7 +125,6 @@ class PolicyCloud_Marketplace_Public
 		add_shortcode('policycloud-marketplace-login', 'PolicyCloud_Marketplace_Public::account_authorization_shortcode');
 	}
 
-
 	/**
 	 * Add a menu item to a selected menu, which conditionally switches
 	 * from log in to log out actions.
@@ -139,24 +138,38 @@ class PolicyCloud_Marketplace_Public
 
 		// Retrieve credentials.
 		$options = get_option('policycloud_marketplace_plugin_settings');
-		if (empty($options['selected_menu']) || empty($options['login_page']) || empty($options['account_page']) || empty($options['registration_page'])) return $items;
+		if (
+			empty($options['selected_menu']) ||
+			empty($options['login_page']) ||
+			empty($options['account_page']) ||
+			empty($options['registration_page'] ||
+				empty($options['upload_page']))
+		) return $items;
+
+		if (!function_exists('list_url_wrap')) {
+			function list_url_wrap($url)
+			{
+				$random_id = rand(1000, 10000);
+				return '<li id="menu-item-' . $random_id . '" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-' . $random_id . '">' . $url . '</li>';
+			}
+		}
 
 		// Add conditional menu item.
 		if ($args->theme_location == $options['selected_menu']) {
 			try {
-				// TODO @alexandrosraikos: Correct CSS layout compatibility for most themes (#4).
 				if (!empty(retrieve_token())) {
-					// TODO @alexandrosraikos: Add 'Create' link to upload page (#50).
-					$link = '<a class="menu-link elementor-item" href="' . $options['account_page'] . '">My Account</a>';
-					$link .= '<a class="menu-link elementor-item policycloud-logout">Log out</a>';
+					$links = list_url_wrap('<a href="' . $options['upload_page'] . '">Create</a>');
+					$links .= list_url_wrap('<a href="' . $options['account_page'] . '">My Account</a>');
+					$links .= list_url_wrap('<a class="policycloud-logout">Log out</a>');
 				} else {
-					$link = '<a class="menu-link elementor-item" href="' . $options['login_page'] . '">Log In</a>';
-					$link .= '<a class="menu-link elementor-item" href="' . $options['registration_page'] . '">Register</a>';
+					$links = list_url_wrap('<a href="' . $options['login_page'] . '">Log In</a>');
+					$links .= list_url_wrap('<a href="' . $options['registration_page'] . '">Register</a>');
 				}
 			} catch (\Exception $e) {
-				$link = '<a class="menu-link elementor-item" href="' . $options['login_page'] . '">Log In</a>';
+				$links = list_url_wrap('<a href="' . $options['login_page'] . '">Log In</a>');
+				$links .= list_url_wrap('<a href="' . $options['registration_page'] . '">Register</a>');
 			}
-			return $items . '<li class="menu-item menu-item-type-post_type menu-item-object-page policycloud-access-button">' . $link . '</li>';
+			return $items . $links;
 		} else return $items;
 	}
 
@@ -815,13 +828,12 @@ class PolicyCloud_Marketplace_Public
 					if ($_POST['subsequent_action'] == "file-download") {
 						if (!empty($_POST['file-type'])) {
 							$options = get_option('policycloud_marketplace_plugin_settings');
-							if(empty($options['marketplace_host'])) {
+							if (empty($options['marketplace_host'])) {
 								throw new RuntimeException("No Marketplace Host was defined in the WordPress Settings.");
-							}
-							else {
+							} else {
 								$download_otc = get_asset_file_url($_POST['file-type'], $_POST['file-identifier'], $token);
 								http_response_code(200);
-								$url = 'https://'.$options['marketplace_host'].'/assets/download/'.$download_otc;
+								$url = 'https://' . $options['marketplace_host'] . '/assets/download/' . $download_otc;
 								die(json_encode([
 									"url" => $url
 								]));
