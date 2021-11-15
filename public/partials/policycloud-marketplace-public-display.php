@@ -260,6 +260,7 @@ function assets_grid_html($assets, $asset_url)
     } else {
         echo '<div class="policycloud-marketplace" id="policycloud-marketplace-assets-grid">';
         echo '<ul>';
+        // TODO @alexandrosraikos: Switch gallery default pic to the default SVG. (#56)
         foreach ($assets as $asset) {
         ?>
             <li>
@@ -944,6 +945,8 @@ function asset_html($asset, $images, $args)
                         show_alert('Your account is still unverified, please check your email inbox or spam folder for a verification email. You can <a id="policycloud-marketplace-resend-verification-email">resend</a> it if you can\'t find it.', 'notice');
                     }
                 } else show_alert("Your account verification status couldn't be accessed.");
+
+                // TODO @alexandrosraikos: Correct count blabels to include assets / reviews instead of their page count (#53). 
         ?>
             <div id="policycloud-marketplace-account" class="policycloud-marketplace">
                 <div id="policycloud-marketplace-account-sidebar">

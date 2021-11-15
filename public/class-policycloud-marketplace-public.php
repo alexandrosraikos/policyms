@@ -144,7 +144,9 @@ class PolicyCloud_Marketplace_Public
 		// Add conditional menu item.
 		if ($args->theme_location == $options['selected_menu']) {
 			try {
+				// TODO @alexandrosraikos: Correct CSS layout compatibility for most themes (#4).
 				if (!empty(retrieve_token())) {
+					// TODO @alexandrosraikos: Add 'Create' link to upload page (#50).
 					$link = '<a class="menu-link elementor-item" href="' . $options['account_page'] . '">My Account</a>';
 					$link .= '<a class="menu-link elementor-item policycloud-logout">Log out</a>';
 				} else {

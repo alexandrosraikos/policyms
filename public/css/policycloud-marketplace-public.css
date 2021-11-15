@@ -241,6 +241,7 @@
 
 /* Forms */
 
+/* TODO @alexandrosraikos: Disable auto margin for asset archive header. */
 .policycloud-marketplace form {
   margin: 0 auto;
   max-width: 900px;
@@ -476,6 +477,7 @@
   content: " ";
 }
 
+/* TODO @alexandrosraikos: Correct content aliasing on some specific heights. (#52) */
 #policycloud-marketplace-modal {
   /* Positioning */
   position: fixed;
