@@ -173,6 +173,8 @@ class PolicyCloud_Marketplace
 	private function define_public_hooks()
 	{
 
+		// TODO @alexandrosraikos: Restructure codebase using OOP (#60).
+
 		$plugin_public = new PolicyCloud_Marketplace_Public($this->get_plugin_name(), $this->get_version());
 
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
