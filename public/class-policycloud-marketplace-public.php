@@ -18,7 +18,7 @@
  *
  * @package    PolicyCloud_Marketplace
  * @subpackage PolicyCloud_Marketplace/public
- * @author     Your Name <email@example.com>
+ * @author     Alexandros Raikos <araikos@unipi.gr>
  */
 class PolicyCloud_Marketplace_Public
 {
@@ -134,7 +134,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public static function add_conditional_access_menu_item($items, $args)
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 
 		// Retrieve credentials.
 		$options = get_option('policycloud_marketplace_plugin_settings');
@@ -183,7 +183,7 @@ class PolicyCloud_Marketplace_Public
 	{
 
 		// Check for existing token.
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 		try {
 			// Retrieve credentials.
 			$options = get_option('policycloud_marketplace_plugin_settings');
@@ -219,7 +219,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public function account_registration_handler()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_registration')) {
@@ -276,7 +276,7 @@ class PolicyCloud_Marketplace_Public
 
 
 		// Check for existing token.
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 		try {
 			if (retrieve_token()) {
 				$logged_in = true;
@@ -305,7 +305,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public function account_authorization_handler()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_login')) {
@@ -347,7 +347,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public static function account_shortcode()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 
 		// Retrieve credentials.
 		$options = get_option('policycloud_marketplace_plugin_settings');
@@ -465,7 +465,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public function account_editing_handler()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_account_editing_verification')) {
@@ -531,7 +531,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public function account_email_verification_resend_handler()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 
 		// Verify WordPress generated nonce.
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_account_editing_verification')) {
@@ -571,7 +571,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public function account_data_request_handler()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 
 		// Verify WordPress generated nonce (using the same as account editing).
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_account_editing_verification')) {
@@ -617,7 +617,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public function account_deletion_handler()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 
 		// Verify WordPress generated nonce (using the same as account editing due to them being in the same page).
 		if (!wp_verify_nonce($_POST['nonce'], 'ajax_policycloud_account_editing_verification')) {
@@ -689,7 +689,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public static function assets_archive_shortcode()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
 
 		try {
@@ -726,7 +726,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public static function asset_shortcode()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
 
 		try {
@@ -805,7 +805,7 @@ class PolicyCloud_Marketplace_Public
 		}
 
 		try {
-			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+			require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 			$token = retrieve_token();
 			if (!empty($token)) {
 				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
@@ -877,7 +877,7 @@ class PolicyCloud_Marketplace_Public
 		}
 
 		try {
-			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+			require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 			$token = retrieve_token();
 			if (!empty($token)) {
 				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';
@@ -914,7 +914,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 	public static function asset_creation_shortcode()
 	{
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 
 		try {
 			// Get specific Description data for authorized users.
@@ -956,7 +956,7 @@ class PolicyCloud_Marketplace_Public
 		}
 
 		try {
-			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-accounts.php';
+			require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 			$token = retrieve_token();
 			if (!empty($token)) {
 				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-content.php';

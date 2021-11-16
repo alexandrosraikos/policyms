@@ -19,7 +19,7 @@
  *
  * @package    PolicyCloud_Marketplace
  * @subpackage PolicyCloud_Marketplace/includes
- * @author     Your Name <email@example.com>
+ * @author     Alexandros Raikos <araikos@unipi.gr>
  */
 class PolicyCloud_Marketplace_Loader {
 

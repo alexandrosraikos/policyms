@@ -25,7 +25,7 @@
  * @since      1.0.0
  * @package    PolicyCloud_Marketplace
  * @subpackage PolicyCloud_Marketplace/includes
- * @author     Your Name <email@example.com>
+ * @author     Alexandros Raikos <araikos@unipi.gr>
  */
 class PolicyCloud_Marketplace
 {
@@ -123,6 +123,9 @@ class PolicyCloud_Marketplace
 		 * side of the site.
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-public.php';
+
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-policycloud-marketplace-account.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-policycloud-marketplace-exceptions.php';
 
 		$this->loader = new PolicyCloud_Marketplace_Loader();
 	}
@@ -249,5 +252,102 @@ class PolicyCloud_Marketplace
 	public function get_version()
 	{
 		return $this->version;
+	}
+
+	/**
+	 * Return the error message derived from a file upload error code.
+	 *
+	 * @uses 	PolicyCloud_Marketplace_Public::account_registration()
+	 * 
+	 * @since	1.0.0
+	 * @author 	Alexandros Raikos <araikos@unipi.gr>
+	 */
+	public static function fileUploadErrorInterpreter($code)
+	{
+		$errors = array(
+			0 => 'There is no error, the file uploaded with success',
+			1 => 'The uploaded file exceeds the upload_max_filesize directive.',
+			2 => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form',
+			3 => 'The uploaded file was only partially uploaded',
+			4 => 'No file was uploaded',
+			6 => 'Missing a temporary folder',
+			7 => 'Failed to write file to disk.',
+			8 => 'A PHP extension stopped the file upload.',
+		);
+		return $errors[$code] ?? $code;
+	}
+
+
+	/**
+	 * Send a request to the PolicyCloud Marketplace API. 
+	 * Documentation: https://documenter.getpostman.com/view/16776360/TzsZs8kn#intro
+	 * 
+	 * @param string $http_method The standardized HTTP method used for the request.
+	 * @param array $data The data to be sent according to the documented schema.
+	 * @param string $token The encoded user access token.
+	 * @param array $additional_headers Any additional HTTP headers for the request.
+	 * 
+	 * @throws InvalidArgumentException For missing WordPress settings.
+	 * @throws ErrorException For connectivity and other API issues.
+	 * 
+	 * @since   1.0.0
+	 * @author  Alexandros Raikos <araikos@unipi.gr>
+	 */
+	public static function api_request($http_method, $uri, $data = [], $token = null, $headers = null, $skip_encoding = false)
+	{
+
+		// Retrieve hostname URL.
+		$options = get_option('policycloud_marketplace_plugin_settings');
+		if (empty($options['marketplace_host'])) throw new InvalidArgumentException("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
+		if (empty($options['api_access_token'])) throw new InvalidArgumentException("No PolicyCloud Marketplace API access key was defined in WordPress settings.");
+
+		if (!empty($data)) {
+			$data = ($skip_encoding) ?  $data : json_encode($data);
+		}
+
+		// Contact Marketplace login API endpoint.
+		$curl = curl_init();
+		curl_setopt_array($curl, [
+			CURLOPT_URL => 'https://' . $options['marketplace_host'] . $uri,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_ENCODING => '',
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_TIMEOUT => 0,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST => $http_method,
+			CURLOPT_POSTFIELDS => (!empty($data)) ?  $data : null,
+			CURLOPT_HTTPHEADER => $headers ?? ['Content-Type: application/json', (!empty($token) ? ('x-access-token: ' . $token) : null), 'x-more-time: ' . $options['api_access_token']]
+		]);
+
+		// Get the data.
+		$response = curl_exec($curl);
+
+		// Handle errors.
+		if (curl_errno($curl)) {
+			throw new Exception("Unable to reach the Marketplace server. More details: " . curl_error($curl));
+		}
+
+		if (isset($response)) {
+			if (is_string($response)) {
+				$decoded = json_decode($response, true);
+				if (json_last_error() === JSON_ERROR_NONE) {
+					$curl_http = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+					if ($decoded['_status'] == 'successful' && ($curl_http == 200 || $curl_http == 201 || $curl_http == 406)) {
+						curl_close($curl);
+						return $decoded;
+					} else {
+						curl_close($curl);
+						throw new ErrorException($decoded['message']);
+					}
+				} else {
+					curl_close($curl);
+					return $response;
+				}
+			}
+		} else {
+			curl_close($curl);
+			throw new ErrorException("There was no response.");
+		};
 	}
 }
