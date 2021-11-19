@@ -1701,8 +1701,7 @@
   font-weight: bold;
 }
 
-#policycloud-marketplace-account-content section .collection-filters,
-div {
+#policycloud-marketplace-account-content section .collection-filters div {
   margin-bottom: 5px;
 }
 
