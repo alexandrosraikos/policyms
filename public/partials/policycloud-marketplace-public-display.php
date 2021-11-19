@@ -387,10 +387,10 @@ function assets_archive_html($assets, $filters, $args)
                         <h3>Views</h3>
                         <div class="views">
                             <div>
-                                <input type="number" name="views_gte" placeholder="0" value="<?php echo $_GET['views_gte'] ?? '' ?>" min="0" />
+                                <input type="number" name="views-gte" placeholder="0" value="<?php echo $_GET['views-gte'] ?? '' ?>" min="0" />
                             </div>
                             <div>
-                                <input type="number" name="views_lte" placeholder="<?php echo $filters['max_views'] ?>" value="<?php echo $_GET['views_lte'] ?? "" ?>" max="<?php echo $filters['max_views'] ?>" />
+                                <input type="number" name="views-lte" placeholder="<?php echo $filters['max_views'] ?>" value="<?php echo $_GET['views-lte'] ?? "" ?>" max="<?php echo $filters['max_views'] ?>" />
                             </div>
                         </div>
                     </fieldset>
@@ -398,12 +398,12 @@ function assets_archive_html($assets, $filters, $args)
                         <h3>Date</h3>
                         <div class="dates">
                             <div>
-                                <label for="update_date_gte">From</label>
-                                <input type="date" onfocus="(this.type='date')" name="update_date_gte" placeholder="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>" value="<?php echo $_GET['update_date_gte'] ?? '' ?>" min="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>" max="<?php echo date("Y-m-d") ?>" />
+                                <label for="update-date-gte">From</label>
+                                <input type="date" onfocus="(this.type='date')" name="update-date-gte" placeholder="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>" value="<?php echo $_GET['update-date-gte'] ?? '' ?>" min="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>" max="<?php echo date("Y-m-d") ?>" />
                             </div>
                             <div>
-                                <label for="update_date_lte">To</label>
-                                <input type="date" name="update_date_lte" placeholder="<?php echo date("Y-m-d") ?>" value="<?php echo $_GET['update_date_lte'] ?? '' ?>" min="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>" max="<?php echo date("Y-m-d") ?>" />
+                                <label for="update-date-lte">To</label>
+                                <input type="date" name="update-date-lte" placeholder="<?php echo date("Y-m-d") ?>" value="<?php echo $_GET['update-date-lte'] ?? '' ?>" min="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>" max="<?php echo date("Y-m-d") ?>" />
                             </div>
                         </div>
                     </fieldset>
@@ -870,25 +870,25 @@ function asset_html($asset, $images, $args)
                     <form action="" class="selector">
                         <label for="sort-by">Sort by</label>
                         <select name="sort-by" data-category="<?php echo $id ?>">
-                            <option value="newest" <?php echo ((($_GET['sort_by'] ?? '' == 'newest') || empty($_GET['sort_by'])) ? "selected" : "") ?>>Newest</option>
-                            <option value="oldest" <?php echo (($_GET['sort_by'] ?? '' == 'oldest') ? "selected" : "") ?>>Oldest</option>
-                            <option value="rating-asc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-asc') ? "selected" : "") ?>>Highest rated</option>
-                            <option value="rating-desc" <?php echo (($_GET['sort_by'] ?? '' == 'rating-desc') ? "selected" : "") ?>>Lowest rated</option>
+                            <option value="newest" <?php echo ((($_GET['sort-by'] ?? '' == 'newest') || empty($_GET['sort-by'])) ? "selected" : "") ?>>Newest</option>
+                            <option value="oldest" <?php echo (($_GET['sort-by'] ?? '' == 'oldest') ? "selected" : "") ?>>Oldest</option>
+                            <option value="rating-asc" <?php echo (($_GET['sort-by'] ?? '' == 'rating-asc') ? "selected" : "") ?>>Highest rated</option>
+                            <option value="rating-desc" <?php echo (($_GET['sort-by'] ?? '' == 'rating-desc') ? "selected" : "") ?>>Lowest rated</option>
                             <?php
                             if ($id == 'assets') {
                             ?>
-                                <option value="views-asc" <?php echo (($_GET['sort_by'] ?? '' == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
-                                <option value="views-desc" <?php echo (($_GET['sort_by'] ?? '' == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
+                                <option value="views-asc" <?php echo (($_GET['sort-by'] ?? '' == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
+                                <option value="views-desc" <?php echo (($_GET['sort-by'] ?? '' == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
                             <?php } ?>
-                            <option value="title" <?php echo (($_GET['sort_by'] ?? '' == 'title') ? "selected" : "") ?>>Title</option>
+                            <option value="title" <?php echo (($_GET['sort-by'] ?? '' == 'title') ? "selected" : "") ?>>Title</option>
                         </select>
                         <label for="items-per-page">Items per page</label>
                         <select name="items-per-page" data-category="<?php echo $id ?>">
-                            <option value="5" <?php echo ((($_GET['items_per_page'] ?? '' == '5') || empty($_GET['items_per_page'])) ? "selected" : "") ?>>5</option>
-                            <option value="10" <?php echo (($_GET['items_per_page'] ?? '' == '10') ? "selected" : "") ?>>10</option>
-                            <option value="25" <?php echo (($_GET['items_per_page'] ?? '' == '25') ? "selected" : "") ?>>25</option>
-                            <option value="50" <?php echo (($_GET['items_per_page'] ?? '' == '50') ? "selected" : "") ?>>50</option>
-                            <option value="100" <?php echo (($_GET['items_per_page'] ?? '' == '100') ? "selected" : "") ?>>100</option>
+                            <option value="5" <?php echo ((($_GET['items-per-page'] ?? '' == '5') || empty($_GET['items-per-page'])) ? "selected" : "") ?>>5</option>
+                            <option value="10" <?php echo (($_GET['items-per-page'] ?? '' == '10') ? "selected" : "") ?>>10</option>
+                            <option value="25" <?php echo (($_GET['items-per-page'] ?? '' == '25') ? "selected" : "") ?>>25</option>
+                            <option value="50" <?php echo (($_GET['items-per-page'] ?? '' == '50') ? "selected" : "") ?>>50</option>
+                            <option value="100" <?php echo (($_GET['items-per-page'] ?? '' == '100') ? "selected" : "") ?>>100</option>
                         </select>
                     </form>
                     <?php

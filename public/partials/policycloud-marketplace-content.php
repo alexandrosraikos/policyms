@@ -35,13 +35,13 @@ function get_assets(array $args)
         'info.description.in' => !empty($args['search']) ? $args['search'] : null,
         'info.fieldOfUse' => !empty($args['field_of_use']) ? $args['field_of_use'] : null,
         'metadata.provider' => !empty($args['provider']) ? join(",", $args['provider']) : null,
-        'metadata.uploadDate.gte' => !empty($args['upload_date_gte']) ? $args['upload_date_gte'] : null,
-        'metadata.uploadDate.lte' => !empty($args['upload_date_lte']) ? $args['upload_date_lte'] : null,
+        'metadata.uploadDate.gte' => !empty($args['upload-date-gte']) ? $args['upload-date-gte'] : null,
+        'metadata.uploadDate.lte' => !empty($args['upload-date-lte']) ? $args['upload-date-lte'] : null,
         'metadata.last_updated_by' => !empty($args['last_updated_by']) ? $args['last_updated_by'] : null,
-        'metadata.views.gte' => !empty($args['views_gte']) ? $args['views_gte'] : null,
-        'metadata.views.lte' => !empty($args['views_lte']) ? $args['views_lte'] : null,
-        'metadata.updateDate.gte' => !empty($args['update_date_gte']) ? $args['update_date_gte'] : null,
-        'metadata.updateDate.lte' => !empty($args['update_date_lte']) ? $args['update_date_lte'] : null
+        'metadata.views.gte' => !empty($args['views-gte']) ? $args['views-gte'] : null,
+        'metadata.views.lte' => !empty($args['views-lte']) ? $args['views-lte'] : null,
+        'metadata.updateDate.gte' => !empty($args['update-date-gte']) ? $args['update-date-gte'] : null,
+        'metadata.updateDate.lte' => !empty($args['update-date-lte']) ? $args['update-date-lte'] : null
     ]);
 
     // Get all descriptions.
@@ -110,7 +110,7 @@ function get_pending_assets(string $token, array $args = [])
  *
  * @param   string $uid The relevant username.
  * @param	array $args An array of arguments to filter the search. NOTICE: When filtering with
- * items_per_page the returning assets will be arranged in arrays.
+ * items-per-page the returning assets will be arranged in arrays.
  * 
  * @throws  LogicException If the sorting setting is unsupported.
  * 
@@ -122,24 +122,24 @@ function get_pending_assets(string $token, array $args = [])
 function get_account_assets(string $uid, string $token = null, array $args = [])
 {
     // Check arguments
-    if (!empty($args['sort_by'])) {
+    if (!empty($args['sort-by'])) {
         if (
-            $args['sort_by'] != 'newest' ||
-            $args['sort_by'] != 'oldest' ||
-            $args['sort_by'] != 'rating-asc' ||
-            $args['sort_by'] != 'rating-desc' ||
-            $args['sort_by'] != 'views-asc' ||
-            $args['sort_by'] != 'views-desc' ||
-            $args['sort_by'] != 'title'
+            $args['sort-by'] != 'newest' ||
+            $args['sort-by'] != 'oldest' ||
+            $args['sort-by'] != 'rating-asc' ||
+            $args['sort-by'] != 'rating-desc' ||
+            $args['sort-by'] != 'views-asc' ||
+            $args['sort-by'] != 'views-desc' ||
+            $args['sort-by'] != 'title'
         ) {
-            throw new LogicException('The ' . $args['sort_by'] . ' sorting setting was not found.');
+            throw new LogicException('The ' . $args['sort-by'] . ' sorting setting was not found.');
         }
     }
 
     $filters = '?' . http_build_query([
-        'sortBy' => $args['sort_by'] ?? null,
+        'sortBy' => $args['sort-by'] ?? null,
         'page' => $args['assets_page'] ?? null,
-        'itemsPerPage' => $args['items_per_page'] ?? 5
+        'itemsPerPage' => $args['items-per-page'] ?? 5
     ]);
 
     return policyCloudMarketplaceAPIRequest(
@@ -179,7 +179,7 @@ function get_filtering_values()
  *
  * @param   string $uid The relevant username.
  * @param	array $args An array of arguments to filter the search. NOTICE: When filtering with
- * items_per_page the returning reviews will be arranged in arrays.
+ * items-per-page the returning reviews will be arranged in arrays.
  * 
  * @throws  LogicException If the sorting setting is unsupported.
  * 
@@ -191,24 +191,24 @@ function get_filtering_values()
 function get_account_reviews(string $uid, string $token = null, array $args = [])
 {
     // Check arguments
-    if (!empty($args['sort_by'])) {
+    if (!empty($args['sort-by'])) {
         if (
-            $args['sort_by'] != 'newest' ||
-            $args['sort_by'] != 'oldest' ||
-            $args['sort_by'] != 'rating-asc' ||
-            $args['sort_by'] != 'rating-desc' ||
-            $args['sort_by'] != 'views-asc' ||
-            $args['sort_by'] != 'views-desc' ||
-            $args['sort_by'] != 'title'
+            $args['sort-by'] != 'newest' ||
+            $args['sort-by'] != 'oldest' ||
+            $args['sort-by'] != 'rating-asc' ||
+            $args['sort-by'] != 'rating-desc' ||
+            $args['sort-by'] != 'views-asc' ||
+            $args['sort-by'] != 'views-desc' ||
+            $args['sort-by'] != 'title'
         ) {
-            throw new LogicException('The ' . $args['sort_by'] . ' sorting setting was not found.');
+            throw new LogicException('The ' . $args['sort-by'] . ' sorting setting was not found.');
         }
     }
 
     $filters = '?' . http_build_query([
-        'sortBy' => $args['sort_by'] ?? null,
+        'sortBy' => $args['sort-by'] ?? null,
         'page' => $args['assets_page'] ?? null,
-        'itemsPerPage' => $args['items_per_page'] ?? 5
+        'itemsPerPage' => $args['items-per-page'] ?? 5
     ]);
 
     return policyCloudMarketplaceAPIRequest(
@@ -662,7 +662,7 @@ function approve_asset($did, $approval, $token)
         [],
         $token,
         [
-          'x-access-token: '. $token,
+          'x-access-token: '. PolicyCloud_Marketplace_Account::retrieve_token(),
           'x-permission: '.$approval
         ]
     )) {

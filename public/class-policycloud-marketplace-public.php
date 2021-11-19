@@ -401,15 +401,15 @@ class PolicyCloud_Marketplace_Public
 					// Get user descriptions.
 					$descriptions = get_account_assets($account_information['username'], $token['encoded'] ?? null, [
 						'page' => $_GET['page'] ?? null,
-						'items_per_page' => $_GET['items_per_page'] ?? null,
-						'sort_by' => $_GET['sort_by'] ?? null,
+						'items-per-page' => $_GET['items-per-page'] ?? null,
+						'sort-by' => $_GET['sort-by'] ?? null,
 					]);
 
 					// Get user reviews.
 					$reviews = get_account_reviews($account_information['username'], $token['encoded'] ?? null, [
 						'page' => $_GET['page'] ?? null,
-						'items_per_page' => $_GET['items_per_page'] ?? null,
-						'sort_by' => $_GET['sort_by'] ?? null,
+						'items-per-page' => $_GET['items-per-page'] ?? null,
+						'sort-by' => $_GET['sort-by'] ?? null,
 					]);
 
 					if ($is_admin && !$visiting) {

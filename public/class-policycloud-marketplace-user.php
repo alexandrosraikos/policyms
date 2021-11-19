@@ -81,7 +81,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
         }
 
         // Prepare and check new account information.
-        // TODO @alexandrosraikos: Move this to the handler.
+        // TODO @alexandrosraikos: Move this check to the handler.
         $data = [
             'password' => stripslashes($information['password'] ?? ''),
             'password-confirm' => stripslashes($information['password-confirm'] ?? ''),

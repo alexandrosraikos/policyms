@@ -7,9 +7,9 @@ abstract class PolicyCloud_Marketplace_Account
 
     protected ?array $picture = null;
 
-    public function __construct(string $username)
+    public function __construct(string $id)
     {
-        $this->id = $username;
+        $this->id = $id;
         $this->token = $this->retrieve_token();
     }
 
@@ -60,11 +60,11 @@ abstract class PolicyCloud_Marketplace_Account
      * 
      * @version 1.1.0
      */
-    protected function retrieve_token()
+    public static function retrieve_token()
     {
         // Retrieve saved token.
         if (!empty($_COOKIE['ppmapi-token'])) {
-            return $this->decrypt_token(filter_var($_COOKIE['pcmapi-token'], FILTER_SANITIZE_STRING));
+            return self::decrypt_token(filter_var($_COOKIE['pcmapi-token'], FILTER_SANITIZE_STRING));
         } else {
             throw new PolicyCloudMarketplaceUnauthorizedRequestException("The token could not be found.");
         };
