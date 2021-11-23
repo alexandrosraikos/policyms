@@ -119,7 +119,7 @@ function time_elapsed_string($datetime, $full = false)
  *
  * @since    1.0.0
  */
-function account_registration_html($authorization_url, $logged_in, $tos_url, $error)
+function account_registration_html($authorization_url, $tos_url, $logged_in, $error)
 {
     if (!empty($error)) {
         show_alert($error);
@@ -781,7 +781,7 @@ function asset_html($asset, $images, $args)
          * @since   1.0.0
          * @author  Alexandros Raikos <araikos@unipi.gr>
          */
-        function asset_creation_html(string $error = null)
+        function description_creation_html()
         {
             if (!empty($error)) {
                 show_alert($error);
@@ -847,8 +847,10 @@ function asset_html($asset, $images, $args)
          * @since   1.0.0
          * @author  Alexandros Raikos <araikos@unipi.gr>
          */
-        function account_html(array $information, $picture, array $statistics, array $assets, array $reviews, array $approvals = [], array $args = [])
+        function account_html(array $data, bool $admin, bool $visitor, array $pages)
         {
+            // TODO @alexandrosraikos: Refactor HTML based on new parameters. (#60)
+
             /**
              * Display a list of assets with filtering, sorting and custom pagination. 
              * 

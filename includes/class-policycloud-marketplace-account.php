@@ -2,54 +2,24 @@
 
 abstract class PolicyCloud_Marketplace_Account
 {
-    protected string $id;
+    public string $id;
     protected string $token;
 
     protected ?array $picture = null;
 
     public function __construct(string $id)
-    {
+    {   
         $this->id = $id;
-        $this->token = $this->retrieve_token();
     }
 
-    protected static function get_option(array|string $keys): array|string
+    protected static function persist_token($token)
     {
-        $options = get_option('policycloud_marketplace_plugin_settings');
-        if (is_array($keys)) {
-            foreach ($keys as $key) {
-                if (empty($options[$key])) {
-                    throw new PolicyCloudMarketplaceMissingOptionsException(
-                        "Please finish setting up PolicyCloud Marketplace for WordPress in the Dashboard."
-                    );
-                }
-            }
-            return array_filter(
-                $options,
-                function ($option_key) use ($keys) {
-                    return key_exists($option_key, $keys);
-                },
-                ARRAY_FILTER_USE_KEY
-            );
-        } elseif (is_string($keys)) {
-            if (empty($options[$keys])) {
-                throw new PolicyCloudMarketplaceMissingOptionsException(
-                    "Please finish setting up PolicyCloud Marketplace for WordPress in the Dashboard."
-                );
-            } else {
-                return $options[$keys];
-            }
-        }
+        return openssl_encrypt($token, "AES-128-ECB", PolicyCloud_Marketplace_Public::get_plugin_setting('encryption_key'));
     }
 
-    protected static function encrypt_token($token)
+    private static function decrypt_token($token)
     {
-        return openssl_encrypt($token, "AES-128-ECB", self::get_option('encryption_key'));
-    }
-
-    protected static function decrypt_token($token)
-    {
-        return openssl_decrypt($token, "AES-128-ECB", self::get_option('encryption_key'));
+        return openssl_decrypt($token, "AES-128-ECB", PolicyCloud_Marketplace_Public::get_plugin_setting('encryption_key'));
     }
 
     /**
@@ -70,12 +40,18 @@ abstract class PolicyCloud_Marketplace_Account
         };
     }
 
+    public static function is_authenticated(): bool {
+        return !empty(self::retrieve_token());
+    }
+
     abstract public static function register(array $information);
     abstract public static function authenticate(string $id, string $password): string;
 
-    abstract protected static function inspect(array $information, array $required);
-    abstract public function read(array $fields): array;
-
+    abstract public function get_role(): string;
+    abstract public function read(array $fields): mixed;
+    
     abstract public function update(array $information, ?array $picture): string;
     abstract public function delete(string $current_password): void;
+    
+    abstract protected static function inspect(array $information, array $required);
 }

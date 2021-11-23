@@ -1,20 +1,21 @@
 <?php
 
 require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-asset.php';
+require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-review.php';
 
 class PolicyCloud_Marketplace_Description
 {
     public string $id;
 
-    protected string $type;
+    public string $type;
 
-    protected array $information;
+    public array $information;
 
-    protected array $metadata;
+    public array $metadata;
 
-    protected ?array $assets;
+    public ?array $assets;
 
-    protected string|bool $token;
+    public ?array $reviews;
 
     public function __construct(string $id, ?array $fetched = [])
     {
@@ -94,6 +95,14 @@ class PolicyCloud_Marketplace_Description
             [],
             PolicyCloud_Marketplace_Account::retrieve_token()
         );
+    }
+
+    public function is_provider(PolicyCloud_Marketplace_User $provider) {
+        return $this->metadata['provider'] == $provider->id;
+    }
+
+    public function get_reviews() {
+        
     }
 
     public function approve(int $decision) {
@@ -279,7 +288,7 @@ class PolicyCloud_Marketplace_Description
         return self::parse($response['results']);
     }
 
-    public static function create(array $information)
+    public static function create(array $information): int
     {
         return PolicyCloud_Marketplace::api_request(
             'POST',

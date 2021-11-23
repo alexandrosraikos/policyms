@@ -2,9 +2,13 @@
 
 class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
 {
-    public function __construct(string $username)
+    public function __construct(?string $username = null)
     {
-        parent::__construct($username);
+        if (isset($username)) {
+            parent::__construct($username);
+        } else {
+            parent::__construct($this->read('username'));
+        }
     }
 
     /**
@@ -13,35 +17,47 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
      * ------------
      */
 
-    public function read(
-        ?array $fields = [
-            'picture',
-            'information',
-            'statistics',
-            'descriptions',
-            'reviews',
-            'approvals',
-            'metadata',
-            'preferences'
-        ],
-    ): array {
+    public function is_admin(): bool {
+        return $this->get_role == 'admin';
+    }
 
+
+    public function get_role (): string {
+        return $this->read('metadata')['role'];
+    }
+
+    
+    /**
+     * 'picture',
+     * 'information',
+     * 'statistics',
+     * 'descriptions' + ,
+     * 'reviews' + ,
+     * 'approvals' + ,
+     * 'metadata',
+     * 'preferences'
+     */
+    public function read(string ...$fields): mixed
+    {
         $user_data = [];
 
         foreach ($fields as $field) {
             switch ($field) {
                 case 'information':
                 case 'metadata':
+                case 'username':
                 case 'preferences':
                     if (
                         !array_key_exists('information', $user_data) &&
                         !array_key_exists('metadata', $user_data) &&
-                        !array_key_exists('preferences', $user_data)
+                        !array_key_exists('preferences', $user_data) &&
+                        !array_key_exists('username', $user_data)
                     ) {
                         $data = $this->get_information();
                         array_merge($user_data, [
                             'information' => $data['info'],
                             'metadata' => $data['account'],
+                            'username' => $data['username'],
                             'preferences' => $data['profile_parameters'],
                         ]);
                     }
@@ -67,39 +83,33 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             }
         }
 
-        return $user_data;
+        if (count($fields) == 1) {
+            return $user_data[$fields[0]];
+        }  else {
+            return $user_data; 
+        }
     }
 
-    public function update(array $information, ?array $picture = null): string
+    public function resend_verification_email(): void {
+        PolicyCloud_Marketplace::api_request(
+            'POST',
+            '/accounts/user/verification/resend',
+            [
+                'email' => $this->read('information')['email']
+            ],
+            $this->token
+        );
+    }
+
+    public function update(array $data, ?array $picture = null): string
     {
         // Inspect uploaded information.
-        self::inspect($information);
+        self::inspect($data);
 
         // Upload new profile picture.
         if (isset($picture)) {
             $token = $this->update_picture($picture);
         }
-
-        // Prepare and check new account information.
-        // TODO @alexandrosraikos: Move this check to the handler.
-        $data = [
-            'password' => stripslashes($information['password'] ?? ''),
-            'password-confirm' => stripslashes($information['password-confirm'] ?? ''),
-            'current-password' => stripslashes($information['current-password'] ?? ''),
-            'name' => stripslashes($information['name']),
-            'surname' => stripslashes($information['surname']),
-            'title' => $information['title'] ?? '',
-            'gender' => $information['gender'] ?? '',
-            'organization' => stripslashes($information['organization'] ?? ''),
-            'email' => $information['email'],
-            'phone' => $information['phone'] ?? '',
-            'socials-title' => $information['socials-title'] ?? '',
-            'socials-url' => $information['socials-url'] ?? '',
-            'about' => stripslashes($information['about'] ?? ''),
-            'public-email' => $information['public-email'],
-            'public-phone' => $information['public-phone'],
-        ];
-
 
         // Contact the PolicyCloud Marketplace API for password change.
         if (!empty($data['password'])) {
@@ -142,7 +152,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
 
         // Return encrypted token.
         if (!empty($token)) {
-            return parent::encrypt_token($token);
+            return parent::persist_token($token);
         }
     }
 
@@ -214,7 +224,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
         );
     }
 
-    public function delete_picture(): string 
+    public function delete_picture(): string
     {
         $response = PolicyCloud_Marketplace::api_request(
             'DELETE',
@@ -224,10 +234,10 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             [
                 'Content-Type: application/json',
                 'x-access-token: ' . $this->token,
-                'x-more-time: ' . parent::get_option('api_access_token')
+                'x-more-time: ' . PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'api_access_token')
             ],
         );
-        return parent::encrypt_token($response['token']);
+        return parent::persist_token($response['token']);
     }
 
     public function update_picture(array $picture): string
@@ -258,12 +268,12 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
                 [
                     'x-mimetype: ' .  $picture['type'],
                     'x-access-token: ' . $this->token,
-                    'x-more-time: ' . parent::get_option('api_access_token')
+                    'x-more-time: ' . PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'api_access_token')
                 ],
                 true
             );
 
-            return parent::encrypt_token($response['token']);
+            return parent::persist_token($response['token']);
         } elseif ($picture['error'] == 4);
     }
 
@@ -285,7 +295,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             ]
         );
 
-        return parent::encrypt_token($response['token']);
+        return parent::persist_token($response['token']);
     }
 
     public static function register(array $information): string
@@ -341,7 +351,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             ]
         );
 
-        return parent::encrypt_token($response['token']);
+        return parent::persist_token($response['token']);
     }
 
     /**
