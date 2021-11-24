@@ -2,8 +2,8 @@
 
 class PolicyCloud_Marketplace_Asset
 {
-    protected string $id;
-    protected string $category;
+    public string $id;
+    public string $category;
 
     public int $filename;
     public string $checksum;

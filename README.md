@@ -16,35 +16,33 @@ Use the shortcodes below for all PolicyCloud Marketplace API functionality.
 
 To add a log in form to a requested page, add the following shortcode:
 
-`[policycloud-marketplace-login]`
+`[policycloud-marketplace-user-authentication]`
 
 ### Registration
 
 To add a registration form to a requested page, add the following shortcode:
 
-`[policycloud-marketplace-registration]`
+`[policycloud-marketplace-user-registration]`
 
-### Show available Description Objects
+### Show available Descriptions
 
-To view multiple Description Objects, add the following shortcode:
+To view Descriptions, add the following shortcodes:
 
-`[policycloud-marketplace-read-single]`
+`[policycloud-marketplace-description-archive]`
 
-To view single Description Objects (for authorized users), add the following shortcode:
-
-`[policycloud-marketplace-read-multiple]`
+`[policycloud-marketplace-description]`
 
 ### Upload Description Object
 
 To view the upload form for creating a Description Object for authorized users, add the following shortcode:
 
-`[policycloud-marketplace-create-object]`
+`[policycloud-marketplace-description-creation]`
 
 ### PolicyCloud Marketplace account page
 
 To view the account page for an authorized user, add the following shortcode:
 
-`[policycloud-marketplace-account]`
+`[policycloud-marketplace-user]`
 
 ## Other features
 

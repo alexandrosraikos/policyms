@@ -187,18 +187,18 @@ class PolicyCloud_Marketplace
 		// Support for user accounts.
 		$this->loader->add_action('init', $plugin_public, 'add_accounts_shortcodes');
 		$this->loader->add_filter('wp_nav_menu_items', $plugin_public, 'add_conditional_access_menu_item', 10, 2);
-		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_registration', $plugin_public, 'account_registration_handler');
-		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_registration', $plugin_public, 'account_registration_handler');
-		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_authorization', $plugin_public, 'account_authorization_handler');
-		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_authorization', $plugin_public, 'account_authorization_handler');
-		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_email_verification_resend', $plugin_public, 'account_email_verification_resend_handler');
-		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_email_verification_resend', $plugin_public, 'account_email_verification_resend_handler');
-		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_edit', $plugin_public, 'account_editing_handler');
-		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_edit', $plugin_public, 'account_editing_handler');
-		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_data_request', $plugin_public, 'account_data_request_handler');
-		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_data_request', $plugin_public, 'account_data_request_handler');
-		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_deletion', $plugin_public, 'account_deletion_handler');
-		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_deletion', $plugin_public, 'account_deletion_handler');
+		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_registration', $plugin_public, 'account_user_registration_handler');
+		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_registration', $plugin_public, 'account_user_registration_handler');
+		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_authentication', $plugin_public, 'account_user_authentication_handler');
+		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_authentication', $plugin_public, 'account_user_authentication_handler');
+		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_retry_verification', $plugin_public, 'account_user_verification_retry_handler');
+		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_retry_verification', $plugin_public, 'account_user_verification_retry_handler');
+		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_edit', $plugin_public, 'account_user_editing_handler');
+		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_edit', $plugin_public, 'account_user_editing_handler');
+		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_data_request', $plugin_public, 'account_user_data_request_handler');
+		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_data_request', $plugin_public, 'account_user_data_request_handler');
+		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_deletion', $plugin_public, 'account_user_deletion_handler');
+		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_deletion', $plugin_public, 'account_user_deletion_handler');
 
 		// Support for descriptions.
 		$this->loader->add_action('init', $plugin_public, 'add_description_shortcodes');

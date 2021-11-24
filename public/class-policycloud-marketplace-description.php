@@ -146,7 +146,7 @@ class PolicyCloud_Marketplace_Description
             $this->metadata = $description['metadata'];
         }
 
-        if (!empty($decription['assets'])) {
+        if (!empty($description['assets'])) {
             $this->assets = [];
             foreach ($description['assets'] as $category => $assets) {
                 $this->assets[$category] = [];

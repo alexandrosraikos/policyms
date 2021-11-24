@@ -94,7 +94,7 @@ class PolicyCloud_Marketplace_Public
 
 		// Accounts related scripts.
 		wp_register_script("policycloud-marketplace-account-registration", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-registration.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
-		wp_register_script("policycloud-marketplace-account-authorization", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-authorization.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
+		wp_register_script("policycloud-marketplace-account-authentication", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-authentication.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
 		wp_register_script("policycloud-marketplace-account", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
 
 		// Content related scripts.
@@ -188,7 +188,7 @@ class PolicyCloud_Marketplace_Public
 	 */
 
 	/**
-	 * Register all the shortcodes concerning user authorization.
+	 * Register all the shortcodes concerning user authentication
 	 *
 	 * @since	1.0.0
 	 * @author	Alexandros Raikos <araikos@unipi.gr>
@@ -196,10 +196,13 @@ class PolicyCloud_Marketplace_Public
 	public function add_accounts_shortcodes()
 	{
 		// Registration sequence.
-		add_shortcode('policycloud-marketplace-registration', 'PolicyCloud_Marketplace_Public::account_registration_shortcode');
+		add_shortcode('policycloud-marketplace-user-registration', 'PolicyCloud_Marketplace_Public::account_registration_shortcode');
 
 		// Log in sequence.
-		add_shortcode('policycloud-marketplace-login', 'PolicyCloud_Marketplace_Public::account_authorization_shortcode');
+		add_shortcode('policycloud-marketplace-user-authentication', 'PolicyCloud_Marketplace_Public::account_authenticationshortcode');
+
+		// Account page shortcode.
+		add_shortcode('policycloud-marketplace-user', 'PolicyCloud_Marketplace_Public::account_shortcode');
 	}
 
 	/**
@@ -286,7 +289,7 @@ class PolicyCloud_Marketplace_Public
 	 * @since	1.0.0
 	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
-	public static function account_registration_shortcode()
+	public static function account_user_registration_shortcode()
 	{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
@@ -295,37 +298,113 @@ class PolicyCloud_Marketplace_Public
 
 		wp_enqueue_script("policycloud-marketplace-account-registration");
 		wp_localize_script('policycloud-marketplace-account-registration', 'AccountRegistrationProperties', array(
-			'nonce' => wp_create_nonce('policycloud_marketplace_account_registration'),
+			'nonce' => wp_create_nonce('policycloud_marketplace_account_user_registration'),
 		));
 
-		account_registration_html(
+		account_user_registration_html(
 			$options['login_page'],
 			$options['tos_url'] ?? '',
-			PolicyCloud_Marketplace_Account::is_authenticated(),
-			$error ?? ''
+			PolicyCloud_Marketplace_Account::is_authenticated()
 		);
 	}
 
 
 	/**
-	 * Register the shortcode for account authorization.
+	 * Register the shortcode for account authentication
 	 *
 	 * @since	1.0.0
 	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
-	public static function account_authorization_shortcode()
+	public static function account_user_authentication_shortcode()
 	{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 
-		wp_enqueue_script("policycloud-marketplace-account-authorization");
-		wp_localize_script('policycloud-marketplace-account-authorization', 'AccountAuthorizationProperties', array(
-			'nonce' => wp_create_nonce('policycloud_marketplace_account_registration')
+		wp_enqueue_script("policycloud-marketplace-account-authentication");
+		wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
+			'nonce' => wp_create_nonce('policycloud_marketplace_account_user_registration')
 		));
 
-		account_authorization_html(
+		account_user_authentication_html(
 			self::get_plugin_setting('registration_page'),
 			PolicyCloud_Marketplace_Account::is_authenticated()
+		);
+	}
+
+	/**
+	 * Requests account related content to display for authenticated users.
+	 * 
+	 * @uses	retrieve_token()
+	 * @uses	verify_user()
+	 * @uses	get_user_information()
+	 * @uses	get_user_descriptions()
+	 * @uses	get_user_statistics()
+	 * @uses	account_html()
+	 *
+	 * @since	1.0.0
+	 * @author	Alexandros Raikos <araikos@unipi.gr>
+	 */
+	public static function account_user_shortcode()
+	{
+		self::exception_handler(
+			function () {
+				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
+				require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
+
+				if (PolicyCloud_Marketplace_User::is_authenticated()) {
+					$user_id = !empty($_GET['user']) ? sanitize_user($_GET['user']) : null;
+					$visitor = empty($user_id);
+					$user = new PolicyCloud_Marketplace_User($visitor ? $user_id : null);
+
+					// Localize script.
+					wp_enqueue_script('policycloud-marketplace-account');
+					wp_localize_script('policycloud-marketplace-account', 'AccountEditingProperties', array(
+						'nonce' => wp_create_nonce('policycloud_marketplace_account_user_edit'),
+						'userID' => $user->id
+					));
+
+					if ($user->is_admin()) {
+						account_user_html(
+							$user->read(
+								'picture',
+								'information',
+								'statistics',
+								'descriptions',
+								'reviews',
+								'approvals',
+								'metadata',
+								'preferences'
+							),
+							$user->is_admin(),
+							$visitor,
+							self::get_plugin_setting(
+								'description_page',
+								'archive_page',
+								'upload_page'
+							)
+						);
+					} else {
+						account_user_html(
+							$user->read(
+								'picture',
+								'information',
+								'statistics',
+								'descriptions',
+								'reviews',
+								'metadata',
+								'preferences'
+							),
+							$user->is_admin(),
+							$visitor,
+							self::get_plugin_setting(
+								'description_page',
+								'archive_page',
+								'upload_page'
+							)
+						);
+					}
+				}
+			}
 		);
 	}
 
@@ -337,7 +416,7 @@ class PolicyCloud_Marketplace_Public
 	 * @since	1.0.0
 	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
-	public function account_registration_handler()
+	public function account_user_registration_handler()
 	{
 		$this->ajax_handler(
 			function ($data) {
@@ -374,12 +453,12 @@ class PolicyCloud_Marketplace_Public
 	/**
 	 * Handle user login AJAX requests.
 	 *
-	 * @uses	PolicyCloud_Marketplace_Public::account_authorization()
+	 * @uses	PolicyCloud_Marketplace_Public::account_authentication)
 	 *
 	 * @since	1.0.0
 	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
-	public function account_authorization_handler()
+	public function account_user_authentication_handler()
 	{
 		$this->ajax_handler(
 			function ($data) {
@@ -387,84 +466,6 @@ class PolicyCloud_Marketplace_Public
 					sanitize_email($data['username-email']),
 					stripslashes($data['password'])
 				);
-			}
-		);
-	}
-
-	// TODO @alexandrosraikos: Resume one-by-one checks and renaming (scripts and display too).
-
-	/**
-	 * Requests account related content to display for authenticated users.
-	 * 
-	 * @uses	retrieve_token()
-	 * @uses	verify_user()
-	 * @uses	get_user_information()
-	 * @uses	get_user_descriptions()
-	 * @uses	get_user_statistics()
-	 * @uses	account_html()
-	 *
-	 * @since	1.0.0
-	 * @author	Alexandros Raikos <araikos@unipi.gr>
-	 */
-	public static function account_shortcode()
-	{
-		self::exception_handler(
-			function () {
-				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
-				require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
-
-				if (PolicyCloud_Marketplace_User::is_authenticated()) {
-					$user_id = !empty($_GET['user']) ? sanitize_user($_GET['user']) : null;
-					$visitor = empty($user_id);
-					$user = new PolicyCloud_Marketplace_User($visitor ? $user_id : null);
-
-					// Localize script.
-					wp_enqueue_script('policycloud-marketplace-account');
-					wp_localize_script('policycloud-marketplace-account', 'AccountEditingProperties', array(
-						'nonce' => wp_create_nonce('policycloud_marketplace_account_edit'),
-					));
-
-					if ($user->is_admin()) {
-						account_html(
-							$user->read(
-								'picture',
-								'information',
-								'statistics',
-								'descriptions',
-								'reviews',
-								'approvals',
-								'metadata',
-								'preferences'
-							),
-							$user->is_admin(),
-							$visitor,
-							self::get_plugin_setting(
-								'description_page',
-								'archive_page',
-								'upload_page'
-							)
-						);
-					} else {
-						account_html(
-							$user->read(
-								'picture',
-								'information',
-								'statistics',
-								'descriptions',
-								'reviews',
-								'metadata',
-								'preferences'
-							),
-							$user->is_admin(),
-							$visitor,
-							self::get_plugin_setting(
-								'description_page',
-								'archive_page',
-								'upload_page'
-							)
-						);
-					}
-				}
 			}
 		);
 	}
@@ -477,32 +478,54 @@ class PolicyCloud_Marketplace_Public
 	 * @since	1.0.0
 	 * @author 	Alexandros Raikos <araikos@unipi.gr>
 	 */
-	public function account_editing_handler()
+	public function account_user_editing_handler()
 	{
 		$this->ajax_handler(
 			function ($data) {
 				require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 				$user = new PolicyCloud_Marketplace_User($data['username'] ?? null);
-				$user->update(
-					[
-						'password' => stripslashes($data['password'] ?? ''),
-						'password-confirm' => stripslashes($data['password-confirm'] ?? ''),
-						'current-password' => stripslashes($data['current-password'] ?? ''),
-						'name' => stripslashes($data['name']),
-						'surname' => stripslashes($data['surname']),
-						'title' => $data['title'] ?? '',
-						'gender' => $data['gender'] ?? '',
-						'organization' => stripslashes($data['organization'] ?? ''),
-						'email' => $data['email'],
-						'phone' => $data['phone'] ?? '',
-						'socials-title' => $data['socials-title'] ?? '',
-						'socials-url' => $data['socials-url'] ?? '',
-						'about' => stripslashes($data['about'] ?? ''),
-						'public-email' => $data['public-email'],
-						'public-phone' => $data['public-phone'],
-					],
-					empty($_FILES['profile_picture']) ?  null : 'profile_picture'
-				);
+				switch ($data['subsequent_action']) {
+					case 'edit_account_user':
+						$user->update(
+							[
+								'password' => stripslashes($data['password'] ?? ''),
+								'password-confirm' => stripslashes($data['password-confirm'] ?? ''),
+								'current-password' => stripslashes($data['current-password'] ?? ''),
+								'name' => stripslashes($data['name']),
+								'surname' => stripslashes($data['surname']),
+								'title' => $data['title'] ?? '',
+								'gender' => $data['gender'] ?? '',
+								'organization' => stripslashes($data['organization'] ?? ''),
+								'email' => $data['email'],
+								'phone' => $data['phone'] ?? '',
+								'socials-title' => $data['socials-title'] ?? '',
+								'socials-url' => $data['socials-url'] ?? '',
+								'about' => stripslashes($data['about'] ?? ''),
+								'public-email' => $data['public-email'],
+								'public-phone' => $data['public-phone'],
+							],
+							empty($_FILES['profile_picture']) ?  null : 'profile_picture'
+						);
+						break;
+					case 'delete_profile_picture':
+						
+						break;
+					default:
+						throw new PolicyCloudMarketplaceInvalidDataException(
+							"No subsequent action was defined."
+						);
+						break;
+				}
+			}
+		);
+	}
+
+	public function account_user_verification_retry_handler() {
+		$this->ajax_handler(
+			function () {
+				require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
+				$user = new PolicyCloud_Marketplace_User();
+				$user->resend_verification_email();
 			}
 		);
 	}
@@ -513,7 +536,7 @@ class PolicyCloud_Marketplace_Public
 	 * @since	1.0.0
 	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
-	public function account_data_request_handler()
+	public function account_user_data_request_handler()
 	{
 		$this->ajax_handler(
 			function () {
@@ -539,7 +562,7 @@ class PolicyCloud_Marketplace_Public
 	 * @since	1.0.0
 	 * @author	Alexandros Raikos <araikos@unipi.gr>
 	 */
-	public function account_deletion_handler()
+	public function account_user_deletion_handler()
 	{
 		$this->ajax_handler(
 			function ($data) {
@@ -568,16 +591,13 @@ class PolicyCloud_Marketplace_Public
 	{
 
 		// Read multiple objects sequence.
-		add_shortcode('policycloud-marketplace-read-multiple', 'PolicyCloud_Marketplace_Public::descriptions_archive_shortcode');
+		add_shortcode('policycloud-marketplace-description-archive', 'PolicyCloud_Marketplace_Public::descriptions_archive_shortcode');
 
 		// Read single object sequence.
-		add_shortcode('policycloud-marketplace-read-single', 'PolicyCloud_Marketplace_Public::description_shortcode');
+		add_shortcode('policycloud-marketplace-description', 'PolicyCloud_Marketplace_Public::description_shortcode');
 
 		// Create object sequence.
-		add_shortcode('policycloud-marketplace-create-object', 'PolicyCloud_Marketplace_Public::description_creation_shortcode');
-
-		// Account page shortcode.
-		add_shortcode('policycloud-marketplace-account', 'PolicyCloud_Marketplace_Public::account_shortcode');
+		add_shortcode('policycloud-marketplace-description-creation', 'PolicyCloud_Marketplace_Public::description_creation_shortcode');
 	}
 
 	/**
@@ -646,7 +666,7 @@ class PolicyCloud_Marketplace_Public
 				$description = new PolicyCloud_Marketplace_Description(sanitize_key($_GET['did']));
 
 				$permissions = [
-					'authorized' => PolicyCloud_Marketplace_User::is_authenticated(),
+					'authenticated' => PolicyCloud_Marketplace_User::is_authenticated(),
 					'provider' => false,
 					'administrator' =>  false
 				];
@@ -673,6 +693,7 @@ class PolicyCloud_Marketplace_Public
 				wp_enqueue_script('policycloud-marketplace-description');
 				wp_localize_script('policycloud-marketplace-description', 'DescriptionEditingProperties', array(
 					'nonce' => wp_create_nonce('policycloud_marketplace_description_editing'),
+					'descriptionID' => $description->id
 				));
 
 				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
@@ -704,27 +725,52 @@ class PolicyCloud_Marketplace_Public
 		$this->ajax_handler(
 			function ($data) {
 				$description = new PolicyCloud_Marketplace_Description($data['description_id']);
-				$description->update(
-					[
-					"title" => sanitize_text_field($data['title']),
-					"type" => sanitize_text_field($data['type']),
-					"subtype" => sanitize_text_field($data['subtype'] ?? ''),
-					"owner" => sanitize_text_field($data['owner'] ?? ''),
-					"description" => sanitize_text_field($data['description']),
-					"fieldOfUse" => explode(", ", $data['fields-of-use'] ?? []),
-					"comments" => sanitize_text_field($data['comments'] ?? '')
-					],
-					array_filter(
-						array_keys($_FILES),
-						function ($key) {
-							return (
-								substr($key, 0, 5) === "image"  ||
-								substr($key, 0, 5) === "video"  ||
-								substr($key, 0, 4) === "file"
-							);
+
+				switch ($data['subsequent_action']) {
+					case 'description-editing':
+						$description->update(
+							[
+							"title" => sanitize_text_field($data['title']),
+							"type" => sanitize_text_field($data['type']),
+							"subtype" => sanitize_text_field($data['subtype'] ?? ''),
+							"owner" => sanitize_text_field($data['owner'] ?? ''),
+							"description" => sanitize_text_field($data['description']),
+							"fieldOfUse" => explode(", ", $data['fields-of-use'] ?? []),
+							"comments" => sanitize_text_field($data['comments'] ?? '')
+							],
+							array_filter(
+								array_keys($_FILES),
+								function ($key) {
+									return (
+										substr($key, 0, 5) === "image"  ||
+										substr($key, 0, 5) === "video"  ||
+										substr($key, 0, 4) === "file"
+									);
+								}
+							)
+						);
+						break;
+					case 'asset-deletion':
+						foreach($description->assets[$data['file-type']] as $asset) {
+							if ($asset->id == $data['file-identifier']) {
+								$asset->delete();
+								return;
+							}
 						}
-					)
-				);
+						throw new PolicyCloudMarketplaceInvalidDataException("The file could not be found.");
+						break;
+					case 'asset-download':
+						foreach($description->assets[$data['file-type']] as $asset) {
+							if ($asset->id == $data['file-identifier']) {
+								return $asset->get_download_url();
+							}
+						}
+						throw new PolicyCloudMarketplaceInvalidDataException("The file could not be found.");
+						break;
+					default:
+						throw new PolicyCloudMarketplaceInvalidDataException("No subsequent action was defined.");
+						break;
+				}
 			}
 		);
 	}

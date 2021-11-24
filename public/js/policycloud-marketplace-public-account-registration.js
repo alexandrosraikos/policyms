@@ -59,20 +59,11 @@
      */
     function registerUser(e) {
       e.preventDefault();
-
-      // Add "loading" class to the submission button.
-      $("#policycloud-registration button[type=submit]").addClass("loading");
-
-      // Prepare form data.
-      var formData = new FormData($("#policycloud-registration")[0]);
-      formData.append("action", "policycloud_marketplace_account_registration");
-      formData.append("nonce", ajax_properties_account_registration.nonce);
-
       makeWPRequest(
         "#policycloud-registration button[type=submit]",
         "policycloud_marketplace_account_registration",
         AccountRegistrationProperties.nonce,
-        formData,
+        new FormData($("#policycloud-registration")[0]),
         () => {
           window.location.href(GlobalProperties.rootURLPath);
         }

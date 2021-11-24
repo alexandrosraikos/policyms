@@ -25,42 +25,17 @@
      */
     function createAsset(e) {
       e.preventDefault();
-
-      // Add loading class.
-      $("#policycloud-marketplace-asset-creation button[type=submit]").addClass(
-        "loading"
-      );
-
-      // Prepare form data.
-      var formData = new FormData(
-        $("#policycloud-marketplace-asset-creation")[0]
-      );
-      formData.append("action", "policycloud_marketplace_asset_creation");
-      formData.append("nonce", ajax_properties_asset_creation.nonce);
-
-      // Perform AJAX request.
-      $.ajax({
-        url: ajax_properties_asset_creation.ajax_url,
-        type: "post",
-        processData: false,
-        contentType: false,
-        data: formData,
-        cache: false,
-        dataType: "json",
-        complete: (response) => {
-          handleAJAXResponse(
-            response,
-            "#policycloud-marketplace-asset-creation button[type=submit]",
-            (data) => {
-              window.location.replace(
-                ajax_properties_asset_creation.description_page +
-                  "/?did=" +
-                  data
-              );
-            }
+      makeWPRequest(
+        "#policycloud-marketplace-description-creation button[type=submit]",
+        "policycloud_marketplace_description_creation",
+        DescriptionCreationProperties.nonce,
+        new FormData($("#policycloud-marketplace-description-creation")[0]),
+        (data) => {
+          window.location.replace(
+            DescriptionCreationProperties.descriptionPage + "/?did=" + data
           );
-        },
-      });
+        }
+      );
     }
 
     /**
@@ -70,8 +45,8 @@
      */
 
     // Submit the asset.
-    $("#policycloud-marketplace-asset-creation button[type=submit]").click(
-      createAsset
-    );
+    $(
+      "#policycloud-marketplace-description-creation button[type=submit]"
+    ).click(createAsset);
   });
 })(jQuery);

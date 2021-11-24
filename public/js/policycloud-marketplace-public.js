@@ -308,7 +308,7 @@ function toggleFileList(e) {
  *
  * This function handles success data using the `completion` and appends errors automatically.
  *
- * @param {string} actionDOMSelector The selector of the DOM element triggering the action.
+ * @param {any} actionDOMSelector The selector of the DOM element triggering the action.
  * @param {string} action The action as registered in {@link ../../class-wc-biz-courier-logistics.php}
  * @param {string} nonce The single nonce appointed to the action.
  * @param {Object} data The array of data to be included in the request.
@@ -324,16 +324,22 @@ function makeWPRequest(actionDOMSelector, action, nonce, data, completion) {
     $(actionDOMSelector).prop("disabled", true);
   }
 
-  // Prepare data fields for WordPress.
-  data.action = action;
-  data.nonce = nonce;
+  if(data instanceof FormData) {
+    data.append("action", action);
+    data.append("nonce", nonce);
+  } 
+  elseif (typeof data === 'object') {
+    // Prepare data fields for WordPress.
+    data.action = action;
+    data.nonce = nonce;
+  }
 
   // Perform AJAX request.
   $.ajax({
     url: GlobalProperties.ajaxURL,
     type: "post",
     data: data,
-    dataType: "json",
+    // dataType: "json",
     complete: (response) => {
       if (response.status === 200) {
         try {
@@ -384,45 +390,6 @@ function makeWPRequest(actionDOMSelector, action, nonce, data, completion) {
       }
     },
   });
-}
-
-/**
- * Handle the response after requesting via WP ajax.
- *
- * @param {Object} response The raw response AJAX object.
- * @param {string} actionSelector The selector of the DOM element triggering the action.
- * @param {completedAction} callback The actions to perform when the response was successful.
- *
- * @author Alexandros Raikos <araikos@unipi.gr>
- */
-function handleAJAXResponse(response, actionSelector, completedAction) {
-  if (response.status === 200) {
-    try {
-      var data = JSON.parse(
-        response.responseText == ""
-          ? '{"message":"completed"}'
-          : response.responseText
-      );
-      completedAction(data);
-    } catch (objError) {
-      console.error("Invalid JSON response: " + objError);
-    }
-  } else if (
-    response.status === 400 ||
-    response.status === 401 ||
-    response.status === 404 ||
-    response.status === 500
-  ) {
-    showAlert(actionSelector, response.responseText);
-  } else {
-    console.error(response.responseText);
-  }
-
-  // Remove the loading class.
-  $(actionSelector).removeClass("loading");
-  if (actionSelector.includes("button")) {
-    $(actionSelector).prop("disabled", false);
-  }
 }
 
 /**
