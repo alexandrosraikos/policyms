@@ -23,7 +23,7 @@
       e.preventDefault();
 
       makeWPRequest(
-        "#policycloud-authorization button[type=submit]",
+        "#policycloud-authentication button[type=submit]",
         "policycloud_marketplace_account_user_authentication",
         AccountAuthenticationProperties.nonce,
         new FormData($("#policycloud-authentication")[0]),

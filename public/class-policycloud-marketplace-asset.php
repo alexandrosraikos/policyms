@@ -5,7 +5,7 @@ class PolicyCloud_Marketplace_Asset
     public string $id;
     public string $category;
 
-    public int $filename;
+    public string $filename;
     public string $checksum;
     public string $size;
     public string $update_date;
@@ -21,7 +21,7 @@ class PolicyCloud_Marketplace_Asset
         $this->filename = $metadata['filename'];
         $this->checksum = $metadata['md5'];
         $this->size = $metadata['size'];
-        $this->update_date = new DateTime($metadata['updateDate']);
+        $this->update_date = $metadata['updateDate'];
         $this->version = $metadata['version'];
         $this->downloads = $metadata['downloads'];
     }
@@ -179,7 +179,7 @@ class PolicyCloud_Marketplace_Asset
                     'mimetype' => $_FILES[$name]['tmp_name'],
                     'name' => $_FILES[$name]['name']
                 ];
-                self::check_specs($type, $file);
+                self::check_specs($category, $file);
                 $completion($file);
             } else {
                 throw new PolicyCloudMarketplaceInvalidDataException(

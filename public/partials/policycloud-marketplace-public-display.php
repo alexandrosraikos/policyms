@@ -216,14 +216,14 @@ function account_user_authentication_html($registration_url, $authenticated)
     if (!$authenticated) {
     ?>
         <div class="policycloud-marketplace">
-            <form id="policycloud-authentication action="">
+            <form id="policycloud-authentication">
                 <fieldset name=" account-credentials">
-                <h2>Insert your credentials</h2>
-                <p>The following information is required to log you in.</p>
-                <label for="username">Username or E-mail address *</label>
-                <input required name="username-email" placeholder="e.x. johndoe / johndoe@example.org" type="text" />
-                <label for="password">Password *</label>
-                <input required name="password" placeholder="Insert your password" type="password" />
+                    <h2>Insert your credentials</h2>
+                    <p>The following information is required to log you in.</p>
+                    <label for="username">Username or E-mail address *</label>
+                    <input required name="username-email" placeholder="e.x. johndoe / johndoe@example.org" type="text" />
+                    <label for="password">Password *</label>
+                    <input required name="password" placeholder="Insert your password" type="password" />
                 </fieldset>
                 <div class="error"></div>
                 <button type="submit" class="action">Log in</button>
@@ -268,7 +268,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
     }, $data['assets'] ?? []));
     $reviews_count = array_sum(array_map(function ($page) {
         return count($page);
-    }, $data['reviews'] ?? []));
+    }, $data['reviews']['content'] ?? []));
     $approvals_count = array_sum(array_map(function ($page) {
         return count($page);
     }, $data['approvals'] ?? []));
@@ -277,11 +277,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
     <div id="policycloud-marketplace-account" class="policycloud-marketplace">
         <div id="policycloud-marketplace-account-sidebar">
             <?php
-            if (!empty($picture)) {
-                echo '<img src="data:image/*;base64,' . base64_encode($picture) . '" draggable="false" />';
-            } else {
-                echo '<img src="' . get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/user.svg') . '" draggable="false" />';
-            }
+            echo '<img src="' . $data['picture'] . '" draggable="false" />';
             ?>
             <nav>
                 <button class="tactile" id="policycloud-marketplace-account-overview" class="active">Overview</button>
@@ -806,42 +802,39 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
  * @author  Alexandros Raikos <araikos@unipi.gr>
  * @author  Eleftheria Kouremenou <elkour@unipi.gr>
  */
-function descriptions_grid_html($assets, $asset_url)
+function descriptions_grid_html(array $descriptions, string $description_url)
 {
-    if (empty($asset_url)) {
-        echo show_alert('No asset page has been defined in the WordPress settings.');
-    }
-    if (empty($assets)) {
+    if (empty($descriptions)) {
         echo show_alert('No assets found.', 'notice');
     } else {
-        echo '<div class="policycloud-marketplace" id="policycloud-marketplace-assets-grid">';
+        echo '<div class="policycloud-marketplace" id="policycloud-marketplace-descriptions-grid">';
         echo '<ul>';
-        foreach ($assets as $asset) {
+        foreach ($descriptions as $description) {
     ?>
             <li>
-                <a href="<?php echo $asset_url . '?did=' . $asset['id'] ?>">
+                <a href="<?php echo $description_url . '?did=' . $description->id ?>">
                     <div class="cover">
                         <img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/marketplace.svg') ?>" alt="" />
                         <div class="content">
-                            <h4><?php echo $asset['info']['title'] ?></h4>
-                            <p><?php echo $asset['info']['short_desc'] ?></p>
+                            <h4><?php echo $description->information['title'] ?></h4>
+                            <p><?php echo $description->information['short_desc'] ?></p>
                         </div>
                     </div>
                     <div class="metadata">
                         <div>
-                            <div class="owner"><?php echo $asset['metadata']['provider'] ?></div>
-                            <div class="last-updated">Updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($asset['metadata']['uploadDate']))) ?></div>
+                            <div class="owner"><?php echo $description->metadata['provider'] ?></div>
+                            <div class="last-updated">Updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($description->metadata['uploadDate']))) ?></div>
                         </div>
                         <div>
-                            <span class="reviews"><span class="fas fa-star"></span> <?php echo $asset['metadata']['reviews']['average_rating'] . ' (' . $asset['metadata']['reviews']['no_reviews'] . ' reviews)' ?></span>
-                            <span class="views"><span class="fas fa-eye"></span> <?php echo $asset['metadata']['views'] ?> views</span>
+                            <span class="reviews"><span class="fas fa-star"></span> <?php echo $description->metadata['reviews']['average_rating'] . ' (' . $description->metadata['reviews']['no_reviews'] . ' reviews)' ?></span>
+                            <span class="views"><span class="fas fa-eye"></span> <?php echo $description->metadata['views'] ?> views</span>
                         </div>
                         <div>
-                            <span class="type pill"><?php echo $asset['info']['type']  ?></span>
+                            <span class="type pill"><?php echo $description->information['type']  ?></span>
                             <?php
-                            if (!empty($asset['info']['subtype'])) {
+                            if (!empty($description->information['subtype'])) {
                             ?>
-                                <span class="sub-type pill"><?php echo $asset['info']['subtype']  ?></span>
+                                <span class="sub-type pill"><?php echo $description->information['subtype']  ?></span>
                             <?php } ?>
                         </div>
                     </div>
@@ -865,105 +858,99 @@ function descriptions_grid_html($assets, $asset_url)
  * @author  Alexandros Raikos <araikos@unipi.gr>
  * @author  Eleftheria Kouremenou <elkour@unipi.gr>
  */
-function descriptions_archive_html($assets, $filters, $description_page)
+function descriptions_archive_html(array $descriptions, array $filters, string $description_page)
 {
     ?>
-    <div class="policycloud-marketplace inspect" id="policycloud-marketplace-asset-archive">
+    <div class="policycloud-marketplace inspect" id="policycloud-marketplace-description-archive">
         <div class="filters">
             <button class="close outlined filters-toggle">Close</button>
             <h2>Filters</h2>
-            <?php
-            if (empty($filters)) {
-                show_alert('Unable to retrieve the filtering data.');
-            } else {
-            ?>
-                <p>Select the options below to narrow your search.</p>
-                <form>
-                    <fieldset>
-                        <input type="text" name="search" placeholder="Search assets" value="<?php echo $_GET['search'] ?? '' ?>" />
-                    </fieldset>
-                    <fieldset>
-                        <h3>Types</h3>
-                        <div class="types">
-                            <span>
-                                <input type="radio" name="type" value="" <?php echo (empty($_GET['type'])) ? 'checked' : '' ?> />
-                                <label for="type">All</label>
-                            </span>
-                            <span>
-                                <input type="radio" name="type" value="algorithms" <?php echo (($_GET['type'] ?? '') == 'algorithms') ? 'checked' : '' ?> />
-                                <label for="type">Algorithms</label>
-                            </span>
-                            <span>
-                                <input type="radio" name="type" value="tools" <?php echo (($_GET['type'] ?? '') == 'tools') ? 'checked' : '' ?> />
-                                <label for="type">Tools</label>
-                            </span>
-                            <span>
-                                <input type="radio" name="type" value="policies" <?php echo (($_GET['type'] ?? '') == 'policies') ? 'checked' : '' ?> />
-                                <label for="type">Policies</label>
-                            </span>
-                            <span>
-                                <input type="radio" name="type" value="datasets" <?php echo (($_GET['type'] ?? '') == 'datasets') ? 'checked' : '' ?> />
-                                <label for="type">Datasets</label>
-                            </span>
-                            <span>
-                                <input type="radio" name="type" value="webinars" <?php echo (($_GET['type'] ?? '') == 'webinars') ? 'checked' : '' ?> />
-                                <label for="type">Webinars</label>
-                            </span>
-                            <span>
-                                <input type="radio" name="type" value="tutorials" <?php echo (($_GET['type'] ?? '') == 'tutorials') ? 'checked' : '' ?> />
-                                <label for="type">Tutorials</label>
-                            </span>
-                            <span>
-                                <input type="radio" name="type" value="documents" <?php echo (($_GET['type'] ?? '') == 'documents') ? 'checked' : '' ?> />
-                                <label for="type">Documents</label>
-                            </span>
-                            <span>
-                                <input type="radio" name="type" value="externals" <?php echo (($_GET['type'] ?? '') == 'externals') ? 'checked' : '' ?> />
-                                <label for="type">Externals</label>
-                            </span>
-                            <span>
-                                <input type="radio" name="type" value="other" <?php echo (($_GET['type'] ?? '') == 'other') ? 'checked' : '' ?> />
-                                <label for="type">Other</label>
-                            </span>
+            <p>Select the options below to narrow your search.</p>
+            <form>
+                <fieldset>
+                    <input type="text" name="search" placeholder="Search assets" value="<?php echo $_GET['search'] ?? '' ?>" />
+                </fieldset>
+                <fieldset>
+                    <h3>Types</h3>
+                    <div class="types">
+                        <span>
+                            <input type="radio" name="type" value="" <?php echo (empty($_GET['type'])) ? 'checked' : '' ?> />
+                            <label for="type">All</label>
+                        </span>
+                        <span>
+                            <input type="radio" name="type" value="algorithms" <?php echo (($_GET['type'] ?? '') == 'algorithms') ? 'checked' : '' ?> />
+                            <label for="type">Algorithms</label>
+                        </span>
+                        <span>
+                            <input type="radio" name="type" value="tools" <?php echo (($_GET['type'] ?? '') == 'tools') ? 'checked' : '' ?> />
+                            <label for="type">Tools</label>
+                        </span>
+                        <span>
+                            <input type="radio" name="type" value="policies" <?php echo (($_GET['type'] ?? '') == 'policies') ? 'checked' : '' ?> />
+                            <label for="type">Policies</label>
+                        </span>
+                        <span>
+                            <input type="radio" name="type" value="datasets" <?php echo (($_GET['type'] ?? '') == 'datasets') ? 'checked' : '' ?> />
+                            <label for="type">Datasets</label>
+                        </span>
+                        <span>
+                            <input type="radio" name="type" value="webinars" <?php echo (($_GET['type'] ?? '') == 'webinars') ? 'checked' : '' ?> />
+                            <label for="type">Webinars</label>
+                        </span>
+                        <span>
+                            <input type="radio" name="type" value="tutorials" <?php echo (($_GET['type'] ?? '') == 'tutorials') ? 'checked' : '' ?> />
+                            <label for="type">Tutorials</label>
+                        </span>
+                        <span>
+                            <input type="radio" name="type" value="documents" <?php echo (($_GET['type'] ?? '') == 'documents') ? 'checked' : '' ?> />
+                            <label for="type">Documents</label>
+                        </span>
+                        <span>
+                            <input type="radio" name="type" value="externals" <?php echo (($_GET['type'] ?? '') == 'externals') ? 'checked' : '' ?> />
+                            <label for="type">Externals</label>
+                        </span>
+                        <span>
+                            <input type="radio" name="type" value="other" <?php echo (($_GET['type'] ?? '') == 'other') ? 'checked' : '' ?> />
+                            <label for="type">Other</label>
+                        </span>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <h3>Provider</h3>
+                    <div class="providers">
+                        <?php
+                        foreach ($filters['providers'] as $provider) {
+                            echo '<span><input type="checkbox" name="provider[]" value="' . $provider . '"/ ' . ((in_array($provider, $_GET['provider'] ?? [])) ? 'checked' : '') . '><label for="provider[]">' . $provider . '</label></span>';
+                        }
+                        ?>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <h3>Views</h3>
+                    <div class="views">
+                        <div>
+                            <input type="number" name="views-gte" placeholder="0" value="<?php echo $_GET['views-gte'] ?? '' ?>" min="0" />
                         </div>
-                    </fieldset>
-                    <fieldset>
-                        <h3>Provider</h3>
-                        <div class="providers">
-                            <?php
-                            foreach ($filters['providers'] as $provider) {
-                                echo '<span><input type="checkbox" name="provider[]" value="' . $provider . '"/ ' . ((in_array($provider, $_GET['provider'] ?? [])) ? 'checked' : '') . '><label for="provider[]">' . $provider . '</label></span>';
-                            }
-                            ?>
+                        <div>
+                            <input type="number" name="views-lte" placeholder="<?php echo $filters['max_views'] ?>" value="<?php echo $_GET['views-lte'] ?? "" ?>" max="<?php echo $filters['max_views'] ?>" />
                         </div>
-                    </fieldset>
-                    <fieldset>
-                        <h3>Views</h3>
-                        <div class="views">
-                            <div>
-                                <input type="number" name="views-gte" placeholder="0" value="<?php echo $_GET['views-gte'] ?? '' ?>" min="0" />
-                            </div>
-                            <div>
-                                <input type="number" name="views-lte" placeholder="<?php echo $filters['max_views'] ?>" value="<?php echo $_GET['views-lte'] ?? "" ?>" max="<?php echo $filters['max_views'] ?>" />
-                            </div>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <h3>Date</h3>
+                    <div class="dates">
+                        <div>
+                            <label for="update-date-gte">From</label>
+                            <input type="date" onfocus="(this.type='date')" name="update-date-gte" placeholder="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>" value="<?php echo $_GET['update-date-gte'] ?? '' ?>" min="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>" max="<?php echo date("Y-m-d") ?>" />
                         </div>
-                    </fieldset>
-                    <fieldset>
-                        <h3>Date</h3>
-                        <div class="dates">
-                            <div>
-                                <label for="update-date-gte">From</label>
-                                <input type="date" onfocus="(this.type='date')" name="update-date-gte" placeholder="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>" value="<?php echo $_GET['update-date-gte'] ?? '' ?>" min="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>" max="<?php echo date("Y-m-d") ?>" />
-                            </div>
-                            <div>
-                                <label for="update-date-lte">To</label>
-                                <input type="date" name="update-date-lte" placeholder="<?php echo date("Y-m-d") ?>" value="<?php echo $_GET['update-date-lte'] ?? '' ?>" min="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>" max="<?php echo date("Y-m-d") ?>" />
-                            </div>
+                        <div>
+                            <label for="update-date-lte">To</label>
+                            <input type="date" name="update-date-lte" placeholder="<?php echo date("Y-m-d") ?>" value="<?php echo $_GET['update-date-lte'] ?? '' ?>" min="<?php echo date("Y-m-d", strtotime($filters['oldest'])) ?>" max="<?php echo date("Y-m-d") ?>" />
                         </div>
-                    </fieldset>
-                    <button type="submit" class="action">Apply filters</button>
-                </form>
-            <?php } ?>
+                    </div>
+                </fieldset>
+                <button type="submit" class="action">Apply filters</button>
+            </form>
         </div>
         <div class="content">
             <header>
@@ -996,27 +983,27 @@ function descriptions_archive_html($assets, $filters, $description_page)
                     </fieldset>
                 </form>
             </header>
-            <div class="gallery">
-                <?php
-                if (empty($assets['results'])) {
-                    echo show_alert('No assets found', 'notice');
-                } else {
-                    foreach ($assets['results'] as $page) {
-                        descriptions_grid_html($page, $description_page);
-                    }
-                }
-                ?>
-            </div>
-            <nav class="pagination">
-                <?php
-                if (!empty($assets['pages'])) {
-                    for ($page = 1; $page < $assets['pages'] + 1; $page++) {
-                        $activePage = $_GET['assets-page'] ?? 1;
+            <?php
+            if (!empty($descriptions)) {
+            ?>
+                <div class="gallery">
+                    <?php
+                    descriptions_grid_html($descriptions['page'], $description_page);
+                    ?>
+                </div>
+                <nav class="pagination">
+                    <?php
+                    for ($page = 1; $page < $descriptions['pages'] + 1; $page++) {
+                        $activePage = $_GET['descriptions-page'] ?? 1;
                         echo '<button class="page-selector ' . (($activePage == ($page)) ? 'active' : '') . '" data-page-number="' . $page . '">' . ($page) . '</button>';
                     }
-                }
-                ?>
-            </nav>
+                    ?>
+                </nav>
+            <?php
+            } else {
+                show_alert('No descriptions found.', 'notice');
+            }
+            ?>
         </div>
     </div>
     <?php
@@ -1220,7 +1207,7 @@ function description_html($description, $image_blobs, $pages, $permissions)
                 <div class="title">
                     <h1><?php echo $description->information['title'] ?>
                         <?php
-                        if ($permissions['provider'] || $permissions['admin']) {
+                        if ($permissions['provider'] || $permissions['administrator']) {
                         ?>
                             <span class="status label <?php echo ($description->metadata['approved'] == "1") ? 'success' : 'notice' ?>"><?php echo ($description->metadata['approved'] == "1") ? 'Approved' : 'Pending' ?></span>
                         <?php
@@ -1228,7 +1215,7 @@ function description_html($description, $image_blobs, $pages, $permissions)
                         ?>
                     </h1>
                     <?php
-                    if ($permissions['provider'] || $permissions['admin']) {
+                    if ($permissions['provider'] || $permissions['administrator']) {
                         echo '<button class="outlined show-editor-modal"><span class="fas fa-pen"></span> Edit</button>';
                     }
                     ?>
@@ -1304,7 +1291,7 @@ function description_html($description, $image_blobs, $pages, $permissions)
                             if ($permissions['authenticated']) {
                                 if (!empty($image_blobs)) {
                                     foreach ($image_blobs as $key => $image_blob) {
-                                        echo '<img src="data:image/*;base64,' . base64_encode($image_blob) . '" data-image-id="' . $description->assets['images'][$key]['id'] . '" draggable="false" />';
+                                        echo '<img src="data:image/*;base64,' . base64_encode($image_blob) . '" data-image-id="' . $description->assets['images'][$key]->id . '" draggable="false" />';
                                     }
                                 } else {
                                     show_alert('No images or videos were found.', 'notice');
@@ -1317,7 +1304,7 @@ function description_html($description, $image_blobs, $pages, $permissions)
                     </div>
                 </div>
                 <?php
-                if ($permissions['provider'] || $permissions['admin']) {
+                if ($permissions['provider'] || $permissions['administrator']) {
                     description_editing_form_html($description);
                 }
                 ?>

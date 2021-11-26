@@ -174,7 +174,7 @@ class PolicyCloud_Marketplace_Public
 		} catch (\Exception $e) {
 
 			// Display the error.
-			require_once plugin_dir_path(dirname(__FILE__)) . 'admin/partials/wc-biz-courier-logistics-admin-display.php';
+			require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 			show_alert($e->getMessage());
 		}
 	}
@@ -196,13 +196,13 @@ class PolicyCloud_Marketplace_Public
 	public function add_accounts_shortcodes()
 	{
 		// Registration sequence.
-		add_shortcode('policycloud-marketplace-user-registration', 'PolicyCloud_Marketplace_Public::account_registration_shortcode');
+		add_shortcode('policycloud-marketplace-user-registration', 'PolicyCloud_Marketplace_Public::account_user_registration_shortcode');
 
 		// Log in sequence.
-		add_shortcode('policycloud-marketplace-user-authentication', 'PolicyCloud_Marketplace_Public::account_authenticationshortcode');
+		add_shortcode('policycloud-marketplace-user-authentication', 'PolicyCloud_Marketplace_Public::account_user_authentication_shortcode');
 
 		// Account page shortcode.
-		add_shortcode('policycloud-marketplace-user', 'PolicyCloud_Marketplace_Public::account_shortcode');
+		add_shortcode('policycloud-marketplace-user', 'PolicyCloud_Marketplace_Public::account_user_shortcode');
 	}
 
 	/**
@@ -226,8 +226,7 @@ class PolicyCloud_Marketplace_Public
 				'registration_page',
 				'upload_page'
 			);
-		}
-		catch (PolicyCloudMarketplaceMissingOptionsException $e) {
+		} catch (PolicyCloudMarketplaceMissingOptionsException $e) {
 			return $items;
 		}
 
@@ -277,7 +276,7 @@ class PolicyCloud_Marketplace_Public
 		}
 
 		if (count($settings) == 1) {
-			return $settings[0];
+			return $settings[$id[0]];
 		} else {
 			return $settings;
 		}
@@ -322,7 +321,7 @@ class PolicyCloud_Marketplace_Public
 
 		wp_enqueue_script("policycloud-marketplace-account-authentication");
 		wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
-			'nonce' => wp_create_nonce('policycloud_marketplace_account_user_registration')
+			'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication')
 		));
 
 		account_user_authentication_html(
@@ -355,6 +354,16 @@ class PolicyCloud_Marketplace_Public
 					$user_id = !empty($_GET['user']) ? sanitize_user($_GET['user']) : null;
 					$visitor = empty($user_id);
 					$user = new PolicyCloud_Marketplace_User($visitor ? $user_id : null);
+					$data = [
+						'picture' => $user->picture,
+						'information' => $user->information,
+						'statistics' => $user->statistics,
+						'descriptions' => $user->descriptions,
+						'reviews' => $user->reviews,
+						'approvals' => $user->is_admin() ? $user->approvals : null,
+						'metadata' => $user->metadata,
+						'preferences' => $user->preferences
+					];
 
 					// Localize script.
 					wp_enqueue_script('policycloud-marketplace-account');
@@ -365,16 +374,7 @@ class PolicyCloud_Marketplace_Public
 
 					if ($user->is_admin()) {
 						account_user_html(
-							$user->read(
-								'picture',
-								'information',
-								'statistics',
-								'descriptions',
-								'reviews',
-								'approvals',
-								'metadata',
-								'preferences'
-							),
+							$data,
 							$user->is_admin(),
 							$visitor,
 							self::get_plugin_setting(
@@ -385,15 +385,15 @@ class PolicyCloud_Marketplace_Public
 						);
 					} else {
 						account_user_html(
-							$user->read(
-								'picture',
-								'information',
-								'statistics',
-								'descriptions',
-								'reviews',
-								'metadata',
-								'preferences'
-							),
+							[
+								'picture' => $user->picture,
+								'information' => $user->information,
+								'statistics' => $user->statistics,
+								'descriptions' => $user->descriptions,
+								'reviews' => $user->reviews,
+								'metadata' => $user->metadata,
+								'preferences' => $user->preferences
+							],
 							$user->is_admin(),
 							$visitor,
 							self::get_plugin_setting(
@@ -462,9 +462,10 @@ class PolicyCloud_Marketplace_Public
 	{
 		$this->ajax_handler(
 			function ($data) {
-				PolicyCloud_Marketplace_User::authenticate(
-					sanitize_email($data['username-email']),
-					stripslashes($data['password'])
+				require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
+				return PolicyCloud_Marketplace_User::authenticate(
+					$data['username-email'],
+					$data['password']
 				);
 			}
 		);
@@ -508,7 +509,7 @@ class PolicyCloud_Marketplace_Public
 						);
 						break;
 					case 'delete_profile_picture':
-						
+
 						break;
 					default:
 						throw new PolicyCloudMarketplaceInvalidDataException(
@@ -520,7 +521,8 @@ class PolicyCloud_Marketplace_Public
 		);
 	}
 
-	public function account_user_verification_retry_handler() {
+	public function account_user_verification_retry_handler()
+	{
 		$this->ajax_handler(
 			function () {
 				require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
@@ -542,16 +544,16 @@ class PolicyCloud_Marketplace_Public
 			function () {
 				require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 				$user = new PolicyCloud_Marketplace_User();
-				return $user->read(
-					'picture',
-					'information',
-					'statistics',
-					'descriptions',
-					'reviews',
-					'approvals',
-					'metadata',
-					'preferences'
-				);
+				return [
+					'picture' => $user->picture,
+					'information' => $user->information,
+					'statistics' => $user->statistics,
+					'descriptions' => $user->descriptions,
+					'reviews' => $user->reviews,
+					'approvals' => $user->approvals,
+					'metadata' => $user->metadata,
+					'preferences' => $user->preferences
+				];
 			}
 		);
 	}
@@ -611,10 +613,14 @@ class PolicyCloud_Marketplace_Public
 		self::exception_handler(
 			function () {
 				require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-description.php';
+				require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
+
+				wp_enqueue_script("policycloud-marketplace-description-archive");
+
 				descriptions_archive_html(
 					PolicyCloud_Marketplace_Description::get_all(),
 					PolicyCloud_Marketplace_Description::get_filters_range(),
-					self::get_plugin_setting('description_page')
+					self::get_plugin_setting(true, 'description_page')
 				);
 			}
 		);
@@ -634,7 +640,6 @@ class PolicyCloud_Marketplace_Public
 				require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-description.php';
 
 				if (PolicyCloud_Marketplace_User::is_authenticated()) {
-
 					wp_enqueue_script("policycloud-marketplace-description-creation");
 					wp_localize_script('policycloud-marketplace-description-creation', 'DescriptionCreationProperties', array(
 						'nonce' => wp_create_nonce('policycloud_marketplace_description_creation'),
@@ -663,7 +668,7 @@ class PolicyCloud_Marketplace_Public
 				require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-description.php';
 				require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 
-				$description = new PolicyCloud_Marketplace_Description(sanitize_key($_GET['did']));
+				$description = new PolicyCloud_Marketplace_Description($_GET['did']);
 
 				$permissions = [
 					'authenticated' => PolicyCloud_Marketplace_User::is_authenticated(),
@@ -671,7 +676,7 @@ class PolicyCloud_Marketplace_Public
 					'administrator' =>  false
 				];
 
-				if ($authenticated) {
+				if ($permissions['authenticated']) {
 					$user = new PolicyCloud_Marketplace_User();
 
 					$permissions['provider'] = $description->is_provider($user);
@@ -683,10 +688,11 @@ class PolicyCloud_Marketplace_Public
 						},
 						array_filter(
 							$description->assets ?? [],
-							function ($asset) {
-								return $asset->type == 'image';
-							}
-						)
+							function ($category) {
+								return  $category == 'images';
+							},
+							ARRAY_FILTER_USE_KEY
+						)['images']
 					);
 				}
 
@@ -702,6 +708,7 @@ class PolicyCloud_Marketplace_Public
 					$description,
 					$image_blobs ?? null,
 					self::get_plugin_setting(
+						true,
 						'login_page',
 						'account_page',
 						'archive_page'
@@ -730,28 +737,26 @@ class PolicyCloud_Marketplace_Public
 					case 'description-editing':
 						$description->update(
 							[
-							"title" => sanitize_text_field($data['title']),
-							"type" => sanitize_text_field($data['type']),
-							"subtype" => sanitize_text_field($data['subtype'] ?? ''),
-							"owner" => sanitize_text_field($data['owner'] ?? ''),
-							"description" => sanitize_text_field($data['description']),
-							"fieldOfUse" => explode(", ", $data['fields-of-use'] ?? []),
-							"comments" => sanitize_text_field($data['comments'] ?? '')
+								"title" => sanitize_text_field($data['title']),
+								"type" => sanitize_text_field($data['type']),
+								"subtype" => sanitize_text_field($data['subtype'] ?? ''),
+								"owner" => sanitize_text_field($data['owner'] ?? ''),
+								"description" => sanitize_text_field($data['description']),
+								"fieldOfUse" => explode(", ", $data['fields-of-use'] ?? []),
+								"comments" => sanitize_text_field($data['comments'] ?? '')
 							],
 							array_filter(
 								array_keys($_FILES),
 								function ($key) {
-									return (
-										substr($key, 0, 5) === "image"  ||
+									return (substr($key, 0, 5) === "image"  ||
 										substr($key, 0, 5) === "video"  ||
-										substr($key, 0, 4) === "file"
-									);
+										substr($key, 0, 4) === "file");
 								}
 							)
 						);
 						break;
 					case 'asset-deletion':
-						foreach($description->assets[$data['file-type']] as $asset) {
+						foreach ($description->assets[$data['file-type']] as $asset) {
 							if ($asset->id == $data['file-identifier']) {
 								$asset->delete();
 								return;
@@ -760,7 +765,7 @@ class PolicyCloud_Marketplace_Public
 						throw new PolicyCloudMarketplaceInvalidDataException("The file could not be found.");
 						break;
 					case 'asset-download':
-						foreach($description->assets[$data['file-type']] as $asset) {
+						foreach ($description->assets[$data['file-type']] as $asset) {
 							if ($asset->id == $data['file-identifier']) {
 								return $asset->get_download_url();
 							}

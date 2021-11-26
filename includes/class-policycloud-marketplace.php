@@ -304,7 +304,6 @@ class PolicyCloud_Marketplace
 		if (!empty($data)) {
 			$data = ($skip_encoding) ?  $data : json_encode($data);
 		}
-
 		// Contact Marketplace login API endpoint.
 		$curl = curl_init();
 		curl_setopt_array($curl, [
@@ -338,7 +337,7 @@ class PolicyCloud_Marketplace
 						return $decoded;
 					} else {
 						curl_close($curl);
-						throw new ErrorException($decoded['message']);
+						throw new PolicyCloudMarketplaceInvalidDataException('PolicyCloud Marketplace error when contacting '. $uri .': '.$decoded['message']);
 					}
 				} else {
 					curl_close($curl);

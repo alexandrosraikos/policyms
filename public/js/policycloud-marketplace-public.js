@@ -218,7 +218,7 @@ function setAuthorizedToken(encryptedToken) {
   date.setTime(date.getTime() + 15 * 24 * 60 * 60 * 1000);
   const expires = "expires=" + date.toUTCString();
   document.cookie =
-    "ppmapi-token=" +
+    "pcmapi-token=" +
     encryptedToken +
     "; Path=" +
     GlobalProperties.rootURLPath +
@@ -318,78 +318,87 @@ function toggleFileList(e) {
  * @since 1.4.0
  */
 function makeWPRequest(actionDOMSelector, action, nonce, data, completion) {
+  function completionHandler(response) {
+    if (response.status === 200) {
+      try {
+        // Parse the data.
+        var object = JSON.parse(
+          response.responseText == ""
+            ? '{"message":"completed"}'
+            : response.responseText
+        );
+
+        // Execution completion callback.
+        if (object.message === "completed") completion();
+        else completion(object);
+
+        // Remove the loading class.
+        $(actionDOMSelector).removeClass("loading");
+        if (actionDOMSelector.includes("button")) {
+          $(actionDOMSelector).prop("disabled", false);
+        }
+      } catch (objError) {
+        console.error("Invalid JSON response: " + objError);
+      }
+    } else if (response.status === 400 || response.status === 500) {
+      showAlert(actionDOMSelector, response.responseText, "error");
+
+      // Remove the loading class.
+      $(actionDOMSelector).removeClass("loading");
+      if (actionDOMSelector.includes("button")) {
+        $(actionDOMSelector).prop("disabled", false);
+      }
+    } else {
+      showAlert(
+        actionDOMSelector,
+        "There was an unknown connection error, please try again later.",
+        "error"
+      );
+
+      // Log additional information into the console.
+      console.error("Policy Cloud Marketplace error: " + response.responseText);
+
+      // Remove the loading class.
+      $(actionDOMSelector).removeClass("loading");
+      if (actionDOMSelector.includes("button")) {
+        $(actionDOMSelector).prop("disabled", false);
+      }
+    }
+  }
+
   // Add the loading class.
   $(actionDOMSelector).addClass("loading");
   if (actionDOMSelector.includes("button")) {
     $(actionDOMSelector).prop("disabled", true);
   }
 
-  if(data instanceof FormData) {
+  if (data instanceof FormData) {
     data.append("action", action);
     data.append("nonce", nonce);
-  } 
-  elseif (typeof data === 'object') {
+
+    // Perform AJAX request.
+    $.ajax({
+      url: GlobalProperties.ajaxURL,
+      type: "post",
+      data: data,
+      contentType: false,
+      processData: false,
+      complete: completionHandler,
+    });
+  } else if (typeof data === "object") {
     // Prepare data fields for WordPress.
     data.action = action;
     data.nonce = nonce;
+
+    // Perform AJAX request.
+    $.ajax({
+      url: GlobalProperties.ajaxURL,
+      type: "post",
+      data: data,
+      dataType: "json",
+      complete: completionHandler,
+    });
   }
-
-  // Perform AJAX request.
-  $.ajax({
-    url: GlobalProperties.ajaxURL,
-    type: "post",
-    data: data,
-    // dataType: "json",
-    complete: (response) => {
-      if (response.status === 200) {
-        try {
-          // Parse the data.
-          var object = JSON.parse(
-            response.responseText == ""
-              ? '{"message":"completed"}'
-              : response.responseText
-          );
-
-          // Execution completion callback.
-          if (object.message === "completed") completion(object);
-          else completion();
-
-          // Remove the loading class.
-          $(actionDOMSelector).removeClass("loading");
-          if (actionDOMSelector.includes("button")) {
-            $(actionDOMSelector).prop("disabled", false);
-          }
-        } catch (objError) {
-          console.error("Invalid JSON response: " + objError);
-        }
-      } else if (response.status === 400 || response.status === 500) {
-        showAlert(actionDOMSelector, response.responseText, "failure");
-
-        // Remove the loading class.
-        $(actionDOMSelector).removeClass("loading");
-        if (actionDOMSelector.includes("button")) {
-          $(actionDOMSelector).prop("disabled", false);
-        }
-      } else {
-        showAlert(
-          actionDOMSelector,
-          "There was an unknown connection error, please try again later.",
-          "failure"
-        );
-
-        // Log additional information into the console.
-        console.error(
-          "Policy Cloud Marketplace error: " + response.responseText
-        );
-
-        // Remove the loading class.
-        $(actionDOMSelector).removeClass("loading");
-        if (actionDOMSelector.includes("button")) {
-          $(actionDOMSelector).prop("disabled", false);
-        }
-      }
-    },
-  });
 }
 
 /**

@@ -17,7 +17,7 @@ class PolicyCloud_Marketplace_Description
 
     public ?array $reviews;
 
-    public function __construct(string $id, ?array $fetched = [])
+    public function __construct(string $id, ?array $fetched = null)
     {
         if (empty($fetched)) {
 
@@ -25,10 +25,12 @@ class PolicyCloud_Marketplace_Description
                 'GET',
                 '/descriptions/all/' . $id,
                 [],
-                PolicyCloud_Marketplace_Account::retrieve_token()
+                PolicyCloud_Marketplace_User::is_authenticated() ?
+                    PolicyCloud_Marketplace_Account::retrieve_token() :
+                    null
             );
 
-            $this->match_field($response['results'][0]);
+            $this->match_field($response['results'][0][0]);
         } else {
             $this->match_field($fetched);
         }
@@ -97,25 +99,23 @@ class PolicyCloud_Marketplace_Description
         );
     }
 
-    public function is_provider(PolicyCloud_Marketplace_User $provider) {
+    public function is_provider(PolicyCloud_Marketplace_User $provider)
+    {
         return $this->metadata['provider'] == $provider->id;
     }
 
-    public function get_reviews() {
-        
-    }
-
-    public function approve(int $decision) {
+    public function approve(int $decision)
+    {
         PolicyCloud_Marketplace::api_request(
             'POST',
-            '/descriptions/permit/all/'.$this->id,
+            '/descriptions/permit/all/' . $this->id,
             [],
             PolicyCloud_Marketplace_Account::retrieve_token(),
             [
-              'x-access-token: '. PolicyCloud_Marketplace_Account::retrieve_token(),
-              'x-permission: '. $decision
+                'x-access-token: ' . PolicyCloud_Marketplace_Account::retrieve_token(),
+                'x-permission: ' . $decision
             ]
-            );
+        );
     }
 
     protected function match_field(array $description)
@@ -132,17 +132,13 @@ class PolicyCloud_Marketplace_Description
             $this->id = $description['id'];
         }
 
-        if (
-            empty($description['collection']) ||
-            empty($description['info'] ||
-                empty($description['metadata']))
+        if (empty($description['info'] || empty($description['metadata']))
         ) {
             throw new PolicyCloudMarketplaceInvalidDataException(
                 "The description did not match the expected schema."
             );
         } else {
-            $this->type = $description['collection'];
-            $this->information = $description['information'];
+            $this->information = $description['info'];
             $this->metadata = $description['metadata'];
         }
 
@@ -164,15 +160,27 @@ class PolicyCloud_Marketplace_Description
         }
     }
 
-    protected static function parse(array $results): self
+    protected static function parse(array $response, bool $specify_pages = true): self|array
     {
         $descriptions = [];
-        foreach ($results as $page) {
-            foreach ($page as $description) {
-                $descriptions[] = new self($description['id'], $description);
+        if (isset($response['results'])) {
+            foreach ($response['results'] as $number => $page) {
+                $descriptions[$number] = [];
+                foreach ($page as $description) {
+                    $descriptions[$number][] = new self($description['id'], $description);
+                }
             }
+            if ($specify_pages) {
+                return [
+                    'pages' => $response['pages'],
+                    'page' => (count($descriptions) == 1) ? $descriptions[0] : $descriptions
+                ];
+            } else {
+                return (count($descriptions) == 1) ? $descriptions[0] : $descriptions;
+            }
+        } else {
+            return [];
         }
-        return (count($descriptions) == 1) ? $descriptions[0] : $descriptions;
     }
 
     protected static function parse_filter_query()
@@ -195,25 +203,27 @@ class PolicyCloud_Marketplace_Description
             }
         }
 
+        // TODO @alexandrosraikos: Handle multiple providers. (TESTING)
+
         return '?' . http_build_query([
-            'sortBy' => isset($_GET['sort-by']) ? sanitize_key($_GET['sort-by']) : null,
-            'page' => isset($_GET['descriptions-page']) ? sanitize_key($_GET['descriptions-page']) : null,
-            'itemsPerPage' => filter_var($_GET['items-per-page'] ?? 5, FILTER_SANITIZE_NUMBER_INT),
-            'info.owner' => isset($_GET['owner']) ? sanitize_key($_GET['owner']) : null,
-            'info.title' => isset($_GET['search']) ? sanitize_text_field($_GET['search']) : null,
-            'info.subtype' => isset($_GET['subtype']) ? sanitize_key($_GET['subtype']) : null,
-            'info.comments.in' => isset($_GET['comments']) ? sanitize_key($_GET['comments']) : null,
-            'info.contact' => isset($_GET['contact']) ? sanitize_key($_GET['contact']) : null,
-            'info.description.in' => isset($_GET['search']) ? sanitize_text_field($_GET['search']) : null,
-            'info.fieldOfUse' => isset($_GET['field-of-use']) ? sanitize_key($_GET['field-of-use']) : null,
-            'metadata.provider' => isset($_GET['provider']) ? sanitize_key($_GET['provider']) : null,
-            'metadata.uploadDate.gte' => isset($_GET['upload-date-gte']) ? $_GET['upload-date-gte'] : null,
-            'metadata.uploadDate.lte' => isset($_GET['upload-date-lte']) ? $_GET['upload-date-lte'] : null,
-            'metadata.last_updated_by' => isset($_GET['last-updated-by']) ? sanitize_key($_GET['last-updated-by']) : null,
-            'metadata.views.gte' => isset($_GET['views-gte']) ? filter_var($_GET['views-gte'], FILTER_VALIDATE_INT) : null,
-            'metadata.views.lte' => isset($_GET['views-lte']) ? filter_var($_GET['views-lte'], FILTER_VALIDATE_INT) : null,
-            'metadata.updateDate.gte' => isset($_GET['update-date-gte']) ? $_GET['update-date-gte'] : null,
-            'metadata.updateDate.lte' => isset($_GET['upload-date-lte']) ? $_GET['upload-date-lte'] : null
+            'sortBy' => !empty($_GET['sort-by']) ? sanitize_key($_GET['sort-by']) : null,
+            'page' => filter_var($_GET['descriptions-page'] ?? 1, FILTER_SANITIZE_NUMBER_INT),
+            'itemsPerPage' => filter_var($_GET['items-per-page'] ?? 10, FILTER_SANITIZE_NUMBER_INT),
+            'info.owner' => !empty($_GET['owner']) ? sanitize_key($_GET['owner']) : null,
+            'info.title' => !empty($_GET['search']) ? sanitize_text_field($_GET['search']) : null,
+            'info.subtype' => !empty($_GET['subtype']) ? sanitize_key($_GET['subtype']) : null,
+            'info.comments.in' => !empty($_GET['comments']) ? sanitize_key($_GET['comments']) : null,
+            'info.contact' => !empty($_GET['contact']) ? sanitize_key($_GET['contact']) : null,
+            'info.description.in' => !empty($_GET['search']) ? sanitize_text_field($_GET['search']) : null,
+            'info.fieldOfUse' => !empty($_GET['field-of-use']) ? sanitize_key($_GET['field-of-use']) : null,
+            'metadata.provider' => !empty($_GET['provider']) ? filter_var($_GET['provider'], FILTER_SANITIZE_STRING) : null,
+            'metadata.uploadDate.gte' => !empty($_GET['upload-date-gte']) ? $_GET['upload-date-gte'] : null,
+            'metadata.uploadDate.lte' => !empty($_GET['upload-date-lte']) ? $_GET['upload-date-lte'] : null,
+            'metadata.last_updated_by' => !empty($_GET['last-updated-by']) ? sanitize_key($_GET['last-updated-by']) : null,
+            'metadata.views.gte' => !empty($_GET['views-gte']) ? filter_var($_GET['views-gte'], FILTER_VALIDATE_INT) : null,
+            'metadata.views.lte' => !empty($_GET['views-lte']) ? filter_var($_GET['views-lte'], FILTER_VALIDATE_INT) : null,
+            'metadata.updateDate.gte' => !empty($_GET['update-date-gte']) ? $_GET['update-date-gte'] : null,
+            'metadata.updateDate.lte' => !empty($_GET['upload-date-lte']) ? $_GET['upload-date-lte'] : null
         ]);
     }
 
@@ -253,13 +263,13 @@ class PolicyCloud_Marketplace_Description
         return self::parse($response['results']);
     }
 
-    public static function get_owned(PolicyCloud_Marketplace_User $user)
+    public static function get_owned(PolicyCloud_Marketplace_User $user, string $token)
     {
         $response = PolicyCloud_Marketplace::api_request(
             'GET',
             '/descriptions/provider/' . $user->id . '/all' . self::parse_filter_query(),
             [],
-            $user->token
+            $token
         );
 
         return self::parse($response['results']);
@@ -269,7 +279,7 @@ class PolicyCloud_Marketplace_Description
     {
         $filters = self::parse_filter_query();
 
-        if (isset($_GET['type'])) {
+        if (!empty($_GET['type'])) {
 
             // Filter by type.
             $response = PolicyCloud_Marketplace::api_request(
@@ -285,7 +295,7 @@ class PolicyCloud_Marketplace_Description
             );
         }
 
-        return self::parse($response['results']);
+        return self::parse($response);
     }
 
     public static function create(array $information): int

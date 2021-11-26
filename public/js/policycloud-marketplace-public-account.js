@@ -39,7 +39,7 @@
 
     // Request a verification email.
     $("a#policycloud-marketplace-resend-verification-email").click(
-      sendVerificationEmail
+      retryVerification
     );
 
     // Change account navigation tab.
@@ -706,11 +706,5 @@
     $("#policycloud-marketplace-delete-account").submit(
       validateDeletionRequest
     );
-
-    // Store any newly verified encrypted token.
-    if (ajax_properties_account_editing.verified_token) {
-      setAuthorizedToken(ajax_properties_account_editing.verified_token);
-      window.location.replace(location.pathname);
-    }
   });
 })(jQuery);

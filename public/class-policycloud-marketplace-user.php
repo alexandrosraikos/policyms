@@ -2,12 +2,51 @@
 
 class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
 {
+    public array $information;
+    public array $metadata;
+    public array $preferences;
+
+    protected ?array $statistics;
+    protected ?array $descriptions;
+    protected ?array $reviews;
+    protected ?string $picture;
+
     public function __construct(?string $username = null)
     {
+        $data = $this->get_account_data();
         if (isset($username)) {
             parent::__construct($username);
         } else {
-            parent::__construct($this->read('username'));
+            parent::__construct($data['username']);
+        }
+
+        $this->information = $data['info'];
+        $this->metadata = $data['account'];
+        $this->preferences = $data['profile_parameters'];
+    }
+
+    public function __get(string $name): mixed
+    {
+        switch ($name) {
+            case 'information':
+            case 'metadata':
+            case 'username':
+            case 'preferences':
+                return $this->${$name};
+            case 'statistics':
+                return $this->statistics ?? $this->get_statistics();
+            case 'descriptions':
+                return $this->descriptions ?? $this->get_descriptions();
+            case 'reviews':
+                return $this->reviews ?? $this->get_reviews();
+            case 'approvals':
+                return PolicyCloud_Marketplace_Description::get_pending();
+            case 'picture':
+                return $this->picture ?? $this->get_picture();
+            default:
+                throw new Exception(
+                    "The property \"" . $name . "\" does not exist in " . get_class($this) . "."
+                );
         }
     }
 
@@ -17,85 +56,24 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
      * ------------
      */
 
-    public function is_admin(): bool {
-        return $this->get_role == 'admin';
-    }
-
-
-    public function get_role (): string {
-        return $this->read('metadata')['role'];
-    }
-
-    
-    /**
-     * 'picture',
-     * 'information',
-     * 'statistics',
-     * 'descriptions' + ,
-     * 'reviews' + ,
-     * 'approvals' + ,
-     * 'metadata',
-     * 'preferences'
-     */
-    public function read(string ...$fields): mixed
+    public function is_admin(): bool
     {
-        $user_data = [];
-
-        foreach ($fields as $field) {
-            switch ($field) {
-                case 'information':
-                case 'metadata':
-                case 'username':
-                case 'preferences':
-                    if (
-                        !array_key_exists('information', $user_data) &&
-                        !array_key_exists('metadata', $user_data) &&
-                        !array_key_exists('preferences', $user_data) &&
-                        !array_key_exists('username', $user_data)
-                    ) {
-                        $data = $this->get_information();
-                        array_merge($user_data, [
-                            'information' => $data['info'],
-                            'metadata' => $data['account'],
-                            'username' => $data['username'],
-                            'preferences' => $data['profile_parameters'],
-                        ]);
-                    }
-                    break;
-                case 'statistics':
-                    $user_data['statistics'] = $this->get_statistics();
-                    break;
-                case 'descriptions':
-                    // TODO @alexandrosraikos: Retrieve descriptions (#60).
-                    break;
-                case 'reviews':
-                    // TODO @alexandrosraikos: Retrieve reviews (#60).
-                    break;
-                case 'approvals':
-                    // TODO @alexandrosraikos: Retrieve approvals (#60).
-                    break;
-                case 'picture':
-                    $user_data['picture'] = $this->get_picture();
-                default:
-                    throw new PolicyCloudMarketplaceInvalidDataException(
-                        "No user fields were set."
-                    );
-            }
-        }
-
-        if (count($fields) == 1) {
-            return $user_data[$fields[0]];
-        }  else {
-            return $user_data; 
-        }
+        return $this->get_role() == 'admin';
     }
 
-    public function resend_verification_email(): void {
+
+    public function get_role(): string
+    {
+        return $this->metadata['role'];
+    }
+
+    public function resend_verification_email(): void
+    {
         PolicyCloud_Marketplace::api_request(
             'POST',
             '/accounts/user/verification/resend',
             [
-                'email' => $this->read('information')['email']
+                'email' => $this->information['email']
             ],
             $this->token
         );
@@ -179,28 +157,30 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
      * 
      */
 
-    protected function get_information(): array
-    {
-        $response = PolicyCloud_Marketplace::api_request(
-            'GET',
-            '/accounts/users/information/' . $this->id,
-            [],
-            $this->token
-        );
-
-        return $response['result'];
-    }
-
     protected function get_statistics(): array
     {
-        $response = PolicyCloud_Marketplace::api_request(
+        $this->statistics = PolicyCloud_Marketplace::api_request(
             'GET',
             '/accounts/users/statistics/' . $this->id,
             [],
             $this->token
-        );
+        )['results'];
 
-        return $response['results'];
+        return $this->statistics;
+    }
+
+    protected function get_descriptions(): array
+    {
+        require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-description.php';
+        $this->descriptions = PolicyCloud_Marketplace_Description::get_owned($this, $this->token);
+        return $this->descriptions;
+    }
+
+    protected function get_reviews(): array
+    {
+        require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-review.php';
+        $this->reviews = PolicyCloud_Marketplace_Review::get_owned($this, $this->token);
+        return $this->reviews;
     }
 
     /**
@@ -212,16 +192,23 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
 
     public function get_picture()
     {
-        return PolicyCloud_Marketplace::api_request(
-            'GET',
-            '/images/' . $this->id,
-            [],
-            $this->token,
-            [
-                'Content-Type: application/octet-stream',
-                (!empty($token) ? ('x-access-token: ' . $token) : null)
-            ],
-        );
+        if ($this->preferences['profile_image'] == 'default_image_users') {
+            $picture_data = file_get_contents(plugin_dir_path(dirname(__FILE__)) .'public/assets/svg/user.svg');
+        } else {
+            $picture_data = PolicyCloud_Marketplace::api_request(
+                'GET',
+                '/images/' . $this->preferences['profile_image'],
+                [],
+                $this->token,
+                [
+                    'Content-Type: application/octet-stream',
+                    (!empty($this->token) ? ('x-access-token: ' . $this->token) : null)
+                ],
+            );
+        }
+        $this->picture = 'data:image/*;base64,' .base64_encode($picture_data);
+
+        return $this->picture;
     }
 
     public function delete_picture(): string
@@ -359,6 +346,18 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
      * Internal Methods (Static)
      * ------------
      */
+
+    protected static function get_account_data(string $id = null): array
+    {
+        $response = PolicyCloud_Marketplace::api_request(
+            'GET',
+            '/accounts/users/information' . (isset($id) ? '/' . $id : ''),
+            [],
+            PolicyCloud_Marketplace_Account::retrieve_token()
+        );
+
+        return $response['result'];
+    }
 
     protected static function inspect(array $information, array $required = null): void
     {
