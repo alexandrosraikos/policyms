@@ -238,6 +238,40 @@ function account_user_authentication_html($registration_url, $authenticated)
     }
 }
 
+/**
+ * Print the password reset form.
+ *
+ * @param   string $registration_url The url that redirects to the registration page.
+ * @param   bool $logged_in Whether the viewer is already logged in.
+ * @param   string $error_message Any potential error message to be displayed.
+ *
+ * @since    1.0.0
+ */
+function account_user_reset_password_html($authenticated)
+{
+    if (!$authenticated) {
+        ?>
+        <div class="policycloud-marketplace">
+            <form id="policycloud-marketplace-password-reset">
+                <fieldset>
+                <h2>Reset your password</h2>
+                <p>Insert your known details below and we will contact you with instructions to reset your password.</p>
+                <label for="username">Username *</label>
+                <input required name="username" placeholder="e.x. johndoe" type="text" />
+                <div class="error"></div>
+                <label for="username">E-mail address *</label>
+                <input required name="email" placeholder="e.x. johndoe@example.org" type="email" />
+                <button type="submit" class="action">Reset password</button>
+                </fieldset>
+            </form>
+        </div>
+        <?php
+    
+    } else {
+        show_alert("You're already logged in.", 'notice');
+    }
+}
+
 
 /**
  * Display the account page HTML for authenticated users.
@@ -285,7 +319,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
             ?>
             <nav>
                 <button class="tactile" id="policycloud-marketplace-account-overview" class="active">Overview</button>
-                <button class="tactile" id="policycloud-marketplace-account-assets">Assets <span class="pill"><?php echo (empty($assets_count)) ? "" : $assets_count ?></span></button>
+                <button class="tactile" id="policycloud-marketplace-account-descriptions">Descriptions <span class="pill"><?php echo (empty($assets_count)) ? "" : $assets_count ?></span></button>
                 <button class="tactile" id="policycloud-marketplace-account-reviews">Reviews <span class="pill"><?php echo (empty($reviews_count)) ? "" : $reviews_count ?></span></button>
                 <?php
                 if (!$visitor && $admin) {
@@ -383,7 +417,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                     }
                     ?>
                 </section>
-                <section class="policycloud-marketplace-account-assets">
+                <section class="policycloud-marketplace-account-descriptions">
                     <?php
                     entity_list_html('descriptions', $data['descriptions'], $visitor, function ($description) use ($pages) {
                         ?>

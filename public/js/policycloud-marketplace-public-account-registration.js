@@ -61,7 +61,7 @@
       e.preventDefault();
       makeWPRequest(
         "#policycloud-registration button[type=submit]",
-        "policycloud_marketplace_account_registration",
+        "policycloud_marketplace_account_user_registration",
         AccountRegistrationProperties.nonce,
         new FormData($("#policycloud-registration")[0]),
         () => {

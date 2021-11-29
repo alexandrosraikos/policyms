@@ -200,6 +200,9 @@ class PolicyCloud_Marketplace_Public
         // Log in sequence.
         add_shortcode('policycloud-marketplace-user-authentication', 'PolicyCloud_Marketplace_Public::account_user_authentication_shortcode');
 
+        // Reset password shortcode.
+        add_shortcode('policycloud-marketplace-user-reset-password', 'PolicyCloud_Marketplace_Public::account_user_reset_password_shortcode');
+
         // Account page shortcode.
         add_shortcode('policycloud-marketplace-user', 'PolicyCloud_Marketplace_Public::account_user_shortcode');
     }
@@ -294,17 +297,22 @@ class PolicyCloud_Marketplace_Public
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 
-        $options = self::get_plugin_setting(false, 'login_page', 'tos_url');
+        self::exception_handler(
+            function () {
 
-        wp_enqueue_script("policycloud-marketplace-account-registration");
-        wp_localize_script('policycloud-marketplace-account-registration', 'AccountRegistrationProperties', array(
-            'nonce' => wp_create_nonce('policycloud_marketplace_account_user_registration'),
-        ));
+            $options = self::get_plugin_setting(true, 'login_page', 'tos_url');
 
-        account_user_registration_html(
-            $options['login_page'],
-            $options['tos_url'] ?? '',
-            PolicyCloud_Marketplace_Account::is_authenticated()
+            wp_enqueue_script("policycloud-marketplace-account-registration");
+            wp_localize_script('policycloud-marketplace-account-registration', 'AccountRegistrationProperties', array(
+                'nonce' => wp_create_nonce('policycloud_marketplace_account_user_registration'),
+            ));
+
+            account_user_registration_html(
+                $options['login_page'],
+                $options['tos_url'] ?? '',
+                PolicyCloud_Marketplace_Account::is_authenticated()
+            );
+            }
         );
     }
 
@@ -332,6 +340,26 @@ class PolicyCloud_Marketplace_Public
     }
 
     /**
+     * Register the shortcode for account password reset.
+     *
+     * @since   1.0.0
+     * @author  Alexandros Raikos <araikos@unipi.gr>
+     */
+    public static function account_user_reset_password_shortcode()
+    {
+        require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
+
+        wp_enqueue_script("policycloud-marketplace-account-authentication");
+        wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
+            'nonce' => wp_create_nonce('policycloud_marketplace_account_user_password_reset')
+        ));
+
+        account_user_reset_password_html(PolicyCloud_Marketplace_Account::is_authenticated());
+
+    }
+
+    /**
      * Requests account related content to display for authenticated users.
      *
      * @uses    retrieve_token()
@@ -353,7 +381,7 @@ class PolicyCloud_Marketplace_Public
 
                 if (PolicyCloud_Marketplace_User::is_authenticated()) {
                     $user_id = !empty($_GET['user']) ? sanitize_user($_GET['user']) : null;
-                    $visitor = empty($user_id);
+                    $visitor = !empty($user_id);
                     $user = new PolicyCloud_Marketplace_User($visitor ? $user_id : null);
                     $data = [
                         'picture' => $user->picture,
@@ -370,6 +398,7 @@ class PolicyCloud_Marketplace_Public
                     wp_enqueue_script('policycloud-marketplace-account');
                     wp_localize_script('policycloud-marketplace-account', 'AccountEditingProperties', array(
                         'nonce' => wp_create_nonce('policycloud_marketplace_account_user_edit'),
+                        'requestDataCopyNonce' => wp_create_nonce('policycloud_marketplace_account_user_data_request'),
                         'userID' => $user->id
                     ));
 
@@ -474,6 +503,19 @@ class PolicyCloud_Marketplace_Public
         );
     }
 
+    public function account_user_password_reset_handler()
+    {
+        $this->ajax_handler(
+            function ($data) {
+                require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
+                return PolicyCloud_Marketplace_User::reset_password(
+                    $data['username'],
+                    $data['email']
+                );
+            }
+        );
+    }
+
     /**
      * Handle user account editing AJAX requests.
      *
@@ -508,7 +550,7 @@ class PolicyCloud_Marketplace_Public
                                 'public-email' => $data['public-email'],
                                 'public-phone' => $data['public-phone'],
                             ],
-                            empty($_FILES['profile_picture']) ?  null : 'profile_picture'
+                            $_FILES['profile_picture']
                         );
                         break;
                     case 'delete_profile_picture':
@@ -543,19 +585,11 @@ class PolicyCloud_Marketplace_Public
     public function account_user_data_request_handler()
     {
         $this->ajax_handler(
-            function () {
+            function ($data) {
                 require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
                 $user = new PolicyCloud_Marketplace_User();
-                return [
-                    'picture' => $user->picture,
-                    'information' => $user->information,
-                    'statistics' => $user->statistics,
-                    'descriptions' => $user->descriptions,
-                    'reviews' => $user->reviews,
-                    'approvals' => $user->approvals,
-                    'metadata' => $user->metadata,
-                    'preferences' => $user->preferences
-                ];
+                $data = $user->get_data_copy();
+                return $data;
             }
         );
     }

@@ -191,6 +191,8 @@ class PolicyCloud_Marketplace
 		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_registration', $plugin_public, 'account_user_registration_handler');
 		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_authentication', $plugin_public, 'account_user_authentication_handler');
 		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_authentication', $plugin_public, 'account_user_authentication_handler');
+		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_password_reset', $plugin_public, 'account_user_password_reset_handler');
+		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_password_reset', $plugin_public, 'account_user_password_reset_handler');
 		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_retry_verification', $plugin_public, 'account_user_verification_retry_handler');
 		$this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_retry_verification', $plugin_public, 'account_user_verification_retry_handler');
 		$this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_edit', $plugin_public, 'account_user_editing_handler');

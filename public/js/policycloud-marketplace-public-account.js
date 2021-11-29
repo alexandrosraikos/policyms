@@ -44,15 +44,15 @@
 
     // Change account navigation tab.
     $(
-      "button#policycloud-marketplace-account-overview, button#policycloud-marketplace-account-assets, button#policycloud-marketplace-account-reviews, button#policycloud-marketplace-account-approvals, button#policycloud-marketplace-account-profile"
+      "button#policycloud-marketplace-account-overview, button#policycloud-marketplace-account-descriptions, button#policycloud-marketplace-account-reviews, button#policycloud-marketplace-account-approvals, button#policycloud-marketplace-account-profile"
     ).click(switchTab);
 
     // Hash determines active tab?
     if (
-      window.location.hash == "#assets" ||
+      window.location.hash == "#descriptions" ||
       window.location.hash == "#reviews" ||
       window.location.hash == "#approvals" ||
-      window.location.hash == "#information"
+      window.location.hash == "#profile"
     ) {
       $(
         "button#policycloud-marketplace-account-" +
@@ -73,7 +73,7 @@
      */
 
     /**
-     * Rearranges all the assets (as list items) into new lists,
+     * Rearranges all the descriptions (as list items) into new lists,
      * based on the properties of the shortcode's Assets section.
      *
      * @param {String} category The category of list items to rearrange.
@@ -204,10 +204,10 @@
 
     /**
      * Print the collection filter buttons by reading the
-     * available collections in the asset list.
+     * available collections in the description list.
      *
      * @param {String} category The tab in which the filters are being displayed
-     * (currently only supports `asset`, `review` and `approval`).
+     * (currently only supports `description`, `review` and `approval`).
      * @param {[String]} collections
      *
      * @author Alexandros Raikos <araikos@unipi.gr>
@@ -238,7 +238,7 @@
 
     /**
      * Manages button activation, filter application and subsquent rearrangement
-     * of active asset list items.
+     * of active description list items.
      *
      * @listens click
      *
@@ -262,7 +262,7 @@
         $('.collection-filters[data-category="' + category + '"] button.active')
           .length > 0
       ) {
-        // Remove "visible" class from every asset.
+        // Remove "visible" class from every description.
         $('.paginated-list[data-category="' + category + '"] li').removeClass(
           "visible"
         );
@@ -272,7 +272,7 @@
           '.collection-filters[data-category="' + category + '"] button.active'
         ).each(
           /**
-           * Add "visible" class to filter matching data type assets.
+           * Add "visible" class to filter matching data type descriptions.
            */
           function () {
             $(
@@ -287,7 +287,7 @@
       }
       // If no filter is active.
       else {
-        // Add "visible" class to every asset.
+        // Add "visible" class to every description.
         $('.paginated-list[data-category="' + category + '"] li').addClass(
           "visible"
         );
@@ -297,7 +297,7 @@
 
     /**
      *
-     * Move the event related asset page into view.
+     * Move the event related description page into view.
      *
      * @param {Event} e
      *
@@ -328,7 +328,7 @@
      */
 
     // Initial print of the filtering buttons.
-    calculateCollectionFilters("asset");
+    calculateCollectionFilters("description");
     calculateCollectionFilters("review");
     calculateCollectionFilters("approval");
 
@@ -495,7 +495,7 @@
       var formData = new FormData(
         $("#policycloud-marketplace-account-edit")[0]
       );
-      formData.append("username", AccountEditingProperties.user_id);
+      formData.append("username", AccountEditingProperties.userID);
       formData.append("subsequent_action", "edit_account_user");
 
       makeWPRequest(
@@ -583,10 +583,11 @@
       makeWPRequest(
         "button#policycloud-marketplace-request-data-copy",
         "policycloud_marketplace_account_user_data_request",
-        AccountEditingProperties.nonce,
+        AccountEditingProperties.requestDataCopyNonce,
         {},
         (data) => {
-          var blob = new Blob([JSON.stringify(data, null, 2)], {
+          const blobData = JSON.stringify(data, null, 2);
+          var blob = new Blob([blobData], {
             type: "text/plain",
           });
           var a = document.createElement("a");

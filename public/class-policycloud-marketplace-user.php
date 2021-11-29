@@ -91,7 +91,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
 
         // Contact the PolicyCloud Marketplace API for password change.
         if (!empty($data['password'])) {
-            $token = PolicyCloud_Marketplace::api_request(
+            $response = PolicyCloud_Marketplace::api_request(
                 'POST',
                 '/accounts/users/password/change',
                 [
@@ -102,7 +102,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             );
         }
 
-        $token = PolicyCloud_Marketplace::api_request(
+        $response = PolicyCloud_Marketplace::api_request(
             'PUT',
             '/accounts/users/information/' . $this->id,
             [
@@ -129,7 +129,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
         );
 
         // Return encrypted token.
-        if (!empty($token)) {
+        if (!empty($response['token'])) {
             return parent::persist_token($token);
         }
     }
@@ -227,7 +227,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
         return parent::persist_token($response['token']);
     }
 
-    public function update_picture(array $picture): string
+    public function update_picture(array $picture): ?string
     {
 
         if ($picture['error'] == 0) {
@@ -261,7 +261,19 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
 
             return parent::persist_token($response['token']);
         } elseif ($picture['error'] == 4) {
+            return null;
         }
+    }
+
+    public function get_data_copy() {
+        $response = PolicyCloud_Marketplace::api_request(
+            'GET',
+            '/accounts/users/data',
+            [],
+            $this->token
+        );
+
+        return $response['account_data'];
     }
 
     /**
@@ -283,6 +295,17 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
         );
 
         return parent::persist_token($response['token']);
+    }
+
+    public static function reset_password(string $username, string $email) {
+        PolicyCloud_Marketplace::api_request(
+            'POST',
+            '/accounts/users/password/reset',
+            [
+                'username' => $username,
+                'email' => $email
+            ]
+        );
     }
 
     public static function register(array $information): string
@@ -448,6 +471,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
                 function ($k, $v) use ($urls) {
                     return $v . ":" . $urls[$k];
                 },
+                array_keys($titles),
                 $titles
             );
         } else {
