@@ -28,6 +28,8 @@ To add a registration form to a requested page, add the following shortcode:
 
 To view Descriptions, add the following shortcodes:
 
+`[policycloud-marketplace-descriptions-featured]`
+
 `[policycloud-marketplace-description-archive]`
 
 `[policycloud-marketplace-description]`

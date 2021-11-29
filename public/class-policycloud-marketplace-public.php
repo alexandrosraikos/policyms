@@ -304,7 +304,7 @@ class PolicyCloud_Marketplace_Public
 
                 wp_enqueue_script("policycloud-marketplace-account-registration");
                 wp_localize_script('policycloud-marketplace-account-registration', 'AccountRegistrationProperties', array(
-                'nonce' => wp_create_nonce('policycloud_marketplace_account_user_registration'),
+                    'nonce' => wp_create_nonce('policycloud_marketplace_account_user_registration'),
                 ));
 
                 account_user_registration_html(
@@ -633,6 +633,9 @@ class PolicyCloud_Marketplace_Public
         // Read multiple objects sequence.
         add_shortcode('policycloud-marketplace-description-archive', 'PolicyCloud_Marketplace_Public::descriptions_archive_shortcode');
 
+        // Create object sequence.
+        add_shortcode('policycloud-marketplace-descriptions-featured', 'PolicyCloud_Marketplace_Public::descriptions_featured_shortcode');
+
         // Read single object sequence.
         add_shortcode('policycloud-marketplace-description', 'PolicyCloud_Marketplace_Public::description_shortcode');
 
@@ -658,6 +661,28 @@ class PolicyCloud_Marketplace_Public
                 descriptions_archive_html(
                     PolicyCloud_Marketplace_Description::get_all(),
                     PolicyCloud_Marketplace_Description::get_filters_range(),
+                    self::get_plugin_setting(true, 'description_page')
+                );
+            }
+        );
+    }
+
+    /**
+     * Display featured descriptions for visitors and authenticated users.
+     *
+     * @since   1.0.0
+     * @author  Alexandros Raikos <araikos@unipi.gr>
+     */
+    public static function descriptions_featured_shortcode()
+    {
+        self::exception_handler(
+            function () {
+                require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-description.php';
+                require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
+
+                wp_enqueue_script("policycloud-marketplace-description-archive");
+                descriptions_grid_html(
+                    PolicyCloud_Marketplace_Description::get_featured(),
                     self::get_plugin_setting(true, 'description_page')
                 );
             }

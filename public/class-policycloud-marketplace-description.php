@@ -74,7 +74,7 @@ class PolicyCloud_Marketplace_Description
             }
         }
 
-        $data = 
+        $data =
             [
                 "title" => $information['title'],
                 "type" => $information['type'],
@@ -136,8 +136,7 @@ class PolicyCloud_Marketplace_Description
             $this->id = $description['id'];
         }
 
-        if (empty($description['info'] || empty($description['metadata']))
-        ) {
+        if (empty($description['info'] || empty($description['metadata']))) {
             throw new PolicyCloudMarketplaceInvalidDataException(
                 "The description did not match the expected schema."
             );
@@ -215,8 +214,7 @@ class PolicyCloud_Marketplace_Description
         $provider = '';
         if (empty($_GET['provider'][0])) {
             $provider = null;
-        }
-        else {
+        } else {
             $provider = implode(",", $_GET['provider']);
         }
 
@@ -288,6 +286,16 @@ class PolicyCloud_Marketplace_Description
         );
 
         return self::parse($response);
+    }
+
+    public static function get_featured(int $number_of_items = 5)
+    {
+        $response = PolicyCloud_Marketplace::api_request(
+                'GET',
+                '/descriptions/all/latest?page=1&itemsPerPage=' . $number_of_items
+            );
+            
+        return self::parse($response, false);
     }
 
     public static function get_all()
