@@ -121,6 +121,8 @@ class PolicyCloud_Marketplace_Asset
                     );
                 }
                 break;
+            case 'files':
+                break;
             default:
                 throw new PolicyCloudMarketplaceInvalidDataException(
                     "There is no asset category of this type."
@@ -143,20 +145,24 @@ class PolicyCloud_Marketplace_Asset
         }
 
         // Check if multiple files were uploaded.
-        if (array_keys($_FILES[$name]['name']) === range(0, count($_FILES[$name]['name']) - 1)) {
+        if (is_array($_FILES[$name]['name'])) {
             $files = [];
             // Check for errors on each file before proceeding.
             foreach ($_FILES[$name]['error'] as  $key => $error) {
                 // Throw on file error.
-                if ($error != 0 && $error != 4) {
-                    throw new PolicyCloudMarketplaceInvalidDataException(
-                        "An error occured when uploading the new files: " . PolicyCloud_Marketplace::fileUploadErrorInterpreter($error)
-                    );
+                if ($error != 0) {
+                    if ($error == 4) {
+                        continue;
+                    } else {
+                        throw new PolicyCloudMarketplaceInvalidDataException(
+                            "An error occured when uploading the new files: " . PolicyCloud_Marketplace::fileUploadErrorInterpreter($error)
+                        );
+                    }
                 }
 
                 $file = [
                     'path' => $_FILES[$name]['tmp_name'][$key],
-                    'mimetype' => $_FILES[$name]['tmp_name'][$key],
+                    'mimetype' => $_FILES[$name]['type'][$key],
                     'name' => $_FILES[$name]['name'][$key]
                 ];
 
@@ -173,7 +179,14 @@ class PolicyCloud_Marketplace_Asset
             }
         } else {
             $error = $_FILES[$name]['error'];
-            if ($error == 0 && $error == 4) {
+            if($error != 0 ) {
+                if($error != 4) {
+                    throw new PolicyCloudMarketplaceInvalidDataException(
+                        "An error occured when uploading the new file: " . PolicyCloud_Marketplace::fileUploadErrorInterpreter($error)
+                    );
+                }
+            }
+            else {
                 $file = [
                     'path' => $_FILES[$name]['tmp_name'],
                     'mimetype' => $_FILES[$name]['tmp_name'],
@@ -181,10 +194,6 @@ class PolicyCloud_Marketplace_Asset
                 ];
                 self::check_specs($category, $file);
                 $completion($file);
-            } else {
-                throw new PolicyCloudMarketplaceInvalidDataException(
-                    "An error occured when uploading the new file: " . PolicyCloud_Marketplace::fileUploadErrorInterpreter($error)
-                );
             }
         }
     }

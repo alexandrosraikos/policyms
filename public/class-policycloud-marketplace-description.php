@@ -58,9 +58,10 @@ class PolicyCloud_Marketplace_Description
                     substr($file_id, 0, 6) === "video-"
                 ) {
                     foreach ($this->assets as $category => $assets) {
-                        if ($category == explode('-', $file_id, 0)[0] . 's') {
+                        $file_category = explode('-', $file_id)[0] . 's';
+                        if ($category == $file_category) {
                             foreach ($assets as $type => $asset) {
-                                $id = explode('-', $file_id, 0)[1];
+                                $id = explode('-', $file_id, 2)[1];
                                 if ($asset->id == $id) {
                                     $asset->update(
                                         $file_id
@@ -73,18 +74,21 @@ class PolicyCloud_Marketplace_Description
             }
         }
 
+        $data = 
+            [
+                "title" => $information['title'],
+                "type" => $information['type'],
+                "subtype" => $information['subtype'],
+                "owner" => $information['owner'],
+                "description" => $information['description'],
+                "fieldOfUse" => $information['fieldOfUse'],
+                "comments" => $information['comments']
+            ];
+
         PolicyCloud_Marketplace::api_request(
             'PUT',
             '/descriptions/all/' . $this->id,
-            [
-                "title" => sanitize_text_field($information['title']),
-                "type" => sanitize_text_field($information['type']),
-                "subtype" => sanitize_text_field($information['subtype'] ?? ''),
-                "owner" => sanitize_text_field($information['owner'] ?? ''),
-                "description" => sanitize_text_field($information['description']),
-                "fieldOfUse" => explode(", ", $information['fields-of-use'] ?? []),
-                "comments" => sanitize_text_field($information['comments'] ?? '')
-            ],
+            $data,
             PolicyCloud_Marketplace_Account::retrieve_token()
         );
     }
@@ -104,7 +108,7 @@ class PolicyCloud_Marketplace_Description
         return $this->metadata['provider'] == $provider->id;
     }
 
-    public function approve(int $decision)
+    public function approve(string $decision)
     {
         PolicyCloud_Marketplace::api_request(
             'POST',
@@ -138,6 +142,7 @@ class PolicyCloud_Marketplace_Description
                 "The description did not match the expected schema."
             );
         } else {
+            $this->type = $description['info']['type'];
             $this->information = $description['info'];
             $this->metadata = $description['metadata'];
         }
@@ -173,7 +178,7 @@ class PolicyCloud_Marketplace_Description
             if ($specify_pages) {
                 return [
                     'pages' => $response['pages'],
-                    'page' => (count($descriptions) == 1) ? $descriptions[0] : $descriptions
+                    'content' => (count($descriptions) == 1) ? $descriptions[0] : $descriptions
                 ];
             } else {
                 return (count($descriptions) == 1) ? $descriptions[0] : $descriptions;
@@ -183,7 +188,7 @@ class PolicyCloud_Marketplace_Description
         }
     }
 
-    protected static function parse_filter_query()
+    protected static function parse_filter_query(bool $pagination = true)
     {
 
         // Check arguments
@@ -203,11 +208,21 @@ class PolicyCloud_Marketplace_Description
             }
         }
 
-        // TODO @alexandrosraikos: Handle multiple providers. (TESTING)
+        // Page parameter.
+        $page = ($pagination) ? (filter_var($_GET['descriptions-page'] ?? 1, FILTER_SANITIZE_NUMBER_INT)) : null;
+
+        // Provider parameter.
+        $provider = '';
+        if (empty($_GET['provider'][0])) {
+            $provider = null;
+        }
+        else {
+            $provider = implode(",", $_GET['provider']);
+        }
 
         return '?' . http_build_query([
             'sortBy' => !empty($_GET['sort-by']) ? sanitize_key($_GET['sort-by']) : null,
-            'page' => filter_var($_GET['descriptions-page'] ?? 1, FILTER_SANITIZE_NUMBER_INT),
+            'page' => $page,
             'itemsPerPage' => filter_var($_GET['items-per-page'] ?? 10, FILTER_SANITIZE_NUMBER_INT),
             'info.owner' => !empty($_GET['owner']) ? sanitize_key($_GET['owner']) : null,
             'info.title' => !empty($_GET['search']) ? sanitize_text_field($_GET['search']) : null,
@@ -216,7 +231,7 @@ class PolicyCloud_Marketplace_Description
             'info.contact' => !empty($_GET['contact']) ? sanitize_key($_GET['contact']) : null,
             'info.description.in' => !empty($_GET['search']) ? sanitize_text_field($_GET['search']) : null,
             'info.fieldOfUse' => !empty($_GET['field-of-use']) ? sanitize_key($_GET['field-of-use']) : null,
-            'metadata.provider' => !empty($_GET['provider']) ? filter_var($_GET['provider'], FILTER_SANITIZE_STRING) : null,
+            'metadata.provider' => $provider,
             'metadata.uploadDate.gte' => !empty($_GET['upload-date-gte']) ? $_GET['upload-date-gte'] : null,
             'metadata.uploadDate.lte' => !empty($_GET['upload-date-lte']) ? $_GET['upload-date-lte'] : null,
             'metadata.last_updated_by' => !empty($_GET['last-updated-by']) ? sanitize_key($_GET['last-updated-by']) : null,
@@ -267,12 +282,12 @@ class PolicyCloud_Marketplace_Description
     {
         $response = PolicyCloud_Marketplace::api_request(
             'GET',
-            '/descriptions/provider/' . $user->id . '/all' . self::parse_filter_query(),
+            '/descriptions/provider/' . $user->id . '/all' . self::parse_filter_query(false),
             [],
             $token
         );
 
-        return self::parse($response['results']);
+        return self::parse($response);
     }
 
     public static function get_all()

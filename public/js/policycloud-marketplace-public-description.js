@@ -64,7 +64,7 @@
      *
      * @author Alexandros Raikos <araikos@unipi.gr>
      */
-    function updateAsset(e) {
+    function updateDescription(e) {
       e.preventDefault();
 
       // Prepare form data.
@@ -84,6 +84,30 @@
           window.location.reload();
         }
       );
+    }
+    /**
+     * Delete the description via an AJAX request.
+     *
+     * @param {Event} e
+     *
+     * @author Alexandros Raikos <araikos@unipi.gr>
+     */
+    function deleteDescription(e) {
+      e.preventDefault();
+
+      if (window.confirm("Are you sure you want to delete this description?")) {
+        makeWPRequest(
+          '#policycloud-marketplace-description-editing button[data-action="delete-description"]',
+          "policycloud_marketplace_description_deletion",
+          DescriptionEditingProperties.deletionNonce,
+          {
+            description_id: DescriptionEditingProperties.descriptionID,
+          },
+          () => {
+            window.location.reload();
+          }
+        );
+      }
     }
 
     /**
@@ -105,19 +129,23 @@
         // Prepare form data.
         var formData = new FormData();
         formData.append(
-          "asset_id",
-          ajax_properties_description_editing.asset_id
+          "description_id",
+          DescriptionEditingProperties.descriptionID
         );
         formData.append("subsequent_action", "asset-deletion");
         formData.append("file-type", type);
         formData.append("file-identifier", fileIdentifier);
 
         makeWPRequest(
-          this,
+          '#policycloud-marketplace-description-editing .file[data-file-identifier="' +
+            fileIdentifier +
+            '"] button.delete',
           "policycloud_marketplace_description_editing",
           DescriptionEditingProperties.nonce,
           formData,
           () => {
+            $('img[data-image-id="' + fileIdentifier + '"').remove();
+            $('*[data-file-id="' + fileIdentifier + '"').remove();
             $(this).closest(".file").remove();
           }
         );
@@ -135,7 +163,10 @@
 
       // Prepare form data.
       var formData = new FormData();
-      formData.append("asset_id", DescriptionEditingProperties.asset_id);
+      formData.append(
+        "description_id",
+        DescriptionEditingProperties.descriptionID
+      );
       formData.append("subsequent_action", "asset-download");
       formData.append("file-type", type);
       formData.append("file-identifier", fileIdentifier);
@@ -184,11 +215,11 @@
       // Perform the AJAX request for a present password value.
       if (confirmed) {
         makeWPRequest(
-          "#policycloud-marketplace-asset-approval button[data-response=" +
+          "#policycloud-marketplace-description-approval button[data-response=" +
             $(this).data("response") +
             "]",
           "policycloud_marketplace_description_approval",
-          DescriptionEditingProperties.nonce,
+          DescriptionEditingProperties.approvalNonce,
           {
             description_id: DescriptionEditingProperties.descriptionID,
             approval: $(this).data("response"),
@@ -211,35 +242,41 @@
       e.preventDefault();
       new Modal(
         "information-editing",
-        $("#policycloud-marketplace-asset-editing").clone()[0]
+        $("#policycloud-marketplace-description-editing").clone()[0]
       );
     });
 
     // Submit the edited information.
     $(document).on(
       "submit",
-      "#policycloud-marketplace-asset-editing form",
-      updateAsset
+      "#policycloud-marketplace-description-editing form",
+      updateDescription
+    );
+
+    $(document).on(
+      "click",
+      '#policycloud-marketplace-description-editing button[data-action="delete-description"]',
+      deleteDescription
     );
 
     // Delete file.
     $(document).on(
       "click",
-      "#policycloud-marketplace-asset-editing .file button.delete",
+      "#policycloud-marketplace-description-editing .file button.delete",
       deleteAsset
     );
 
     // Approve description (admin)
     $(document).on(
       "click",
-      "#policycloud-marketplace-asset-approval button",
+      "#policycloud-marketplace-description-approval button",
       approvalRequest
     );
 
     // Download file.
     $(document).on(
       "click",
-      "#policycloud-marketplace-asset .file-viewer .download",
+      "#policycloud-marketplace-description .file-viewer .download",
       downloadAsset
     );
   });

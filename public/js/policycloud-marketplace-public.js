@@ -88,24 +88,26 @@ class Modal {
 
     // Iterate through content on button click.
     if (this.iterable) {
-      // Set next on click.
-      this.controls.next().on("click", () => {
-        this.next();
-      });
-      // Set next on right arrow key press.
-      $(document).on("keydown", (e) => {
-        e.preventDefault();
-        if (e.key === "ArrowRight") this.next();
-      });
+      $(document).ready(() => {
+        // Set next on click.
+        this.controls.next().on("click", () => {
+          this.next();
+        });
+        // Set next on right arrow key press.
+        $("#policycloud-marketplace-modal").on("keydown", (e) => {
+          e.preventDefault();
+          if (e.key === "ArrowRight") this.next();
+        });
 
-      // Set next.
-      this.controls.previous().on("click", () => {
-        this.previous();
-      });
-      // Set previous on left arrow key press.
-      $(document).on("keydown", (e) => {
-        e.preventDefault();
-        if (e.key === "ArrowLeft") this.previous();
+        // Set next.
+        this.controls.previous().on("click", () => {
+          this.previous();
+        });
+        // Set previous on left arrow key press.
+        $("#policycloud-marketplace-modal").on("keydown", (e) => {
+          e.preventDefault();
+          if (e.key === "ArrowLeft") this.previous();
+        });
       });
     }
 
@@ -116,7 +118,7 @@ class Modal {
     });
 
     // Dismiss modal on 'Escape' key press.
-    $(document).on("keyup", (e) => {
+    $("#policycloud-marketplace-modal").on("keyup", (e) => {
       e.preventDefault();
       if (e.key === "Escape") this.hide();
     });
@@ -236,7 +238,7 @@ function setAuthorizedToken(encryptedToken) {
  */
 function removeAuthorization(reload = false) {
   document.cookie =
-    "ppmapi-token=; Path=" +
+    "pcmapi-token=; Path=" +
     GlobalProperties.rootURLPath +
     "; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
   if (reload) window.location.reload();

@@ -11,11 +11,12 @@ class PolicyCloud_Marketplace_Review
     public string $title;
     public string $comment;
     public int $rating;
-    protected string $description_id;
-    protected string $user_id;
+    public string $description_id;
+    public string $user_id;
     public string $creation_date;
     public string $update_date;
     public int $version;
+    public string $collection;
 
     public function __construct(
         string $title,
@@ -25,7 +26,8 @@ class PolicyCloud_Marketplace_Review
         string $user_id,
         string $creation_date,
         string $update_date,
-        int $version
+        int $version,
+        string $collection
     ) {
         $this->title = $title;
         $this->comment = $comment;
@@ -35,6 +37,7 @@ class PolicyCloud_Marketplace_Review
         $this->creation_date = $creation_date;
         $this->update_date = $update_date;
         $this->version = $version;
+        $this->collection = $collection;
     }
 
     protected static function parse(array $fetched)
@@ -53,6 +56,7 @@ class PolicyCloud_Marketplace_Review
                                 $review['initial_review_date'],
                                 $review['updated_review_date'],
                                 $review['review_version'],
+                                $review['collection']
                             );
                         },
                         $page

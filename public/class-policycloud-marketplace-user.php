@@ -151,10 +151,10 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
      */
 
     /**
-     * 
+     *
      * User Data
      * ------------
-     * 
+     *
      */
 
     protected function get_statistics(): array
@@ -184,10 +184,10 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
     }
 
     /**
-     * 
+     *
      * User Picture
      * ------------
-     * 
+     *
      */
 
     public function get_picture()
@@ -231,8 +231,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
     {
 
         if ($picture['error'] == 0) {
-            if (
-                $picture['type'] != 'image/jpeg' &&
+            if ($picture['type'] != 'image/jpeg' &&
                 $picture['type'] != 'image/png'
             ) {
                 throw new PolicyCloudMarketplaceInvalidDataException(
@@ -249,7 +248,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
                 'PUT',
                 '/accounts/users/image',
                 [
-                    'asset' => new CURLFile($picture['tmp_name'],  $picture['type'], $this->id)
+                    'asset' => new CURLFile($picture['tmp_name'], $picture['type'], $this->id)
                 ],
                 $this->token,
                 [
@@ -261,7 +260,8 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             );
 
             return parent::persist_token($response['token']);
-        } elseif ($picture['error'] == 4);
+        } elseif ($picture['error'] == 4) {
+        }
     }
 
     /**
@@ -384,8 +384,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
 
         // Check password and confirmation.
         if (!empty($information['password'])) {
-            if (
-                !empty(preg_match('@[A-Z]@', $information['password'])) &&
+            if (!empty(preg_match('@[A-Z]@', $information['password'])) &&
                 !empty(preg_match('@[a-z]@', $information['password'])) &&
                 !empty(preg_match('@[0-9]@', $information['password'])) &&
                 !empty(preg_match('@[^\w]@', $information['password'])) &&
@@ -451,6 +450,8 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
                 },
                 $titles
             );
-        } else return [''];
+        } else {
+            return [''];
+        }
     }
 }
