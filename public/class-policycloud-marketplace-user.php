@@ -13,10 +13,11 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
 
     public function __construct(?string $username = null)
     {
-        $data = $this->get_account_data();
         if (isset($username)) {
+            $data = $this->get_account_data($username);
             parent::__construct($username);
         } else {
+            $data = $this->get_account_data();
             parent::__construct($data['username']);
         }
 
@@ -79,7 +80,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
         );
     }
 
-    public function update(array $data, ?array $picture = null): string
+    public function update(array $data, ?array $picture = null): ?string
     {
         // Inspect uploaded information.
         self::inspect($data);
@@ -193,7 +194,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
     public function get_picture()
     {
         if ($this->preferences['profile_image'] == 'default_image_users') {
-            $picture_data = file_get_contents(plugin_dir_path(dirname(__FILE__)) .'public/assets/svg/user.svg');
+            $this->picture = get_site_url(null, '/wp-content/plugins/policycloud-marketplace/public/assets/svg/user.svg');
         } else {
             $picture_data = PolicyCloud_Marketplace::api_request(
                 'GET',
@@ -205,8 +206,8 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
                     (!empty($this->token) ? ('x-access-token: ' . $this->token) : null)
                 ],
             );
+            $this->picture = 'data:image/*;base64,' .base64_encode($picture_data);
         }
-        $this->picture = 'data:image/*;base64,' .base64_encode($picture_data);
 
         return $this->picture;
     }
@@ -265,7 +266,8 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
         }
     }
 
-    public function get_data_copy() {
+    public function get_data_copy()
+    {
         $response = PolicyCloud_Marketplace::api_request(
             'GET',
             '/accounts/users/data',
@@ -297,7 +299,8 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
         return parent::persist_token($response['token']);
     }
 
-    public static function reset_password(string $username, string $email) {
+    public static function reset_password(string $username, string $email)
+    {
         PolicyCloud_Marketplace::api_request(
             'POST',
             '/accounts/users/password/reset',

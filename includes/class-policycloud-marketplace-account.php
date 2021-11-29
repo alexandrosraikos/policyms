@@ -56,7 +56,7 @@ abstract class PolicyCloud_Marketplace_Account
     abstract public function __get(string $name);
     abstract public function get_role(): string;
     
-    abstract public function update(array $information, ?array $picture): string;
+    abstract public function update(array $information, ?array $picture): ?string;
     abstract public function delete(string $current_password): void;
     
     abstract protected static function inspect(array $information, array $required);

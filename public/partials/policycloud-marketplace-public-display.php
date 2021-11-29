@@ -44,15 +44,15 @@ function show_alert(string $message, string $type = 'error')
  */
 function show_modal($inner_html, $controls = false)
 {
-    ?>
+?>
     <div id="policycloud-marketplace-modal" class="hidden">
         <button class="close tactile"><span class="fas fa-times"></span></button>
         <div class="container">
             <?php
             if ($controls) {
-                ?>
+            ?>
                 <button class="previous tactile" disabled><span class="fas fa-chevron-left"></span></button>
-                <?php
+            <?php
             }
             ?>
             <div class="content">
@@ -60,9 +60,9 @@ function show_modal($inner_html, $controls = false)
             </div>
             <?php
             if ($controls) {
-                ?>
+            ?>
                 <button class="next tactile"><span class="fas fa-chevron-right"></span></button>
-                <?php
+            <?php
             }
             ?>
         </div>
@@ -126,7 +126,7 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
     if ($authenticated) {
         show_alert("You're already logged in.", 'notice');
     } else {
-        ?>
+    ?>
         <div class="policycloud-marketplace">
             <form id="policycloud-registration" action="">
                 <fieldset name="account-credentials">
@@ -197,7 +197,7 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
                     Already have an account? Please <a href="<?php echo $authentication_url ?>">Log in</a>.</p>
             </form>
         </div>
-        <?php
+    <?php
     }
 }
 
@@ -213,10 +213,10 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
  *
  * @since    1.0.0
  */
-function account_user_authentication_html($registration_url, $authenticated)
+function account_user_authentication_html($registration_url, $reset_password_page, $authenticated)
 {
     if (!$authenticated) {
-        ?>
+    ?>
         <div class="policycloud-marketplace">
             <form id="policycloud-authentication">
                 <fieldset name=" account-credentials">
@@ -229,10 +229,10 @@ function account_user_authentication_html($registration_url, $authenticated)
                 </fieldset>
                 <div class="error"></div>
                 <button type="submit" class="action">Log in</button>
-                <p>Don't have an account yet? You can <a href="<?php echo $registration_url ?>">register</a> now to obtain full access to the Marketplace.</p>
+                <p>Don't have an account yet? You can <a href="<?php echo $registration_url ?>">register</a> now to obtain full access to the Marketplace. If you have forgotten your credentials, you can <a href="<?php echo $reset_password_page ?>">reset your password.</a></p>
             </form>
         </div>
-        <?php
+    <?php
     } else {
         show_alert("You're already logged in.", 'notice');
     }
@@ -250,23 +250,22 @@ function account_user_authentication_html($registration_url, $authenticated)
 function account_user_reset_password_html($authenticated)
 {
     if (!$authenticated) {
-        ?>
+    ?>
         <div class="policycloud-marketplace">
             <form id="policycloud-marketplace-password-reset">
                 <fieldset>
-                <h2>Reset your password</h2>
-                <p>Insert your known details below and we will contact you with instructions to reset your password.</p>
-                <label for="username">Username *</label>
-                <input required name="username" placeholder="e.x. johndoe" type="text" />
-                <div class="error"></div>
-                <label for="username">E-mail address *</label>
-                <input required name="email" placeholder="e.x. johndoe@example.org" type="email" />
-                <button type="submit" class="action">Reset password</button>
+                    <h2>Reset your password</h2>
+                    <p>Insert your known details below and we will contact you with instructions to reset your password.</p>
+                    <label for="username">Username *</label>
+                    <input required name="username" placeholder="e.x. johndoe" type="text" />
+                    <div class="error"></div>
+                    <label for="username">E-mail address *</label>
+                    <input required name="email" placeholder="e.x. johndoe@example.org" type="email" />
+                    <button type="submit" class="action">Reset password</button>
                 </fieldset>
             </form>
         </div>
-        <?php
-    
+    <?php
     } else {
         show_alert("You're already logged in.", 'notice');
     }
@@ -303,13 +302,13 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
 
     $assets_count = array_sum(array_map(function ($page) {
         return count($page);
-    }, $data['assets'] ?? []));
+    }, $data['descriptions']['content'] ?? []));
     $reviews_count = array_sum(array_map(function ($page) {
         return count($page);
     }, $data['reviews']['content'] ?? []));
     $approvals_count = array_sum(array_map(function ($page) {
         return count($page);
-    }, $data['approvals'] ?? []));
+    }, $data['approvals']['content'] ?? []));
 
     ?>
     <div id="policycloud-marketplace-account" class="policycloud-marketplace">
@@ -323,11 +322,11 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                 <button class="tactile" id="policycloud-marketplace-account-reviews">Reviews <span class="pill"><?php echo (empty($reviews_count)) ? "" : $reviews_count ?></span></button>
                 <?php
                 if (!$visitor && $admin) {
-                    ?>
+                ?>
                     <hr />
                     <button class="tactile" id="policycloud-marketplace-account-approvals">Approvals <span class="pill"><?php echo (empty($approvals_count)) ? "" : $approvals_count ?></span></button>
                     <hr />
-                    <?php
+                <?php
                 }
                 ?>
                 <button class="tactile" id="policycloud-marketplace-account-profile">Profile</button>
@@ -361,7 +360,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                         </p>
                         <?php
                         if (!empty($data['information']['social'][0])) {
-                            ?>
+                        ?>
                             <ul>
                                 <?php
                                 foreach ($data['information']['social'] as $link) {
@@ -411,7 +410,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                 </td>
                             </tr>
                         </table>
-                        <?php
+                    <?php
                     } else {
                         show_alert("Statistics for this user are currently unavailable.", 'notice');
                     }
@@ -420,7 +419,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                 <section class="policycloud-marketplace-account-descriptions">
                     <?php
                     entity_list_html('descriptions', $data['descriptions'], $visitor, function ($description) use ($pages) {
-                        ?>
+                    ?>
                         <li data-type-filter="<?php echo $description->type ?>" data-date-updated="<?php echo strtotime($description->metadata['uploadDate']) ?>" data-rating="<?php echo $description->metadata['reviews']['average_rating'] ?>" data-total-views="<?php echo $description->metadata['views'] ?>" class="visible">
                             <div class="description">
                                 <a href="<?php echo $pages['description_page'] . "?did=" . $description->id ?>">
@@ -437,14 +436,14 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                 </div>
                             </div>
                         </li>
-                        <?php
+                    <?php
                     }, $pages['upload_page']);
-    ?>
+                    ?>
                 </section>
                 <section class="policycloud-marketplace-account-reviews">
                     <?php
                     entity_list_html('reviews', $data['reviews'], $visitor, function ($review) use ($pages) {
-                        ?>
+                    ?>
                         <li data-type-filter="<?php echo $review->collection ?>" data-date-updated="<?php echo strtotime($review->update_date) ?>" data-rating="<?php echo $review->rating ?>" class="visible">
                             <div class="review">
                                 <div class="rating">
@@ -460,38 +459,38 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                 </div>
                             </div>
                         </li>
-                        <?php
+                    <?php
                     });
-    ?>
+                    ?>
                 </section>
                 <?php
                 if (!empty($data['approvals'])) {
-                    ?>
+                ?>
                     <section class="policycloud-marketplace-account-approvals">
                         <?php
-                        entity_list_html('approvals', $data['approvals'], $visitor, function ($approval) use ($pages) {
-                            ?>
-                            <li data-type-filter="<?php echo $approval['info']['type'] ?>" data-date-updated="<?php echo strtotime($approval['metadata']['uploadDate']) ?>" data-rating="<?php echo $approval['metadata']['reviews']['average_rating'] ?>" data-total-views="<?php echo $approval['metadata']['views'] ?>" class="visible">
+                        entity_list_html('approvals', $data['approvals'], $visitor, function ($pending_description) use ($pages) {
+                        ?>
+                            <li data-type-filter="<?php echo $pending_description->type ?>" data-date-updated="<?php echo strtotime($pending_description->metadata['uploadDate']) ?>" data-rating="<?php echo $pending_description->metadata['reviews']['average_rating'] ?>" data-total-views="<?php echo $pending_description->metadata['views'] ?>" class="visible">
                                 <div class="description">
-                                    <a href="<?php echo $pages['description_page'] . "?did=" . $approval['id'] ?>">
-                                        <h4><?php echo $approval['info']['title'] ?></h4>
+                                    <a href="<?php echo $pages['description_page'] . "?did=" . $pending_description->id ?>">
+                                        <h4><?php echo $pending_description->information['title'] ?></h4>
                                     </a>
-                                    <p><?php echo $approval['info']['short_desc'] ?></p>
+                                    <p><?php echo $pending_description->information['short_desc'] ?></p>
                                     <div class="metadata">
-                                        <a class="pill"><?php echo $approval['info']['type']  ?></a>
-                                        <a class="pill"><?php echo $approval['info']['subtype']  ?></a>
-                                        <span><span class="fas fa-star"></span> <?php echo $approval['metadata']['reviews']['average_rating'] . ' (' . $approval['metadata']['reviews']['no_reviews'] . ' reviews)' ?></span>
-                                        <span><span class="fas fa-eye"></span> <?php echo $approval['metadata']['views'] ?> views</span>
-                                        <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($approval['metadata']['uploadDate']))) ?></span>
+                                        <a class="pill"><?php echo $pending_description->type  ?></a>
+                                        <a class="pill"><?php echo $pending_description->information['subtype']  ?></a>
+                                        <span><span class="fas fa-star"></span> <?php echo $pending_description->metadata['reviews']['average_rating'] . ' (' . $pending_description->metadata['reviews']['no_reviews'] . ' reviews)' ?></span>
+                                        <span><span class="fas fa-eye"></span> <?php echo $pending_description->metadata['views'] ?> views</span>
+                                        <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($pending_description->metadata['uploadDate']))) ?></span>
                                         <span class="label notice">Pending</span>
                                     </div>
                                 </div>
                             </li>
-                            <?php
+                        <?php
                         });
-                    ?>
+                        ?>
                     </section>
-                    <?php
+                <?php
                 }
                 ?>
                 <section class="policycloud-marketplace-account-profile">
@@ -499,9 +498,9 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                         <h3>Information</h3>
                         <?php
                         if (!$visitor || $admin) {
-                            ?>
+                        ?>
                             <button id="policycloud-marketplace-account-edit-toggle"><span class="fas fa-pen"></span> Edit</button>
-                            <?php
+                        <?php
                         }
                         ?>
                     </header>
@@ -509,28 +508,26 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                         <table class="information">
                             <?php
                             if ($admin || !$visitor) {
-                                ?>
+                            ?>
                                 <tr>
                                     <td class="folding">
                                         <span>Profile picture</span>
                                     </td>
                                     <td class="folding">
                                         <?php
-                                        if (!empty($picture)) {
-                                            ?>
+                                        if (!empty($data['picture'])) {
+                                        ?>
                                             <div class="file-editor" data-name="profile-picture">
-                                                <img class="file" src="data:image/*;base64,<?php echo base64_encode($picture) ?>" draggable="false" />
+                                                <img class="file" src="<?php echo $data['picture'] ?>" draggable="false" />
                                                 <button type="button" class="delete"><span class="fas fa-times"></span></button>
                                             </div>
-                                            <?php
+                                        <?php
                                         }
-                                        if (!$admin && !$visitor) {
-                                            ?>
+                                        ?>
                                             <span class="folding">
                                                 <input type="file" name="profile_picture" accept="image/png, image/jpeg" />
                                                 <label for="picture">Please select an image of up to 1MB and over 256x256 for optimal results. Supported file types: jpg, png.</label>
                                             </span>
-                                        <?php } ?>
                                     </td>
                                 </tr>
                             <?php } ?>
@@ -544,9 +541,9 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                     </span>
                                     <?php
                                     if (!$visitor || $admin) {
-                                        ?>
+                                    ?>
                                         <textarea name="about" class="folding" placeholder="Tell us about yourself" style="resize:vertical"><?php echo $data['information']['about'] ?? ''; ?></textarea>
-                                        <?php
+                                    <?php
                                     }
                                     ?>
                                 </td>
@@ -567,7 +564,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                     </span>
                                     <?php
                                     if (!$visitor || $admin) {
-                                        ?>
+                                    ?>
                                         <div class="socials folding">
                                             <div>
                                                 <?php
@@ -576,22 +573,22 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                                     foreach ($data['information']['social'] as $link) {
                                                         $link_title = explode(':', $link, 2)[0];
                                                         $link_url = explode(':', $link, 2)[1];
-                                                        ?>
+                                                ?>
                                                         <div>
                                                             <input type="text" name="socials-title[]" placeholder="Example" value="<?php echo $link_title ?>" />
                                                             <input type="url" name="socials-url[]" placeholder="https://www.example.org/" value="<?php echo $link_url ?>" />
                                                             <button class="remove-field" title="Remove this link." <?php if (count($data['information']['social']) == 1) {
-                                                                echo 'disabled';
-                                                                                                                   } ?>><span class="fas fa-times"></span></button>
+                                                                                                                        echo 'disabled';
+                                                                                                                    } ?>><span class="fas fa-times"></span></button>
                                                         </div>
-                                                        <?php
+                                                <?php
                                                     }
                                                 }
                                                 ?>
                                             </div>
                                             <button class="add-field" title="Add another link."><span class="fas fa-plus"></span> Add link</button>
                                         </div>
-                                        <?php
+                                    <?php
                                     }
                                     ?>
                                 </td>
@@ -611,7 +608,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                             <tr>
                                 <?php
                                 if (!$visitor) {
-                                    ?>
+                                ?>
                                     <td>
                                         Password
                                     </td>
@@ -621,7 +618,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                         <input class="folding" type="password" name="password-confirm" placeholder="Confirm new password here" />
                                     <?php
                                 }
-                                ?>
+                                    ?>
                                     </td>
                             </tr>
                             <tr>
@@ -646,7 +643,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                     </span>
                                     <?php
                                     if (!$visitor || $admin) {
-                                        ?>
+                                    ?>
                                         <select class="folding" name="title">
                                             <option value="Mr." <?php echo ($data['information']['title'] == 'Mr.' ? 'selected' : '') ?>>Mr.</option>
                                             <option value="Ms." <?php echo ($data['information']['title'] == 'Ms.' ? 'selected' : '') ?>>Ms.</option>
@@ -660,7 +657,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                         </select>
                                         <input class="folding" type="text" name="name" placeholder="Name" value="<?php echo ($data['information']['name']); ?>" required />
                                         <input class="folding" type="text" name="surname" placeholder="Surname" value="<?php echo ($data['information']['surname']); ?>" required />
-                                        <?php
+                                    <?php
                                     }
                                     ?>
                                 </td>
@@ -677,7 +674,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                     </span>
                                     <?php
                                     if (!$visitor || $admin) {
-                                        ?>
+                                    ?>
                                         <select name="gender" class="folding">
                                             <option value="male" <?php echo ($data['information']['gender'] == 'male' ? 'selected' : '') ?>>Male</option>
                                             <option value="female" <?php echo ($data['information']['gender'] == 'female' ? 'selected' : '') ?>>Female</option>
@@ -686,7 +683,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                             <option value="questioning" <?php echo ($data['information']['gender'] == 'questioning' ? 'selected' : '') ?>>Questioning</option>
                                             <option value="-" <?php echo ($data['information']['gender'] == '-' ? 'selected' : '') ?>>Prefer not to say</option>
                                         </select>
-                                        <?php
+                                    <?php
                                     }
                                     ?>
                                 </td>
@@ -703,16 +700,16 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                     </span>
                                     <?php
                                     if (!$visitor || $admin) {
-                                        ?>
+                                    ?>
                                         <input class="folding" type="text" name="organization" value="<?php echo ($data['information']['organization'] ?? ''); ?>" placeholder="Insert your organization here" />
-                                        <?php
+                                    <?php
                                     }
                                     ?>
                                 </td>
                             </tr>
                             <?php
                             if (!empty($data['information']['email']) || !$visitor) {
-                                ?>
+                            ?>
                                 <tr>
                                     <td>
                                         E-mail
@@ -722,10 +719,10 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                             <?php
                                             echo ($data['information']['email']);
                                             if ($data['metadata']['verified'] != '1') {
-                                                ?>
+                                            ?>
                                                 <span class="unverified">(Unverified)</span>
                                                 <button id="policycloud-marketplace-resend-verification-email">Resend verification email</button>
-                                                <?php
+                                            <?php
                                             } else {
                                                 if (!$visitor || $admin) {
                                                     echo ' <span class="label ' . (($data['preferences']['public_email'] == 0) ? 'notice' : 'success') . '">' . (($data['preferences']['public_email'] == 0) ? 'Private' : 'Public') . '</span>';
@@ -735,22 +732,22 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                         </span>
                                         <?php
                                         if (!$visitor || $admin) {
-                                            ?>
+                                        ?>
                                             <label for="email" class="folding">Changing this setting will require a verification of the new e-mail address.</label>
                                             <input class="folding" type="email" name="email" value="<?php echo $data['information']['email'] ?>" required />
                                             <select name="public-email" class="folding">
                                                 <option value="1" <?php echo ($data['preferences']['public_email'] == 1 ? 'selected' : '') ?>>Public</option>
                                                 <option value="0" <?php echo ($data['preferences']['public_email'] == 0 ? 'selected' : '') ?>>Private</option>
                                             </select>
-                                            <?php
+                                        <?php
                                         }
                                         ?>
                                     </td>
                                 </tr>
-                                <?php
+                            <?php
                             }
                             if (!empty($data['information']['phone']) || !$visitor) {
-                                ?>
+                            ?>
                                 <tr>
                                     <td>
                                         Phone number
@@ -770,18 +767,18 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                         </span>
                                         <?php
                                         if (!$visitor || $admin) {
-                                            ?>
+                                        ?>
                                             <input class="folding" type="text" name="phone" value="<?php echo (empty($data['information']['phone']) ? '' : $data['information']['phone']); ?>" placeholder="Insert your phone number here" />
                                             <select name="public-phone" class="folding">
                                                 <option value="1" <?php echo ($data['preferences']['public_phone'] == 1 ? 'selected' : '') ?>>Public</option>
                                                 <option value="0" <?php echo ($data['preferences']['public_phone'] == 0 ? 'selected' : '') ?>>Private</option>
                                             </select>
-                                            <?php
+                                        <?php
                                         }
                                         ?>
                                     </td>
                                 </tr>
-                                <?php
+                            <?php
                             }
                             ?>
                             <tr>
@@ -797,7 +794,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                         </table>
                         <?php
                         if (!$visitor || $admin) {
-                            ?>
+                        ?>
                             <div class="folding error"></div>
                             <div class="folding notice"></div>
                             <div class="critical-action">
@@ -805,18 +802,18 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                 <input name="current-password" type="password" placeholder="Insert your current password here">
                             </div>
                             <button type="submit" class="folding">Submit</button>
-                            <?php
+                        <?php
                         }
                         ?>
                     </form>
                     <?php
                     if (!$visitor) {
-                        ?>
+                    ?>
                         <button id="policycloud-marketplace-request-data-copy" class="action">Request data copy</button>
-                        <?php
+                    <?php
                     }
                     if (!$visitor || $admin) {
-                        ?>
+                    ?>
                         <form id="policycloud-marketplace-delete-account">
                             <div>
                                 <label for="current-password">Please type your current password to continue.</label>
@@ -852,7 +849,7 @@ function descriptions_grid_html(array $descriptions, string $description_url)
         echo '<div class="policycloud-marketplace" id="policycloud-marketplace-descriptions-grid">';
         echo '<ul>';
         foreach ($descriptions as $description) {
-            ?>
+    ?>
             <li>
                 <a href="<?php echo $description_url . '?did=' . $description->id ?>">
                     <div class="cover">
@@ -875,14 +872,14 @@ function descriptions_grid_html(array $descriptions, string $description_url)
                             <span class="type pill"><?php echo $description->type  ?></span>
                             <?php
                             if (!empty($description->information['subtype'])) {
-                                ?>
+                            ?>
                                 <span class="sub-type pill"><?php echo $description->information['subtype']  ?></span>
                             <?php } ?>
                         </div>
                     </div>
                 </a>
             </li>
-            <?php
+    <?php
         }
         echo '</ul>';
         echo '</div>';
@@ -1027,7 +1024,7 @@ function descriptions_archive_html(array $descriptions, array $filters, string $
             </header>
             <?php
             if (!empty($descriptions)) {
-                ?>
+            ?>
                 <div class="gallery">
                     <?php
                     descriptions_grid_html($descriptions['content'], $description_page);
@@ -1041,7 +1038,7 @@ function descriptions_archive_html(array $descriptions, array $filters, string $
                     }
                     ?>
                 </nav>
-                <?php
+            <?php
             } else {
                 show_alert('No descriptions found.', 'notice');
             }
@@ -1095,7 +1092,7 @@ function description_html($description, $image_blobs, $pages, $permissions)
      */
     function asset_viewer(string $title, string $category, array $assets, bool $collapsed = false): void
     {
-        ?>
+    ?>
         <div class="policycloud-marketplace file-viewer <?php echo ($collapsed) ? 'collapsed' : '' ?>">
             <button data-files-category="<?php echo $category ?>" class="action"><?php echo $title ?></button>
             <table>
@@ -1108,14 +1105,14 @@ function description_html($description, $image_blobs, $pages, $permissions)
                 <?php
                 if (!empty($assets)) {
                     foreach ($assets as $asset) {
-                        ?>
+                ?>
                         <tr data-file-id="<?php echo $asset->id ?>">
                             <td><a class="download" data-file-id="<?php echo $asset->id ?>" data-type="<?php echo $category ?>"><?php echo $asset->filename ?></a></td>
                             <td><?php echo $asset->version ?></td>
                             <td><?php echo $asset->size ?></td>
                             <td><?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($asset->update_date))) ?></td>
                         </tr>
-                        <?php
+                <?php
                     }
                 } else {
                     echo '<tr><td colspan="4">';
@@ -1125,12 +1122,12 @@ function description_html($description, $image_blobs, $pages, $permissions)
                 ?>
             </table>
         </div>
-        <?php
+    <?php
     }
 
     function description_editing_form_html(PolicyCloud_Marketplace_Description $description)
     {
-        ?>
+    ?>
         <div id="policycloud-marketplace-description-editing" class="policycloud-marketplace modal-content">
             <form action="">
                 <fieldset name="basic-information">
@@ -1172,7 +1169,7 @@ function description_html($description, $image_blobs, $pages, $permissions)
                     <?php
                     if (!empty($description->assets['files'])) {
                         foreach ($description->assets['files'] as $asset) {
-                            ?>
+                    ?>
                             <div class="file" data-file-type="files" data-file-identifier="<?php echo $asset->id ?>">
                                 <div>
                                     <button class="delete"><span class="fas fa-times"></span></button>
@@ -1181,7 +1178,7 @@ function description_html($description, $image_blobs, $pages, $permissions)
                                 <label for="file-<?php echo $asset->id ?>">Replace file (supported file types: jpg, png):</label>
                                 <input type="file" name="file-<?php echo $asset->id ?>" multiple />
                             </div>
-                            <?php
+                    <?php
                         }
                     }
                     ?>
@@ -1191,7 +1188,7 @@ function description_html($description, $image_blobs, $pages, $permissions)
                     <?php
                     if (!empty($description->assets['images'])) {
                         foreach ($description->assets['images'] as $asset) {
-                            ?>
+                    ?>
                             <div class="file" data-file-type="images" data-file-identifier="<?php echo $asset->id ?>">
                                 <div>
                                     <button class="delete"><span class="fas fa-times"></span></button>
@@ -1200,7 +1197,7 @@ function description_html($description, $image_blobs, $pages, $permissions)
                                 <label for="image-<?php echo $asset->id ?>">Replace image</label>
                                 <input type="file" name="image-<?php echo $asset->id ?>" accept="image/png, image/jpeg" />
                             </div>
-                            <?php
+                    <?php
                         }
                     }
                     ?>
@@ -1209,7 +1206,7 @@ function description_html($description, $image_blobs, $pages, $permissions)
                     <?php
                     if (!empty($description->assets['videos'])) {
                         foreach ($description->assets['videos'] as $asset) {
-                            ?>
+                    ?>
                             <div class="file" data-file-type="videos" data-file-identifier="<?php echo $asset->id ?>">
                                 <div>
                                     <button class="delete"><span class="fas fa-times"></span></button>
@@ -1218,7 +1215,7 @@ function description_html($description, $image_blobs, $pages, $permissions)
                                 <label for="video-<?php echo $asset->id ?>">Replace video</label>
                                 <input type="file" name="video-<?php echo $asset->id ?>" accept="image/png, image/jpeg" multiple />
                             </div>
-                            <?php
+                    <?php
                         }
                     }
                     ?>
@@ -1231,21 +1228,21 @@ function description_html($description, $image_blobs, $pages, $permissions)
                 </div>
             </form>
         </div>
-        <?php
+    <?php
     }
 
     if (!empty($description)) {
-        ?>
+    ?>
         <div class="policycloud-marketplace" id="policycloud-marketplace-asset">
             <?php
             if ($permissions['administrator'] && $description->metadata['approved'] == "0") {
-                ?>
+            ?>
                 <div class="policycloud-marketplace-notice" id="policycloud-marketplace-description-approval">
                     <p>This asset is not yet accessible from other authorized Marketplace users.</p>
                     <button class="action productive" data-response="approve">Approve</button>
                     <button class="action destructive" data-response="disapprove">Delete</button>
                 </div>
-                <?php
+            <?php
             }
             ?>
             <header>
@@ -1253,9 +1250,9 @@ function description_html($description, $image_blobs, $pages, $permissions)
                     <h1><?php echo $description->information['title'] ?>
                         <?php
                         if ($permissions['provider'] || $permissions['administrator']) {
-                            ?>
+                        ?>
                             <span class="status label <?php echo ($description->metadata['approved'] == "1") ? 'success' : 'notice' ?>"><?php echo ($description->metadata['approved'] == "1") ? 'Approved' : 'Pending' ?></span>
-                            <?php
+                        <?php
                         }
                         ?>
                     </h1>
@@ -1304,7 +1301,7 @@ function description_html($description, $image_blobs, $pages, $permissions)
                         show_lock($pages['login_page'], 'view and download files');
                     }
                     if ($permissions['authenticated']) {
-                        ?>
+                    ?>
                         <div class="comments">
                             <h2>Additional information</h2>
                             <?php
@@ -1315,7 +1312,7 @@ function description_html($description, $image_blobs, $pages, $permissions)
                             }
                             ?>
                         </div>
-                        <?php
+                    <?php
                     }
                     ?>
                 </div>
@@ -1435,7 +1432,7 @@ function description_creation_html()
  */
 function entity_list_html(string $id, array $content, bool $visitor, callable $inner_html, ?string $create_page_url = null)
 {
-    ?>
+        ?>
         <header>
             <h3><?php echo ucfirst($id) ?></h3>
             <div class="actions">
@@ -1448,7 +1445,7 @@ function entity_list_html(string $id, array $content, bool $visitor, callable $i
                         <option value="rating-desc" <?php echo (($_GET['sort-by'] ?? '' == 'rating-desc') ? "selected" : "") ?>>Lowest rated</option>
                         <?php
                         if ($id == 'descriptions') {
-                            ?>
+                        ?>
                             <option value="views-asc" <?php echo (($_GET['sort-by'] ?? '' == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
                             <option value="views-desc" <?php echo (($_GET['sort-by'] ?? '' == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
                         <?php } ?>
@@ -1465,7 +1462,7 @@ function entity_list_html(string $id, array $content, bool $visitor, callable $i
                 </form>
                 <?php
                 if (!$visitor && $id == 'descriptions'  && !empty($create_page_url)) {
-                    ?>
+                ?>
                     <a id="policycloud-upload" href="<?php echo $create_page_url ?>" title="Create new"><span class="fas fa-plus"></span> Create new</a>
                 <?php } ?>
             </div>

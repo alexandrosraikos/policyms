@@ -275,7 +275,7 @@ class PolicyCloud_Marketplace_Description
             );
         }
 
-        return self::parse($response['results']);
+        return self::parse($response);
     }
 
     public static function get_owned(PolicyCloud_Marketplace_User $user, string $token)

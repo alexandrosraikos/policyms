@@ -300,18 +300,18 @@ class PolicyCloud_Marketplace_Public
         self::exception_handler(
             function () {
 
-            $options = self::get_plugin_setting(true, 'login_page', 'tos_url');
+                $options = self::get_plugin_setting(true, 'login_page', 'tos_url');
 
-            wp_enqueue_script("policycloud-marketplace-account-registration");
-            wp_localize_script('policycloud-marketplace-account-registration', 'AccountRegistrationProperties', array(
+                wp_enqueue_script("policycloud-marketplace-account-registration");
+                wp_localize_script('policycloud-marketplace-account-registration', 'AccountRegistrationProperties', array(
                 'nonce' => wp_create_nonce('policycloud_marketplace_account_user_registration'),
-            ));
+                ));
 
-            account_user_registration_html(
-                $options['login_page'],
-                $options['tos_url'] ?? '',
-                PolicyCloud_Marketplace_Account::is_authenticated()
-            );
+                account_user_registration_html(
+                    $options['login_page'],
+                    $options['tos_url'] ?? '',
+                    PolicyCloud_Marketplace_Account::is_authenticated()
+                );
             }
         );
     }
@@ -335,6 +335,7 @@ class PolicyCloud_Marketplace_Public
 
         account_user_authentication_html(
             self::get_plugin_setting(true, 'registration_page'),
+            self::get_plugin_setting(true, 'password_reset_page'),
             PolicyCloud_Marketplace_Account::is_authenticated()
         );
     }
@@ -356,7 +357,6 @@ class PolicyCloud_Marketplace_Public
         ));
 
         account_user_reset_password_html(PolicyCloud_Marketplace_Account::is_authenticated());
-
     }
 
     /**
@@ -383,6 +383,8 @@ class PolicyCloud_Marketplace_Public
                     $user_id = !empty($_GET['user']) ? sanitize_user($_GET['user']) : null;
                     $visitor = !empty($user_id);
                     $user = new PolicyCloud_Marketplace_User($visitor ? $user_id : null);
+                    $self = new PolicyCloud_Marketplace_User();
+
                     $data = [
                         'picture' => $user->picture,
                         'information' => $user->information,
@@ -402,10 +404,10 @@ class PolicyCloud_Marketplace_Public
                         'userID' => $user->id
                     ));
 
-                    if ($user->is_admin()) {
+                    if ($self->is_admin()) {
                         account_user_html(
                             $data,
-                            $user->is_admin(),
+                            $self->is_admin(),
                             $visitor,
                             self::get_plugin_setting(
                                 true,
@@ -425,7 +427,7 @@ class PolicyCloud_Marketplace_Public
                                 'metadata' => $user->metadata,
                                 'preferences' => $user->preferences
                             ],
-                            $user->is_admin(),
+                            $self->is_admin(),
                             $visitor,
                             self::get_plugin_setting(
                                 true,
