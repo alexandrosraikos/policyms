@@ -20,7 +20,6 @@ class PolicyCloud_Marketplace_Description
     public function __construct(string $id, ?array $fetched = null)
     {
         if (empty($fetched)) {
-
             $response = PolicyCloud_Marketplace::api_request(
                 'GET',
                 '/descriptions/all/' . $id,
@@ -41,10 +40,8 @@ class PolicyCloud_Marketplace_Description
 
         if (!empty($file_identifiers)) {
             foreach ($file_identifiers as $file_id) {
-
                 // Check for new files.
-                if (
-                    $file_id == 'files' ||
+                if ($file_id == 'files' ||
                     $file_id == 'images' ||
                     $file_id == 'videos'
                 ) {
@@ -52,8 +49,7 @@ class PolicyCloud_Marketplace_Description
                         $file_id,
                         $this
                     );
-                } elseif (
-                    substr($file_id, 0, 5) === "file-" ||
+                } elseif (substr($file_id, 0, 5) === "file-" ||
                     substr($file_id, 0, 6) === "image-" ||
                     substr($file_id, 0, 6) === "video-"
                 ) {
@@ -164,7 +160,7 @@ class PolicyCloud_Marketplace_Description
         }
     }
 
-    protected static function parse(array $response, bool $specify_pages = true, string $container_key = 'results'): self|array
+    protected static function parse(array $response, bool $specify_pages = true, string $container_key = 'results')
     {
         $descriptions = [];
         if (isset($response[$container_key])) {
@@ -192,8 +188,7 @@ class PolicyCloud_Marketplace_Description
 
         // Check arguments
         if (!empty($_GET['sort-by'])) {
-            if (
-                $_GET['sort-by'] != 'newest' ||
+            if ($_GET['sort-by'] != 'newest' ||
                 $_GET['sort-by'] != 'oldest' ||
                 $_GET['sort-by'] != 'rating-asc' ||
                 $_GET['sort-by'] != 'rating-desc' ||
@@ -291,16 +286,16 @@ class PolicyCloud_Marketplace_Description
     public static function get_featured()
     {
         $response = PolicyCloud_Marketplace::api_request(
-                'GET',
-                '/frontend/homepage'
-            );
+            'GET',
+            '/frontend/homepage'
+        );
             
         $featured = [
             'latest' => self::parse($response, false, 'latest'),
             'most_viewed' => self::parse($response, false, 'most_viewed'),
             'statistics' => $response['statistics'],
             'suggestions' => self::parse($response, false, 'suggestions'),
-            'top_rated' => self::parse($response, false,'top_rated' )
+            'top_rated' => self::parse($response, false, 'top_rated')
         ];
         
         return $featured;
@@ -311,14 +306,12 @@ class PolicyCloud_Marketplace_Description
         $filters = self::parse_filter_query();
 
         if (!empty($_GET['type'])) {
-
             // Filter by type.
             $response = PolicyCloud_Marketplace::api_request(
                 'GET',
                 '/descriptions/' . sanitize_key($_GET['type']) . $filters
             );
         } else {
-
             // Get all descriptions.
             $response = PolicyCloud_Marketplace::api_request(
                 'GET',

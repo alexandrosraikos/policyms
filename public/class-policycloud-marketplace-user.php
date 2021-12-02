@@ -462,7 +462,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
         }
     }
 
-    protected static function implode_urls(array|string $titles, array|string $urls): array
+    protected static function implode_urls($titles, $urls): array
     {
         if (!empty($titles) && !empty($urls)) {
             if (!is_array($titles) || !is_array($urls)) {

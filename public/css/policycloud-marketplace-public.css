@@ -574,6 +574,10 @@
   border-radius: 12px;
 }
 
+#policycloud-marketplace-modal > .container > .content > img {
+  height: 90vh;
+}
+
 /** 
 * Errors & notices
 */

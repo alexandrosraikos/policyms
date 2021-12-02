@@ -261,7 +261,7 @@ class PolicyCloud_Marketplace_Public
         }
     }
 
-    public static function get_plugin_setting(bool $throw, string ...$id): string|array
+    public static function get_plugin_setting(bool $throw, string ...$id)
     {
 
         $options = get_option('policycloud_marketplace_plugin_settings');
