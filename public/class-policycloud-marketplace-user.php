@@ -26,7 +26,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
         $this->preferences = $data['profile_parameters'];
     }
 
-    public function __get(string $name): mixed
+    public function __get(string $name)
     {
         switch ($name) {
             case 'information':
