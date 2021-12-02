@@ -134,12 +134,17 @@ class PolicyCloud_Marketplace_Public
             }, ARRAY_FILTER_USE_KEY));
 
             // Prepare the data and send.
-            $data = json_encode($data);
-            if ($data == false) {
-                throw new RuntimeException("There was an error while encoding the data to JSON.");
-            } else {
+            if (empty($data)) {
                 http_response_code(200);
-                die(json_encode($data));
+                die();
+            } else {
+                $data = json_encode($data);
+                if ($data == false) {
+                    throw new RuntimeException("There was an error while encoding the data to JSON.");
+                } else {
+                    http_response_code(200);
+                    die(json_encode($data));
+                }
             }
         } catch (PolicyCloudMarketplaceUnauthorizedRequestException $e) {
             http_response_code(401);
@@ -510,8 +515,7 @@ class PolicyCloud_Marketplace_Public
         $this->ajax_handler(
             function ($data) {
                 require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
-                return PolicyCloud_Marketplace_User::reset_password(
-                    $data['username'],
+                PolicyCloud_Marketplace_User::reset_password(
                     $data['email']
                 );
             }
@@ -629,12 +633,10 @@ class PolicyCloud_Marketplace_Public
      */
     public function add_description_shortcodes()
     {
+        add_shortcode('policycloud-marketplace-descriptions-featured', 'PolicyCloud_Marketplace_Public::descriptions_featured_shortcode');
 
         // Read multiple objects sequence.
         add_shortcode('policycloud-marketplace-description-archive', 'PolicyCloud_Marketplace_Public::descriptions_archive_shortcode');
-
-        // Create object sequence.
-        add_shortcode('policycloud-marketplace-descriptions-featured', 'PolicyCloud_Marketplace_Public::descriptions_featured_shortcode');
 
         // Read single object sequence.
         add_shortcode('policycloud-marketplace-description', 'PolicyCloud_Marketplace_Public::description_shortcode');
@@ -680,9 +682,10 @@ class PolicyCloud_Marketplace_Public
                 require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-description.php';
                 require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 
+                $featured = PolicyCloud_Marketplace_Description::get_featured();
                 wp_enqueue_script("policycloud-marketplace-description-archive");
-                descriptions_grid_html(
-                    PolicyCloud_Marketplace_Description::get_featured(),
+                featured_descriptions_html(
+                    $featured,
                     self::get_plugin_setting(true, 'description_page')
                 );
             }

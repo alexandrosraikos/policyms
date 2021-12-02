@@ -164,11 +164,11 @@ class PolicyCloud_Marketplace_Description
         }
     }
 
-    protected static function parse(array $response, bool $specify_pages = true): self|array
+    protected static function parse(array $response, bool $specify_pages = true, string $container_key = 'results'): self|array
     {
         $descriptions = [];
-        if (isset($response['results'])) {
-            foreach ($response['results'] as $number => $page) {
+        if (isset($response[$container_key])) {
+            foreach ($response[$container_key] as $number => $page) {
                 $descriptions[$number] = [];
                 foreach ($page as $description) {
                     $descriptions[$number][] = new self($description['id'], $description);
@@ -285,17 +285,25 @@ class PolicyCloud_Marketplace_Description
             $token
         );
 
-        return self::parse($response);
+        return self::parse($response, false);
     }
 
-    public static function get_featured(int $number_of_items = 5)
+    public static function get_featured()
     {
         $response = PolicyCloud_Marketplace::api_request(
                 'GET',
-                '/descriptions/all/latest?page=1&itemsPerPage=' . $number_of_items
+                '/frontend/homepage'
             );
             
-        return self::parse($response, false);
+        $featured = [
+            'latest' => self::parse($response, false, 'latest'),
+            'most_viewed' => self::parse($response, false, 'most_viewed'),
+            'statistics' => $response['statistics'],
+            'suggestions' => self::parse($response, false, 'suggestions'),
+            'top_rated' => self::parse($response, false,'top_rated' )
+        ];
+        
+        return $featured;
     }
 
     public static function get_all()

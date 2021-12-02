@@ -48,6 +48,7 @@
         new FormData($("#policycloud-marketplace-password-reset")[0]),
         () => {
           showAlert(
+            "#policycloud-marketplace-password-reset button[type=submit]",
             "An email has been sent with instructions to reset your password.",
             "notice"
           );

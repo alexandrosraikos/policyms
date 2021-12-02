@@ -40,10 +40,39 @@ class PolicyCloud_Marketplace_Review
         $this->collection = $collection;
     }
 
-    protected static function parse(array $fetched)
+    protected static function parse(array $fetched, bool $specify_pages = true): array
     {
-        return [
-            'content' => array_map(
+        if (empty($fetched['results'])) {
+            return [];
+        }
+
+        if ($specify_pages) {
+            return [
+                'content' => array_map(
+                    function ($page) {
+                        return array_map(
+                            function ($review) {
+                                return new PolicyCloud_Marketplace_Review(
+                                    $review['title'],
+                                    $review['comment'],
+                                    $review['rating'],
+                                    $review['did'],
+                                    $review['username'],
+                                    $review['initial_review_date'],
+                                    $review['updated_review_date'],
+                                    $review['review_version'],
+                                    $review['collection']
+                                );
+                            },
+                            $page
+                        );
+                    },
+                    $fetched['results']
+                ),
+                'pages' => $fetched['pages']
+            ];
+        } else {
+            return array_map(
                 function ($page) {
                     return array_map(
                         function ($review) {
@@ -63,9 +92,8 @@ class PolicyCloud_Marketplace_Review
                     );
                 },
                 $fetched['results']
-            ),
-            'pages' => $fetched['pages']
-        ];
+            );
+        }
     }
 
     public static function get_owned(PolicyCloud_Marketplace_User $user, string $token)
@@ -77,7 +105,7 @@ class PolicyCloud_Marketplace_Review
             $token
         );
 
-        return self::parse($response);
+        return self::parse($response, false);
     }
 
     public function get_author(): PolicyCloud_Marketplace_User

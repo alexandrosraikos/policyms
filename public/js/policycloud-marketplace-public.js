@@ -7,8 +7,6 @@
 
 var $ = jQuery;
 
-// TODO @alexandrosraikos: Refactor all dependent JS by moving to `makeWPRequest` (#60).
-
 /**
  * Global
  *
@@ -39,32 +37,27 @@ class Modal {
     /**
      * The modal HTML.
      */
-    this.HTML = `<div id="policycloud-marketplace-modal" class="policycloud-marketplace ${
-      this.type
-    } hidden">
+    this.HTML = `<div id="policycloud-marketplace-modal" class="policycloud-marketplace ${this.type
+      } hidden">
         <button class="close tactile"><span class="fas fa-times"></span></button>
         <div class="container">
-        ${
-          this.iterable
-            ? `<button class="previous tactile" ${
-                this.index - 1 < 0 ? "disabled" : ""
-              }>
+        ${this.iterable
+        ? `<button class="previous tactile" ${this.index - 1 < 0 ? "disabled" : ""
+        }>
           <span class="fas fa-chevron-left"></span>
         </button>`
-            : ``
-        }
+        : ``
+      }
             <div class="content">
             </div>
             
-        ${
-          this.iterable
-            ? `<button class="next tactile" ${
-                this.index + 2 > this.data.length ? "disabled" : ""
-              }>
+        ${this.iterable
+        ? `<button class="next tactile" ${this.index + 2 > this.data.length ? "disabled" : ""
+        }>
           <span class="fas fa-chevron-right"></span>
         </button>`
-            : ``
-        }
+        : ``
+      }
         </div>
     </div>
     `;
@@ -145,8 +138,8 @@ class Modal {
     previous: () => {
       return $(
         "#policycloud-marketplace-modal." +
-          this.type +
-          " > .container > .previous"
+        this.type +
+        " > .container > .previous"
       );
     },
     next: () => {
@@ -266,18 +259,18 @@ function showAlert(
   if (placeBefore) {
     $(selector).before(
       '<div class="policycloud-marketplace-' +
-        type +
-        ' animated"><span>' +
-        message +
-        "</span></div>"
+      type +
+      ' animated"><span>' +
+      message +
+      "</span></div>"
     );
   } else {
     $(selector).after(
       '<div class="policycloud-marketplace-' +
-        type +
-        ' animated"><span>' +
-        message +
-        "</span></div>"
+      type +
+      ' animated"><span>' +
+      message +
+      "</span></div>"
     );
   }
   if (disappearing) {
@@ -324,15 +317,12 @@ function makeWPRequest(actionDOMSelector, action, nonce, data, completion) {
     if (response.status === 200) {
       try {
         // Parse the data.
-        var object = JSON.parse(
-          response.responseText == ""
-            ? '{"message":"completed"}'
-            : response.responseText
-        );
-
-        // Execution completion callback.
-        if (object.message === "completed") completion();
-        else completion(object);
+        if (response.responseText == '') {
+          completion();
+        }
+        else {
+          completion(JSON.parse(response.responseText));
+        }
 
         // Remove the loading class.
         $(actionDOMSelector).removeClass("loading");

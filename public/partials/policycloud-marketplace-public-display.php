@@ -255,10 +255,7 @@ function account_user_reset_password_html($authenticated)
             <form id="policycloud-marketplace-password-reset">
                 <fieldset>
                     <h2>Reset your password</h2>
-                    <p>Insert your known details below and we will contact you with instructions to reset your password.</p>
-                    <label for="username">Username *</label>
-                    <input required name="username" placeholder="e.x. johndoe" type="text" />
-                    <div class="error"></div>
+                    <p>Insert your e-mail address below and we will contact you with instructions to reset your password.</p>
                     <label for="username">E-mail address *</label>
                     <input required name="email" placeholder="e.x. johndoe@example.org" type="email" />
                     <button type="submit" class="action">Reset password</button>
@@ -300,15 +297,15 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
         show_alert("Your account verification status couldn't be accessed.");
     }
 
-    $assets_count = array_sum(array_map(function ($page) {
+    $descriptions_count = array_sum(array_map(function ($page) {
         return count($page);
-    }, $data['descriptions']['content'] ?? []));
+    }, $data['descriptions'] ?? []));
     $reviews_count = array_sum(array_map(function ($page) {
         return count($page);
-    }, $data['reviews']['content'] ?? []));
+    }, $data['reviews'] ?? []));
     $approvals_count = array_sum(array_map(function ($page) {
         return count($page);
-    }, $data['approvals']['content'] ?? []));
+    }, $data['approvals'] ?? []));
 
     ?>
     <div id="policycloud-marketplace-account" class="policycloud-marketplace">
@@ -318,13 +315,13 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
             ?>
             <nav>
                 <button class="tactile" id="policycloud-marketplace-account-overview" class="active">Overview</button>
-                <button class="tactile" id="policycloud-marketplace-account-descriptions">Descriptions <span class="pill"><?php echo (empty($assets_count)) ? "" : $assets_count ?></span></button>
-                <button class="tactile" id="policycloud-marketplace-account-reviews">Reviews <span class="pill"><?php echo (empty($reviews_count)) ? "" : $reviews_count ?></span></button>
+                <button class="tactile" id="policycloud-marketplace-account-descriptions">Descriptions <span class="pill"><?php echo $descriptions_count ?></span></button>
+                <button class="tactile" id="policycloud-marketplace-account-reviews">Reviews <span class="pill"><?php echo $reviews_count ?></span></button>
                 <?php
                 if (!$visitor && $admin) {
                 ?>
                     <hr />
-                    <button class="tactile" id="policycloud-marketplace-account-approvals">Approvals <span class="pill"><?php echo (empty($approvals_count)) ? "" : $approvals_count ?></span></button>
+                    <button class="tactile" id="policycloud-marketplace-account-approvals">Approvals <span class="pill"><?php echo $approvals_count ?></span></button>
                     <hr />
                 <?php
                 }
@@ -339,7 +336,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
             <div class="policycloud-marketplace-account-title">
                 <h2>
                     <?php
-                    echo ($data['information']['title'] ?? '') . ' ' . $data['information']['name'] . ' ' . $data['information']['surname'];
+                    echo ((($data['information']['title'] ?? '-') == '-') ? '' : $data['information']['title'] ) . ' ' . $data['information']['name'] . ' ' . $data['information']['surname'];
                     ?>
                 </h2>
                 <div>
@@ -846,7 +843,7 @@ function descriptions_grid_html(array $descriptions, string $description_url)
     if (empty($descriptions)) {
         echo show_alert('No assets found.', 'notice');
     } else {
-        echo '<div class="policycloud-marketplace" id="policycloud-marketplace-descriptions-grid">';
+        echo '<div class="policycloud-marketplace descriptions-grid">';
         echo '<ul>';
         foreach ($descriptions as $description) {
     ?>
@@ -884,6 +881,62 @@ function descriptions_grid_html(array $descriptions, string $description_url)
         echo '</ul>';
         echo '</div>';
     }
+}
+
+function featured_descriptions_html(array $categories, string $description_page): void
+{
+    ?>
+    <div class="policycloud-marketplace featured-descriptions">
+        <div class="row statistics">
+            <div class="column">
+                <figure>
+                    <?php echo $categories['statistics']['sum'] ?>
+                    <figcaption>Total assets</figcaption>
+                </figure>
+            </div>
+            <div class="column">
+                <figure>
+                    <?php echo $categories['statistics']['top'][0]['descriptions'] ?>
+                    <figcaption>
+                        <?php echo ucfirst($categories['statistics']['top'][0]['collection']) ?>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="column">
+                <figure>
+                    <?php echo $categories['statistics']['top'][1]['descriptions'] ?>
+                    <figcaption>
+                        <?php echo ucfirst($categories['statistics']['top'][1]['collection']) ?>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="column">
+                <figure>
+                    <?php echo $categories['statistics']['top'][2]['descriptions'] ?>
+                    <figcaption>
+                        <?php echo ucfirst($categories['statistics']['top'][2]['collection']) ?>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+        <h2>Top rated descriptions</h2>
+        <?php
+        descriptions_grid_html($categories['top_rated'], $description_page);
+        ?>
+        <h2>Most viewed descriptions</h2>
+        <?php
+        descriptions_grid_html($categories['most_viewed'], $description_page);
+        ?>
+        <h2>Latest descriptions</h2>
+        <?php
+        descriptions_grid_html($categories['latest'], $description_page);
+        ?>
+        <h2>Suggestions</h2>
+        <?php
+        descriptions_grid_html($categories['suggestions'], $description_page);
+        ?>
+    </div>
+    <?php
 }
 
 
@@ -1453,8 +1506,8 @@ function entity_list_html(string $id, array $content, bool $visitor, callable $i
                     </select>
                     <label for="items-per-page">Items per page</label>
                     <select name="items-per-page" data-category="<?php echo $id ?>">
-                        <option value="5" <?php echo ((($_GET['items-per-page'] ?? '' == '5') || empty($_GET['items-per-page'])) ? "selected" : "") ?>>5</option>
-                        <option value="10" <?php echo (($_GET['items-per-page'] ?? '' == '10') ? "selected" : "") ?>>10</option>
+                        <option value="5" <?php echo ((($_GET['items-per-page'] ?? '' == '5')) ? "selected" : "") ?>>5</option>
+                        <option value="10" <?php echo (($_GET['items-per-page'] ?? '' == '10' || empty($_GET['items-per-page'])) ? "selected" : "") ?>>10</option>
                         <option value="25" <?php echo (($_GET['items-per-page'] ?? '' == '25') ? "selected" : "") ?>>25</option>
                         <option value="50" <?php echo (($_GET['items-per-page'] ?? '' == '50') ? "selected" : "") ?>>50</option>
                         <option value="100" <?php echo (($_GET['items-per-page'] ?? '' == '100') ? "selected" : "") ?>>100</option>
@@ -1473,7 +1526,7 @@ function entity_list_html(string $id, array $content, bool $visitor, callable $i
         <div class="paginated-list" data-category="<?php echo $id ?>">
             <?php
             if (!empty($content)) {
-                foreach ($content['content'] as $page => $page_items) {
+                foreach ($content as $page => $page_items) {
                     echo '<ul data-page="' . ($page + 1) . '" class="page ' . $id . ' ' . ($page == 0 ? 'visible' : '') . '">';
                     if (!empty($content)) {
                         foreach ($page_items as $item) {
@@ -1490,7 +1543,7 @@ function entity_list_html(string $id, array $content, bool $visitor, callable $i
             <nav class="pagination">
                 <?php
                 if (count($content ?? []) > 1) {
-                    foreach ($content['content'] as $page => $page_items) {
+                    foreach ($content as $page => $page_items) {
                         echo '<button data-category="' . $id . '" class="page-selector ' . (($page == ($_GET['page'] ?? 0)) ? 'active' : '') . '" data-' . $id . '-page="' . ($page + 1) . '">' . ($page + 1) . '</button>';
                     }
                 } ?>

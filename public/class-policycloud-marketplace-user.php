@@ -299,13 +299,12 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
         return parent::persist_token($response['token']);
     }
 
-    public static function reset_password(string $username, string $email)
+    public static function reset_password(string $email)
     {
         PolicyCloud_Marketplace::api_request(
             'POST',
             '/accounts/users/password/reset',
             [
-                'username' => $username,
                 'email' => $email
             ]
         );
