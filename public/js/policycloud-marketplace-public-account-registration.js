@@ -59,44 +59,15 @@
      */
     function registerUser(e) {
       e.preventDefault();
-
-      // Add "loading" class to the submission button.
-      $("#policycloud-registration button[type=submit]").addClass("loading");
-
-      // Prepare form data.
-      var formData = new FormData($("#policycloud-registration")[0]);
-      formData.append("action", "policycloud_marketplace_account_registration");
-      formData.append("nonce", ajax_properties_account_registration.nonce);
-
-      // Perform AJAX request.
-      $.ajax({
-        url: ajax_properties_account_registration.ajax_url,
-        type: "post",
-        processData: false,
-        contentType: false,
-        data: formData,
-        dataType: "json",
-        complete: (response) => {
-          handleAJAXResponse(
-            response,
-            "#policycloud-registration button[type=submit]",
-            (data) => {
-              setAuthorizedToken(data.newToken);
-
-              // Handle any warning message in case of semi-complete registration.
-              if (data.warningMessage) {
-                $("#policycloud-registration fieldset").prop("disabled", true);
-                showAlert(
-                  "#policycloud-registration button[type=submit]",
-                  data.warningMessage
-                );
-              } else {
-                window.location.reload();
-              }
-            }
-          );
-        },
-      });
+      makeWPRequest(
+        "#policycloud-registration button[type=submit]",
+        "policycloud_marketplace_account_user_registration",
+        AccountRegistrationProperties.nonce,
+        new FormData($("#policycloud-registration")[0]),
+        () => {
+          window.location.href(GlobalProperties.rootURLPath);
+        }
+      );
     }
 
     /**

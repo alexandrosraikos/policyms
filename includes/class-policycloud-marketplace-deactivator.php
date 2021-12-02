@@ -18,7 +18,7 @@
  * @since      1.0.0
  * @package    PolicyCloud_Marketplace
  * @subpackage PolicyCloud_Marketplace/includes
- * @author     Your Name <email@example.com>
+ * @author     Alexandros Raikos <araikos@unipi.gr>
  */
 class PolicyCloud_Marketplace_Deactivator {
 

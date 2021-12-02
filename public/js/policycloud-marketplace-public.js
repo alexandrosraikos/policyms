@@ -37,32 +37,27 @@ class Modal {
     /**
      * The modal HTML.
      */
-    this.HTML = `<div id="policycloud-marketplace-modal" class="policycloud-marketplace ${
-      this.type
-    } hidden">
+    this.HTML = `<div id="policycloud-marketplace-modal" class="policycloud-marketplace ${this.type
+      } hidden">
         <button class="close tactile"><span class="fas fa-times"></span></button>
         <div class="container">
-        ${
-          this.iterable
-            ? `<button class="previous tactile" ${
-                this.index - 1 < 0 ? "disabled" : ""
-              }>
+        ${this.iterable
+        ? `<button class="previous tactile" ${this.index - 1 < 0 ? "disabled" : ""
+        }>
           <span class="fas fa-chevron-left"></span>
         </button>`
-            : ``
-        }
+        : ``
+      }
             <div class="content">
             </div>
             
-        ${
-          this.iterable
-            ? `<button class="next tactile" ${
-                this.index + 2 > this.data.length ? "disabled" : ""
-              }>
+        ${this.iterable
+        ? `<button class="next tactile" ${this.index + 2 > this.data.length ? "disabled" : ""
+        }>
           <span class="fas fa-chevron-right"></span>
         </button>`
-            : ``
-        }
+        : ``
+      }
         </div>
     </div>
     `;
@@ -86,24 +81,26 @@ class Modal {
 
     // Iterate through content on button click.
     if (this.iterable) {
-      // Set next on click.
-      this.controls.next().on("click", () => {
-        this.next();
-      });
-      // Set next on right arrow key press.
-      $(document).on("keydown", (e) => {
-        e.preventDefault();
-        if (e.key === "ArrowRight") this.next();
-      });
+      $(document).ready(() => {
+        // Set next on click.
+        this.controls.next().on("click", () => {
+          this.next();
+        });
+        // Set next on right arrow key press.
+        $("#policycloud-marketplace-modal").on("keydown", (e) => {
+          e.preventDefault();
+          if (e.key === "ArrowRight") this.next();
+        });
 
-      // Set next.
-      this.controls.previous().on("click", () => {
-        this.previous();
-      });
-      // Set previous on left arrow key press.
-      $(document).on("keydown", (e) => {
-        e.preventDefault();
-        if (e.key === "ArrowLeft") this.previous();
+        // Set next.
+        this.controls.previous().on("click", () => {
+          this.previous();
+        });
+        // Set previous on left arrow key press.
+        $("#policycloud-marketplace-modal").on("keydown", (e) => {
+          e.preventDefault();
+          if (e.key === "ArrowLeft") this.previous();
+        });
       });
     }
 
@@ -114,7 +111,7 @@ class Modal {
     });
 
     // Dismiss modal on 'Escape' key press.
-    $(document).on("keyup", (e) => {
+    $("#policycloud-marketplace-modal").on("keyup", (e) => {
       e.preventDefault();
       if (e.key === "Escape") this.hide();
     });
@@ -141,8 +138,8 @@ class Modal {
     previous: () => {
       return $(
         "#policycloud-marketplace-modal." +
-          this.type +
-          " > .container > .previous"
+        this.type +
+        " > .container > .previous"
       );
     },
     next: () => {
@@ -216,7 +213,7 @@ function setAuthorizedToken(encryptedToken) {
   date.setTime(date.getTime() + 15 * 24 * 60 * 60 * 1000);
   const expires = "expires=" + date.toUTCString();
   document.cookie =
-    "ppmapi-token=" +
+    "pcmapi-token=" +
     encryptedToken +
     "; Path=" +
     GlobalProperties.rootURLPath +
@@ -234,7 +231,7 @@ function setAuthorizedToken(encryptedToken) {
  */
 function removeAuthorization(reload = false) {
   document.cookie =
-    "ppmapi-token=; Path=" +
+    "pcmapi-token=; Path=" +
     GlobalProperties.rootURLPath +
     "; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
   if (reload) window.location.reload();
@@ -262,18 +259,18 @@ function showAlert(
   if (placeBefore) {
     $(selector).before(
       '<div class="policycloud-marketplace-' +
-        type +
-        ' animated"><span>' +
-        message +
-        "</span></div>"
+      type +
+      ' animated"><span>' +
+      message +
+      "</span></div>"
     );
   } else {
     $(selector).after(
       '<div class="policycloud-marketplace-' +
-        type +
-        ' animated"><span>' +
-        message +
-        "</span></div>"
+      type +
+      ' animated"><span>' +
+      message +
+      "</span></div>"
     );
   }
   if (disappearing) {
@@ -302,42 +299,97 @@ function toggleFileList(e) {
 }
 
 /**
- * Handle the response after requesting via WP ajax.
+ * Make a WP request.
  *
- * @param {Object} response The raw response AJAX object.
- * @param {string} actionSelector The selector of the DOM element triggering the action.
- * @param {completedAction} callback The actions to perform when the response was successful.
+ * This function handles success data using the `completion` and appends errors automatically.
  *
- * @author Alexandros Raikos <araikos@unipi.gr>
+ * @param {any} actionDOMSelector The selector of the DOM element triggering the action.
+ * @param {string} action The action as registered in {@link ../../class-wc-biz-courier-logistics.php}
+ * @param {string} nonce The single nonce appointed to the action.
+ * @param {Object} data The array of data to be included in the request.
+ * @param {Function} completion The actions to perform when the response was successful.
+ *
+ * @author Alexandros Raikos <alexandros@araikos.gr>
+ * @since 1.4.0
  */
-function handleAJAXResponse(response, actionSelector, completedAction) {
-  if (response.status === 200) {
-    try {
-      var data = JSON.parse(
-        response.responseText == ""
-          ? '{"message":"completed"}'
-          : response.responseText
+function makeWPRequest(actionDOMSelector, action, nonce, data, completion) {
+  function completionHandler(response) {
+    if (response.status === 200) {
+      try {
+        // Parse the data.
+        if (response.responseText == '') {
+          completion();
+        }
+        else {
+          completion(JSON.parse(response.responseText));
+        }
+
+        // Remove the loading class.
+        $(actionDOMSelector).removeClass("loading");
+        if (actionDOMSelector.includes("button")) {
+          $(actionDOMSelector).prop("disabled", false);
+        }
+      } catch (objError) {
+        console.error("Invalid JSON response: " + objError);
+      }
+    } else if (response.status === 400 || response.status === 500) {
+      showAlert(actionDOMSelector, response.responseText, "error");
+
+      // Remove the loading class.
+      $(actionDOMSelector).removeClass("loading");
+      if (actionDOMSelector.includes("button")) {
+        $(actionDOMSelector).prop("disabled", false);
+      }
+    } else {
+      showAlert(
+        actionDOMSelector,
+        "There was an unknown connection error, please try again later.",
+        "error"
       );
-      completedAction(data);
-    } catch (objError) {
-      console.error("Invalid JSON response: " + objError);
+
+      // Log additional information into the console.
+      console.error("Policy Cloud Marketplace error: " + response.responseText);
+
+      // Remove the loading class.
+      $(actionDOMSelector).removeClass("loading");
+      if (actionDOMSelector.includes("button")) {
+        $(actionDOMSelector).prop("disabled", false);
+      }
     }
-  } else if (
-    response.status === 400 ||
-    response.status === 404 ||
-    response.status === 500
-  ) {
-    showAlert(actionSelector, response.responseText);
-  } else if (response.status === 440) {
-    removeAuthorization(true);
-  } else {
-    console.error(response.responseText);
   }
 
-  // Remove the loading class.
-  $(actionSelector).removeClass("loading");
-  if (actionSelector.includes("button")) {
-    $(actionSelector).prop("disabled", false);
+  // Add the loading class.
+  $(actionDOMSelector).addClass("loading");
+  if (actionDOMSelector.includes("button")) {
+    $(actionDOMSelector).prop("disabled", true);
+  }
+
+  if (data instanceof FormData) {
+    data.append("action", action);
+    data.append("nonce", nonce);
+
+    // Perform AJAX request.
+    $.ajax({
+      url: GlobalProperties.ajaxURL,
+      type: "post",
+      data: data,
+      contentType: false,
+      processData: false,
+      complete: completionHandler,
+    });
+  } else if (typeof data === "object") {
+    // Prepare data fields for WordPress.
+    data.action = action;
+    data.nonce = nonce;
+
+    // Perform AJAX request.
+    $.ajax({
+      url: GlobalProperties.ajaxURL,
+      type: "post",
+      data: data,
+      dataType: "json",
+      complete: completionHandler,
+    });
   }
 }
 

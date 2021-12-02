@@ -151,6 +151,25 @@ function policycloud_marketplace_plugin_section_three()
     echo '<p>Select your preferred operating settings.</p>';
 }
 
+
+function policycloud_marketplace_plugin_password_reset_page_selector()
+{
+    $options = get_option('policycloud_marketplace_plugin_settings');
+    $pages = get_pages([
+        'post_status' => 'publish'
+    ]);
+?>
+    <select name="policycloud_marketplace_plugin_settings[password_reset_page]">
+        <?php
+        foreach ($pages as $page) {
+            echo '<option value="' . get_page_link($page->ID) . '" '.($options['password_reset_page']==get_page_link($page->ID) ? 'selected' : '').'>' . $page->post_title . '</option>';
+        }
+        ?>
+    </select>
+    <p>Select the page where you've inserted the <em>[policycloud-marketplace-user-password-reset]</em> shortcode.</p>
+<?php
+}
+
 function policycloud_marketplace_plugin_tos_url()
 {
     $options = get_option('policycloud_marketplace_plugin_settings');
@@ -174,7 +193,7 @@ function policycloud_marketplace_plugin_description_page_selector()
         }
         ?>
     </select>
-    <p>Select the page where you've inserted the <em>[policycloud-marketplace-read-single]</em> shortcode.</p>
+    <p>Select the page where you've inserted the <em>[policycloud-marketplace-description]</em> shortcode.</p>
 <?php
 }
 
@@ -192,7 +211,7 @@ function policycloud_marketplace_plugin_archive_page_selector()
         }
         ?>
     </select>
-    <p>Select the page where you've inserted the <em>[policycloud-marketplace-read-multiple]</em> shortcode.</p>
+    <p>Select the page where you've inserted the <em>[policycloud-marketplace-description-archive]</em> shortcode.</p>
 <?php
 }
 
@@ -210,6 +229,6 @@ function policycloud_marketplace_plugin_upload_page_selector()
         }
         ?>
     </select>
-    <p>Select the page where you've inserted the <em>[policycloud-marketplace-create-object]</em> shortcode.</p>
+    <p>Select the page where you've inserted the <em>[policycloud-marketplace-description-creation]</em> shortcode.</p>
 <?php
 }

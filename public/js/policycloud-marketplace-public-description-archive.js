@@ -1,6 +1,6 @@
 /**
  * @file Provides dynamic fields and handles form requests for forms and buttons
- * in the asset archive shortcode.
+ * in the description archive shortcode.
  *
  * @author Alexandros Raikos <araikos@unipi.gr>
  * @author Eleftheria Kouremenou <elkour@unipi.gr>
@@ -13,7 +13,7 @@
      * Generic
      *
      * This section includes generic functionality
-     * regarding the usage of the asset archive shortcode.
+     * regarding the usage of the description archive shortcode.
      *
      */
 
@@ -28,10 +28,13 @@
     function switchPage(e) {
       e.preventDefault();
       var url = new URL(window.location.href);
-      if (url.searchParams.has("page")) {
-        url.searchParams.set("assets-page", $(this).data("page-number"));
+      if (url.searchParams.has("descriptions-page")) {
+        url.searchParams.set("descriptions-page", $(this).data("page-number"));
       } else {
-        url.searchParams.append("assets-page", $(this).data("page-number"));
+        url.searchParams.append(
+          "descriptions-page",
+          $(this).data("page-number")
+        );
       }
       window.location.href = url.href;
     }
@@ -81,26 +84,32 @@
      */
 
     // Toggle the filter view.
-    $("#policycloud-marketplace-asset-archive .filters-toggle").click((e) => {
-      e.preventDefault();
-      $("#policycloud-marketplace-asset-archive").toggleClass("inspect");
-      if (!$("#policycloud-marketplace-asset-archive").hasClass("inspect")) {
-        $("body").css("overflowY", "hidden");
-      } else {
-        $("body").css("overflowY", "auto");
+    $("#policycloud-marketplace-description-archive .filters-toggle").click(
+      (e) => {
+        e.preventDefault();
+        $("#policycloud-marketplace-description-archive").toggleClass(
+          "inspect"
+        );
+        if (
+          !$("#policycloud-marketplace-description-archive").hasClass("inspect")
+        ) {
+          $("body").css("overflowY", "hidden");
+        } else {
+          $("body").css("overflowY", "auto");
+        }
       }
-    });
+    );
 
     $(
-      "#policycloud-marketplace-asset-archive .content nav.pagination button"
+      "#policycloud-marketplace-description-archive .content nav.pagination button"
     ).click(switchPage);
 
     $(
-      '#policycloud-marketplace-asset-archive header select[name="sort-by"]'
+      '#policycloud-marketplace-description-archive header select[name="sort-by"]'
     ).change(addSortFilter);
 
     $(
-      '#policycloud-marketplace-asset-archive header select[name="items-per-page"]'
+      '#policycloud-marketplace-description-archive header select[name="items-per-page"]'
     ).change(addSizeFilter);
   });
 })(jQuery);
