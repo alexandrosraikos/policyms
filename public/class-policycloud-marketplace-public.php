@@ -305,11 +305,12 @@ class PolicyCloud_Marketplace_Public
         self::exception_handler(
             function () {
 
-                $options = self::get_plugin_setting(true, 'login_page', 'tos_url');
+                $options = self::get_plugin_setting(true, 'login_page', 'account_page', 'tos_url');
 
                 wp_enqueue_script("policycloud-marketplace-account-registration");
                 wp_localize_script('policycloud-marketplace-account-registration', 'AccountRegistrationProperties', array(
                     'nonce' => wp_create_nonce('policycloud_marketplace_account_user_registration'),
+                    'accountPage' => $options['account_page']
                 ));
 
                 account_user_registration_html(
@@ -397,7 +398,7 @@ class PolicyCloud_Marketplace_Public
                         'statistics' => $user->statistics,
                         'descriptions' => $user->descriptions,
                         'reviews' => $user->reviews,
-                        'approvals' => $user->is_admin() ? $user->approvals : null,
+                        'approvals' => ($self->is_admin() && $self->is_verified()) ? $user->approvals : null,
                         'metadata' => $user->metadata,
                         'preferences' => $user->preferences
                     ];
@@ -406,6 +407,8 @@ class PolicyCloud_Marketplace_Public
                     wp_enqueue_script('policycloud-marketplace-account');
                     wp_localize_script('policycloud-marketplace-account', 'AccountEditingProperties', array(
                         'nonce' => wp_create_nonce('policycloud_marketplace_account_user_edit'),
+                        'deletionNonce' => wp_create_nonce('policycloud_marketplace_account_user_deletion'),
+                        'verificationRetryNonce' => wp_create_nonce('policycloud_marketplace_account_user_retry_verification'),
                         'requestDataCopyNonce' => wp_create_nonce('policycloud_marketplace_account_user_data_request'),
                         'userID' => $user->id
                     ));
@@ -413,7 +416,7 @@ class PolicyCloud_Marketplace_Public
                     if ($self->is_admin()) {
                         account_user_html(
                             $data,
-                            $self->is_admin(),
+                            ($self->is_admin() && $self->is_verified()),
                             $visitor,
                             self::get_plugin_setting(
                                 true,
@@ -778,7 +781,8 @@ class PolicyCloud_Marketplace_Public
                     'nonce' => wp_create_nonce('policycloud_marketplace_description_editing'),
                     'descriptionID' => $description->id,
                     'approvalNonce' => $permissions['administrator'] ? wp_create_nonce('policycloud_marketplace_description_approval') : null,
-                    'deletionNonce' => ($permissions['administrator'] || $permissions['provider']) ? wp_create_nonce('policycloud_marketplace_description_deletion') : null
+                    'deletionNonce' => ($permissions['administrator'] || $permissions['provider']) ? wp_create_nonce('policycloud_marketplace_description_deletion') : null,
+                    'deleteRedirect' => $permissions['provider'] ? (self::get_plugin_setting(true, 'account_page')."#descriptions") : (self::get_plugin_setting(true, 'account_page')."#approvals")
                 ));
 
                 description_html(

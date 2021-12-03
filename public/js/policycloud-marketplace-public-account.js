@@ -56,7 +56,7 @@
     ) {
       $(
         "button#policycloud-marketplace-account-" +
-          window.location.hash.substr(1)
+        window.location.hash.substr(1)
       ).trigger("click");
     } else {
       $("button#policycloud-marketplace-account-overview").trigger("click");
@@ -91,13 +91,13 @@
       rememberPage = false,
       itemsPerPage = $(
         ".policycloud-marketplace-account-" +
-          category +
-          " form.selector select[name=items-per-page]"
+        category +
+        " form.selector select[name=items-per-page]"
       ).val(),
       sortBy = $(
         ".policycloud-marketplace-account-" +
-          category +
-          " form.selector select[name=sort-by]"
+        category +
+        " form.selector select[name=sort-by]"
       ).val()
     ) {
       // Get structure and clear DOM.
@@ -158,12 +158,12 @@
           // Add page.
           $('.paginated-list[data-category="' + category + '"]').prepend(
             '<ul data-page="' +
-              page +
-              '" class="page ' +
-              category +
-              " " +
-              (page == activePage ? "visible" : "") +
-              '"></ul>'
+            page +
+            '" class="page ' +
+            category +
+            " " +
+            (page == activePage ? "visible" : "") +
+            '"></ul>'
           );
 
           // Add pagination and buttons.
@@ -176,16 +176,16 @@
             '.paginated-list[data-category="' + category + '"] nav.pagination'
           ).append(
             '<button data-category="' +
-              category +
-              '" class="page-selector' +
-              (page == activePage ? " active" : "") +
-              '" data-' +
-              category +
-              '-page="' +
-              page +
-              '">' +
-              page +
-              "</button>"
+            category +
+            '" class="page-selector' +
+            (page == activePage ? " active" : "") +
+            '" data-' +
+            category +
+            '-page="' +
+            page +
+            '">' +
+            page +
+            "</button>"
           );
           page++;
         }
@@ -226,12 +226,12 @@
       for (let i = 0; i < collections.length; i++) {
         $('.collection-filters[data-category="' + category + 's"]').append(
           '<button class="outlined" data-category="' +
-            category +
-            's" data-type-filter="' +
-            collections[i] +
-            '">' +
-            collections[i] +
-            "</button>"
+          category +
+          's" data-type-filter="' +
+          collections[i] +
+          '">' +
+          collections[i] +
+          "</button>"
         );
       }
     }
@@ -251,10 +251,10 @@
       // Highlight active button.
       $(
         '#policycloud-marketplace-account-content .collection-filters[data-category="' +
-          category +
-          '"] button[data-type-filter="' +
-          collection +
-          '"]'
+        category +
+        '"] button[data-type-filter="' +
+        collection +
+        '"]'
       ).toggleClass("active");
 
       // If at least one filter is active.
@@ -277,10 +277,10 @@
           function () {
             $(
               '.paginated-list[data-category="' +
-                category +
-                '"] li[data-type-filter="' +
-                $(this).data("type-filter") +
-                '"]'
+              category +
+              '"] li[data-type-filter="' +
+              $(this).data("type-filter") +
+              '"]'
             ).addClass("visible");
           }
         );
@@ -310,14 +310,14 @@
       ).removeClass("active");
       $(
         "#policycloud-marketplace-account-content section ul." +
-          $(this).data("category")
+        $(this).data("category")
       ).removeClass("visible");
       $(this).addClass("active");
       $(
         "#policycloud-marketplace-account-content section ul[data-page='" +
-          $(this).data($(this).data("category") + "-page") +
-          "']." +
-          $(this).data("category")
+        $(this).data($(this).data("category") + "-page") +
+        "']." +
+        $(this).data("category")
       ).addClass("visible");
     }
 
@@ -553,7 +553,7 @@
       makeWPRequest(
         "button#policycloud-marketplace-resend-verification-email",
         "policycloud_marketplace_account_user_retry_verification",
-        AccountEditingProperties.nonce,
+        AccountEditingProperties.verificationRetryNonce,
         {
           username: AccountEditingProperties.userID,
         },
@@ -591,7 +591,7 @@
             type: "text/plain",
           });
           var a = document.createElement("a");
-          a.download = "account_data.txt";
+          a.download = AccountEditingProperties.userID + "_account_data.txt";
           a.href = URL.createObjectURL(blob);
           a.dataset.downloadurl = ["text/plain", a.download, a.href].join(":");
           a.style.display = "none";
@@ -628,7 +628,7 @@
         makeWPRequest(
           "#policycloud-marketplace-delete-account button[type=submit]",
           "policycloud_marketplace_account_user_deletion",
-          AccountEditingProperties.nonce,
+          AccountEditingProperties.deletionNonce,
           {
             current_password: $(
               "#policycloud-marketplace-delete-account input[name=current-password]"

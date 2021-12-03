@@ -291,7 +291,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
     // Show account verification notice.
     if (!empty($data['metadata']['verified'])) {
         if ($data['metadata']['verified'] !== '1') {
-            show_alert('Your account is still unverified, please check your email inbox or spam folder for a verification email. You can <a id="policycloud-marketplace-resend-verification-email">resend</a> it if you can\'t find it.', 'notice');
+            show_alert('Your account is still unverified, please check your email inbox or spam folder for a verification email. You can resend it in your profile settings if you can\'t find it.', 'notice');
         }
     } else {
         show_alert("Your account verification status couldn't be accessed.");

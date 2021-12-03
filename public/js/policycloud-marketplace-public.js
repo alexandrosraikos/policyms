@@ -275,10 +275,10 @@ function showAlert(
   if (disappearing) {
     setTimeout(() => {
       $(selector).next().addClass("seen");
-    }, 2500);
+    }, 3500);
     setTimeout(() => {
       $(selector).next().addClass("dismissed");
-    }, 2700);
+    }, 3700);
   }
 }
 
@@ -320,7 +320,7 @@ function makeWPRequest(actionDOMSelector, action, nonce, data, completion) {
           completion();
         }
         else {
-          completion(JSON.parse(response.responseText));
+          completion(JSON.parse(response.responseJSON ?? response.responseText));
         }
 
         // Remove the loading class.

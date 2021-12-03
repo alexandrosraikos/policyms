@@ -104,7 +104,7 @@
             description_id: DescriptionEditingProperties.descriptionID,
           },
           () => {
-            window.location.reload();
+            window.location.href = DescriptionEditingProperties.deleteRedirect;
           }
         );
       }
@@ -138,8 +138,8 @@
 
         makeWPRequest(
           '#policycloud-marketplace-description-editing .file[data-file-identifier="' +
-            fileIdentifier +
-            '"] button.delete',
+          fileIdentifier +
+          '"] button.delete',
           "policycloud_marketplace_description_editing",
           DescriptionEditingProperties.nonce,
           formData,
@@ -216,8 +216,8 @@
       if (confirmed) {
         makeWPRequest(
           "#policycloud-marketplace-description-approval button[data-response=" +
-            $(this).data("response") +
-            "]",
+          $(this).data("response") +
+          "]",
           "policycloud_marketplace_description_approval",
           DescriptionEditingProperties.approvalNonce,
           {

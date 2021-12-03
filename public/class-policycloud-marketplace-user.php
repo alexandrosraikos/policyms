@@ -65,7 +65,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
 
     public function is_verified(): bool
     {
-        return $this->metadata['verified'] == 1;
+        return $this->metadata['verified'] == "1";
     }
 
 
@@ -78,7 +78,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
     {
         PolicyCloud_Marketplace::api_request(
             'POST',
-            '/accounts/user/verification/resend',
+            '/accounts/users/verification/resend',
             [
                 'email' => $this->information['email']
             ],

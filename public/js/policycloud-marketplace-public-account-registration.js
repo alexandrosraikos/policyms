@@ -64,8 +64,10 @@
         "policycloud_marketplace_account_user_registration",
         AccountRegistrationProperties.nonce,
         new FormData($("#policycloud-registration")[0]),
-        () => {
-          window.location.href(GlobalProperties.rootURLPath);
+        (data) => {
+          setAuthorizedToken(data);
+          console.log(AccountRegistrationProperties.accountPage);
+          window.location.href = AccountRegistrationProperties.accountPage;
         }
       );
     }
