@@ -707,6 +707,7 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   overflow: hidden;
   justify-self: flex-start;
+  width: calc(100% - 20px);
 
   /* Other */
   background-color: var(--policycloud-background-color);
@@ -728,6 +729,10 @@
 
   /* Other */
   font-weight: normal;
+}
+
+.policycloud-marketplace.descriptions-grid > ul > li > a > div {
+  width: 100%;
 }
 
 .policycloud-marketplace.descriptions-grid > ul > li > a > .cover > img {

@@ -229,13 +229,12 @@ function setAuthorizedToken(encryptedToken) {
  *
  * @author Alexandros Raikos <araikos@unipi.gr>
  */
-function removeAuthorization(reload = false) {
+function removeAuthorization() {
   document.cookie =
     "pcmapi-token=; Path=" +
     GlobalProperties.rootURLPath +
     "; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-  if (reload) window.location.reload();
-  else window.location.href = GlobalProperties.rootURLPath;
+  window.location.href = GlobalProperties.rootURLPath;
 }
 
 /**

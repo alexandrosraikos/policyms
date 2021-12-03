@@ -596,9 +596,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                 </td>
                                 <td>
                                     <span>
-                                        <?php
-                                        echo ($data['username'] ?? '-');
-                                        ?>
+                                        <?php echo $data['username']; ?>
                                     </span>
                                 </td>
                             </tr>
@@ -635,7 +633,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                 <td>
                                     <span class="folding visible">
                                         <?php
-                                        echo ($data['information']['title'] ?? '') . ' ' . ($data['information']['name']) . ' ' . ($data['information']['surname']);
+                                        echo ((($data['information']['title'] ?? '-') == '-') ? '' : $data['information']['title'] )  . ' ' . ($data['information']['name']) . ' ' . ($data['information']['surname']);
                                         ?>
                                     </span>
                                     <?php

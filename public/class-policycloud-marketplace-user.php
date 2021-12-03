@@ -21,6 +21,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             parent::__construct($data['username']);
         }
 
+        $this->username = $data['username'];
         $this->information = $data['info'];
         $this->metadata = $data['account'];
         $this->preferences = $data['profile_parameters'];
@@ -60,6 +61,11 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
     public function is_admin(): bool
     {
         return $this->get_role() == 'admin';
+    }
+
+    public function is_verified(): bool
+    {
+        return $this->metadata['verified'] == 1;
     }
 
 

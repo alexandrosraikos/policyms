@@ -391,6 +391,7 @@ class PolicyCloud_Marketplace_Public
                     $self = $visitor ? (new PolicyCloud_Marketplace_User()) : $user;
 
                     $data = [
+                        'username' => $user->username,
                         'picture' => $user->picture,
                         'information' => $user->information,
                         'statistics' => $user->statistics,
@@ -424,6 +425,7 @@ class PolicyCloud_Marketplace_Public
                     } else {
                         account_user_html(
                             [
+                                'username' => $user->username,
                                 'picture' => $user->picture,
                                 'information' => $user->information,
                                 'statistics' => $user->statistics,
@@ -442,6 +444,8 @@ class PolicyCloud_Marketplace_Public
                             )
                         );
                     }
+                } else {
+                    show_alert("You need to be logged in to view accounts.");
                 }
             }
         );
@@ -704,6 +708,7 @@ class PolicyCloud_Marketplace_Public
             function () {
                 require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
                 require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-description.php';
+                require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 
                 if (PolicyCloud_Marketplace_User::is_authenticated()) {
                     wp_enqueue_script("policycloud-marketplace-description-creation");
@@ -712,7 +717,6 @@ class PolicyCloud_Marketplace_Public
                         'descriptionPage' => self::get_plugin_setting(true, 'description_page')
                     ));
 
-                    require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
                     description_creation_html();
                 } else {
                     show_alert("You need to be logged in to create a description.");
@@ -733,6 +737,7 @@ class PolicyCloud_Marketplace_Public
             function () {
                 require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-description.php';
                 require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
+                require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 
                 $description = new PolicyCloud_Marketplace_Description($_GET['did']);
 
@@ -745,21 +750,27 @@ class PolicyCloud_Marketplace_Public
                 if ($permissions['authenticated']) {
                     $user = new PolicyCloud_Marketplace_User();
 
-                    $permissions['provider'] = $description->is_provider($user);
-                    $permissions['administrator'] = $user->is_admin();
+                    if ($user->is_verified() || $description->is_provider($user)) {
 
-                    $image_blobs =  array_map(
-                        function ($image) {
-                            return $image->pull();
-                        },
-                        array_filter(
-                            $description->assets ?? [],
-                            function ($category) {
-                                return  $category == 'images';
+                        $permissions['provider'] = $description->is_provider($user);
+                        $permissions['administrator'] = $user->is_admin();
+
+                        $image_blobs =  array_map(
+                            function ($image) {
+                                return $image->pull();
                             },
-                            ARRAY_FILTER_USE_KEY
-                        )['images']
-                    );
+                            array_filter(
+                                $description->assets ?? [],
+                                function ($category) {
+                                    return  $category == 'images';
+                                },
+                                ARRAY_FILTER_USE_KEY
+                            )['images'] ?? []
+                        );
+                    } else {
+                        $permissions['authenticated'] = false;
+                        show_alert("You need to be verified in order to view description details.", 'notice');
+                    }
                 }
 
                 wp_enqueue_script('policycloud-marketplace-description');
@@ -769,8 +780,6 @@ class PolicyCloud_Marketplace_Public
                     'approvalNonce' => $permissions['administrator'] ? wp_create_nonce('policycloud_marketplace_description_approval') : null,
                     'deletionNonce' => ($permissions['administrator'] || $permissions['provider']) ? wp_create_nonce('policycloud_marketplace_description_deletion') : null
                 ));
-
-                require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/policycloud-marketplace-public-display.php';
 
                 description_html(
                     $description,
