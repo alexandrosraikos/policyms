@@ -58,4 +58,4 @@ This plugin also enables the following features:
 
 ## Credits
 
-This work extends, and is schematically based upon, the PolicyCloud Marketplace API, created and maintained by @vkoukos. Special thanks to @elefkour for co-authoring and co-maintaining this repository.
+This work extends, and is schematically based upon, the PolicyCloud Marketplace API, created and maintained by [@vkoukos](https://github.com/vkoukos). Special thanks to [@elefkour](https://github.com/elefkour) for co-authoring and co-maintaining this repository.
