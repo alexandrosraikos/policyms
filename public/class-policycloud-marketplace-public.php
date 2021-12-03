@@ -388,7 +388,7 @@ class PolicyCloud_Marketplace_Public
                     $user_id = !empty($_GET['user']) ? sanitize_user($_GET['user']) : null;
                     $visitor = !empty($user_id);
                     $user = new PolicyCloud_Marketplace_User($visitor ? $user_id : null);
-                    $self = new PolicyCloud_Marketplace_User();
+                    $self = $visitor ? (new PolicyCloud_Marketplace_User()) : $user;
 
                     $data = [
                         'picture' => $user->picture,

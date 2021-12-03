@@ -891,7 +891,7 @@ function featured_descriptions_html(array $categories, string $description_page)
             <div class="column">
                 <figure>
                     <?php echo $categories['statistics']['sum'] ?>
-                    <figcaption>Total assets</figcaption>
+                    <figcaption>Total descriptions</figcaption>
                 </figure>
             </div>
             <div class="column">
