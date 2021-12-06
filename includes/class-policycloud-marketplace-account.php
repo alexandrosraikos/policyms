@@ -8,7 +8,7 @@ abstract class PolicyCloud_Marketplace_Account
     protected ?string $picture = null;
 
     public function __construct(string $id)
-    {   
+    {
         $this->id = $id;
         $this->token = self::retrieve_token();
     }
@@ -41,7 +41,8 @@ abstract class PolicyCloud_Marketplace_Account
         };
     }
 
-    public static function is_authenticated(): bool {
+    public static function is_authenticated(): bool
+    {
         try {
             return !empty(self::retrieve_token());
         } catch (PolicyCloudMarketplaceUnauthorizedRequestException $e) {
@@ -55,9 +56,9 @@ abstract class PolicyCloud_Marketplace_Account
     abstract protected static function get_account_data(string $id = null): array;
     abstract public function __get(string $name);
     abstract public function get_role(): string;
-    
+
     abstract public function update(array $information, ?array $picture): ?string;
     abstract public function delete(string $current_password): void;
-    
+
     abstract protected static function inspect(array $information, array $required);
 }

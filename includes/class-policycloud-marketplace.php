@@ -125,6 +125,7 @@ class PolicyCloud_Marketplace
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-public.php';
 
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-policycloud-marketplace-account.php';
+
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-policycloud-marketplace-exceptions.php';
 
         $this->loader = new PolicyCloud_Marketplace_Loader();
