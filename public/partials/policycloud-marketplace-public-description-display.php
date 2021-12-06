@@ -14,13 +14,15 @@
  */
 function descriptions_grid_html(array $descriptions, string $description_url)
 {
+    // TODO @alexandrosraikos: Replace description image placeholder with public description image link. #67
+
     if (empty($descriptions)) {
         echo show_alert('No assets found.', 'notice');
     } else {
         echo '<div class="policycloud-marketplace descriptions-grid">';
         echo '<ul>';
         foreach ($descriptions as $description) {
-    ?>
+?>
             <li>
                 <a href="<?php echo $description_url . '?did=' . $description->id ?>">
                     <div class="cover">
@@ -110,7 +112,7 @@ function featured_descriptions_html(array $categories, string $description_page)
         descriptions_grid_html($categories['suggestions'], $description_page);
         ?>
     </div>
-    <?php
+<?php
 }
 
 
@@ -126,7 +128,7 @@ function featured_descriptions_html(array $categories, string $description_page)
  */
 function descriptions_archive_html(array $descriptions, array $filters, string $description_page)
 {
-    ?>
+?>
     <div class="policycloud-marketplace inspect" id="policycloud-marketplace-description-archive">
         <div class="filters">
             <button class="close outlined filters-toggle">Close</button>

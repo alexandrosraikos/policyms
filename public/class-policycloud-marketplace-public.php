@@ -227,7 +227,7 @@ class PolicyCloud_Marketplace_Public
      */
     public static function add_conditional_access_menu_item($items, $args)
     {
-
+        // TODO @alexandrosraikos: Add description search box. #51
 
         // Retrieve credentials.
         try {
@@ -375,6 +375,12 @@ class PolicyCloud_Marketplace_Public
      */
     public static function account_user_shortcode()
     {
+        // TODO @alexandrosraikos: Fix unverified user viewing other accounts error. #72
+        // TODO @alexandrosraikos: Rename account overview statistics fields. #73
+        // TODO @alexandrosraikos: Hide verification retrying on guest profile views. #71
+        // TODO @alexandrosraikos: Add notice when user views self publicly. #70
+        // TODO @alexandrosraikos: Add account name as head meta title. #54
+
         self::exception_handler(
             function () {
                 if (PolicyCloud_Marketplace_User::is_authenticated()) {
@@ -718,6 +724,7 @@ class PolicyCloud_Marketplace_Public
      */
     public static function description_shortcode()
     {
+
         self::exception_handler(
             function () {
                 $description = new PolicyCloud_Marketplace_Description($_GET['did']);
@@ -761,6 +768,11 @@ class PolicyCloud_Marketplace_Public
                     'deletionNonce' => ($permissions['administrator'] || $permissions['provider']) ? wp_create_nonce('policycloud_marketplace_description_deletion') : null,
                     'deleteRedirect' => $permissions['provider'] ? (self::get_plugin_setting(true, 'account_page') . "#descriptions") : (self::get_plugin_setting(true, 'account_page') . "#approvals")
                 ));
+                // TODO @alexandrosraikos: Add main image selector on the editing form. #69
+                // TODO @alexandrosraikos: Restructure gallery to dynamic thumbnail usage. #68
+                // TODO @alexandrosraikos: Add description name as head meta title. #54
+                // TODO @alexandrosraikos: Add user reviews interface CRUD. #38
+                // TODO @alexandrosraikos: Add video viewer in gallery. #39
 
                 description_html(
                     $description,
