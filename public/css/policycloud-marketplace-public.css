@@ -363,6 +363,26 @@
   width: 80%;
 }
 
+.policycloud-marketplace.menu-search form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.policycloud-marketplace.menu-search form input {
+  margin: 0 0 0 10px !important;
+  background-color: transparent !important;
+  color: inherit !important;
+}
+
+.policycloud-marketplace.menu-search form button[type="submit"] {
+  width: 36px;
+  height: 36px;
+  padding: 0 !important;
+  text-align: center;
+  margin-left: 10px;
+}
+
 /* File viewer */
 
 .policycloud-marketplace .file-viewer {

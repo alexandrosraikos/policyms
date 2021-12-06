@@ -13,7 +13,7 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
     if ($authenticated) {
         show_alert("You're already logged in.", 'notice');
     } else {
-    ?>
+?>
         <div class="policycloud-marketplace">
             <form id="policycloud-registration" action="">
                 <fieldset name="account-credentials">
@@ -176,7 +176,7 @@ function account_user_reset_password_html($authenticated)
 function account_user_html(array $data, bool $admin, bool $visitor, array $pages)
 {
     // Show account verification notice.
-    if (!empty($data['metadata']['verified'])) {
+    if (isset($data['metadata']['verified'])) {
         if ($data['metadata']['verified'] !== '1') {
             show_alert('Your account is still unverified, please check your email inbox or spam folder for a verification email. You can resend it in your profile settings if you can\'t find it.', 'notice');
         }
@@ -223,7 +223,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
             <div class="policycloud-marketplace-account-title">
                 <h2>
                     <?php
-                    echo ((($data['information']['title'] ?? '-') == '-') ? '' : $data['information']['title'] ) . ' ' . $data['information']['name'] . ' ' . $data['information']['surname'];
+                    echo ((($data['information']['title'] ?? '-') == '-') ? '' : $data['information']['title']) . ' ' . $data['information']['name'] . ' ' . $data['information']['surname'];
                     ?>
                 </h2>
                 <div>
@@ -280,7 +280,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                             <tr>
                                 <td>
                                     <div class="large-figure"><span class="fas fa-comment"></span> <?php echo $data['statistics']['total_reviews'] ?></div>
-                                    <div class="assets-caption">Total reviews</div>
+                                    <div class="assets-caption">Total received reviews</div>
                                 </td>
                                 <td>
                                     <div class="large-figure"><span class="fas fa-star"></span> <?php echo $data['statistics']['average_rating'] ?></div>
@@ -408,10 +408,10 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                         <?php
                                         }
                                         ?>
-                                            <span class="folding">
-                                                <input type="file" name="profile_picture" accept="image/png, image/jpeg" />
-                                                <label for="picture">Please select an image of up to 1MB and over 256x256 for optimal results. Supported file types: jpg, png.</label>
-                                            </span>
+                                        <span class="folding">
+                                            <input type="file" name="profile_picture" accept="image/png, image/jpeg" />
+                                            <label for="picture">Please select an image of up to 1MB and over 256x256 for optimal results. Supported file types: jpg, png.</label>
+                                        </span>
                                     </td>
                                 </tr>
                             <?php } ?>
@@ -520,7 +520,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                 <td>
                                     <span class="folding visible">
                                         <?php
-                                        echo ((($data['information']['title'] ?? '-') == '-') ? '' : $data['information']['title'] )  . ' ' . ($data['information']['name']) . ' ' . ($data['information']['surname']);
+                                        echo ((($data['information']['title'] ?? '-') == '-') ? '' : $data['information']['title'])  . ' ' . ($data['information']['name']) . ' ' . ($data['information']['surname']);
                                         ?>
                                     </span>
                                     <?php
@@ -600,7 +600,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                         <span class="folding visible">
                                             <?php
                                             echo ($data['information']['email']);
-                                            if ($data['metadata']['verified'] != '1') {
+                                            if ($data['metadata']['verified'] != '1' && !$visitor) {
                                             ?>
                                                 <span class="unverified">(Unverified)</span>
                                                 <button id="policycloud-marketplace-resend-verification-email">Resend verification email</button>
@@ -708,5 +708,5 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
             </div>
         </div>
     </div>
-    <?php
+<?php
 }

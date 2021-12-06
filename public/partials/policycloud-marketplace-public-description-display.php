@@ -14,8 +14,6 @@
  */
 function descriptions_grid_html(array $descriptions, string $description_url)
 {
-    // TODO @alexandrosraikos: Replace description image placeholder with public description image link. #67
-
     if (empty($descriptions)) {
         echo show_alert('No assets found.', 'notice');
     } else {
@@ -26,7 +24,7 @@ function descriptions_grid_html(array $descriptions, string $description_url)
             <li>
                 <a href="<?php echo $description_url . '?did=' . $description->id ?>">
                     <div class="cover">
-                        <img src="<?php echo get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/svg/marketplace.svg') ?>" alt="" />
+                        <img src="<?= PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'marketplace_host') . '/descriptions/image/' . $description->id ?>" alt="" />
                         <div class="content">
                             <h4><?php echo $description->information['title'] ?></h4>
                             <p><?php echo $description->information['short_desc'] ?></p>
@@ -136,7 +134,7 @@ function descriptions_archive_html(array $descriptions, array $filters, string $
             <p>Select the options below to narrow your search.</p>
             <form>
                 <fieldset>
-                    <input type="text" name="search" placeholder="Search assets" value="<?php echo $_GET['search'] ?? '' ?>" />
+                    <input type="text" name="search" placeholder="Search descriptions" value="<?php echo $_GET['search'] ?? '' ?>" />
                 </fieldset>
                 <fieldset>
                     <h3>Types</h3>

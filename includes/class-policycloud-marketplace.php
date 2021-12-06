@@ -184,7 +184,7 @@ class PolicyCloud_Marketplace
 
         // Support for user accounts.
         $this->loader->add_action('init', $plugin_public, 'add_accounts_shortcodes');
-        $this->loader->add_filter('wp_nav_menu_items', $plugin_public, 'add_conditional_access_menu_item', 10, 2);
+        $this->loader->add_filter('wp_nav_menu_items', $plugin_public, 'add_menu_items', 10, 2);
         $this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_registration', $plugin_public, 'account_user_registration_handler');
         $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_registration', $plugin_public, 'account_user_registration_handler');
         $this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_authentication', $plugin_public, 'account_user_authentication_handler');
@@ -313,7 +313,7 @@ class PolicyCloud_Marketplace
         // Contact Marketplace login API endpoint.
         $curl = curl_init();
         curl_setopt_array($curl, [
-            CURLOPT_URL => 'https://' . $options['marketplace_host'] . $uri,
+            CURLOPT_URL => $options['marketplace_host'] . $uri,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -343,7 +343,7 @@ class PolicyCloud_Marketplace
                         return $decoded;
                     } else {
                         curl_close($curl);
-                        throw new PolicyCloudMarketplaceInvalidDataException('PolicyCloud Marketplace error when contacting '. $uri .': '.$decoded['message']);
+                        throw new PolicyCloudMarketplaceInvalidDataException('PolicyCloud Marketplace error when contacting ' . $uri . ': ' . $decoded['message']);
                     }
                 } else {
                     curl_close($curl);

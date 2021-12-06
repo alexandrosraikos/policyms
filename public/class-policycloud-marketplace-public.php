@@ -225,10 +225,8 @@ class PolicyCloud_Marketplace_Public
      * @since   1.0.0
      * @author  Alexandros Raikos <araikos@unipi.gr>
      */
-    public static function add_conditional_access_menu_item($items, $args)
+    public static function add_menu_items($items, $args)
     {
-        // TODO @alexandrosraikos: Add description search box. #51
-
         // Retrieve credentials.
         try {
             $options = self::get_plugin_setting(
@@ -237,7 +235,8 @@ class PolicyCloud_Marketplace_Public
                 'login_page',
                 'account_page',
                 'registration_page',
-                'upload_page'
+                'upload_page',
+                'archive_page'
             );
         } catch (PolicyCloudMarketplaceMissingOptionsException $e) {
             return $items;
@@ -261,6 +260,18 @@ class PolicyCloud_Marketplace_Public
                 $links = list_url_wrap('<a href="' . $options['login_page'] . '">Log In</a>');
                 $links .= list_url_wrap('<a href="' . $options['registration_page'] . '">Register</a>');
             }
+            $links .= "
+            <div class=\"policycloud-marketplace menu-search\">
+                <form 
+                    method=\"get\" 
+                    action=\"" . $options['archive_page'] . "\">
+                    <input type=\"text\" name=\"search\" placeholder=\"Search...\" />
+                    <button class=\"tactile\" type=\"submit\" title=\"Search\">
+                        <span class=\"fas fa-search\"></span>
+                    </button>
+                </form>
+            </div>
+            ";
             return $items . $links;
         } else {
             return $items;
@@ -285,7 +296,17 @@ class PolicyCloud_Marketplace_Public
                     );
                 }
             } else {
-                $settings[$key] = $options[$key];
+                if (!function_exists('str_contains')) {
+                    function str_contains($haystack, $needle)
+                    {
+                        return $needle !== '' && mb_strpos($haystack, $needle) !== false;
+                    }
+                }
+                if (str_contains($key, '_page')) {
+                    $settings[$key] = get_page_link($options[$key]);
+                } else {
+                    $settings[$key] = $options[$key];
+                }
             }
         }
 
@@ -375,19 +396,31 @@ class PolicyCloud_Marketplace_Public
      */
     public static function account_user_shortcode()
     {
-        // TODO @alexandrosraikos: Fix unverified user viewing other accounts error. #72
-        // TODO @alexandrosraikos: Rename account overview statistics fields. #73
-        // TODO @alexandrosraikos: Hide verification retrying on guest profile views. #71
-        // TODO @alexandrosraikos: Add notice when user views self publicly. #70
-        // TODO @alexandrosraikos: Add account name as head meta title. #54
 
         self::exception_handler(
             function () {
                 if (PolicyCloud_Marketplace_User::is_authenticated()) {
                     $user_id = !empty($_GET['user']) ? sanitize_user($_GET['user']) : null;
                     $visitor = !empty($user_id);
-                    $user = new PolicyCloud_Marketplace_User($visitor ? $user_id : null);
-                    $self = $visitor ? (new PolicyCloud_Marketplace_User()) : $user;
+                    $self = new PolicyCloud_Marketplace_User();
+                    if ($visitor) {
+                        if ($self->is_verified()) {
+                            $user = new PolicyCloud_Marketplace_User($user_id);
+                        } else {
+                            throw new PolicyCloudMarketplaceUnauthorizedRequestException(
+                                "You need to be verified in order to view other user accounts."
+                            );
+                        }
+                        if ($self->username === $user_id) {
+                            show_alert(
+                                "You're currently viewing your profile as it is viewed by other registered users.
+                                <a href=\"" . self::get_plugin_setting(true, 'account_page') . "\">Return to your account page.</a>",
+                                'notice'
+                            );
+                        }
+                    } else {
+                        $user = $self;
+                    }
 
                     $data = [
                         'username' => $user->username,
@@ -410,6 +443,18 @@ class PolicyCloud_Marketplace_Public
                         'requestDataCopyNonce' => wp_create_nonce('policycloud_marketplace_account_user_data_request'),
                         'userID' => $user->id
                     ));
+
+                    // TODO @alexandrosraikos: Add account name as head meta title. #54
+                    remove_action('wp_head', '_wp_render_title_tag', 1);
+                    add_filter(
+                        'pre_get_document_title',
+                        function ($title) use ($user) {
+                            $title = $user->informaton['name'] . ' ' . $user->information['surname'];
+                            return $title;
+                        },
+                        9999,
+                        1
+                    );
 
                     if ($self->is_admin()) {
                         account_user_html(
