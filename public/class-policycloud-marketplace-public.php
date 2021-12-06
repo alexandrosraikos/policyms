@@ -727,6 +727,11 @@ class PolicyCloud_Marketplace_Public
 
         self::exception_handler(
             function () {
+                if (empty($_GET['did'])) {
+                    throw new PolicyCloudMarketplaceInvalidDataException(
+                        "Please specify the ID of the description."
+                    );
+                }
                 $description = new PolicyCloud_Marketplace_Description($_GET['did']);
                 $permissions = [
                     'authenticated' => PolicyCloud_Marketplace_User::is_authenticated(),
