@@ -81,6 +81,8 @@ class PolicyCloud_Marketplace_Public
     public function enqueue_styles()
     {
         wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/policycloud-marketplace-public.css', array(), $this->version, 'all');
+        wp_enqueue_style('policycloud-marketplace-public-descriptions', plugin_dir_url(__FILE__) . 'css/policycloud-marketplace-public-descriptions.css', array(), $this->version, 'all');
+        wp_enqueue_style('policycloud-marketplace-public-accounts', plugin_dir_url(__FILE__) . 'css/policycloud-marketplace-public-accounts.css', array(), $this->version, 'all');
     }
 
     /**
@@ -95,6 +97,7 @@ class PolicyCloud_Marketplace_Public
         wp_enqueue_script("policycloud-marketplace", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public.js', array('jquery'), $this->version, false);
         wp_localize_script("policycloud-marketplace", 'GlobalProperties', array(
             "rootURLPath" => (empty(parse_url(get_site_url())['path']) ? "/" : parse_url(get_site_url())['path']),
+            "archivePage" => self::get_plugin_setting('archive_page'),
             "ajaxURL" => admin_url('admin-ajax.php')
         ));
 
@@ -105,7 +108,7 @@ class PolicyCloud_Marketplace_Public
 
         // Content related scripts.
         wp_register_script("policycloud-marketplace-description", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-description.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
-        wp_register_script("policycloud-marketplace-description-archive", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-description-archive.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
+        wp_register_script(".policycloud-marketplace.descriptions.archive", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-description-archive.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
         wp_register_script("policycloud-marketplace-description-creation", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-description-creation.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
     }
 
@@ -260,18 +263,15 @@ class PolicyCloud_Marketplace_Public
                 $links = list_url_wrap('<a href="' . $options['login_page'] . '">Log In</a>');
                 $links .= list_url_wrap('<a href="' . $options['registration_page'] . '">Register</a>');
             }
-            $links .= "
-            <div class=\"policycloud-marketplace menu-search\">
-                <form 
-                    method=\"get\" 
-                    action=\"" . $options['archive_page'] . "\">
-                    <input type=\"text\" name=\"search\" placeholder=\"Search...\" />
-                    <button class=\"tactile\" type=\"submit\" title=\"Search\">
+            $links .= list_url_wrap(
+                "
+                <div class=\"policycloud-marketplace menu-search\">
+                    <button class=\"tactile\" data-action=\"description-search\">
                         <span class=\"fas fa-search\"></span>
                     </button>
-                </form>
-            </div>
-            ";
+                </div>
+                "
+            );
             return $items . $links;
         } else {
             return $items;
@@ -705,7 +705,7 @@ class PolicyCloud_Marketplace_Public
     {
         self::exception_handler(
             function () {
-                wp_enqueue_script("policycloud-marketplace-description-archive");
+                wp_enqueue_script(".policycloud-marketplace.descriptions.archive");
 
                 descriptions_archive_html(
                     PolicyCloud_Marketplace_Description::get_all(),
@@ -727,7 +727,7 @@ class PolicyCloud_Marketplace_Public
         self::exception_handler(
             function () {
                 $featured = PolicyCloud_Marketplace_Description::get_featured();
-                wp_enqueue_script("policycloud-marketplace-description-archive");
+                wp_enqueue_script(".policycloud-marketplace.descriptions.archive");
                 featured_descriptions_html(
                     $featured,
                     self::get_plugin_setting(true, 'description_page')
@@ -753,7 +753,7 @@ class PolicyCloud_Marketplace_Public
                         'descriptionPage' => self::get_plugin_setting(true, 'description_page')
                     ));
 
-                    description_creation_html();
+                    description_editor_html();
                 } else {
                     show_alert("You need to be logged in to create a description.");
                 }
@@ -804,6 +804,8 @@ class PolicyCloud_Marketplace_Public
                                 ARRAY_FILTER_USE_KEY
                             )['images'] ?? []
                         );
+
+                        // $reviews = $description->get_reviews();
                     } else {
                         $permissions['authenticated'] = false;
                         show_alert("You need to be verified in order to view description details.", 'notice');
@@ -833,6 +835,7 @@ class PolicyCloud_Marketplace_Public
                         'account_page',
                         'archive_page'
                     ),
+                    $reviews ?? null,
                     $permissions
                 );
             }

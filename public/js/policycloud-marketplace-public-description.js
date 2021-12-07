@@ -20,7 +20,7 @@
 
     // Get image id array.
     const imageReference = Array.from(
-      $("#policycloud-marketplace-asset .gallery img").map((index, element) => {
+      $(".policycloud-marketplace.description .gallery img").map((index, element) => {
         return $(element).data("image-id");
       })
     );
@@ -35,11 +35,12 @@
     $(".policycloud-marketplace .file-viewer > button").click(toggleFileList);
 
     // Toggle the gallery modal visibility.
-    $("#policycloud-marketplace-asset .gallery img").click((e) => {
+    $(".policycloud-marketplace.description .gallery img").click((e) => {
       new Modal(
         "gallery",
+        // TODO @alexandrosraikos: Create array of <img> loaders on show. #68
         Array.from(
-          $("#policycloud-marketplace-asset .gallery img").map(
+          $(".policycloud-marketplace.description .gallery img").map(
             (index, element) => {
               return $(element).clone()[0];
             }
@@ -76,7 +77,7 @@
       formData.append("subsequent_action", "description-editing");
 
       makeWPRequest(
-        "#policycloud-marketplace-description-editing button[type=submit]",
+        ".policycloud-marketplace.description.editor button[type=submit]",
         "policycloud_marketplace_description_editing",
         DescriptionEditingProperties.nonce,
         formData,
@@ -97,7 +98,7 @@
 
       if (window.confirm("Are you sure you want to delete this description?")) {
         makeWPRequest(
-          '#policycloud-marketplace-description-editing button[data-action="delete-description"]',
+          '.policycloud-marketplace.description.editor button[data-action="delete-description"]',
           "policycloud_marketplace_description_deletion",
           DescriptionEditingProperties.deletionNonce,
           {
@@ -137,7 +138,7 @@
         formData.append("file-identifier", fileIdentifier);
 
         makeWPRequest(
-          '#policycloud-marketplace-description-editing .file[data-file-identifier="' +
+          '.policycloud-marketplace.description.editor .file[data-file-identifier="' +
           fileIdentifier +
           '"] button.delete',
           "policycloud_marketplace_description_editing",
@@ -183,7 +184,7 @@
             "id",
             "policycloud-marketplace-file-" + fileIdentifier + "-download"
           );
-          $("#policycloud-marketplace-asset .file-viewer").append(a);
+          $(".policycloud-marketplace.description .file-viewer").append(a);
           $(
             "a#policycloud-marketplace-file-" + fileIdentifier + "-download"
           ).attr("download", "");
@@ -231,6 +232,22 @@
       }
     }
 
+    function highlightRatingStars(e) {
+      e.preventDefault();
+      const eventStar = $(e.target);
+      $('.policycloud-marketplace.description .reviews .stars input[type="radio"]').each((index, element) => {
+        if (e.type == 'click' || e.type == 'mouseover') {
+          if ($(element).val() <= eventStar.val()) {
+            $(element).addClass('checked');
+          } else {
+            $(element).removeClass('checked');
+          }
+        }
+        else if (e.type == 'mouseout') {
+        }
+      });
+    }
+
     /**
      *
      * Asset editing interface actions & event listeners.
@@ -238,31 +255,31 @@
      */
 
     // Toggle asset editor visibility.
-    $("#policycloud-marketplace-asset header .show-editor-modal").click((e) => {
+    $(".policycloud-marketplace.description button[data-action=\"edit\"]").click((e) => {
       e.preventDefault();
       new Modal(
-        "information-editing",
-        $("#policycloud-marketplace-description-editing").clone()[0]
+        "description-editor",
+        $(".policycloud-marketplace.description.editor").clone()[0]
       );
     });
 
     // Submit the edited information.
     $(document).on(
       "submit",
-      "#policycloud-marketplace-description-editing form",
+      ".policycloud-marketplace.description.editor form",
       updateDescription
     );
 
     $(document).on(
       "click",
-      '#policycloud-marketplace-description-editing button[data-action="delete-description"]',
+      '.policycloud-marketplace.description.editor button[data-action="delete-description"]',
       deleteDescription
     );
 
     // Delete file.
     $(document).on(
       "click",
-      "#policycloud-marketplace-description-editing .file button.delete",
+      ".policycloud-marketplace.description.editor .file button.delete",
       deleteAsset
     );
 
@@ -279,5 +296,12 @@
       "#policycloud-marketplace-description .file-viewer .download",
       downloadAsset
     );
+
+    // Highlight rating stars.
+    $(document).on(
+      "click mouseover mouseout",
+      '.policycloud-marketplace.description .reviews .stars input[type="radio"]',
+      highlightRatingStars
+    )
   });
 })(jQuery);

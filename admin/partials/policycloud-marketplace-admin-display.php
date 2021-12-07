@@ -218,7 +218,7 @@ function policycloud_marketplace_plugin_archive_page_selector()
         }
         ?>
     </select>
-    <p>Select the page where you've inserted the <em>[policycloud-marketplace-description-archive]</em> shortcode.</p>
+    <p>Select the page where you've inserted the <em>[.policycloud-marketplace.descriptions.archive]</em> shortcode.</p>
 <?php
 }
 

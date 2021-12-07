@@ -67,7 +67,7 @@ function show_modal($inner_html, $controls = false)
             ?>
         </div>
     </div>
-    <?php
+<?php
 }
 
 
@@ -110,4 +110,19 @@ function time_elapsed_string($datetime, $full = false)
         $string = array_slice($string, 0, 1);
     }
     return $string ? implode(', ', $string) . ' ago' : 'just now';
+}
+
+/**
+ * Print the locked content notification.
+ *
+ * @param   array $login_page The login page defined in the WordPress Settings.
+ * @param   array $message The lowercase message indicating the desired action.
+ *
+ * @since   1.0.0
+ * @author  Alexandros Raikos <araikos@unipi.gr>
+ * @author  Eleftheria Kouremenou <elkour@unipi.gr>
+ */
+function show_lock($login_page, $message)
+{
+    echo '<div class="lock"><img src="' . get_site_url('', '/wp-content/plugins/policycloud-marketplace/public/assets/img/lock.svg') . '" /><p>Please <a href="' . $login_page . '">log in</a> to ' . $message . '.</p></div>';
 }

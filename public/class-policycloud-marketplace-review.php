@@ -108,6 +108,18 @@ class PolicyCloud_Marketplace_Review
         return self::parse($response, false);
     }
 
+    public static function get_reviews(PolicyCloud_Marketplace_Description $description, string $filters = null)
+    {
+        $response = PolicyCloud_Marketplace::api_request(
+            'GET',
+            '/descriptions/reviews/' . $description->id . $filters,
+            [],
+            PolicyCloud_Marketplace_Account::retrieve_token(),
+        );
+
+        return self::parse($response, false);
+    }
+
     public function get_author(): PolicyCloud_Marketplace_User
     {
         return new PolicyCloud_Marketplace_User($this->user_id);

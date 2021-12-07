@@ -121,6 +121,11 @@ class PolicyCloud_Marketplace_Description
         );
     }
 
+    public function get_reviews(int $page = 1)
+    {
+        return PolicyCloud_Marketplace_Review::get_reviews($this, self::parse_filter_query());
+    }
+
     protected function match_field(array $description)
     {
         if (empty($description['id'])) {

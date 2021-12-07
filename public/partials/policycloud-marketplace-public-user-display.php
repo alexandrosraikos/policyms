@@ -78,8 +78,9 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
                     <label for="phone">Phone number</label>
                     <input type="tel" name="phone" placeholder="e.x. +30 6999123456" />
                 </fieldset>
-                <div class="error"></div>
-                <button type="submit" class="action ">Create account</button>
+                <div class="actions">
+                    <button type="submit" class="action ">Create account</button>
+                </div>
                 <p>By submitting this form, you agree to our <a href="<?php echo $tos_url ?>">Terms of Service</a>.
                     Already have an account? Please <a href="<?php echo $authentication_url ?>">Log in</a>.</p>
             </form>
@@ -114,8 +115,9 @@ function account_user_authentication_html($registration_url, $reset_password_pag
                     <label for="password">Password *</label>
                     <input required name="password" placeholder="Insert your password" type="password" />
                 </fieldset>
-                <div class="error"></div>
-                <button type="submit" class="action">Log in</button>
+                <div class="actions">
+                    <button type="submit" class="action">Log in</button>
+                </div>
                 <p>Don't have an account yet? You can <a href="<?php echo $registration_url ?>">register</a> now to obtain full access to the Marketplace. If you have forgotten your credentials, you can <a href="<?php echo $reset_password_page ?>">reset your password.</a></p>
             </form>
         </div>
