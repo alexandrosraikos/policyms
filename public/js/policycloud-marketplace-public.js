@@ -27,12 +27,13 @@ class Modal {
    * @param {string} type The type of modal.
    * @param {any} data The modal's data. Will add controls if iterable.
    */
-  constructor(type, data, index = 0) {
+  constructor(type, data, index = 0, completion = null) {
     // Initialize variables.
     this.type = type;
     this.data = data;
     this.index = index ?? 0;
     this.iterable = this.data.constructor === Array;
+    this.completion = completion;
 
     /**
      * The modal HTML.
@@ -185,6 +186,9 @@ class Modal {
   set(data) {
     this.content().empty();
     this.content().append(data);
+    if (this.completion) {
+      this.completion(this.content().children()[0]);
+    }
   }
 
   next() {
@@ -323,25 +327,14 @@ function makeWPRequest(actionDOMSelector, action, nonce, data, completion) {
           completion();
         }
         else {
-          completion(JSON.parse(response.responseJSON ?? response.responseText));
-        }
-
-        // Remove the loading class.
-        $(actionDOMSelector).removeClass("loading");
-        if (actionDOMSelector.includes("button")) {
-          $(actionDOMSelector).prop("disabled", false);
+          completion(response.responseJSON ?? JSON.parse(response.responseText));
         }
       } catch (objError) {
         console.error("Invalid JSON response: " + objError);
+        completion();
       }
     } else if (response.status === 400 || response.status === 500) {
       showAlert(actionDOMSelector, response.responseText, "error");
-
-      // Remove the loading class.
-      $(actionDOMSelector).removeClass("loading");
-      if (actionDOMSelector.includes("button")) {
-        $(actionDOMSelector).prop("disabled", false);
-      }
     } else {
       showAlert(
         actionDOMSelector,
@@ -351,9 +344,11 @@ function makeWPRequest(actionDOMSelector, action, nonce, data, completion) {
 
       // Log additional information into the console.
       console.error("Policy Cloud Marketplace error: " + response.responseText);
+    }
 
-      // Remove the loading class.
-      $(actionDOMSelector).removeClass("loading");
+    // Remove the loading class.
+    $(actionDOMSelector).removeClass("loading");
+    if (typeof actionDOMSelector === 'string') {
       if (actionDOMSelector.includes("button")) {
         $(actionDOMSelector).prop("disabled", false);
       }
@@ -362,8 +357,10 @@ function makeWPRequest(actionDOMSelector, action, nonce, data, completion) {
 
   // Add the loading class.
   $(actionDOMSelector).addClass("loading");
-  if (actionDOMSelector.includes("button")) {
-    $(actionDOMSelector).prop("disabled", true);
+  if (typeof actionDOMSelector === 'string') {
+    if (actionDOMSelector.includes("button")) {
+      $(actionDOMSelector).prop("disabled", true);
+    }
   }
 
   if (data instanceof FormData) {

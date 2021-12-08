@@ -15,7 +15,7 @@ class PolicyCloud_Marketplace_Description
 
     public ?array $assets;
 
-    public ?array $reviews;
+    public ?PolicyCloud_Marketplace_Review $user_review;
 
     public function __construct(string $id, ?array $fetched = null)
     {
@@ -38,7 +38,6 @@ class PolicyCloud_Marketplace_Description
 
     public function update(array $information, ?array $file_identifiers = null)
     {
-
         if (!empty($file_identifiers)) {
             foreach ($file_identifiers as $file_id) {
                 // Check for new files.
@@ -123,7 +122,10 @@ class PolicyCloud_Marketplace_Description
 
     public function get_reviews(int $page = 1)
     {
-        return PolicyCloud_Marketplace_Review::get_reviews($this, self::parse_filter_query());
+        if (empty($this->reviews)) {
+            $this->reviews = PolicyCloud_Marketplace_Review::get_reviews($this, $page);
+        }
+        return $this->reviews;
     }
 
     protected function match_field(array $description)
@@ -165,6 +167,17 @@ class PolicyCloud_Marketplace_Description
                     );
                 }
             }
+        }
+
+        if (!empty($description['your_review'][0])) {
+            $this->user_review = new PolicyCloud_Marketplace_Review(
+                $description['your_review'][0]['comment'],
+                $description['your_review'][0]['rating'],
+                $description['id'],
+                $description['your_review'][0]['username'],
+                $description['your_review'][0]['updated_review_date'],
+                $description['your_review'][0]['review_version'],
+            );
         }
     }
 

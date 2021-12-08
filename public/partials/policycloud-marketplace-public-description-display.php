@@ -450,14 +450,60 @@ function description_editor_html(PolicyCloud_Marketplace_Description $descriptio
 <?php
 }
 
-function description_reviews_list_html(array $reviews = null, int $pages = 0)
+function description_reviews_list_html(array $reviews)
+{
+?>
+    <ul>
+        <?php
+        foreach ($reviews[0] as $review) { ?>
+            <li class="review">
+                <div class="rating">
+                    <?= $review->rating ?>
+                    <span class="stars">
+                        <?php
+                        for ($i = 0; $i < $review->rating; $i++) {
+                        ?>
+
+                            <span class="fas fa-star"></span>
+                        <?php
+                        }
+                        ?>
+                    </span>
+                </div>
+                <div class="comment">
+                    <?= $review->comment ?>
+                </div>
+                <div class="metadata">
+                    <span>
+                        <?= time_elapsed_string(date('Y-m-d H:i:s', strtotime($review->update_date))) ?>
+                    </span>
+                    <span>
+                        by <a href="<?= PolicyCloud_Marketplace_Public::get_plugin_setting(false, 'account_page') . '?user=' . $review->user_id ?>"><?= $review->user_id ?></a>
+                    </span>
+                </div>
+            </li>
+        <?php } ?>
+    </ul>
+<?php
+
+}
+
+function description_reviews_html(array $reviews = null, ?int $pages = 0, PolicyCloud_Marketplace_Review $existing_review = null)
 {
 ?>
     <div class="policycloud-marketplace reviews">
         <?php
         if (!empty($reviews)) {
+            description_reviews_list_html($reviews);
         ?>
-
+            <nav class="pagination">
+                <?php
+                for ($page = 1; $page < $pages; $page++) {
+                    $activePage = $_GET['reviews-page'] ?? 1;
+                    echo '<button class="page-selector ' . (($activePage == ($page)) ? 'active' : '') . '" data-page-number="' . $page . '" data-action="change-review-page">' . ($page) . '</button>';
+                }
+                ?>
+            </nav>
         <?php
         } else {
             show_alert('No reviews yet.', 'notice');
@@ -465,31 +511,37 @@ function description_reviews_list_html(array $reviews = null, int $pages = 0)
         ?>
         <form>
             <label for="comment">Comment</label>
-            <textarea name="comment" placeholder="Insert your comment here.."></textarea>
+            <textarea name="comment" placeholder="Insert your comment here.."><?= !empty($existing_review) ? $existing_review->comment : null ?></textarea>
             <label for="rating">Rating</label>
             <div class="stars">
-                <label>
-                    <input type="radio" name="rating" value="1" />
-                    <span class="fas fa-star"></span>
-                </label>
-                <label>
-                    <input type="radio" name="rating" value="2" />
-                    <span class="fas fa-star"></span>
-                </label>
-                <label>
-                    <input type="radio" name="rating" value="3" />
-                    <span class="fas fa-star"></span>
-                </label>
-                <label>
-                    <input type="radio" name="rating" value="4" />
-                    <span class="fas fa-star"></span>
-                </label>
-                <label>
-                    <input type="radio" name="rating" value="5" required />
-                    <span class="fas fa-star"></span>
-                </label>
+                <?php
+                for ($i = 0; $i < 5; $i++) {
+                    $rating = $i + 1;
+                ?>
+                    <label>
+                        <input type="radio" name="rating" value="<?= $rating ?>" class="<?= ($rating <= ($existing_review->rating ?? 0)) ? 'checked' : '' ?>" <?= ($rating == ($existing_review->rating ?? 0)) ? 'checked' : '' ?> required />
+                        <span class="fas fa-star"></span>
+                    </label>
+                <?php
+                }
+                ?>
             </div>
-            <button class="action" type="submit">Submit</button>
+            <?= !empty($existing_review) ? '<input style="display:none" type="checkbox" name="update" checked/>' : '' ?>
+            <?php
+            if (!empty($existing_review)) { ?>
+                <p>
+                    Last submitted <?= time_elapsed_string(date('Y-m-d H:i:s', strtotime($existing_review->update_date))) ?>
+                </p>
+            <?php } ?>
+            <div class="actions">
+                <?php if (!empty($existing_review)) {
+                ?>
+                    <button class="action destructive" data-action="delete-review">Delete</button>
+                <?php
+                }
+                ?>
+                <button class="action" type="submit">Submit</button>
+            </div>
         </form>
     </div>
     <?php
@@ -697,163 +749,169 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                             ?>
                         </div>
                     </div>
-                    <div class="reviews" id="reviews">
-                        <h2>Reviews</h2>
-                        <?php
-                        if ($permissions['authenticated']) {
-                            description_reviews_list_html($reviews);
-                        } else {
-                            show_lock($pages['login_page'], 'view reviews for this description');
-                        }
-                        ?>
-                    </div>
-                    <?php
-                    if ($permissions['provider'] || $permissions['administrator']) {
-                        description_editor_html($description);
-                    }
-                    ?>
                 </div>
-            <?php
-        }
-    }
-
-
-    /**
-     * Print the asset HTML.
-     *
-     * @param   array $asset The PolicyCloud Marketplace API asset.
-     * @param   array $args Various printing arguments.
-     *
-     * @since   1.0.0
-     * @author  Alexandros Raikos <araikos@unipi.gr>
-     */
-    function description_creation_html()
-    {
-        if (!empty($error)) {
-            show_alert($error);
-        } else {
-            ?>
-                <div class="policycloud-marketplace">
-                    <form id="policycloud-marketplace-description-creation" action="">
-                        <fieldset name="basic-information">
-                            <h2>Basic information</h2>
-                            <p>To create a new Marketplace asset, the following fields represent basic information that will be visible to others.</p>
-                            <label for="title">Title *</label>
-                            <input required name="title" placeholder="Insert a title" type="text" />
-                            <label for="type">Primary collection type *</label>
-                            <select name="type" required>
-                                <option value="algorithms" selected>Algorithms</option>
-                                <option value="tools">Tools</option>
-                                <option value="policies">Policies</option>
-                                <option value="datasets">Datasets</option>
-                                <option value="webinars">Webinars</option>
-                                <option value="tutorials">Tutorials</option>
-                                <option value="documents">Documents</option>
-                                <option value="externals">Externals</option>
-                                <option value="other">Other</option>
-                            </select>
-                            <label for="subtype">Secondary collection type</label>
-                            <input type="text" placeholder="Insert a secondary collection type" name="subtype" />
-                            <label for="fields-of-use">Fields of usage</label>
-                            <textarea name="fields-of-use" placeholder="Separate multiple fields of usage using a comma (lorem, ipsum, etc.)"></textarea>
-                            <label for="owner">Legal owner *</label>
-                            <input required name="owner" placeholder="Insert the legal owner of the object" type="text" />
-                            <label for="description">Description *</label>
-                            <textarea name="description" placeholder="Insert a detailed description" style="resize:vertical"></textarea>
-                        </fieldset>
-                        <fieldset name="internal-information">
-                            <h2>Additional information</h2>
-                            <p>You can include additional comments for authorized visitors. This field is optional.</p>
-                            <label for="comments">Comments</label>
-                            <textarea name="comments" placeholder="Insert any additional comments"></textarea>
-                        </fieldset>
-                        <div class="error"></div>
-                        <button type="submit" class="action ">Create</button>
-                    </form>
-                </div>
-            <?php
-        }
-    }
-
-
-
-    /**
-     * Display a list of assets with filtering, sorting and custom pagination.
-     *
-     * @param string $id The identifier for the viewer.
-     * @param array $content The asset structure to be displayed.
-     * @param callable $inner_html The callback that prints the list item HTML.
-     * @param array $args The arguments of the parent function
-     *
-     * @since   1.0.0
-     * @author  Alexandros Raikos <araikos@unipi.gr>
-     *
-     */
-    function entity_list_html(string $id, array $content, bool $visitor, callable $inner_html, ?string $create_page_url = null)
-    {
-            ?>
-            <header>
-                <h3><?= ucfirst($id) ?></h3>
-                <div class="actions">
-                    <form action="" class="selector">
-                        <label for="sort-by">Sort by</label>
-                        <select name="sort-by" data-category="<?= $id ?>">
-                            <option value="newest" <?= ((($_GET['sort-by'] ?? '' == 'newest') || empty($_GET['sort-by'])) ? "selected" : "") ?>>Newest</option>
-                            <option value="oldest" <?= (($_GET['sort-by'] ?? '' == 'oldest') ? "selected" : "") ?>>Oldest</option>
-                            <option value="rating-asc" <?= (($_GET['sort-by'] ?? '' == 'rating-asc') ? "selected" : "") ?>>Highest rated</option>
-                            <option value="rating-desc" <?= (($_GET['sort-by'] ?? '' == 'rating-desc') ? "selected" : "") ?>>Lowest rated</option>
-                            <?php
-                            if ($id == 'descriptions') {
-                            ?>
-                                <option value="views-asc" <?= (($_GET['sort-by'] ?? '' == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
-                                <option value="views-desc" <?= (($_GET['sort-by'] ?? '' == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
-                            <?php } ?>
-                            <option value="title" <?= (($_GET['sort-by'] ?? '' == 'title') ? "selected" : "") ?>>Title</option>
-                        </select>
-                        <label for="items-per-page">Items per page</label>
-                        <select name="items-per-page" data-category="<?= $id ?>">
-                            <option value="5" <?= ((($_GET['items-per-page'] ?? '' == '5')) ? "selected" : "") ?>>5</option>
-                            <option value="10" <?= (($_GET['items-per-page'] ?? '' == '10' || empty($_GET['items-per-page'])) ? "selected" : "") ?>>10</option>
-                            <option value="25" <?= (($_GET['items-per-page'] ?? '' == '25') ? "selected" : "") ?>>25</option>
-                            <option value="50" <?= (($_GET['items-per-page'] ?? '' == '50') ? "selected" : "") ?>>50</option>
-                            <option value="100" <?= (($_GET['items-per-page'] ?? '' == '100') ? "selected" : "") ?>>100</option>
-                        </select>
-                    </form>
-                    <?php
-                    if (!$visitor && $id == 'descriptions'  && !empty($create_page_url)) {
-                    ?>
-                        <a id="policycloud-upload" href="<?= $create_page_url ?>" title="Create new"><span class="fas fa-plus"></span> Create new</a>
-                    <?php } ?>
-                </div>
-            </header>
-            <div class="collection-filters" data-category="<?= $id ?>">
-                <div>Filter by type:</div>
             </div>
-            <div class="paginated-list" data-category="<?= $id ?>">
+
+            <div class="reviews" id="reviews">
+                <h2>Reviews</h2>
                 <?php
-                if (!empty($content)) {
-                    foreach ($content as $page => $page_items) {
-                        echo '<ul data-page="' . ($page + 1) . '" class="page ' . $id . ' ' . ($page == 0 ? 'visible' : '') . '">';
-                        if (!empty($content)) {
-                            foreach ($page_items as $item) {
-                                $inner_html($item);
-                            }
-                        } else {
-                            show_alert("You don't have any " . $id . " yet.");
-                        }
-                        echo '</ul>';
-                    }
+                if ($permissions['authenticated']) {
+                    description_reviews_html(
+                        $reviews['content'] ?? [],
+                        $reviews['pages'] ?? null,
+                        $description->user_review ?? null
+                    );
                 } else {
-                    show_alert('This user does not have any ' . $id . '.', 'notice');
-                } ?>
-                <nav class="pagination">
-                    <?php
-                    if (count($content ?? []) > 1) {
-                        foreach ($content as $page => $page_items) {
-                            echo '<button data-category="' . $id . '" class="page-selector ' . (($page == ($_GET['page'] ?? 0)) ? 'active' : '') . '" data-' . $id . '-page="' . ($page + 1) . '">' . ($page + 1) . '</button>';
-                        }
-                    } ?>
-                </nav>
+                    show_lock($pages['login_page'], 'view reviews for this description');
+                }
+                ?>
+            </div>
+            <?php
+            if ($permissions['provider'] || $permissions['administrator']) {
+                description_editor_html($description);
+            }
+            ?>
+        <?php
+    }
+}
+
+
+/**
+ * Print the asset HTML.
+ *
+ * @param   array $asset The PolicyCloud Marketplace API asset.
+ * @param   array $args Various printing arguments.
+ *
+ * @since   1.0.0
+ * @author  Alexandros Raikos <araikos@unipi.gr>
+ */
+function description_creation_html()
+{
+    if (!empty($error)) {
+        show_alert($error);
+    } else {
+        ?>
+            <div class="policycloud-marketplace">
+                <form id="policycloud-marketplace-description-creation" action="">
+                    <fieldset name="basic-information">
+                        <h2>Basic information</h2>
+                        <p>To create a new Marketplace asset, the following fields represent basic information that will be visible to others.</p>
+                        <label for="title">Title *</label>
+                        <input required name="title" placeholder="Insert a title" type="text" />
+                        <label for="type">Primary collection type *</label>
+                        <select name="type" required>
+                            <option value="algorithms" selected>Algorithms</option>
+                            <option value="tools">Tools</option>
+                            <option value="policies">Policies</option>
+                            <option value="datasets">Datasets</option>
+                            <option value="webinars">Webinars</option>
+                            <option value="tutorials">Tutorials</option>
+                            <option value="documents">Documents</option>
+                            <option value="externals">Externals</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <label for="subtype">Secondary collection type</label>
+                        <input type="text" placeholder="Insert a secondary collection type" name="subtype" />
+                        <label for="fields-of-use">Fields of usage</label>
+                        <textarea name="fields-of-use" placeholder="Separate multiple fields of usage using a comma (lorem, ipsum, etc.)"></textarea>
+                        <label for="owner">Legal owner *</label>
+                        <input required name="owner" placeholder="Insert the legal owner of the object" type="text" />
+                        <label for="description">Description *</label>
+                        <textarea name="description" placeholder="Insert a detailed description" style="resize:vertical"></textarea>
+                    </fieldset>
+                    <fieldset name="internal-information">
+                        <h2>Additional information</h2>
+                        <p>You can include additional comments for authorized visitors. This field is optional.</p>
+                        <label for="comments">Comments</label>
+                        <textarea name="comments" placeholder="Insert any additional comments"></textarea>
+                    </fieldset>
+                    <div class="error"></div>
+                    <button type="submit" class="action ">Create</button>
+                </form>
             </div>
         <?php
     }
+}
+
+
+
+/**
+ * Display a list of assets with filtering, sorting and custom pagination.
+ *
+ * @param string $id The identifier for the viewer.
+ * @param array $content The asset structure to be displayed.
+ * @param callable $inner_html The callback that prints the list item HTML.
+ * @param array $args The arguments of the parent function
+ *
+ * @since   1.0.0
+ * @author  Alexandros Raikos <araikos@unipi.gr>
+ *
+ */
+function entity_list_html(string $id, array $content, bool $visitor, callable $inner_html, ?string $create_page_url = null)
+{
+        ?>
+        <header>
+            <h3><?= ucfirst($id) ?></h3>
+            <div class="actions">
+                <form action="" class="selector">
+                    <label for="sort-by">Sort by</label>
+                    <select name="sort-by" data-category="<?= $id ?>">
+                        <option value="newest" <?= ((($_GET['sort-by'] ?? '' == 'newest') || empty($_GET['sort-by'])) ? "selected" : "") ?>>Newest</option>
+                        <option value="oldest" <?= (($_GET['sort-by'] ?? '' == 'oldest') ? "selected" : "") ?>>Oldest</option>
+                        <option value="rating-asc" <?= (($_GET['sort-by'] ?? '' == 'rating-asc') ? "selected" : "") ?>>Highest rated</option>
+                        <option value="rating-desc" <?= (($_GET['sort-by'] ?? '' == 'rating-desc') ? "selected" : "") ?>>Lowest rated</option>
+                        <?php
+                        if ($id == 'descriptions') {
+                        ?>
+                            <option value="views-asc" <?= (($_GET['sort-by'] ?? '' == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
+                            <option value="views-desc" <?= (($_GET['sort-by'] ?? '' == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
+                        <?php } ?>
+                        <option value="title" <?= (($_GET['sort-by'] ?? '' == 'title') ? "selected" : "") ?>>Title</option>
+                    </select>
+                    <label for="items-per-page">Items per page</label>
+                    <select name="items-per-page" data-category="<?= $id ?>">
+                        <option value="5" <?= ((($_GET['items-per-page'] ?? '' == '5')) ? "selected" : "") ?>>5</option>
+                        <option value="10" <?= (($_GET['items-per-page'] ?? '' == '10' || empty($_GET['items-per-page'])) ? "selected" : "") ?>>10</option>
+                        <option value="25" <?= (($_GET['items-per-page'] ?? '' == '25') ? "selected" : "") ?>>25</option>
+                        <option value="50" <?= (($_GET['items-per-page'] ?? '' == '50') ? "selected" : "") ?>>50</option>
+                        <option value="100" <?= (($_GET['items-per-page'] ?? '' == '100') ? "selected" : "") ?>>100</option>
+                    </select>
+                </form>
+                <?php
+                if (!$visitor && $id == 'descriptions'  && !empty($create_page_url)) {
+                ?>
+                    <a id="policycloud-upload" href="<?= $create_page_url ?>" title="Create new"><span class="fas fa-plus"></span> Create new</a>
+                <?php } ?>
+            </div>
+        </header>
+        <div class="collection-filters" data-category="<?= $id ?>">
+            <div>Filter by type:</div>
+        </div>
+        <div class="paginated-list" data-category="<?= $id ?>">
+            <?php
+            if (!empty($content)) {
+                foreach ($content as $page => $page_items) {
+                    echo '<ul data-page="' . ($page + 1) . '" class="page ' . $id . ' ' . ($page == 0 ? 'visible' : '') . '">';
+                    if (!empty($content)) {
+                        foreach ($page_items as $item) {
+                            $inner_html($item);
+                        }
+                    } else {
+                        show_alert("You don't have any " . $id . " yet.");
+                    }
+                    echo '</ul>';
+                }
+            } else {
+                show_alert('This user does not have any ' . $id . '.', 'notice');
+            } ?>
+            <nav class="pagination">
+                <?php
+                if (count($content ?? []) > 1) {
+                    foreach ($content as $page => $page_items) {
+                        echo '<button data-category="' . $id . '" class="page-selector ' . (($page == ($_GET['page'] ?? 0)) ? 'active' : '') . '" data-' . $id . '-page="' . ($page + 1) . '">' . ($page + 1) . '</button>';
+                    }
+                } ?>
+            </nav>
+        </div>
+    <?php
+}

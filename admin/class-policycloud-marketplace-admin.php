@@ -105,7 +105,6 @@ class PolicyCloud_Marketplace_Admin
 
     function register_settings()
     {
-        // TODO @alexandrosraikos: Switch to using URL by page ID setters/getters instead of raw URLs. #44
 
         register_setting(
             'policycloud_marketplace_plugin_settings',

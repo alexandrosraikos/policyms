@@ -38,15 +38,32 @@
     $(".policycloud-marketplace.description .gallery img").click((e) => {
       new Modal(
         "gallery",
-        // TODO @alexandrosraikos: Create array of <img> loaders on show. #68
-        Array.from(
-          $(".policycloud-marketplace.description .gallery img").map(
-            (index, element) => {
-              return $(element).clone()[0];
-            }
-          )
+        imageReference.map(
+          (imageID) => {
+            return (`<div data-file-category="images" data-file-id="` + imageID + `"></div>`)
+          }
         ),
-        imageReference.indexOf($(e.target).data("image-id"))
+        imageReference.indexOf($(e.target).data("image-id")),
+        (imageContainer) => {
+          const type = $(imageContainer).data('file-category');
+          const fileIdentifier = $(imageContainer).data('file-id');
+
+          makeWPRequest(
+            this,
+            "policycloud_marketplace_asset_download",
+            DescriptionEditingProperties.assetDownloadNonce,
+            {
+              'description_id': DescriptionEditingProperties.descriptionID,
+              'category': type,
+              'file_id': fileIdentifier,
+              'download': false,
+            },
+            (data) => {
+              const fullQualityImage = '<img src="' + data.url + '" />';
+              $(imageContainer).append(fullQualityImage);
+            }
+          );
+        }
       );
     });
 
@@ -168,14 +185,14 @@
         "description_id",
         DescriptionEditingProperties.descriptionID
       );
-      formData.append("subsequent_action", "asset-download");
-      formData.append("file-type", type);
-      formData.append("file-identifier", fileIdentifier);
+      formData.append("category", type);
+      formData.append("file_id", fileIdentifier);
+      formData.append("download", true);
 
       makeWPRequest(
         this,
-        "policycloud_marketplace_description_editing",
-        DescriptionEditingProperties.nonce,
+        "policycloud_marketplace_asset_download",
+        DescriptionEditingProperties.assetDownloadNonce,
         formData,
         (data) => {
           var a = document.createElement("a");
@@ -235,6 +252,7 @@
     function highlightRatingStars(e) {
       e.preventDefault();
       const eventStar = $(e.target);
+      eventStar.attr('checked', true);
       $('.policycloud-marketplace.description .reviews .stars input[type="radio"]').each((index, element) => {
         if (e.type == 'click' || e.type == 'mouseover') {
           if ($(element).val() <= eventStar.val()) {
@@ -246,6 +264,64 @@
         else if (e.type == 'mouseout') {
         }
       });
+    }
+
+    function changeReviewPage(e) {
+      e.preventDefault();
+      if (!$(e.target).hasClass('active')) {
+        $(e.target).data('page-number');
+        $(".policycloud-marketplace.description .reviews .pagination button").removeClass('active');
+        $(e.target).addClass("active");
+        makeWPRequest(
+          e.target,
+          'policycloud_marketplace_get_description_reviews',
+          DescriptionEditingProperties.reviewsNonce,
+          {
+            description_id: DescriptionEditingProperties.descriptionID,
+            page: $(e.target).data('page-number')
+          },
+          (data) => {
+            $(".policycloud-marketplace.description .reviews ul").remove();
+            $(".policycloud-marketplace.description .reviews:last-child").prepend(data);
+          }
+        )
+      }
+    }
+
+    function createReview(e) {
+      e.preventDefault();
+      var formData = new FormData($(e.target)[0]);
+      formData.append(
+        "description_id",
+        DescriptionEditingProperties.descriptionID
+      );
+
+      makeWPRequest(
+        ".policycloud-marketplace .reviews form button[type=\"submit\"]",
+        'policycloud_marketplace_create_review',
+        DescriptionEditingProperties.createReviewNonce,
+        formData,
+        () => {
+          window.location.reload()
+        }
+      )
+    }
+
+    function deleteReview(e) {
+      e.preventDefault();
+      if (window.confirm('Are you sure you would like to delete this review?')) {
+        makeWPRequest(
+          e.target,
+          'policycloud_marketplace_delete_review',
+          DescriptionEditingProperties.deleteReviewNonce,
+          {
+            "description_id": DescriptionEditingProperties.descriptionID
+          },
+          () => {
+            window.location.reload()
+          }
+        )
+      }
     }
 
     /**
@@ -293,15 +369,36 @@
     // Download file.
     $(document).on(
       "click",
-      "#policycloud-marketplace-description .file-viewer .download",
+      ".policycloud-marketplace.description .file-viewer .download",
       downloadAsset
     );
+
+    // Change rating page.
+    $(document).on(
+      'click',
+      '.policycloud-marketplace.description .reviews button[data-action="change-review-page"]',
+      changeReviewPage
+    )
 
     // Highlight rating stars.
     $(document).on(
       "click mouseover mouseout",
       '.policycloud-marketplace.description .reviews .stars input[type="radio"]',
       highlightRatingStars
+    )
+
+    // Submit new review.
+    $(document).on(
+      'submit',
+      '.policycloud-marketplace .reviews form',
+      createReview
+    )
+
+    // Delete a review.
+    $(document).on(
+      'click',
+      '.policycloud-marketplace .reviews form button[data-action="delete-review"]',
+      deleteReview
     )
   });
 })(jQuery);

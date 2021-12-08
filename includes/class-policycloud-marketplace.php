@@ -210,6 +210,16 @@ class PolicyCloud_Marketplace
         $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_description_approval', $plugin_public, 'description_approval_handler');
         $this->loader->add_action('wp_ajax_policycloud_marketplace_description_deletion', $plugin_public, 'description_deletion_handler');
         $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_description_deletion', $plugin_public, 'description_deletion_handler');
+        $this->loader->add_action('wp_ajax_policycloud_marketplace_asset_download', $plugin_public, 'asset_download_handler');
+        $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_asset_download', $plugin_public, 'asset_download_handler');
+
+        // Support for descriptions' reviews.
+        $this->loader->add_action('wp_ajax_policycloud_marketplace_get_description_reviews', $plugin_public, 'get_description_reviews_handler');
+        $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_get_description_reviews', $plugin_public, 'get_description_reviews_handler');
+        $this->loader->add_action('wp_ajax_policycloud_marketplace_create_review', $plugin_public, 'create_review_handler');
+        $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_create_review', $plugin_public, 'create_review_handler');
+        $this->loader->add_action('wp_ajax_policycloud_marketplace_delete_review', $plugin_public, 'delete_review_handler');
+        $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_delete_review', $plugin_public, 'delete_review_handler');
     }
 
     /**

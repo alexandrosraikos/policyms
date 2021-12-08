@@ -152,7 +152,7 @@ class PolicyCloud_Marketplace_Public
                     throw new RuntimeException("There was an error while encoding the data to JSON.");
                 } else {
                     http_response_code(200);
-                    die(json_encode($data));
+                    die($data);
                 }
             }
         } catch (PolicyCloudMarketplaceUnauthorizedRequestException $e) {
@@ -303,7 +303,7 @@ class PolicyCloud_Marketplace_Public
                     }
                 }
                 if (str_contains($key, '_page')) {
-                    $settings[$key] = get_page_link($options[$key]);
+                    $settings[$key] = get_page_link(intval($options[$key]));
                 } else {
                     $settings[$key] = $options[$key];
                 }
@@ -769,7 +769,6 @@ class PolicyCloud_Marketplace_Public
      */
     public static function description_shortcode()
     {
-
         self::exception_handler(
             function () {
                 if (empty($_GET['did'])) {
@@ -805,7 +804,7 @@ class PolicyCloud_Marketplace_Public
                             )['images'] ?? []
                         );
 
-                        // $reviews = $description->get_reviews();
+                        $reviews = $description->get_reviews(filter_var($_GET['reviews-page'] ?? 1, FILTER_VALIDATE_INT));
                     } else {
                         $permissions['authenticated'] = false;
                         show_alert("You need to be verified in order to view description details.", 'notice');
@@ -816,14 +815,17 @@ class PolicyCloud_Marketplace_Public
                 wp_localize_script('policycloud-marketplace-description', 'DescriptionEditingProperties', array(
                     'nonce' => wp_create_nonce('policycloud_marketplace_description_editing'),
                     'descriptionID' => $description->id,
+                    'assetDownloadNonce' => $permissions['authenticated'] ? wp_create_nonce('policycloud_marketplace_asset_download') : null,
+                    'reviewsNonce' => $permissions['authenticated'] ? wp_create_nonce('policycloud_marketplace_get_description_reviews') : null,
+                    'createReviewNonce' => $permissions['authenticated'] ? wp_create_nonce('policycloud_marketplace_create_review') : null,
+                    'deleteReviewNonce' => $permissions['authenticated'] ? wp_create_nonce('policycloud_marketplace_delete_review') : null,
                     'approvalNonce' => $permissions['administrator'] ? wp_create_nonce('policycloud_marketplace_description_approval') : null,
                     'deletionNonce' => ($permissions['administrator'] || $permissions['provider']) ? wp_create_nonce('policycloud_marketplace_description_deletion') : null,
                     'deleteRedirect' => $permissions['provider'] ? (self::get_plugin_setting(true, 'account_page') . "#descriptions") : (self::get_plugin_setting(true, 'account_page') . "#approvals")
                 ));
+
                 // TODO @alexandrosraikos: Add main image selector on the editing form. #69
-                // TODO @alexandrosraikos: Restructure gallery to dynamic thumbnail usage. #68
                 // TODO @alexandrosraikos: Add description name as head meta title. #54
-                // TODO @alexandrosraikos: Add user reviews interface CRUD. #38
                 // TODO @alexandrosraikos: Add video viewer in gallery. #39
 
                 description_html(
@@ -970,6 +972,68 @@ class PolicyCloud_Marketplace_Public
             function ($data) {
                 $description = new PolicyCloud_Marketplace_Description($data['description_id']);
                 $description->delete();
+            }
+        );
+    }
+
+    public function asset_download_handler()
+    {
+        $this->ajax_handler(
+            function ($data) {
+                $otc = PolicyCloud_Marketplace_Asset::get_download_url(
+                    $data['category'],
+                    $data['file_id']
+                );
+                return [
+                    'url' => self::get_plugin_setting(true, 'marketplace_host') . '/assets/download/' . $otc . (($data['download'] == 'true') ? '' : '?na=not')
+                ];
+            }
+        );
+    }
+
+    public function get_description_reviews_handler()
+    {
+        $this->ajax_handler(
+            function ($data) {
+                $description = new PolicyCloud_Marketplace_Description($data['description_id']);
+                $reviews = $description->get_reviews($data['page']);
+                ob_start();
+                description_reviews_list_html($reviews['content']);
+                $html_response = ob_get_contents();
+                ob_end_clean();
+                return $html_response;
+            }
+        );
+    }
+
+    public function create_review_handler()
+    {
+        $this->ajax_handler(
+            function ($data) {
+                if ($data['update'] == 'on') {
+                    PolicyCloud_Marketplace_Review::update(
+                        $data['description_id'],
+                        $data['rating'],
+                        $data['comment'],
+                        $data['update']
+                    );
+                } else {
+                    PolicyCloud_Marketplace_Review::create(
+                        $data['description_id'],
+                        $data['rating'],
+                        $data['comment'],
+                        $data['update']
+                    );
+                }
+            }
+        );
+    }
+
+    public function delete_review_handler()
+    {
+        $this->ajax_handler(
+            function ($data) {
+                PolicyCloud_Marketplace_Review::delete($data['description_id']);
             }
         );
     }

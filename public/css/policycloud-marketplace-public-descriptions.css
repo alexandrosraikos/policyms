@@ -673,6 +673,29 @@
 * ----
 */
 
+.policycloud-marketplace.description > .reviews {
+  padding: 20px;
+}
+
+.policycloud-marketplace.description .reviews ul {
+  list-style-type: none;
+  margin-bottom: 20px;
+}
+
+.policycloud-marketplace.description .review {
+  margin: 20px 0 10px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--policycloud-border-color-light);
+}
+
+.policycloud-marketplace.description .review .rating {
+  font-weight: bold;
+}
+
+.policycloud-marketplace.description .review .rating .stars * {
+  fill: var(--policycloud-background-warning-outline);
+}
+
 .policycloud-marketplace.description .reviews form label {
   float: none;
 }

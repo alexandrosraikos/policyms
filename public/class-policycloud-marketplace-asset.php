@@ -71,7 +71,7 @@ class PolicyCloud_Marketplace_Asset
         // Currently only supports images.
         $response = PolicyCloud_Marketplace::api_request(
             'GET',
-            '/images/' . $this->id,
+            '/images/' . $this->id . '?thumbnail=yes',
             [],
             $token,
             [
@@ -83,15 +83,13 @@ class PolicyCloud_Marketplace_Asset
         return $response;
     }
 
-    public function get_download_url(): string
+    public static function get_download_url(string $category, string $id): string
     {
-        $token = PolicyCloud_Marketplace_Account::retrieve_token();
-
         $response = PolicyCloud_Marketplace::api_request(
             'GET',
-            '/assets/' . $this->category . '/' . $this->id,
+            '/assets/' . $category . '/' . $id,
             [],
-            $token
+            PolicyCloud_Marketplace_Account::retrieve_token()
         );
 
         return $response['otc'];
@@ -179,14 +177,13 @@ class PolicyCloud_Marketplace_Asset
             }
         } else {
             $error = $_FILES[$name]['error'];
-            if($error != 0 ) {
-                if($error != 4) {
+            if ($error != 0) {
+                if ($error != 4) {
                     throw new PolicyCloudMarketplaceInvalidDataException(
                         "An error occured when uploading the new file: " . PolicyCloud_Marketplace::fileUploadErrorInterpreter($error)
                     );
                 }
-            }
-            else {
+            } else {
                 $file = [
                     'path' => $_FILES[$name]['tmp_name'],
                     'mimetype' => $_FILES[$name]['tmp_name'],
