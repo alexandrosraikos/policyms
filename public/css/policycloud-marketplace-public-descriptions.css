@@ -638,6 +638,7 @@
   /* Display & Box Model */
   display: flex;
   width: 100%;
+  flex-wrap: wrap;
   overflow-x: auto;
 }
 
@@ -646,12 +647,30 @@
   > .information
   > .gallery
   > .slider
+  > .item {
+  width: 200px;
+}
+
+.policycloud-marketplace.description
+  > .content
+  > .information
+  > .gallery
+  > .slider
+  > .item {
+  margin-right: 15px;
+  margin-bottom: 15px;
+}
+
+.policycloud-marketplace.description
+  > .content
+  > .information
+  > .gallery
+  > .slider
+  > .item
   > img {
   /* Display & Box Model */
   height: 200px;
-  width: auto;
-  margin-right: 15px;
-  margin-bottom: 15px;
+  object-fit: cover;
   border-radius: 8px;
   transition: transform 0.2s ease-in-out;
 }
@@ -661,11 +680,66 @@
   > .information
   > .gallery
   > .slider
+  > .item
   > img:hover {
   /* Display & Box Model */
   cursor: pointer;
   transform: scale(0.98);
   transition: transform 0.2s ease-in-out;
+}
+.policycloud-marketplace.description
+  > .content
+  > .information
+  > .gallery
+  > .slider
+  > .item
+  > .toolbar {
+  display: none;
+}
+
+.policycloud-marketplace.description
+  > .content
+  > .information
+  > .gallery
+  > .slider
+  > .item
+  > .toolbar {
+  display: none;
+}
+
+.policycloud-marketplace.modal.gallery .content > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.policycloud-marketplace.modal.gallery .toolbar {
+  padding: 8px 12px;
+  background-color: black;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.policycloud-marketplace.modal.gallery .toolbar .tools {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.policycloud-marketplace.modal.gallery .toolbar span {
+  margin-right: 10px;
+}
+
+.policycloud-marketplace.modal.gallery .toolbar button {
+  font-weight: bold;
+  margin: 0;
+}
+
+.policycloud-marketplace.modal.gallery .toolbar button[data-action="delete"] {
+  color: var(--policycloud-background-failure-outline) !important;
 }
 
 /**
@@ -747,29 +821,24 @@
 * Asset editing form
 */
 
-.policycloud-marketplace.description .editor {
+.policycloud-marketplace.description.editor {
   margin: 20px 0;
-  padding: 0;
+  padding: 20px;
 }
 
-.policycloud-marketplace.description .editor {
+.policycloud-marketplace.description.editor {
   background-color: var(--policycloud-background-color);
 }
 
-.policycloud-marketplace.description .editor form fieldset {
+.policycloud-marketplace.description.editor form fieldset {
   border: none;
 }
 
-.policycloud-marketplace.description .editor .fieldset {
+.policycloud-marketplace.description.editor .fieldset {
   border: none;
 }
 
-.policycloud-marketplace.description .editor input[type="file"] {
-  font-size: 14px;
-  margin-bottom: 20px;
-}
-
-.policycloud-marketplace.description .editor .file {
+.policycloud-marketplace.description.editor .file {
   display: flex;
   width: 100;
   flex-wrap: wrap;
@@ -782,25 +851,25 @@
   margin: 10px 0;
 }
 
-.policycloud-marketplace.description .editor .file:last-of-type {
+.policycloud-marketplace.description.editor .file:last-of-type {
   margin-bottom: 20px;
 }
 
-.policycloud-marketplace.description .editor .file > * {
+.policycloud-marketplace.description.editor .file > * {
   margin-right: 15px;
 }
 
-.policycloud-marketplace.description .editor .file > div {
+.policycloud-marketplace.description.editor .file > div {
   display: flex;
   justify-content: flex-start;
   align-items: center;
 }
 
-.policycloud-marketplace.description .editor .file input[type="file"] {
+.policycloud-marketplace.description.editor .file input[type="file"] {
   margin-bottom: 0;
 }
 
-.policycloud-marketplace.description .editor .file .delete {
+.policycloud-marketplace.description.editor .file .delete {
   padding: 0px 6px;
   margin-right: 15px;
   display: block;
@@ -812,23 +881,23 @@
   transition: all 0.2s ease-in-out;
 }
 
-.policycloud-marketplace.description .editor .file .delete:hover {
+.policycloud-marketplace.description.editor .file .delete:hover {
   border: none;
   transform: scale(0.9);
   transition: all 0.2s ease-in-out;
 }
 
 @media screen and (max-width: 650px) {
-  .policycloud-marketplace.description .editor form {
+  .policycloud-marketplace.description.editor form {
     width: 100%;
     height: 100%;
     padding: 10px;
   }
-  .policycloud-marketplace.description .editor form > fieldset {
+  .policycloud-marketplace.description.editor form > fieldset {
     padding: 10px;
   }
 
-  .policycloud-marketplace.description .editor .close {
+  .policycloud-marketplace.description.editor .close {
     color: black !important;
   }
 }
@@ -887,38 +956,53 @@
 
 /* File editor */
 
-.policycloud-marketplace .file-editor {
-  display: inline-block;
-  width: 100%;
+.policycloud-marketplace.description .asset-editor {
+  border: 1px solid var(--policycloud-border-color-light);
   margin: 10px 0;
-  position: relative;
-  --image-width: 100px;
-}
-
-.policycloud-marketplace .file-editor > * {
-  display: inline-block;
-}
-
-.policycloud-marketplace .file-editor img {
-  max-width: var(--image-width);
+  padding: 10px;
   border-radius: 8px;
 }
 
-.policycloud-marketplace .file-editor button.delete {
-  padding: 3px !important;
+.policycloud-marketplace .asset-editor button.delete {
+  padding: 0px !important;
   text-align: center;
-  border-radius: 100px !important;
+  border-radius: 6px !important;
   height: 24px;
   width: 24px;
-  margin: 0 !important;
-  position: absolute;
-  top: -6px;
-  left: calc(var(--image-width) - 18px);
+  margin: 0 4px 0 0 !important;
   background-color: var(--policycloud-background-failure-outline) !important;
 }
 
-.policycloud-marketplace .file-editor button.delete:disabled {
+.policycloud-marketplace .asset-editor button.delete:disabled {
   cursor: wait !important;
   z-index: 10;
   background-color: rgba(150, 150, 150, 0.5) !important;
+}
+
+.policycloud-marketplace.description .asset-editor > * {
+  display: block;
+  float: none;
+}
+
+.policycloud-marketplace.description .asset-editor > .controls {
+  font-weight: bold;
+  border-bottom: 1px solid var(--policycloud-border-color-light);
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+}
+
+.policycloud-marketplace.description .asset-editor input[type="file"] {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.policycloud-marketplace.description .asset-editor > label {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.policycloud-marketplace.description .asset-editor > .chooser > label {
+  margin: 0 8px 0 0;
 }

@@ -168,6 +168,15 @@ class Modal {
   }
 
   /**
+   * Destroy any modal.
+   * @param {string} id The identifier of the modal
+   */
+  static kill(id) {
+    $(".policycloud-marketplace.modal." + id).remove();
+    $("html, body").css({ overflow: "auto" });
+  }
+
+  /**
    * Set the control buttons disabled status.
    *
    * @param {Boolean} previousState Whether there is a previous state.

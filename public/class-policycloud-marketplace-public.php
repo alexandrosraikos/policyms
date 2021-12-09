@@ -816,6 +816,8 @@ class PolicyCloud_Marketplace_Public
                     'nonce' => wp_create_nonce('policycloud_marketplace_description_editing'),
                     'descriptionID' => $description->id,
                     'assetDownloadNonce' => $permissions['authenticated'] ? wp_create_nonce('policycloud_marketplace_asset_download') : null,
+                    'setDefaultImageNonce' => $permissions['authenticated'] ? wp_create_nonce('policycloud_marketplace_set_description_image') : null,
+                    'removeDefaultImageNonce' => $permissions['authenticated'] ? wp_create_nonce('policycloud_marketplace_remove_description_image') : null,
                     'reviewsNonce' => $permissions['authenticated'] ? wp_create_nonce('policycloud_marketplace_get_description_reviews') : null,
                     'createReviewNonce' => $permissions['authenticated'] ? wp_create_nonce('policycloud_marketplace_create_review') : null,
                     'deleteReviewNonce' => $permissions['authenticated'] ? wp_create_nonce('policycloud_marketplace_delete_review') : null,
@@ -1034,6 +1036,29 @@ class PolicyCloud_Marketplace_Public
         $this->ajax_handler(
             function ($data) {
                 PolicyCloud_Marketplace_Review::delete($data['description_id']);
+            }
+        );
+    }
+
+    public function set_description_image_handler()
+    {
+        $this->ajax_handler(
+            function ($data) {
+                PolicyCloud_Marketplace_Description::set_default_image(
+                    $data['description_id'],
+                    $data['image_id']
+                );
+            }
+        );
+    }
+
+    public function remove_description_image_handler()
+    {
+        $this->ajax_handler(
+            function ($data) {
+                PolicyCloud_Marketplace_Description::remove_default_image(
+                    $data['description_id']
+                );
             }
         );
     }

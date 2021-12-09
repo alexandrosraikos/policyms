@@ -154,8 +154,7 @@
   transition: all 0.1s ease-in-out;
 }
 
-.policycloud-marketplace a.pill,
-.policycloud-marketplace span.pill {
+.policycloud-marketplace *.pill {
   display: inline-block !important;
   font-size: 90%;
   font-weight: 500;

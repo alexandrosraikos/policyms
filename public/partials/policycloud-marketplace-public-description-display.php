@@ -324,7 +324,7 @@ function descriptions_archive_html(array $descriptions, array $filters, string $
             ?>
         </div>
     </div>
-    <?php
+<?php
 }
 
 
@@ -339,47 +339,8 @@ function descriptions_archive_html(array $descriptions, array $filters, string $
  */
 function description_editor_html(PolicyCloud_Marketplace_Description $description = null): void
 {
-    if (!function_exists('description_editor_file_manager_html')) {
-        function description_editor_file_manager_html(array $assets)
-        { ?>
-            <fieldset name="uploads">
-                <h2>Uploads</h2>
-                <p>Manage your content and upload new files, images and videos.</p>
-                <?php
-                foreach ($assets as $category => $assets) {
-                    $upload_notice = ($category == 'images') ? '(supported file types: jpg, png)' : '';
-                ?>
-                    <h3>
-                        <?= ucfirst($category) ?>
-                    </h3>
-                    <?php
-                    if (!empty($assets)) {
-                        foreach ($assets as $asset) { ?>
-                            <div class="asset" data-file-type="<?= $category ?>" data-file-identifier="<?= $asset->id ?>">
-                                <div>
-                                    <button class="delete"><span class="fas fa-times"></span></button>
-                                    <?= $asset->filename . ' (' . $asset->size . ')' ?>
-                                </div>
-                                <label for="<?= $category . '-' . $asset->id ?>">
-                                    Replace file <?= $upload_notice ?>:
-                                </label>
-                                <input type="file" name="<?= $category . '-' . $asset->id ?>" multiple />
-                            </div>
-                    <?php
-                        }
-                    } ?>
-                    <label for="file">Upload new file <?= $upload_notice ?>:</label>
-                    <input type="file" name="<?= $category ?>[]" multiple />
-                <?php
-                }
-                ?>
-            </fieldset>
-    <?php
-        }
-    }
-
     // Print the main editor HTML.
-    ?>
+?>
     <div class="policycloud-marketplace description editor <?= !empty($description) ? 'modalize' : '' ?>">
         <form>
             <fieldset name="basic-information">
@@ -429,11 +390,24 @@ function description_editor_html(PolicyCloud_Marketplace_Description $descriptio
                 <label for="comments">Comments</label>
                 <textarea name="comments" placeholder="Insert any additional comments"><?= empty($description->information['comments']) ? '' : $description->information['comments'] ?></textarea>
             </fieldset>
-            <?=
-            !empty($description)
-                ? description_editor_file_manager_html($description->assets)
-                : null
-            ?>
+            <?php if (!empty($description)) { ?>
+                <fieldset name="uploads">
+                    <h2>Uploads</h2>
+                    <p>Manage your content and upload new files, images and videos.</p>
+                    <?php
+                    foreach ($description->assets as $category => $assets) {
+                        $upload_notice = ($category == 'images') ? '(supported file types: jpg, png)' : '';
+                    ?>
+                        <h3>
+                            <?= ucfirst($category) ?>
+                        </h3>
+                        <label for="file">Upload new file <?= $upload_notice ?>:</label>
+                        <input type="file" name="<?= $category ?>[]" multiple />
+                    <?php
+                    }
+                    ?>
+                </fieldset>
+            <?php } ?>
             <div class="error"></div>
             <div class="actions">
                 <?php
@@ -738,15 +712,46 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                             if ($permissions['authenticated']) {
                                 if (!empty($image_blobs)) {
                                     foreach ($image_blobs as $key => $image_blob) {
-                                        echo '<img src="data:image/*;base64,' . base64_encode($image_blob) . '" data-image-id="' . $description->assets['images'][$key]->id . '" draggable="false" />';
-                                    }
-                                } else {
-                                    show_alert('No images or videos were found.', 'notice');
-                                }
-                            } else {
-                                show_lock($pages['login_page'], 'view the image gallery');
-                            }
                             ?>
+                                        <div class="item" data-asset-id="<?= $description->assets['images'][$key]->id ?>">
+                                            <?php
+                                            echo '<img src="data:image/*;base64,' . base64_encode($image_blob) . '" data-image-id="' . $description->assets['images'][$key]->id . '" draggable="false" />';
+                                            if ($permissions['provider']) {
+                                            ?>
+                                                <div class="toolbar">
+                                                    <span>
+                                                        <?= $description->assets['images'][$key]->filename ?>
+
+                                                        (<?= $description->assets['images'][$key]->size ?>)
+                                                    </span>
+                                                    <div class="tools">
+                                                        <?php if ($description->assets['images'][$key]->id == $description->image_id) { ?>
+                                                            <button data-action="remove-default" data-asset-id="<?= $description->assets['images'][$key]->id ?>" class="action outlined">Remove default image</button>
+                                                        <?php } else { ?>
+                                                            <button data-action="set-default" data-asset-id="<?= $description->assets['images'][$key]->id ?>" class="action outlined">Set as default image</button>
+                                                        <?php } ?>
+                                                        <!-- <form class="replace">
+                                                            <input type="file" style="display:none" name="<?= 'images-' . $description->assets['images'][$key]->id ?>" required />
+                                                            <button type=submit class="action outlined">Replace</button>
+                                                        </form> -->
+                                                        <button data-action="delete" data-asset-category="images" data-asset-id="<?= $description->assets['images'][$key]->id ?>" class="action outlined">
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            <?php
+                                            } ?>
+
+
+                                        </div> <?php
+                                            }
+                                        } else {
+                                            show_alert('No images or videos were found.', 'notice');
+                                        }
+                                    } else {
+                                        show_lock($pages['login_page'], 'view the image gallery');
+                                    }
+                                                ?>
                         </div>
                     </div>
                 </div>

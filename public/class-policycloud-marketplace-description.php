@@ -11,6 +11,8 @@ class PolicyCloud_Marketplace_Description
 
     public array $information;
 
+    public string $image_id;
+
     public array $metadata;
 
     public ?array $assets;
@@ -120,6 +122,26 @@ class PolicyCloud_Marketplace_Description
         );
     }
 
+    public static function set_default_image(string $description_id, string $image_id)
+    {
+        PolicyCloud_Marketplace::api_request(
+            'PUT',
+            '/descriptions/image/' . $description_id . '/' . $image_id,
+            [],
+            PolicyCloud_Marketplace_Account::retrieve_token()
+        );
+    }
+
+    public static function remove_default_image(string $description_id)
+    {
+        PolicyCloud_Marketplace::api_request(
+            'DELETE',
+            '/descriptions/image/' . $description_id,
+            [],
+            PolicyCloud_Marketplace_Account::retrieve_token()
+        );
+    }
+
     public function get_reviews(int $page = 1)
     {
         if (empty($this->reviews)) {
@@ -142,7 +164,7 @@ class PolicyCloud_Marketplace_Description
             $this->id = $description['id'];
         }
 
-        if (empty($description['info'] || empty($description['metadata']))) {
+        if (empty($description['info'] || empty($description['metadata']) || empty($description['main_image']))) {
             throw new PolicyCloudMarketplaceInvalidDataException(
                 "The description did not match the expected schema."
             );
@@ -150,6 +172,7 @@ class PolicyCloud_Marketplace_Description
             $this->type = $description['info']['type'];
             $this->information = $description['info'];
             $this->metadata = $description['metadata'];
+            $this->image_id = $description['main_image'];
         }
 
         if (!empty($description['assets'])) {
