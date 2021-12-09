@@ -584,7 +584,6 @@ class PolicyCloud_Marketplace_Public
     {
         $this->ajax_handler(
             function ($data) {
-
                 $user = new PolicyCloud_Marketplace_User($data['username'] ?? null);
                 switch ($data['subsequent_action']) {
                     case 'edit_account_user':
@@ -610,6 +609,7 @@ class PolicyCloud_Marketplace_Public
                         );
                         break;
                     case 'delete_profile_picture':
+                        $user->delete_picture();
                         break;
                     default:
                         throw new PolicyCloudMarketplaceInvalidDataException(
@@ -826,7 +826,6 @@ class PolicyCloud_Marketplace_Public
                     'deleteRedirect' => $permissions['provider'] ? (self::get_plugin_setting(true, 'account_page') . "#descriptions") : (self::get_plugin_setting(true, 'account_page') . "#approvals")
                 ));
 
-                // TODO @alexandrosraikos: Add main image selector on the editing form. #69
                 // TODO @alexandrosraikos: Add description name as head meta title. #54
                 // TODO @alexandrosraikos: Add video viewer in gallery. #39
 

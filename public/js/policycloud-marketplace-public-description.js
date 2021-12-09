@@ -19,9 +19,12 @@
      */
 
     // Get image id array.
-    const imageReference = Array.from(
-      $(".policycloud-marketplace.description .gallery img").map((index, element) => {
-        return $(element).data("image-id");
+    const itemReference = Array.from(
+      $(".policycloud-marketplace.description .gallery img, .policycloud-marketplace.description .gallery video").map((index, element) => {
+        return {
+          category: $(element).data("asset-category"),
+          id: $(element).data("asset-id")
+        };
       })
     );
 
@@ -35,37 +38,51 @@
     $(".policycloud-marketplace .file-viewer > button").click(toggleFileList);
 
     // Toggle the gallery modal visibility.
-    $(".policycloud-marketplace.description .gallery img").click((e) => {
+    $(".policycloud-marketplace.description .gallery .item").click((e) => {
+      e.preventDefault();
+      e.stopPropagation();
       new Modal(
         "gallery",
-        imageReference.map(
-          (imageID) => {
-            return `<div data-file-category="images" data-file-id="` + imageID + `">
+        itemReference.map(
+          (itemData) => {
+            return `<div data-asset-category="` + itemData.category + `" data-asset-id="` + itemData.id + `">
             </div>`;
           }
         ),
-        imageReference.indexOf($(e.target).data("image-id")),
-        (imageContainer) => {
-          const type = $(imageContainer).data('file-category');
-          const fileIdentifier = $(imageContainer).data('file-id');
+        itemReference.findIndex((itemData) => {
+          return itemData.id == $(e.target).first().data('asset-id')
+        }),
+        (itemContainer) => {
+          const type = $(itemContainer).data('asset-category');
+          const fileIdentifier = $(itemContainer).data('asset-id');
 
-          makeWPRequest(
-            this,
-            "policycloud_marketplace_asset_download",
-            DescriptionEditingProperties.assetDownloadNonce,
-            {
-              'description_id': DescriptionEditingProperties.descriptionID,
-              'category': type,
-              'file_id': fileIdentifier,
-              'download': false,
-            },
-            (data) => {
-              const fullQualityImage = '<img src="' + data.url + '" />';
-              const toolbar = $('.policycloud-marketplace.description .gallery img[data-image-id="' + fileIdentifier + '"] + .toolbar');
-              $(imageContainer).prepend(fullQualityImage);
-              $(imageContainer).append(toolbar.clone());
-            }
-          );
+          if (type == 'images') {
+            makeWPRequest(
+              this,
+              "policycloud_marketplace_asset_download",
+              DescriptionEditingProperties.assetDownloadNonce,
+              {
+                'description_id': DescriptionEditingProperties.descriptionID,
+                'category': type,
+                'file_id': fileIdentifier,
+                'download': false,
+              },
+              (data) => {
+                const fullQualityImage = '<img src="' + data.url + '" />';
+                const toolbar = $('.policycloud-marketplace.description .gallery img[data-asset-id="' + fileIdentifier + '"] + .toolbar');
+                $(itemContainer).prepend(fullQualityImage);
+                $(itemContainer).append(toolbar.clone());
+              }
+            );
+          }
+          else if (type == 'videos') {
+            const videoPlayer = $('.policycloud-marketplace.description .gallery video[data-asset-id="' + fileIdentifier + '"]');
+            const largeVideoPlayer = videoPlayer.clone();
+            largeVideoPlayer.addClass("large");
+            $(itemContainer).prepend(largeVideoPlayer);
+            const toolbar = $('.policycloud-marketplace.description .gallery video[data-asset-id="' + fileIdentifier + '"] + .toolbar');
+            $(itemContainer).append(toolbar.clone());
+          }
         }
       );
     });
@@ -449,7 +466,7 @@
     // Delete file.
     $(document).on(
       "click",
-      ".policycloud-marketplace.modal.gallery .toolbar button[data-action=\"delete\"]",
+      ".policycloud-marketplace.modal.gallery.toolbar button[data-action=\"delete\"], .policycloud-marketplace.description.editor .asset-editor button[data-action=\"delete\"]",
       deleteAsset
     );
   });

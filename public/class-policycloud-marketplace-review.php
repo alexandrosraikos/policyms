@@ -8,6 +8,8 @@ class PolicyCloud_Marketplace_Review
     public string $comment;
     public int $rating;
     public ?string $description_id;
+    public ?string $description_title;
+    public ?string $description_collection;
     public string $user_id;
     public string $update_date;
     public int $version;
@@ -19,10 +21,14 @@ class PolicyCloud_Marketplace_Review
         string $user_id,
         string $update_date,
         int $version,
+        string $description_title = null,
+        string $description_collection = null
     ) {
         $this->comment = $comment;
         $this->rating = $rating;
         $this->description_id = $description_id;
+        $this->description_title = $description_title ?? null;
+        $this->description_collection = $description_collection ?? null;
         $this->user_id = $user_id;
         $this->update_date = $update_date;
         $this->version = $version;
@@ -46,7 +52,9 @@ class PolicyCloud_Marketplace_Review
                                     $review['did'] ?? null,
                                     $review['username'],
                                     $review['updated_review_date'],
-                                    $review['review_version']
+                                    $review['review_version'],
+                                    $review['title'] ?? null,
+                                    $review['collection'] ?? null
                                 );
                             },
                             $page
@@ -67,7 +75,9 @@ class PolicyCloud_Marketplace_Review
                                 $review['did'] ?? null,
                                 $review['username'],
                                 $review['updated_review_date'],
-                                $review['review_version']
+                                $review['review_version'],
+                                $review['title'] ?? null,
+                                $review['collection'] ?? null
                             );
                         },
                         $page

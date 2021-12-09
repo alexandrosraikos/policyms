@@ -514,6 +514,13 @@
   justify-content: space-between;
   align-items: center;
 }
+.policycloud-marketplace.description > header > .title > h1 {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  margin-bottom: 0;
+}
 
 .policycloud-marketplace.description > header > .title > h1 .status {
   /* Display & Box Model */
@@ -521,7 +528,7 @@
   padding: 5px 10px;
   display: block;
   float: right;
-  margin: 10px 0 0 10px;
+  margin: 0 0 0 10px;
 }
 
 .policycloud-marketplace.description > header > .title > button {
@@ -648,7 +655,7 @@
   > .gallery
   > .slider
   > .item {
-  width: 200px;
+  max-width: 200px;
 }
 
 .policycloud-marketplace.description
@@ -658,7 +665,7 @@
   > .slider
   > .item {
   margin-right: 15px;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 .policycloud-marketplace.description
@@ -667,7 +674,14 @@
   > .gallery
   > .slider
   > .item
-  > img {
+  > img,
+.policycloud-marketplace.description
+  > .content
+  > .information
+  > .gallery
+  > .slider
+  > .item
+  > video {
   /* Display & Box Model */
   height: 200px;
   object-fit: cover;
@@ -681,12 +695,37 @@
   > .gallery
   > .slider
   > .item
-  > img:hover {
+  > img:hover,
+.policycloud-marketplace.description
+  > .content
+  > .information
+  > .gallery
+  > .slider
+  > .item
+  > video:hover {
   /* Display & Box Model */
   cursor: pointer;
   transform: scale(0.98);
   transition: transform 0.2s ease-in-out;
 }
+
+.policycloud-marketplace.description
+  > .content
+  > .information
+  > .gallery
+  > .slider
+  > .item
+  > img:active,
+.policycloud-marketplace.description
+  > .content
+  > .information
+  > .gallery
+  > .slider
+  > .item
+  > video:active {
+  pointer-events: none;
+}
+
 .policycloud-marketplace.description
   > .content
   > .information
@@ -705,12 +744,24 @@
   > .item
   > .toolbar {
   display: none;
+}
+
+.policycloud-marketplace.modal.gallery .content {
+  overflow: hidden;
 }
 
 .policycloud-marketplace.modal.gallery .content > div {
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: black;
+}
+
+.policycloud-marketplace.modal.gallery .content video.large {
+  min-width: 600px;
+  width: 100%;
+  height: 100%;
+  max-height: 90.2vh;
 }
 
 .policycloud-marketplace.modal.gallery .toolbar {
@@ -935,6 +986,7 @@
   height: 24px;
   width: 24px;
   margin: 0 4px 0 0 !important;
+  font-size: 14.5px;
   background-color: var(--policycloud-background-failure-outline) !important;
 }
 

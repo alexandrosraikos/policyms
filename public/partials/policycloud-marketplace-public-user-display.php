@@ -330,18 +330,18 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                     <?php
                     entity_list_html('reviews', $data['reviews'], $visitor, function ($review) use ($pages) {
                     ?>
-                        <li data-type-filter="<?php echo $review->collection ?>" data-date-updated="<?php echo strtotime($review->update_date) ?>" data-rating="<?php echo $review->rating ?>" class="visible">
+                        <li data-type-filter="<?php echo $review->description_collection ?>" data-date-updated="<?php echo strtotime($review->update_date) ?>" data-rating="<?php echo $review->rating ?>" class="visible">
                             <div class="review">
                                 <div class="rating">
                                     <span><span class="fas fa-star"></span> <?php echo $review->rating ?></span>
                                     <span>Posted <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($review->update_date))) ?></span>
                                 </div>
                                 <p>"<?php echo $review->comment ?>"</p>
-                                <a href="<?php echo $pages['description_page'] . "?did=" . $review->description_id ?>">
-                                    <h4><?php echo $review->title ?></h4>
+                                <a href="<?php echo $pages['description_page'] . "?did=" . $review->description_id ?>#reviews">
+                                    <h4><?php echo $review->description_title ?></h4>
                                 </a>
                                 <div class="metadata">
-                                    <a class="pill"><?php echo $review->collection  ?></a>
+                                    <a class="pill"><?php echo $review->description_collection  ?></a>
                                 </div>
                             </div>
                         </li>
@@ -405,7 +405,9 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                         ?>
                                             <div class="file-editor" data-name="profile-picture">
                                                 <img class="file" src="<?php echo $data['picture'] ?>" draggable="false" />
-                                                <button type="button" class="delete"><span class="fas fa-times"></span></button>
+                                                <?php if ($data['preferences']['profile_image'] != 'default_image_users') { ?>
+                                                    <button type="button" data-action="delete-picture" class="action destructive">Remove</button>
+                                                <?php } ?>
                                             </div>
                                         <?php
                                         }

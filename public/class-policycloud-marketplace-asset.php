@@ -131,8 +131,6 @@ class PolicyCloud_Marketplace_Asset
 
     protected static function handle_retrieved_file(string $name, string $category, callable $completion)
     {
-
-
         if (empty($_FILES[$name])) {
             throw new PolicyCloudMarketplaceInvalidDataException(
                 sprintf(
@@ -186,7 +184,7 @@ class PolicyCloud_Marketplace_Asset
             } else {
                 $file = [
                     'path' => $_FILES[$name]['tmp_name'],
-                    'mimetype' => $_FILES[$name]['tmp_name'],
+                    'mimetype' => $_FILES[$name]['type'],
                     'name' => $_FILES[$name]['name']
                 ];
                 self::check_specs($category, $file);

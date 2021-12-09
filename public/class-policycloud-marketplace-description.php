@@ -53,14 +53,14 @@ class PolicyCloud_Marketplace_Description
                         $this
                     );
                 } elseif (
-                    substr($file_id, 0, 5) === "file-" ||
-                    substr($file_id, 0, 6) === "image-" ||
-                    substr($file_id, 0, 6) === "video-"
+                    substr($file_id, 0, 6) === "files-" ||
+                    substr($file_id, 0, 7) === "images-" ||
+                    substr($file_id, 0, 7) === "videos-"
                 ) {
                     foreach ($this->assets as $category => $assets) {
-                        $file_category = explode('-', $file_id)[0] . 's';
+                        $file_category = explode('-', $file_id)[0];
                         if ($category == $file_category) {
-                            foreach ($assets as $type => $asset) {
+                            foreach ($assets as $asset) {
                                 $id = explode('-', $file_id, 2)[1];
                                 if ($asset->id == $id) {
                                     $asset->update(

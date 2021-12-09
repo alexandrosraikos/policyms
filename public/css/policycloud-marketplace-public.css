@@ -20,14 +20,18 @@
   --policycloud-highlight-color-light: #00bdf5;
   --policycloud-border-color-light: rgba(0, 0, 0, 0.1);
   --policycloud-background-color: rgba(253, 253, 253);
-  --policycloud-background-notice: lightblue;
-  --policycloud-background-notice-outline: rgb(52, 111, 131);
-  --policycloud-background-failure: #ffe8e8;
-  --policycloud-background-failure-outline: #7f1010;
+  --policycloud-background-notice: var(--policycloud-highlight-color-mid);
+  --policycloud-background-notice-outline: var(
+    --policycloud-highlight-color-mid
+  );
+  --policycloud-background-failure: #e73d3d;
+  --policycloud-background-failure-outline: #e73d3d;
   --policycloud-background-warning: #fffce8;
   --policycloud-background-warning-outline: #dfaf2b;
-  --policycloud-background-success: #ecffe8;
-  --policycloud-background-success-outline: #3c5e21;
+  --policycloud-background-success: var(--policycloud-highlight-color-light);
+  --policycloud-background-success-outline: var(
+    --policycloud-highlight-color-light
+  );
 }
 
 /* Links & buttons */
@@ -59,7 +63,7 @@
   border: 1px solid var(--policycloud-background-notice-outline);
   border-radius: 8px;
   background: var(--policycloud-background-notice) !important;
-  color: var(--policycloud-text-color) !important;
+  color: var(--policycloud-text-color-invert) !important;
   font-weight: 500;
   transition: all 0.2s ease-in-out;
 }
@@ -67,13 +71,13 @@
 .policycloud-marketplace button.action.destructive {
   background-color: var(--policycloud-background-failure) !important;
   border-color: var(--policycloud-background-failure-outline);
-  color: var(--policycloud-background-failure-outline) !important;
+  color: var(--policycloud-text-color-invert) !important;
 }
 
 .policycloud-marketplace button.action.productive {
   background-color: var(--policycloud-background-success) !important;
   border-color: var(--policycloud-background-success-outline);
-  color: var(--policycloud-background-success-outline) !important;
+  color: var(--policycloud-text-color-invert) !important;
 }
 
 .policycloud-marketplace button.action:hover {
@@ -201,11 +205,12 @@
   display: inline-block !important;
   padding: 0 10px;
   border: 1px solid var(--policycloud-background-notice-outline);
-  color: var(--policycloud-text-color);
+  color: var(--policycloud-text-color-invert);
 }
 
 .policycloud-marketplace span.label.success {
   background-color: var(--policycloud-background-success);
+  color: var(--policycloud-text-color-invert);
   border: 1px solid var(--policycloud-background-success-outline);
 }
 
@@ -631,12 +636,17 @@
   width: 100%;
   max-width: 100%;
   font-weight: bold;
-  background-color: lightblue;
+  background-color: var(--policycloud-highlight-color-light);
+  color: var(--policycloud-text-color-invert);
   text-align: center;
   margin: 25px auto;
   border-radius: 8px;
   padding: 10px 15px;
   position: relative;
+}
+
+.policycloud-marketplace-notice p {
+  margin: 5px;
 }
 
 .policycloud-marketplace-alert-close {

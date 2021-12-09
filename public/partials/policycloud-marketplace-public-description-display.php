@@ -401,7 +401,25 @@ function description_editor_html(PolicyCloud_Marketplace_Description $descriptio
                         <h3>
                             <?= ucfirst($category) ?>
                         </h3>
-                        <p><?= $upload_notice ?></p>
+                        <?php
+                        if (!empty($assets)) {
+                            foreach ($assets as $asset) { ?>
+                                <div class="asset-editor" data-asset-type="<?= $category ?>" data-asset-id="<?= $asset->id ?>">
+                                    <div>
+                                        <button class="delete" data-asset-category="<?= $category ?>" data-asset-id="<?= $asset->id ?>" data-action="delete">
+                                            <span class="fas fa-times"></span>
+                                        </button>
+                                        <?= $asset->filename . ' (' . $asset->size . ')' ?>
+                                    </div>
+                                    <label for="<?= $category . '-' . $asset->id ?>">
+                                        Replace file <?= $upload_notice ?>:
+                                    </label>
+                                    <input type="file" name="<?= $category . '-' . $asset->id ?>" multiple />
+                                </div>
+                        <?php
+                            }
+                        } ?>
+                        Upload new files <?= $upload_notice ?>:
                         <div class="chooser">
                             <input type="file" name="<?= $category ?>[]" multiple />
                         </div>
@@ -591,8 +609,8 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
             ?>
                 <div class="policycloud-marketplace-notice" id="policycloud-marketplace-description-approval">
                     <p>This asset is not yet accessible from other authorized Marketplace users.</p>
-                    <button class="action productive" data-response="approve">Approve</button>
                     <button class="action destructive" data-response="disapprove">Delete</button>
+                    <button class="action" data-response="approve">Approve</button>
                 </div>
             <?php
             }
@@ -663,7 +681,7 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                         <?= $description->metadata['views'] ?> views
                     </span>
                     <span class="last-update-date">
-                        Last updated <?= time_elapsed_string(date('Y-m-d H:i:s', strtotime($description->metadata['uploadDate']))) ?>
+                        Last updated <?= time_elapsed_string(date('Y-m-d H:i:s', strtotime($description->metadata['updateDate']))) ?>
                     </span>
                 </div>
             </header>
@@ -673,7 +691,7 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                     <?php
                     if ($permissions['authenticated']) {
                         asset_viewer('Files', 'files', $description->assets['files'], (empty($description->assets['files'])));
-                        asset_viewer('Video', 'video', $description->assets['videos'], (empty($description->assets['videos'])));
+                        asset_viewer('Videos', 'videos', $description->assets['videos'], (empty($description->assets['videos'])));
                         asset_viewer('Images (Gallery)', 'images', $description->assets['images'], (empty($description->assets['images'])));
                     } else {
                         show_lock($pages['login_page'], 'view and download files');
@@ -712,11 +730,47 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                         <div class="slider">
                             <?php
                             if ($permissions['authenticated']) {
+                                if (!empty($description->assets['videos'])) {
+                                    foreach ($description->assets['videos'] as $video) { ?>
+                                        <div class="item" data-asset-category="videos" data-asset-id="<?= $video->id ?>">
+                                            <video data-asset-category="videos" data-asset-id="<?= $video->id ?>" controls preload="none" poster="
+                                                <?=
+                                                (PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'marketplace_host')
+                                                    . '/videos/' . $video->id . '?thumbnail=1'
+                                                )
+                                                ?>">
+                                                <source src=" 
+                                                <?=
+                                                (PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'marketplace_host')
+                                                    . '/videos/' . $video->id
+                                                )
+                                                ?>">
+                                            </video>
+                                            <?php
+                                            if ($permissions['provider']) {
+                                            ?>
+                                                <div class="toolbar">
+                                                    <span>
+                                                        <?= $video->filename ?>
+                                                        (<?= $video->size ?>)
+                                                    </span>
+                                                    <div class="tools">
+                                                        <button data-action="delete" data-asset-category="images" data-asset-id="<?= $video->id ?>" class="action outlined">
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            <?php
+                                            } ?>
+                                        </div>
+                                    <?php
+                                    }
+                                }
                                 if (!empty($image_blobs)) {
                                     foreach ($image_blobs as $key => $image_blob) { ?>
                                         <div class="item" data-asset-id="<?= $description->assets['images'][$key]->id ?>">
                                             <?php
-                                            echo '<img src="data:image/*;base64,' . base64_encode($image_blob) . '" data-image-id="' . $description->assets['images'][$key]->id . '" draggable="false" />';
+                                            echo '<img src="data:image/*;base64,' . base64_encode($image_blob) . '" data-asset-category="images" data-asset-id="' . $description->assets['images'][$key]->id . '" draggable="false" />';
                                             if ($permissions['provider']) {
                                             ?>
                                                 <div class="toolbar">
@@ -738,8 +792,6 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                                                 </div>
                                             <?php
                                             } ?>
-
-
                                         </div> <?php
                                             }
                                         } else {
