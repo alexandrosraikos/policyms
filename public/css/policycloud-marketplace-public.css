@@ -553,12 +553,13 @@
 */
 .policycloud-marketplace.modal > .container > .content {
   /* Display & Box Model */
-  max-height: 90vh;
+  max-height: 90.2vh;
   overflow-x: hidden;
   overflow-y: auto;
   margin: 0;
   background-color: var(--policycloud-background-color);
   border-radius: 12px;
+  perspective: 1px;
 }
 
 /**

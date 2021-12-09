@@ -64,7 +64,7 @@
 }
 
 .policycloud-marketplace.descriptions-grid > ul > li > a > .cover > img {
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .policycloud-marketplace.descriptions-grid > ul > li > a > .cover > div {
@@ -91,7 +91,7 @@
 
 .policycloud-marketplace.descriptions-grid > ul > li > a img {
   /* Display & Box Model */
-  max-height: 150px;
+  height: 150px;
   width: 100%;
 
   /* Other */
@@ -834,57 +834,22 @@
   border: none;
 }
 
-.policycloud-marketplace.description.editor .fieldset {
+.policycloud-marketplace.description.editor fieldset {
   border: none;
 }
 
-.policycloud-marketplace.description.editor .file {
+.policycloud-marketplace.description.editor fieldset[name="uploads"] .chooser {
   display: flex;
-  width: 100;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 14px;
-  border: 1px solid var(--policycloud-border-color-light);
-  border-radius: 12px;
-  padding: 7.5px 15px;
-  margin: 10px 0;
-}
-
-.policycloud-marketplace.description.editor .file:last-of-type {
-  margin-bottom: 20px;
-}
-
-.policycloud-marketplace.description.editor .file > * {
-  margin-right: 15px;
-}
-
-.policycloud-marketplace.description.editor .file > div {
-  display: flex;
-  justify-content: flex-start;
   align-items: center;
 }
 
-.policycloud-marketplace.description.editor .file input[type="file"] {
-  margin-bottom: 0;
-}
-
-.policycloud-marketplace.description.editor .file .delete {
-  padding: 0px 6px;
-  margin-right: 15px;
-  display: block;
-  border-radius: 100px;
-  border: none;
-  font-size: 14px;
-  background-color: var(--policycloud-background-failure-outline) !important;
-  color: var(--policycloud-text-color-invert) !important;
-  transition: all 0.2s ease-in-out;
-}
-
-.policycloud-marketplace.description.editor .file .delete:hover {
-  border: none;
-  transform: scale(0.9);
-  transition: all 0.2s ease-in-out;
+.policycloud-marketplace.description.editor
+  fieldset[name="uploads"]
+  .chooser
+  input {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
 }
 
 @media screen and (max-width: 650px) {

@@ -401,8 +401,10 @@ function description_editor_html(PolicyCloud_Marketplace_Description $descriptio
                         <h3>
                             <?= ucfirst($category) ?>
                         </h3>
-                        <label for="file">Upload new file <?= $upload_notice ?>:</label>
-                        <input type="file" name="<?= $category ?>[]" multiple />
+                        <p><?= $upload_notice ?></p>
+                        <div class="chooser">
+                            <input type="file" name="<?= $category ?>[]" multiple />
+                        </div>
                     <?php
                     }
                     ?>
@@ -711,8 +713,7 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                             <?php
                             if ($permissions['authenticated']) {
                                 if (!empty($image_blobs)) {
-                                    foreach ($image_blobs as $key => $image_blob) {
-                            ?>
+                                    foreach ($image_blobs as $key => $image_blob) { ?>
                                         <div class="item" data-asset-id="<?= $description->assets['images'][$key]->id ?>">
                                             <?php
                                             echo '<img src="data:image/*;base64,' . base64_encode($image_blob) . '" data-image-id="' . $description->assets['images'][$key]->id . '" draggable="false" />';
@@ -730,10 +731,6 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                                                         <?php } else { ?>
                                                             <button data-action="set-default" data-asset-id="<?= $description->assets['images'][$key]->id ?>" class="action outlined">Set as default image</button>
                                                         <?php } ?>
-                                                        <!-- <form class="replace">
-                                                            <input type="file" style="display:none" name="<?= 'images-' . $description->assets['images'][$key]->id ?>" required />
-                                                            <button type=submit class="action outlined">Replace</button>
-                                                        </form> -->
                                                         <button data-action="delete" data-asset-category="images" data-asset-id="<?= $description->assets['images'][$key]->id ?>" class="action outlined">
                                                             Delete
                                                         </button>
