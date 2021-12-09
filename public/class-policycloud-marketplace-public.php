@@ -449,7 +449,7 @@ class PolicyCloud_Marketplace_Public
                     add_filter(
                         'pre_get_document_title',
                         function ($title) use ($user) {
-                            $title = $user->informaton['name'] . ' ' . $user->information['surname'];
+                            $title = $user->information['name'] . ' ' . $user->information['surname'];
                             return $title;
                         },
                         9999,
