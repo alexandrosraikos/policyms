@@ -83,9 +83,10 @@ function policycloud_marketplace_plugin_login_page_selector()
     ]);
 ?>
     <select name="policycloud_marketplace_plugin_settings[login_page]">
+        <option value="" selected>-</option>
         <?php
         foreach ($pages as $page) {
-            echo '<option value="' . get_page_link($page->ID) . '" '.($options['login_page']==get_page_link($page->ID) ? 'selected' : '').'>' . $page->post_title . '</option>';
+            echo '<option value="' . $page->ID . '" ' . (($options['login_page'] == $page->ID) ? 'selected' : '') . '>' . $page->post_title . '</option>';
         }
         ?>
     </select>
@@ -101,9 +102,10 @@ function policycloud_marketplace_plugin_registration_page_selector()
     ]);
 ?>
     <select name="policycloud_marketplace_plugin_settings[registration_page]">
+        <option value="" selected>-</option>
         <?php
         foreach ($pages as $page) {
-            echo '<option value="' . get_page_link($page->ID) . '" '.($options['registration_page']==get_page_link($page->ID) ? 'selected' : '').'>' . $page->post_title . '</option>';
+            echo '<option value="' . ($page->ID) . '" ' . ($options['registration_page'] == ($page->ID) ? 'selected' : '') . '>' . $page->post_title . '</option>';
         }
         ?>
     </select>
@@ -120,9 +122,10 @@ function policycloud_marketplace_plugin_account_page_selector()
     ]);
 ?>
     <select name="policycloud_marketplace_plugin_settings[account_page]">
+        <option value="" selected>-</option>
         <?php
         foreach ($pages as $page) {
-            echo '<option value="' . get_page_link($page->ID) . '" '.($options['account_page']==get_page_link($page->ID) ? 'selected' : '').'>' . $page->post_title . '</option>';
+            echo '<option value="' . ($page->ID) . '" ' . ($options['account_page'] == ($page->ID) ? 'selected' : '') . '>' . $page->post_title . '</option>';
         }
         ?>
     </select>
@@ -136,9 +139,10 @@ function policycloud_marketplace_plugin_menu_selector()
     $menus = get_registered_nav_menus();
 ?>
     <select name="policycloud_marketplace_plugin_settings[selected_menu]">
+        <option value="" selected>-</option>
         <?php
         foreach ($menus as $location => $description) {
-            echo '<option value="' . $location . '" '.($options['selected_menu']==$location ? 'selected' : '').'>' . $description. '</option>';
+            echo '<option value="' . $location . '" ' . ($options['selected_menu'] == $location ? 'selected' : '') . '>' . $description . '</option>';
         }
         ?>
     </select>
@@ -160,9 +164,10 @@ function policycloud_marketplace_plugin_password_reset_page_selector()
     ]);
 ?>
     <select name="policycloud_marketplace_plugin_settings[password_reset_page]">
+        <option value="" selected>-</option>
         <?php
         foreach ($pages as $page) {
-            echo '<option value="' . get_page_link($page->ID) . '" '.($options['password_reset_page']==get_page_link($page->ID) ? 'selected' : '').'>' . $page->post_title . '</option>';
+            echo '<option value="' . ($page->ID) . '" ' . ($options['password_reset_page'] == ($page->ID) ? 'selected' : '') . '>' . $page->post_title . '</option>';
         }
         ?>
     </select>
@@ -187,9 +192,10 @@ function policycloud_marketplace_plugin_description_page_selector()
     ]);
 ?>
     <select name="policycloud_marketplace_plugin_settings[description_page]">
+        <option value="" selected>-</option>
         <?php
         foreach ($pages as $page) {
-            echo '<option value="' . get_page_link($page->ID) . '" '.($options['description_page']==get_page_link($page->ID) ? 'selected' : '').'>' . $page->post_title . '</option>';
+            echo '<option value="' . ($page->ID) . '" ' . ($options['description_page'] == ($page->ID) ? 'selected' : '') . '>' . $page->post_title . '</option>';
         }
         ?>
     </select>
@@ -205,13 +211,14 @@ function policycloud_marketplace_plugin_archive_page_selector()
     ]);
 ?>
     <select name="policycloud_marketplace_plugin_settings[archive_page]">
+        <option value="" selected>-</option>
         <?php
         foreach ($pages as $page) {
-            echo '<option value="' . get_page_link($page->ID) . '" '.($options['archive_page']==get_page_link($page->ID) ? 'selected' : '').'>' . $page->post_title . '</option>';
+            echo '<option value="' . ($page->ID) . '" ' . ($options['archive_page'] == ($page->ID) ? 'selected' : '') . '>' . $page->post_title . '</option>';
         }
         ?>
     </select>
-    <p>Select the page where you've inserted the <em>[policycloud-marketplace-description-archive]</em> shortcode.</p>
+    <p>Select the page where you've inserted the <em>[.policycloud-marketplace.descriptions.archive]</em> shortcode.</p>
 <?php
 }
 
@@ -223,9 +230,10 @@ function policycloud_marketplace_plugin_upload_page_selector()
     ]);
 ?>
     <select name="policycloud_marketplace_plugin_settings[upload_page]">
+        <option value="" selected>-</option>
         <?php
         foreach ($pages as $page) {
-            echo '<option value="' . get_page_link($page->ID) . '" '.($options['upload_page']==get_page_link($page->ID) ? 'selected' : '').'>' . $page->post_title . '</option>';
+            echo '<option value="' . ($page->ID) . '" ' . ($options['upload_page'] == ($page->ID) ? 'selected' : '') . '>' . $page->post_title . '</option>';
         }
         ?>
     </select>

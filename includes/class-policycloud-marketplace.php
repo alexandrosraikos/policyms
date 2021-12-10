@@ -125,6 +125,7 @@ class PolicyCloud_Marketplace
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-public.php';
 
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-policycloud-marketplace-account.php';
+
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-policycloud-marketplace-exceptions.php';
 
         $this->loader = new PolicyCloud_Marketplace_Loader();
@@ -183,7 +184,7 @@ class PolicyCloud_Marketplace
 
         // Support for user accounts.
         $this->loader->add_action('init', $plugin_public, 'add_accounts_shortcodes');
-        $this->loader->add_filter('wp_nav_menu_items', $plugin_public, 'add_conditional_access_menu_item', 10, 2);
+        $this->loader->add_filter('wp_nav_menu_items', $plugin_public, 'add_menu_items', 10, 2);
         $this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_registration', $plugin_public, 'account_user_registration_handler');
         $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_registration', $plugin_public, 'account_user_registration_handler');
         $this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_authentication', $plugin_public, 'account_user_authentication_handler');
@@ -209,6 +210,22 @@ class PolicyCloud_Marketplace
         $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_description_approval', $plugin_public, 'description_approval_handler');
         $this->loader->add_action('wp_ajax_policycloud_marketplace_description_deletion', $plugin_public, 'description_deletion_handler');
         $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_description_deletion', $plugin_public, 'description_deletion_handler');
+
+        // Support for descriptions' assets.
+        $this->loader->add_action('wp_ajax_policycloud_marketplace_asset_download', $plugin_public, 'asset_download_handler');
+        $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_asset_download', $plugin_public, 'asset_download_handler');
+        $this->loader->add_action('wp_ajax_policycloud_marketplace_set_description_image', $plugin_public, 'set_description_image_handler');
+        $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_set_description_image', $plugin_public, 'set_description_image_handler');
+        $this->loader->add_action('wp_ajax_policycloud_marketplace_remove_description_image', $plugin_public, 'remove_description_image_handler');
+        $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_remove_description_image', $plugin_public, 'remove_description_image_handler');
+
+        // Support for descriptions' reviews.
+        $this->loader->add_action('wp_ajax_policycloud_marketplace_get_description_reviews', $plugin_public, 'get_description_reviews_handler');
+        $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_get_description_reviews', $plugin_public, 'get_description_reviews_handler');
+        $this->loader->add_action('wp_ajax_policycloud_marketplace_create_review', $plugin_public, 'create_review_handler');
+        $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_create_review', $plugin_public, 'create_review_handler');
+        $this->loader->add_action('wp_ajax_policycloud_marketplace_delete_review', $plugin_public, 'delete_review_handler');
+        $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_delete_review', $plugin_public, 'delete_review_handler');
     }
 
     /**
@@ -312,7 +329,7 @@ class PolicyCloud_Marketplace
         // Contact Marketplace login API endpoint.
         $curl = curl_init();
         curl_setopt_array($curl, [
-            CURLOPT_URL => 'https://' . $options['marketplace_host'] . $uri,
+            CURLOPT_URL => $options['marketplace_host'] . $uri,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -342,7 +359,7 @@ class PolicyCloud_Marketplace
                         return $decoded;
                     } else {
                         curl_close($curl);
-                        throw new PolicyCloudMarketplaceInvalidDataException('PolicyCloud Marketplace error when contacting '. $uri .': '.$decoded['message']);
+                        throw new PolicyCloudMarketplaceInvalidDataException('PolicyCloud Marketplace error when contacting ' . $uri . ': ' . $decoded['message']);
                     }
                 } else {
                     curl_close($curl);

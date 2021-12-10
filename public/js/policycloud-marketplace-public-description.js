@@ -19,9 +19,12 @@
      */
 
     // Get image id array.
-    const imageReference = Array.from(
-      $("#policycloud-marketplace-asset .gallery img").map((index, element) => {
-        return $(element).data("image-id");
+    const itemReference = Array.from(
+      $(".policycloud-marketplace.description .gallery img, .policycloud-marketplace.description .gallery video").map((index, element) => {
+        return {
+          category: $(element).data("asset-category"),
+          id: $(element).data("asset-id")
+        };
       })
     );
 
@@ -35,17 +38,52 @@
     $(".policycloud-marketplace .file-viewer > button").click(toggleFileList);
 
     // Toggle the gallery modal visibility.
-    $("#policycloud-marketplace-asset .gallery img").click((e) => {
+    $(".policycloud-marketplace.description .gallery .item").click((e) => {
+      e.preventDefault();
+      e.stopPropagation();
       new Modal(
         "gallery",
-        Array.from(
-          $("#policycloud-marketplace-asset .gallery img").map(
-            (index, element) => {
-              return $(element).clone()[0];
-            }
-          )
+        itemReference.map(
+          (itemData) => {
+            return `<div data-asset-category="` + itemData.category + `" data-asset-id="` + itemData.id + `">
+            </div>`;
+          }
         ),
-        imageReference.indexOf($(e.target).data("image-id"))
+        itemReference.findIndex((itemData) => {
+          return itemData.id == $(e.target).first().data('asset-id')
+        }),
+        (itemContainer) => {
+          const type = $(itemContainer).data('asset-category');
+          const fileIdentifier = $(itemContainer).data('asset-id');
+
+          if (type == 'images') {
+            makeWPRequest(
+              this,
+              "policycloud_marketplace_asset_download",
+              DescriptionEditingProperties.assetDownloadNonce,
+              {
+                'description_id': DescriptionEditingProperties.descriptionID,
+                'category': type,
+                'file_id': fileIdentifier,
+                'download': false,
+              },
+              (data) => {
+                const fullQualityImage = '<img src="' + data.url + '" />';
+                const toolbar = $('.policycloud-marketplace.description .gallery img[data-asset-id="' + fileIdentifier + '"] + .toolbar');
+                $(itemContainer).prepend(fullQualityImage);
+                $(itemContainer).append(toolbar.clone());
+              }
+            );
+          }
+          else if (type == 'videos') {
+            const videoPlayer = $('.policycloud-marketplace.description .gallery video[data-asset-id="' + fileIdentifier + '"]');
+            const largeVideoPlayer = videoPlayer.clone();
+            largeVideoPlayer.addClass("large");
+            $(itemContainer).prepend(largeVideoPlayer);
+            const toolbar = $('.policycloud-marketplace.description .gallery video[data-asset-id="' + fileIdentifier + '"] + .toolbar');
+            $(itemContainer).append(toolbar.clone());
+          }
+        }
       );
     });
 
@@ -76,7 +114,7 @@
       formData.append("subsequent_action", "description-editing");
 
       makeWPRequest(
-        "#policycloud-marketplace-description-editing button[type=submit]",
+        ".policycloud-marketplace.description.editor button[type=submit]",
         "policycloud_marketplace_description_editing",
         DescriptionEditingProperties.nonce,
         formData,
@@ -97,7 +135,7 @@
 
       if (window.confirm("Are you sure you want to delete this description?")) {
         makeWPRequest(
-          '#policycloud-marketplace-description-editing button[data-action="delete-description"]',
+          '.policycloud-marketplace.description.editor button[data-action="delete-description"]',
           "policycloud_marketplace_description_deletion",
           DescriptionEditingProperties.deletionNonce,
           {
@@ -123,8 +161,8 @@
         // Add loading class.
         $(this).addClass("loading");
 
-        const type = $(this).closest(".file").data("file-type");
-        const fileIdentifier = $(this).closest(".file").data("file-identifier");
+        const type = $(e.target).data("asset-category");
+        const fileIdentifier = $(e.target).data("asset-id");
 
         // Prepare form data.
         var formData = new FormData();
@@ -137,16 +175,16 @@
         formData.append("file-identifier", fileIdentifier);
 
         makeWPRequest(
-          '#policycloud-marketplace-description-editing .file[data-file-identifier="' +
+          '.policycloud-marketplace.description.editor .file[data-file-identifier="' +
           fileIdentifier +
           '"] button.delete',
           "policycloud_marketplace_description_editing",
           DescriptionEditingProperties.nonce,
           formData,
           () => {
-            $('img[data-image-id="' + fileIdentifier + '"').remove();
-            $('*[data-file-id="' + fileIdentifier + '"').remove();
-            $(this).closest(".file").remove();
+            Modal.kill('gallery');
+            $('*[data-image-id="' + fileIdentifier + '"').remove();
+            $('*[data-asset-id="' + fileIdentifier + '"').remove();
           }
         );
       }
@@ -167,14 +205,14 @@
         "description_id",
         DescriptionEditingProperties.descriptionID
       );
-      formData.append("subsequent_action", "asset-download");
-      formData.append("file-type", type);
-      formData.append("file-identifier", fileIdentifier);
+      formData.append("category", type);
+      formData.append("file_id", fileIdentifier);
+      formData.append("download", true);
 
       makeWPRequest(
         this,
-        "policycloud_marketplace_description_editing",
-        DescriptionEditingProperties.nonce,
+        "policycloud_marketplace_asset_download",
+        DescriptionEditingProperties.assetDownloadNonce,
         formData,
         (data) => {
           var a = document.createElement("a");
@@ -183,7 +221,7 @@
             "id",
             "policycloud-marketplace-file-" + fileIdentifier + "-download"
           );
-          $("#policycloud-marketplace-asset .file-viewer").append(a);
+          $(".policycloud-marketplace.description .file-viewer").append(a);
           $(
             "a#policycloud-marketplace-file-" + fileIdentifier + "-download"
           ).attr("download", "");
@@ -231,6 +269,116 @@
       }
     }
 
+    function highlightRatingStars(e) {
+      e.preventDefault();
+      const eventStar = $(e.target);
+      eventStar.attr('checked', true);
+      $('.policycloud-marketplace.description .reviews .stars input[type="radio"]').each((index, element) => {
+        if (e.type == 'click' || e.type == 'mouseover') {
+          if ($(element).val() <= eventStar.val()) {
+            $(element).addClass('checked');
+          } else {
+            $(element).removeClass('checked');
+          }
+        }
+        else if (e.type == 'mouseout') {
+        }
+      });
+    }
+
+    function changeReviewPage(e) {
+      e.preventDefault();
+      if (!$(e.target).hasClass('active')) {
+        $(e.target).data('page-number');
+        $(".policycloud-marketplace.description .reviews .pagination button").removeClass('active');
+        $(e.target).addClass("active");
+        makeWPRequest(
+          e.target,
+          'policycloud_marketplace_get_description_reviews',
+          DescriptionEditingProperties.reviewsNonce,
+          {
+            description_id: DescriptionEditingProperties.descriptionID,
+            page: $(e.target).data('page-number')
+          },
+          (data) => {
+            $(".policycloud-marketplace.description .reviews ul").remove();
+            $(".policycloud-marketplace.description .reviews:last-child").prepend(data);
+          }
+        )
+      }
+    }
+
+    function createReview(e) {
+      e.preventDefault();
+      var formData = new FormData($(e.target)[0]);
+      formData.append(
+        "description_id",
+        DescriptionEditingProperties.descriptionID
+      );
+
+      makeWPRequest(
+        ".policycloud-marketplace .reviews form button[type=\"submit\"]",
+        'policycloud_marketplace_create_review',
+        DescriptionEditingProperties.createReviewNonce,
+        formData,
+        () => {
+          window.location.reload()
+        }
+      )
+    }
+
+    function deleteReview(e) {
+      e.preventDefault();
+      if (window.confirm('Are you sure you would like to delete this review?')) {
+        makeWPRequest(
+          e.target,
+          'policycloud_marketplace_delete_review',
+          DescriptionEditingProperties.deleteReviewNonce,
+          {
+            "description_id": DescriptionEditingProperties.descriptionID
+          },
+          () => {
+            window.location.reload()
+          }
+        )
+      }
+    }
+
+    function setDefaultImage(e) {
+      e.preventDefault();
+      makeWPRequest(
+        e.target,
+        'policycloud_marketplace_set_description_image',
+        DescriptionEditingProperties.setDefaultImageNonce,
+        {
+          "description_id": DescriptionEditingProperties.descriptionID,
+          "image_id": $(e.target).data('asset-id')
+        },
+        () => {
+          const button = $('.gallery .toolbar button[data-action="set-default"][data-asset-id="' + $(e.target).data('asset-id') + '"]');
+          button.data("action", "remove-default");
+          button.html('Remove default image')
+        }
+      )
+    }
+
+    function removeDefaultImage(e) {
+      e.preventDefault();
+      makeWPRequest(
+        e.target,
+        'policycloud_marketplace_remove_description_image',
+        DescriptionEditingProperties.removeDefaultImageNonce,
+        {
+          "description_id": DescriptionEditingProperties.descriptionID
+        },
+        () => {
+          const button = $('.gallery .toolbar button[data-action="remove-default"][data-asset-id="' + $(e.target).data('asset-id') + '"]');
+          button.data("action", "set-default");
+          button.html('Set as default image')
+        }
+      )
+    }
+
     /**
      *
      * Asset editing interface actions & event listeners.
@@ -238,32 +386,25 @@
      */
 
     // Toggle asset editor visibility.
-    $("#policycloud-marketplace-asset header .show-editor-modal").click((e) => {
+    $(".policycloud-marketplace.description button[data-action=\"edit\"]").click((e) => {
       e.preventDefault();
       new Modal(
-        "information-editing",
-        $("#policycloud-marketplace-description-editing").clone()[0]
+        "description-editor",
+        $(".policycloud-marketplace.description.editor").clone()[0]
       );
     });
 
     // Submit the edited information.
     $(document).on(
       "submit",
-      "#policycloud-marketplace-description-editing form",
+      ".policycloud-marketplace.description.editor form",
       updateDescription
     );
 
     $(document).on(
       "click",
-      '#policycloud-marketplace-description-editing button[data-action="delete-description"]',
+      '.policycloud-marketplace.description.editor button[data-action="delete-description"]',
       deleteDescription
-    );
-
-    // Delete file.
-    $(document).on(
-      "click",
-      "#policycloud-marketplace-description-editing .file button.delete",
-      deleteAsset
     );
 
     // Approve description (admin)
@@ -276,8 +417,57 @@
     // Download file.
     $(document).on(
       "click",
-      "#policycloud-marketplace-description .file-viewer .download",
+      ".policycloud-marketplace.description .file-viewer .download",
       downloadAsset
+    );
+
+    // Change rating page.
+    $(document).on(
+      'click',
+      '.policycloud-marketplace.description .reviews button[data-action="change-review-page"]',
+      changeReviewPage
+    )
+
+    // Highlight rating stars.
+    $(document).on(
+      "click mouseover mouseout",
+      '.policycloud-marketplace.description .reviews .stars input[type="radio"]',
+      highlightRatingStars
+    )
+
+    // Submit new review.
+    $(document).on(
+      'submit',
+      '.policycloud-marketplace .reviews form',
+      createReview
+    )
+
+    // Delete a review.
+    $(document).on(
+      'click',
+      '.policycloud-marketplace .reviews form button[data-action="delete-review"]',
+      deleteReview
+    )
+
+    // Set default image.
+    $(document).on(
+      "click",
+      ".policycloud-marketplace.modal.gallery .toolbar button[data-action=\"set-default\"]",
+      setDefaultImage
+    );
+
+    // Remove default image.
+    $(document).on(
+      "click",
+      ".policycloud-marketplace.modal.gallery .toolbar button[data-action=\"remove-default\"]",
+      removeDefaultImage
+    );
+
+    // Delete file.
+    $(document).on(
+      "click",
+      ".policycloud-marketplace.modal.gallery.toolbar button[data-action=\"delete\"], .policycloud-marketplace.description.editor .asset-editor button[data-action=\"delete\"]",
+      deleteAsset
     );
   });
 })(jQuery);

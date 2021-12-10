@@ -77,7 +77,17 @@ class PolicyCloud_Marketplace_Admin
 
     function policycloud_marketplace_validate_plugin_settings($input)
     {
-        $output['marketplace_host'] = sanitize_text_field($input['marketplace_host']);
+        if (!function_exists('force_protocol_prefix')) {
+            function force_protocol_prefix($url)
+            {
+                if (!preg_match("~^(?:f|ht)tps?://~i", $url)) {
+                    $url = "https://" . $url;
+                }
+                return $url;
+            }
+        }
+
+        $output['marketplace_host'] = esc_url(force_protocol_prefix($input['marketplace_host']));
         $output['api_access_token'] = sanitize_text_field($input['api_access_token']);
         $output['jwt_key'] = sanitize_text_field($input['jwt_key']);
         $output['encryption_key'] = sanitize_text_field($input['encryption_key']);
@@ -95,7 +105,7 @@ class PolicyCloud_Marketplace_Admin
 
     function register_settings()
     {
-        
+
         register_setting(
             'policycloud_marketplace_plugin_settings',
             'policycloud_marketplace_plugin_settings',
@@ -158,7 +168,7 @@ class PolicyCloud_Marketplace_Admin
 
         add_settings_field(
             'login_page',
-            'Redirect to Log In',
+            'Log In page',
             'policycloud_marketplace_plugin_login_page_selector',
             'policycloud_marketplace_plugin',
             'section_two'
@@ -166,7 +176,7 @@ class PolicyCloud_Marketplace_Admin
 
         add_settings_field(
             'registration_page',
-            'Redirect to Registration',
+            'Registration page',
             'policycloud_marketplace_plugin_registration_page_selector',
             'policycloud_marketplace_plugin',
             'section_two'
@@ -205,7 +215,7 @@ class PolicyCloud_Marketplace_Admin
 
         add_settings_field(
             'description_page',
-            'Redirect to single Description page',
+            'Description page',
             'policycloud_marketplace_plugin_description_page_selector',
             'policycloud_marketplace_plugin',
             'section_three'
@@ -213,7 +223,7 @@ class PolicyCloud_Marketplace_Admin
 
         add_settings_field(
             'archive_page',
-            'Redirect to Assets archive page',
+            'Description archive page',
             'policycloud_marketplace_plugin_archive_page_selector',
             'policycloud_marketplace_plugin',
             'section_three'
@@ -221,13 +231,13 @@ class PolicyCloud_Marketplace_Admin
 
         add_settings_field(
             'upload_page',
-            'Redirect to Description upload',
+            'Description upload page',
             'policycloud_marketplace_plugin_upload_page_selector',
             'policycloud_marketplace_plugin',
             'section_three'
         );
     }
-      
+
     public function add_settings_page()
     {
         require_once plugin_dir_path(dirname(__FILE__)) . 'admin/partials/policycloud-marketplace-admin-display.php';

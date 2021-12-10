@@ -1,43 +1,37 @@
 <?php
-
-use PolicyCloud_Marketplace_Review as GlobalPolicyCloud_Marketplace_Review;
-
 require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-description.php';
 require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-marketplace-user.php';
 
 class PolicyCloud_Marketplace_Review
 {
 
-    public string $title;
     public string $comment;
     public int $rating;
-    public string $description_id;
+    public ?string $description_id;
+    public ?string $description_title;
+    public ?string $description_collection;
     public string $user_id;
-    public string $creation_date;
     public string $update_date;
     public int $version;
-    public string $collection;
 
     public function __construct(
-        string $title,
         string $comment,
         int $rating,
-        string $description_id,
+        ?string $description_id,
         string $user_id,
-        string $creation_date,
         string $update_date,
         int $version,
-        string $collection
+        string $description_title = null,
+        string $description_collection = null
     ) {
-        $this->title = $title;
         $this->comment = $comment;
         $this->rating = $rating;
         $this->description_id = $description_id;
+        $this->description_title = $description_title ?? null;
+        $this->description_collection = $description_collection ?? null;
         $this->user_id = $user_id;
-        $this->creation_date = $creation_date;
         $this->update_date = $update_date;
         $this->version = $version;
-        $this->collection = $collection;
     }
 
     protected static function parse(array $fetched, bool $specify_pages = true): array
@@ -53,15 +47,14 @@ class PolicyCloud_Marketplace_Review
                         return array_map(
                             function ($review) {
                                 return new PolicyCloud_Marketplace_Review(
-                                    $review['title'],
                                     $review['comment'],
                                     $review['rating'],
-                                    $review['did'],
+                                    $review['did'] ?? null,
                                     $review['username'],
-                                    $review['initial_review_date'],
                                     $review['updated_review_date'],
                                     $review['review_version'],
-                                    $review['collection']
+                                    $review['title'] ?? null,
+                                    $review['collection'] ?? null
                                 );
                             },
                             $page
@@ -77,15 +70,14 @@ class PolicyCloud_Marketplace_Review
                     return array_map(
                         function ($review) {
                             return new PolicyCloud_Marketplace_Review(
-                                $review['title'],
                                 $review['comment'],
                                 $review['rating'],
-                                $review['did'],
+                                $review['did'] ?? null,
                                 $review['username'],
-                                $review['initial_review_date'],
                                 $review['updated_review_date'],
                                 $review['review_version'],
-                                $review['collection']
+                                $review['title'] ?? null,
+                                $review['collection'] ?? null
                             );
                         },
                         $page
@@ -106,6 +98,54 @@ class PolicyCloud_Marketplace_Review
         );
 
         return self::parse($response, false);
+    }
+
+    public static function get_reviews(PolicyCloud_Marketplace_Description $description, int $page = 1)
+    {
+        $response = PolicyCloud_Marketplace::api_request(
+            'GET',
+            '/descriptions/reviews/' . $description->id . '?itemsPerPage=5&page=' . $page,
+            [],
+            PolicyCloud_Marketplace_Account::retrieve_token(),
+        );
+
+        return self::parse($response, true);
+    }
+
+    public static function update(string $description_id, int $rating, string $comment)
+    {
+        PolicyCloud_Marketplace::api_request(
+            'PUT',
+            '/descriptions/review/' . $description_id,
+            [
+                'rating' => $rating,
+                'comment' => $comment
+            ],
+            PolicyCloud_Marketplace_Account::retrieve_token(),
+        );
+    }
+
+    public static function create(string $description_id, int $rating, string $comment)
+    {
+        PolicyCloud_Marketplace::api_request(
+            'POST',
+            '/descriptions/review/' . $description_id,
+            [
+                'rating' => $rating,
+                'comment' => $comment
+            ],
+            PolicyCloud_Marketplace_Account::retrieve_token(),
+        );
+    }
+
+    public static function delete(string $description_id): void
+    {
+        PolicyCloud_Marketplace::api_request(
+            'DELETE',
+            '/descriptions/review/' . $description_id,
+            [],
+            PolicyCloud_Marketplace_Account::retrieve_token(),
+        );
     }
 
     public function get_author(): PolicyCloud_Marketplace_User

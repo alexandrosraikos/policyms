@@ -11,14 +11,17 @@ class PolicyCloud_Marketplace_Description
 
     public array $information;
 
+    public string $image_id;
+
     public array $metadata;
 
     public ?array $assets;
 
-    public ?array $reviews;
+    public ?PolicyCloud_Marketplace_Review $user_review;
 
     public function __construct(string $id, ?array $fetched = null)
     {
+
         if (empty($fetched)) {
             $response = PolicyCloud_Marketplace::api_request(
                 'GET',
@@ -37,11 +40,11 @@ class PolicyCloud_Marketplace_Description
 
     public function update(array $information, ?array $file_identifiers = null)
     {
-
         if (!empty($file_identifiers)) {
             foreach ($file_identifiers as $file_id) {
                 // Check for new files.
-                if ($file_id == 'files' ||
+                if (
+                    $file_id == 'files' ||
                     $file_id == 'images' ||
                     $file_id == 'videos'
                 ) {
@@ -49,14 +52,15 @@ class PolicyCloud_Marketplace_Description
                         $file_id,
                         $this
                     );
-                } elseif (substr($file_id, 0, 5) === "file-" ||
-                    substr($file_id, 0, 6) === "image-" ||
-                    substr($file_id, 0, 6) === "video-"
+                } elseif (
+                    substr($file_id, 0, 6) === "files-" ||
+                    substr($file_id, 0, 7) === "images-" ||
+                    substr($file_id, 0, 7) === "videos-"
                 ) {
                     foreach ($this->assets as $category => $assets) {
-                        $file_category = explode('-', $file_id)[0] . 's';
+                        $file_category = explode('-', $file_id)[0];
                         if ($category == $file_category) {
-                            foreach ($assets as $type => $asset) {
+                            foreach ($assets as $asset) {
                                 $id = explode('-', $file_id, 2)[1];
                                 if ($asset->id == $id) {
                                     $asset->update(
@@ -118,6 +122,34 @@ class PolicyCloud_Marketplace_Description
         );
     }
 
+    public static function set_default_image(string $description_id, string $image_id)
+    {
+        PolicyCloud_Marketplace::api_request(
+            'PUT',
+            '/descriptions/image/' . $description_id . '/' . $image_id,
+            [],
+            PolicyCloud_Marketplace_Account::retrieve_token()
+        );
+    }
+
+    public static function remove_default_image(string $description_id)
+    {
+        PolicyCloud_Marketplace::api_request(
+            'DELETE',
+            '/descriptions/image/' . $description_id,
+            [],
+            PolicyCloud_Marketplace_Account::retrieve_token()
+        );
+    }
+
+    public function get_reviews(int $page = 1)
+    {
+        if (empty($this->reviews)) {
+            $this->reviews = PolicyCloud_Marketplace_Review::get_reviews($this, $page);
+        }
+        return $this->reviews;
+    }
+
     protected function match_field(array $description)
     {
         if (empty($description['id'])) {
@@ -132,7 +164,7 @@ class PolicyCloud_Marketplace_Description
             $this->id = $description['id'];
         }
 
-        if (empty($description['info'] || empty($description['metadata']))) {
+        if (empty($description['info'] || empty($description['metadata']) || empty($description['main_image']))) {
             throw new PolicyCloudMarketplaceInvalidDataException(
                 "The description did not match the expected schema."
             );
@@ -140,6 +172,7 @@ class PolicyCloud_Marketplace_Description
             $this->type = $description['info']['type'];
             $this->information = $description['info'];
             $this->metadata = $description['metadata'];
+            $this->image_id = $description['main_image'];
         }
 
         if (!empty($description['assets'])) {
@@ -157,6 +190,17 @@ class PolicyCloud_Marketplace_Description
                     );
                 }
             }
+        }
+
+        if (!empty($description['your_review'][0])) {
+            $this->user_review = new PolicyCloud_Marketplace_Review(
+                $description['your_review'][0]['comment'],
+                $description['your_review'][0]['rating'],
+                $description['id'],
+                $description['your_review'][0]['username'],
+                $description['your_review'][0]['updated_review_date'],
+                $description['your_review'][0]['review_version'],
+            );
         }
     }
 
@@ -188,7 +232,8 @@ class PolicyCloud_Marketplace_Description
 
         // Check arguments
         if (!empty($_GET['sort-by'])) {
-            if ($_GET['sort-by'] != 'newest' ||
+            if (
+                $_GET['sort-by'] != 'newest' ||
                 $_GET['sort-by'] != 'oldest' ||
                 $_GET['sort-by'] != 'rating-asc' ||
                 $_GET['sort-by'] != 'rating-desc' ||
@@ -289,7 +334,7 @@ class PolicyCloud_Marketplace_Description
             'GET',
             '/frontend/homepage'
         );
-            
+
         $featured = [
             'latest' => self::parse($response, false, 'latest'),
             'most_viewed' => self::parse($response, false, 'most_viewed'),
@@ -297,7 +342,7 @@ class PolicyCloud_Marketplace_Description
             'suggestions' => self::parse($response, false, 'suggestions'),
             'top_rated' => self::parse($response, false, 'top_rated')
         ];
-        
+
         return $featured;
     }
 

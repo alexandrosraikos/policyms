@@ -527,7 +527,7 @@
 
       // Prepare deletion form.
       var formData = new FormData();
-      formData.append("username", AccountEditingProperties.user_id ?? "");
+      formData.append("username", AccountEditingProperties.userID ?? "");
       formData.append("subsequent_action", "delete_profile_picture");
 
       makeWPRequest(
@@ -653,7 +653,7 @@
 
     // Delete profile picture.
     $(
-      '.policycloud-marketplace .file-editor[data-name="profile-picture"] .delete'
+      '.policycloud-marketplace #policycloud-marketplace-account-edit button[data-action="delete-picture"]'
     ).click(deleteProfilePicture);
 
     // Add a weblink field.

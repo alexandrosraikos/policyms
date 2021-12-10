@@ -84,14 +84,14 @@
      */
 
     // Toggle the filter view.
-    $("#policycloud-marketplace-description-archive .filters-toggle").click(
+    $(".policycloud-marketplace.descriptions.archive .filters-toggle").click(
       (e) => {
         e.preventDefault();
-        $("#policycloud-marketplace-description-archive").toggleClass(
+        $(".policycloud-marketplace.descriptions.archive").toggleClass(
           "inspect"
         );
         if (
-          !$("#policycloud-marketplace-description-archive").hasClass("inspect")
+          !$(".policycloud-marketplace.descriptions.archive").hasClass("inspect")
         ) {
           $("body").css("overflowY", "hidden");
         } else {
@@ -101,15 +101,15 @@
     );
 
     $(
-      "#policycloud-marketplace-description-archive .content nav.pagination button"
+      ".policycloud-marketplace.descriptions.archive .content nav.pagination button"
     ).click(switchPage);
 
     $(
-      '#policycloud-marketplace-description-archive header select[name="sort-by"]'
+      '.policycloud-marketplace.descriptions.archive header select[name="sort-by"]'
     ).change(addSortFilter);
 
     $(
-      '#policycloud-marketplace-description-archive header select[name="items-per-page"]'
+      '.policycloud-marketplace.descriptions.archive header select[name="items-per-page"]'
     ).change(addSizeFilter);
   });
 })(jQuery);

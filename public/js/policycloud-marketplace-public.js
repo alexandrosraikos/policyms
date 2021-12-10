@@ -27,29 +27,33 @@ class Modal {
    * @param {string} type The type of modal.
    * @param {any} data The modal's data. Will add controls if iterable.
    */
-  constructor(type, data, index = 0) {
+  constructor(type, data, index = 0, completion = null) {
     // Initialize variables.
     this.type = type;
     this.data = data;
     this.index = index ?? 0;
     this.iterable = this.data.constructor === Array;
+    this.completion = completion;
 
     /**
      * The modal HTML.
      */
-    this.HTML = `<div id="policycloud-marketplace-modal" class="policycloud-marketplace ${this.type
-      } hidden">
-        <button class="close tactile"><span class="fas fa-times"></span></button>
+    this.HTML = `
+    <div class="policycloud-marketplace modal ${this.type
+      }" hidden>
+        <button class="close tactile" data-action="close">
+          <span class="fas fa-times"></span>
+        </button>
         <div class="container">
-        ${this.iterable
+          ${this.iterable
         ? `<button class="previous tactile" ${this.index - 1 < 0 ? "disabled" : ""
         }>
-          <span class="fas fa-chevron-left"></span>
-        </button>`
+            <span class="fas fa-chevron-left"></span>
+          </button>`
         : ``
       }
-            <div class="content">
-            </div>
+          <div class="content">
+          </div>
             
         ${this.iterable
         ? `<button class="next tactile" ${this.index + 2 > this.data.length ? "disabled" : ""
@@ -72,7 +76,7 @@ class Modal {
     this.set(this.iterable ? this.data[index] : this.data);
 
     // Show modal.
-    $("#policycloud-marketplace-modal." + this.type).removeClass("hidden");
+    $(".policycloud-marketplace.modal." + this.type).removeClass("hidden");
 
     /**
      * Listeners
@@ -87,7 +91,7 @@ class Modal {
           this.next();
         });
         // Set next on right arrow key press.
-        $("#policycloud-marketplace-modal").on("keydown", (e) => {
+        $(".policycloud-marketplace.modal").on("keydown", (e) => {
           e.preventDefault();
           if (e.key === "ArrowRight") this.next();
         });
@@ -97,7 +101,7 @@ class Modal {
           this.previous();
         });
         // Set previous on left arrow key press.
-        $("#policycloud-marketplace-modal").on("keydown", (e) => {
+        $(".policycloud-marketplace.modal").on("keydown", (e) => {
           e.preventDefault();
           if (e.key === "ArrowLeft") this.previous();
         });
@@ -105,13 +109,13 @@ class Modal {
     }
 
     // Dismiss modal on button click.
-    $("#policycloud-marketplace-modal > .close").on("click", (e) => {
+    $(".policycloud-marketplace.modal button[data-action=\"close\"]").on("click", (e) => {
       e.preventDefault();
       this.hide();
     });
 
     // Dismiss modal on 'Escape' key press.
-    $("#policycloud-marketplace-modal").on("keyup", (e) => {
+    $(".policycloud-marketplace.modal").on("keyup", (e) => {
       e.preventDefault();
       if (e.key === "Escape") this.hide();
     });
@@ -127,7 +131,7 @@ class Modal {
    */
   content = () => {
     return $(
-      "#policycloud-marketplace-modal." + this.type + " > .container > .content"
+      ".policycloud-marketplace.modal." + this.type + " > .container > .content"
     );
   };
 
@@ -137,14 +141,14 @@ class Modal {
   controls = {
     previous: () => {
       return $(
-        "#policycloud-marketplace-modal." +
+        ".policycloud-marketplace.modal." +
         this.type +
         " > .container > .previous"
       );
     },
     next: () => {
       return $(
-        "#policycloud-marketplace-modal." + this.type + " > .container > .next"
+        ".policycloud-marketplace.modal." + this.type + " > .container > .next"
       );
     },
   };
@@ -159,7 +163,16 @@ class Modal {
    * @param {Event} e The event.
    */
   hide() {
-    $("#policycloud-marketplace-modal." + this.type).remove();
+    $(".policycloud-marketplace.modal." + this.type).remove();
+    $("html, body").css({ overflow: "auto" });
+  }
+
+  /**
+   * Destroy any modal.
+   * @param {string} id The identifier of the modal
+   */
+  static kill(id) {
+    $(".policycloud-marketplace.modal." + id).remove();
     $("html, body").css({ overflow: "auto" });
   }
 
@@ -182,6 +195,9 @@ class Modal {
   set(data) {
     this.content().empty();
     this.content().append(data);
+    if (this.completion) {
+      this.completion(this.content().children()[0]);
+    }
   }
 
   next() {
@@ -320,25 +336,14 @@ function makeWPRequest(actionDOMSelector, action, nonce, data, completion) {
           completion();
         }
         else {
-          completion(JSON.parse(response.responseJSON ?? response.responseText));
-        }
-
-        // Remove the loading class.
-        $(actionDOMSelector).removeClass("loading");
-        if (actionDOMSelector.includes("button")) {
-          $(actionDOMSelector).prop("disabled", false);
+          completion(response.responseJSON ?? JSON.parse(response.responseText));
         }
       } catch (objError) {
         console.error("Invalid JSON response: " + objError);
+        completion();
       }
     } else if (response.status === 400 || response.status === 500) {
       showAlert(actionDOMSelector, response.responseText, "error");
-
-      // Remove the loading class.
-      $(actionDOMSelector).removeClass("loading");
-      if (actionDOMSelector.includes("button")) {
-        $(actionDOMSelector).prop("disabled", false);
-      }
     } else {
       showAlert(
         actionDOMSelector,
@@ -348,9 +353,11 @@ function makeWPRequest(actionDOMSelector, action, nonce, data, completion) {
 
       // Log additional information into the console.
       console.error("Policy Cloud Marketplace error: " + response.responseText);
+    }
 
-      // Remove the loading class.
-      $(actionDOMSelector).removeClass("loading");
+    // Remove the loading class.
+    $(actionDOMSelector).removeClass("loading");
+    if (typeof actionDOMSelector === 'string') {
       if (actionDOMSelector.includes("button")) {
         $(actionDOMSelector).prop("disabled", false);
       }
@@ -359,8 +366,10 @@ function makeWPRequest(actionDOMSelector, action, nonce, data, completion) {
 
   // Add the loading class.
   $(actionDOMSelector).addClass("loading");
-  if (actionDOMSelector.includes("button")) {
-    $(actionDOMSelector).prop("disabled", true);
+  if (typeof actionDOMSelector === 'string') {
+    if (actionDOMSelector.includes("button")) {
+      $(actionDOMSelector).prop("disabled", true);
+    }
   }
 
   if (data instanceof FormData) {
@@ -407,6 +416,27 @@ $(document).ready(() => {
   );
   $(".policycloud-marketplace-alert-close").click(function (e) {
     $(this.parentNode).addClass("seen");
+  });
+
+  // Search button listener.
+  $(".policycloud-marketplace button[data-action=\"description-search\"]").click((e) => {
+    e.preventDefault();
+    new Modal(
+      "description-search",
+      `
+      <div
+        class="policycloud-marketplace menu-search">
+        <form 
+          method="get\" 
+          action="`+ GlobalProperties.archivePage + `">
+          <input type="text\" name="search" placeholder="Search descriptions..." />
+          <button class="tactile" type="submit" title="Search">
+              <span class="fas fa-search"></span>
+          </button>
+        </form>
+      </div>
+      `
+    );
   });
 
   // User log out.
