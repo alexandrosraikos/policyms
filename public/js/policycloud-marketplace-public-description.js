@@ -20,7 +20,7 @@
 
     // Get image id array.
     const itemReference = Array.from(
-      $(".policycloud-marketplace.description .gallery img, .policycloud-marketplace.description .gallery video").map((index, element) => {
+      $(".policycloud-marketplace.description .gallery .item").map((index, element) => {
         return {
           category: $(element).data("asset-category"),
           id: $(element).data("asset-id")
@@ -40,7 +40,6 @@
     // Toggle the gallery modal visibility.
     $(".policycloud-marketplace.description .gallery .item").click((e) => {
       e.preventDefault();
-      e.stopPropagation();
       new Modal(
         "gallery",
         itemReference.map(
@@ -50,11 +49,12 @@
           }
         ),
         itemReference.findIndex((itemData) => {
-          return itemData.id == $(e.target).first().data('asset-id')
+          return itemData.id == $(e.target).parent('.item').data('asset-id')
         }),
         (itemContainer) => {
           const type = $(itemContainer).data('asset-category');
           const fileIdentifier = $(itemContainer).data('asset-id');
+          const toolbar = $('.policycloud-marketplace.description .gallery .item[data-asset-id="' + fileIdentifier + '"] .toolbar');
 
           if (type == 'images') {
             makeWPRequest(
@@ -69,20 +69,17 @@
               },
               (data) => {
                 const fullQualityImage = '<img src="' + data.url + '" />';
-                const toolbar = $('.policycloud-marketplace.description .gallery img[data-asset-id="' + fileIdentifier + '"] + .toolbar');
                 $(itemContainer).prepend(fullQualityImage);
-                $(itemContainer).append(toolbar.clone());
               }
             );
           }
           else if (type == 'videos') {
-            const videoPlayer = $('.policycloud-marketplace.description .gallery video[data-asset-id="' + fileIdentifier + '"]');
-            const largeVideoPlayer = videoPlayer.clone();
-            largeVideoPlayer.addClass("large");
-            $(itemContainer).prepend(largeVideoPlayer);
-            const toolbar = $('.policycloud-marketplace.description .gallery video[data-asset-id="' + fileIdentifier + '"] + .toolbar');
-            $(itemContainer).append(toolbar.clone());
+            const videoPlayer = `
+            <video src="`+ DescriptionEditingProperties.videoURL + '/videos/' + fileIdentifier + `" class="large" data-asset-category="videos" data-asset-id="` + fileIdentifier + `" controls preload="none" />
+            `;
+            $(itemContainer).prepend(videoPlayer);
           }
+          $(itemContainer).append(toolbar.clone());
         }
       );
     });
@@ -263,25 +260,23 @@
             approval: $(this).data("response"),
           },
           () => {
-            window.location.reload();
+            if ($(this).data("response") == 'approve') {
+              window.location.reload();
+            } else {
+              window.location.href = DescriptionEditingProperties.deleteRedirect;
+            }
           }
         );
       }
     }
 
     function highlightRatingStars(e) {
-      e.preventDefault();
       const eventStar = $(e.target);
       eventStar.attr('checked', true);
       $('.policycloud-marketplace.description .reviews .stars input[type="radio"]').each((index, element) => {
-        if (e.type == 'click' || e.type == 'mouseover') {
-          if ($(element).val() <= eventStar.val()) {
-            $(element).addClass('checked');
-          } else {
-            $(element).removeClass('checked');
-          }
-        }
-        else if (e.type == 'mouseout') {
+        $(element).removeClass('checked');
+        if ($(element).val() <= eventStar.val()) {
+          $(element).addClass('checked');
         }
       });
     }
@@ -355,9 +350,20 @@
           "image_id": $(e.target).data('asset-id')
         },
         () => {
-          const button = $('.gallery .toolbar button[data-action="set-default"][data-asset-id="' + $(e.target).data('asset-id') + '"]');
-          button.data("action", "remove-default");
-          button.html('Remove default image')
+          // Unset other remove buttons.
+          $('.gallery .toolbar button[data-action="remove-default"]').each(
+            (index, element) => {
+              $(element).data("action", "set-default");
+              $(element).html('Set as default image');
+            }
+          );
+          // Transform current button.
+          const setButton = $('.gallery .toolbar button[data-action="set-default"][data-asset-id="' + $(e.target).data('asset-id') + '"]').each(
+            (index, element) => {
+              $(element).attr("data-action", "remove-default");
+              $(element).html('Remove default image');
+            }
+          );
         }
       )
     }
@@ -372,9 +378,13 @@
           "description_id": DescriptionEditingProperties.descriptionID
         },
         () => {
-          const button = $('.gallery .toolbar button[data-action="remove-default"][data-asset-id="' + $(e.target).data('asset-id') + '"]');
-          button.data("action", "set-default");
-          button.html('Set as default image')
+          // Set all "set" buttons
+          $('.gallery .toolbar button[data-action*="default"]').each(
+            (index, element) => {
+              $(element).attr("data-action", "set-default");
+              $(element).html('Set as default image');
+            }
+          );
         }
       )
     }
@@ -430,7 +440,7 @@
 
     // Highlight rating stars.
     $(document).on(
-      "click mouseover mouseout",
+      "click",
       '.policycloud-marketplace.description .reviews .stars input[type="radio"]',
       highlightRatingStars
     )
@@ -466,7 +476,7 @@
     // Delete file.
     $(document).on(
       "click",
-      ".policycloud-marketplace.modal.gallery.toolbar button[data-action=\"delete\"], .policycloud-marketplace.description.editor .asset-editor button[data-action=\"delete\"]",
+      ".policycloud-marketplace.modal.gallery .toolbar button[data-action=\"delete\"], .policycloud-marketplace.description.editor .asset-editor button[data-action=\"delete\"]",
       deleteAsset
     );
   });

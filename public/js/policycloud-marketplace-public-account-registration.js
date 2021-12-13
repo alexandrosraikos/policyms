@@ -25,9 +25,14 @@
      */
     function addSocialField(e) {
       e.preventDefault();
-      $("#policycloud-registration .socials > div > div:last-of-type")
-        .clone()
-        .appendTo("#policycloud-registration .socials > div");
+      const newSocialField = $("#policycloud-registration .socials > div > div:last-of-type").clone();
+      newSocialField.find('input[name*=socials]').each(
+        (index, element) => {
+          $(element).val("");
+        }
+      )
+
+      newSocialField.appendTo("#policycloud-registration .socials > div");
       $("#policycloud-registration .socials button.remove-field").prop(
         "disabled",
         $("#policycloud-registration .socials button.remove-field").length === 1

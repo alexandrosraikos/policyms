@@ -97,7 +97,7 @@ class PolicyCloud_Marketplace_Public
         wp_enqueue_script("policycloud-marketplace", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public.js', array('jquery'), $this->version, false);
         wp_localize_script("policycloud-marketplace", 'GlobalProperties', array(
             "rootURLPath" => (empty(parse_url(get_site_url())['path']) ? "/" : parse_url(get_site_url())['path']),
-            "archivePage" => self::get_plugin_setting('archive_page'),
+            "archivePage" => self::get_plugin_setting(true, 'archive_page'),
             "ajaxURL" => admin_url('admin-ajax.php')
         ));
 
@@ -408,7 +408,7 @@ class PolicyCloud_Marketplace_Public
                             $user = new PolicyCloud_Marketplace_User($user_id);
                         } else {
                             throw new PolicyCloudMarketplaceUnauthorizedRequestException(
-                                "You need to be verified in order to view other user accounts."
+                                "You need to be verify your email address in order to view other user accounts."
                             );
                         }
                         if ($self->username === $user_id) {
@@ -807,7 +807,7 @@ class PolicyCloud_Marketplace_Public
                         $reviews = $description->get_reviews(filter_var($_GET['reviews-page'] ?? 1, FILTER_VALIDATE_INT));
                     } else {
                         $permissions['authenticated'] = false;
-                        show_alert("You need to be verified in order to view description details.", 'notice');
+                        show_alert("You need to verify your email address to be able to view description details.", 'notice');
                     }
                 }
 
@@ -823,7 +823,8 @@ class PolicyCloud_Marketplace_Public
                     'deleteReviewNonce' => $permissions['authenticated'] ? wp_create_nonce('policycloud_marketplace_delete_review') : null,
                     'approvalNonce' => $permissions['administrator'] ? wp_create_nonce('policycloud_marketplace_description_approval') : null,
                     'deletionNonce' => ($permissions['administrator'] || $permissions['provider']) ? wp_create_nonce('policycloud_marketplace_description_deletion') : null,
-                    'deleteRedirect' => $permissions['provider'] ? (self::get_plugin_setting(true, 'account_page') . "#descriptions") : (self::get_plugin_setting(true, 'account_page') . "#approvals")
+                    'deleteRedirect' => $permissions['provider'] ? (self::get_plugin_setting(true, 'account_page') . "#descriptions") : (self::get_plugin_setting(true, 'account_page') . "#approvals"),
+                    'videoURL' => $permissions['authenticated'] ? self::get_plugin_setting(true, 'marketplace_host') : ''
                 ));
 
                 // TODO @alexandrosraikos: Add description name as head meta title. #54
@@ -859,49 +860,33 @@ class PolicyCloud_Marketplace_Public
             function ($data) {
 
                 $description = new PolicyCloud_Marketplace_Description($data['description_id']);
-
-                switch ($data['subsequent_action']) {
-                    case 'description-editing':
-                        $description->update(
-                            [
-                                "title" => sanitize_text_field($data['title']),
-                                "type" => sanitize_text_field($data['type']),
-                                "subtype" => sanitize_text_field($data['subtype'] ?? ''),
-                                "owner" => sanitize_text_field($data['owner'] ?? ''),
-                                "description" => sanitize_text_field($data['description']),
-                                "fieldOfUse" => explode(", ", $data['fields-of-use'] ?? ''),
-                                "comments" => sanitize_text_field($data['comments'] ?? '')
-                            ],
-                            array_filter(
-                                array_keys($_FILES),
-                                function ($key) {
-                                    return (substr($key, 0, 5) === "image"  ||
-                                        substr($key, 0, 5) === "video"  ||
-                                        substr($key, 0, 4) === "file");
-                                }
-                            )
-                        );
-                        break;
-                    case 'asset-deletion':
-                        foreach ($description->assets[$data['file-type']] as $asset) {
-                            if ($asset->id == $data['file-identifier']) {
-                                $asset->delete();
-                                return;
+                try {
+                    $description->update(
+                        [
+                            "title" => sanitize_text_field($data['title']),
+                            "type" => sanitize_text_field($data['type']),
+                            "subtype" => sanitize_text_field($data['subtype'] ?? ''),
+                            "owner" => sanitize_text_field($data['owner'] ?? ''),
+                            "description" => sanitize_text_field($data['description']),
+                            "fieldOfUse" => explode(", ", $data['fields-of-use'] ?? ''),
+                            "comments" => sanitize_text_field($data['comments'] ?? '')
+                        ],
+                        array_filter(
+                            array_keys($_FILES),
+                            function ($key) {
+                                return (substr($key, 0, 5) === "image"  ||
+                                    substr($key, 0, 5) === "video"  ||
+                                    substr($key, 0, 4) === "file");
                             }
-                        }
-                        throw new PolicyCloudMarketplaceInvalidDataException("The file could not be found.");
-                        break;
-                    case 'asset-download':
-                        foreach ($description->assets[$data['file-type']] as $asset) {
-                            if ($asset->id == $data['file-identifier']) {
-                                return $asset->get_download_url();
-                            }
-                        }
-                        throw new PolicyCloudMarketplaceInvalidDataException("The file could not be found.");
-                        break;
-                    default:
-                        throw new PolicyCloudMarketplaceInvalidDataException("No subsequent action was defined.");
-                        break;
+                        )
+                    );
+                } catch (PolicyCloudMarketplaceAPIError $e) {
+                    if ($e->http_status === 406) {
+                        http_response_code(200);
+                        die();
+                    } else {
+                        throw $e;
+                    }
                 }
             }
         );
@@ -942,6 +927,14 @@ class PolicyCloud_Marketplace_Public
     {
         $this->ajax_handler(
             function ($data) {
+
+                if (!empty($data['subtype'])) {
+                    if (strlen($data['subtype']) > 25) {
+                        throw new PolicyCloudMarketplaceInvalidDataException(
+                            "The secondary collection type label exceeds the 25 character limit."
+                        );
+                    }
+                }
 
                 return (PolicyCloud_Marketplace_Description::create(
                     [

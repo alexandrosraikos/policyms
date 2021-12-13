@@ -41,6 +41,7 @@ class Modal {
     this.HTML = `
     <div class="policycloud-marketplace modal ${this.type
       }" hidden>
+        <div class="backdrop"></div>
         <button class="close tactile" data-action="close">
           <span class="fas fa-times"></span>
         </button>
@@ -91,8 +92,7 @@ class Modal {
           this.next();
         });
         // Set next on right arrow key press.
-        $(".policycloud-marketplace.modal").on("keydown", (e) => {
-          e.preventDefault();
+        $(document).on("keydown", (e) => {
           if (e.key === "ArrowRight") this.next();
         });
 
@@ -101,8 +101,7 @@ class Modal {
           this.previous();
         });
         // Set previous on left arrow key press.
-        $(".policycloud-marketplace.modal").on("keydown", (e) => {
-          e.preventDefault();
+        $(document).on("keydown", (e) => {
           if (e.key === "ArrowLeft") this.previous();
         });
       });
@@ -114,9 +113,16 @@ class Modal {
       this.hide();
     });
 
+    $(".policycloud-marketplace.modal .backdrop").on(
+      "click",
+      (e) => {
+        e.preventDefault();
+        this.hide();
+      }
+    )
+
     // Dismiss modal on 'Escape' key press.
-    $(".policycloud-marketplace.modal").on("keyup", (e) => {
-      e.preventDefault();
+    $(document).on("keydown", (e) => {
       if (e.key === "Escape") this.hide();
     });
   }
@@ -357,6 +363,7 @@ function makeWPRequest(actionDOMSelector, action, nonce, data, completion) {
 
     // Remove the loading class.
     $(actionDOMSelector).removeClass("loading");
+    $(actionDOMSelector).closest('form').removeClass("loading");
     if (typeof actionDOMSelector === 'string') {
       if (actionDOMSelector.includes("button")) {
         $(actionDOMSelector).prop("disabled", false);
@@ -366,6 +373,7 @@ function makeWPRequest(actionDOMSelector, action, nonce, data, completion) {
 
   // Add the loading class.
   $(actionDOMSelector).addClass("loading");
+  $(actionDOMSelector).closest('form').addClass("loading");
   if (typeof actionDOMSelector === 'string') {
     if (actionDOMSelector.includes("button")) {
       $(actionDOMSelector).prop("disabled", true);
@@ -417,6 +425,7 @@ $(document).ready(() => {
   $(".policycloud-marketplace-alert-close").click(function (e) {
     $(this.parentNode).addClass("seen");
   });
+
 
   // Search button listener.
   $(".policycloud-marketplace button[data-action=\"description-search\"]").click((e) => {

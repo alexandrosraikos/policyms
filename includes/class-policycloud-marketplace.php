@@ -343,32 +343,40 @@ class PolicyCloud_Marketplace
 
         // Get the data.
         $response = curl_exec($curl);
+        $curl_http = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
         // Handle errors.
         if (curl_errno($curl)) {
             throw new Exception("Unable to reach the Marketplace server. More details: " . curl_error($curl));
         }
 
-        if (isset($response)) {
-            if (is_string($response)) {
-                $decoded = json_decode($response, true);
-                if (json_last_error() === JSON_ERROR_NONE) {
-                    $curl_http = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-                    if ($decoded['_status'] == 'successful' && ($curl_http == 200 || $curl_http == 201 || $curl_http == 406)) {
-                        curl_close($curl);
-                        return $decoded;
-                    } else {
-                        curl_close($curl);
-                        throw new PolicyCloudMarketplaceInvalidDataException('PolicyCloud Marketplace error when contacting ' . $uri . ': ' . $decoded['message']);
-                    }
-                } else {
-                    curl_close($curl);
-                    return $response;
-                }
-            }
+        curl_close($curl);
+        if ($curl_http != 200 && $curl_http != 201) {
+            throw new PolicyCloudMarketplaceAPIError(
+                "The PolicyCloud Marketplace API encountered an HTTP " . $curl_http . " status code. More information: " . $response ?? '',
+                $curl_http
+            );
         } else {
-            curl_close($curl);
-            throw new ErrorException("There was no response.");
-        };
+            if (isset($response)) {
+                if (is_string($response)) {
+                    $decoded = json_decode($response, true);
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        if ($decoded['_status'] == 'successful') {
+                            return $decoded;
+                        } else {
+                            throw new PolicyCloudMarketplaceAPIError(
+                                'PolicyCloud Marketplace error when contacting ' . $uri . ': ' . $decoded['message'],
+                                $curl_http
+                            );
+                        }
+                    } else {
+                        return $response;
+                    }
+                }
+            } else {
+                curl_close($curl);
+                throw new ErrorException("There was no response.");
+            };
+        }
     }
 }

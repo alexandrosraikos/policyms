@@ -26,10 +26,10 @@
     function createAsset(e) {
       e.preventDefault();
       makeWPRequest(
-        "#policycloud-marketplace-description-creation button[type=submit]",
+        ".policycloud-marketplace.description.editor button[type=submit]",
         "policycloud_marketplace_description_creation",
         DescriptionCreationProperties.nonce,
-        new FormData($("#policycloud-marketplace-description-creation")[0]),
+        new FormData($(".policycloud-marketplace.description.editor form")[0]),
         (data) => {
           window.location.replace(
             DescriptionCreationProperties.descriptionPage + "/?did=" + data
@@ -46,7 +46,7 @@
 
     // Submit the asset.
     $(
-      "#policycloud-marketplace-description-creation button[type=submit]"
+      ".policycloud-marketplace.description.editor button[type=submit]"
     ).click(createAsset);
   });
 })(jQuery);

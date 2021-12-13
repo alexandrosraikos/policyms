@@ -20,8 +20,13 @@
 #policycloud-registration .socials div div {
   display: flex;
   align-items: center;
-  justify-content: center;
   margin-bottom: 10px;
+}
+#policycloud-registration .socials div div input[name="socials-title[]"] {
+  max-width: 200px;
+}
+#policycloud-registration .socials div div input[name="socials-url[]"] {
+  min-width: 225px;
 }
 
 #policycloud-registration .socials div div * {

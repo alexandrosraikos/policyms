@@ -23,3 +23,13 @@ class PolicyCloudMarketplaceMissingOptionsException extends Exception
         parent::__construct($message, $code, $previous);
     }
 }
+
+class PolicyCloudMarketplaceAPIError extends Exception
+{
+    public int $http_status;
+    public function __construct($message, int $http_status, $code = 0, Throwable $previous = null)
+    {
+        $this->http_status = $http_status;
+        parent::__construct($message, $code, $previous);
+    }
+}

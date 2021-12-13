@@ -6,6 +6,13 @@ The official plugin for the PolicyCloud Marketplace, enabling front-end access t
 
 Read the sections below to get started with PolicyCloud Marketplace for WordPress.
 
+### Requirements
+
+- PHP >= 7.4
+- Set PHP's `upload_max_filesize` directive to the desired Marketplace limit, up to **500MB**.
+- Set PHP's `post_max_size` directive to match the previous value.
+- WordPress >= 5.0
+
 ### Installation & Setup
 
 Clone the repository, zip and install via the WordPress dashboard.

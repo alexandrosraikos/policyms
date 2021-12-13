@@ -217,10 +217,10 @@ class PolicyCloud_Marketplace_Description
             if ($specify_pages) {
                 return [
                     'pages' => $response['pages'],
-                    'content' => (count($descriptions) == 1) ? $descriptions[0] : $descriptions
+                    'content' => $descriptions
                 ];
             } else {
-                return (count($descriptions) == 1) ? $descriptions[0] : $descriptions;
+                return $descriptions;
             }
         } else {
             return [];
@@ -367,7 +367,7 @@ class PolicyCloud_Marketplace_Description
         return self::parse($response);
     }
 
-    public static function create(array $information): int
+    public static function create(array $information): string
     {
         return PolicyCloud_Marketplace::api_request(
             'POST',

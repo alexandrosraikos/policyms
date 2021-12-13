@@ -52,7 +52,7 @@ function descriptions_grid_html(array $descriptions, string $description_url)
                                         time_elapsed_string(
                                             date(
                                                 'Y-m-d H:i:s',
-                                                strtotime($description->metadata['uploadDate'])
+                                                strtotime($description->metadata['updateDate'])
                                             )
                                         )
                                         ?>
@@ -135,19 +135,19 @@ function featured_descriptions_html(array $categories, string $description_page)
         </div>
         <h2>Top rated descriptions</h2>
         <?php
-        descriptions_grid_html($categories['top_rated'], $description_page);
+        descriptions_grid_html($categories['top_rated'][0], $description_page);
         ?>
         <h2>Most viewed descriptions</h2>
         <?php
-        descriptions_grid_html($categories['most_viewed'], $description_page);
+        descriptions_grid_html($categories['most_viewed'][0], $description_page);
         ?>
         <h2>Latest descriptions</h2>
         <?php
-        descriptions_grid_html($categories['latest'], $description_page);
+        descriptions_grid_html($categories['latest'][0], $description_page);
         ?>
         <h2>Suggestions</h2>
         <?php
-        descriptions_grid_html($categories['suggestions'], $description_page);
+        descriptions_grid_html($categories['suggestions'][0], $description_page);
         ?>
     </div>
 <?php
@@ -215,7 +215,7 @@ function descriptions_archive_filters_html($filters)
                     foreach ($filters['providers'] as $provider) {
                     ?>
                         <span>
-                            <input type="checkbox" name="provider" value="<?= $provider ?>" <?= in_array($provider, $_GET['provider'] ?? []) ? 'checked' : ''  ?> />
+                            <input type="checkbox" name="provider[]" value="<?= $provider ?>" <?= in_array($provider, $_GET['provider'] ?? []) ? 'checked' : ''  ?> />
                             <label for="provider[]">
                                 <?= $provider ?>
                             </label>
@@ -306,7 +306,7 @@ function descriptions_archive_html(array $descriptions, array $filters, string $
             ?>
                 <div class="gallery">
                     <?php
-                    descriptions_grid_html($descriptions['content'], $description_page);
+                    descriptions_grid_html($descriptions['content'][0], $description_page);
                     ?>
                 </div>
                 <nav class="pagination">
@@ -397,6 +397,17 @@ function description_editor_html(PolicyCloud_Marketplace_Description $descriptio
                     <?php
                     foreach ($description->assets as $category => $assets) {
                         $upload_notice = ($category == 'images') ? '(supported file types: jpg, png)' : '';
+                        switch ($category) {
+                            case 'images':
+                                $allowed_mimetypes = 'image/jpeg,image/png';
+                                break;
+                            case 'videos':
+                                $allowed_mimetypes = 'video/mp4,video/ogg,video/webm';
+                                break;
+                            default:
+                                $allowed_mimetypes = '';
+                                break;
+                        }
                     ?>
                         <h3>
                             <?= ucfirst($category) ?>
@@ -414,14 +425,14 @@ function description_editor_html(PolicyCloud_Marketplace_Description $descriptio
                                     <label for="<?= $category . '-' . $asset->id ?>">
                                         Replace file <?= $upload_notice ?>:
                                     </label>
-                                    <input type="file" name="<?= $category . '-' . $asset->id ?>" multiple />
+                                    <input type="file" name="<?= $category . '-' . $asset->id ?>" accept="<?= $allowed_mimetypes ?>" multiple />
                                 </div>
                         <?php
                             }
                         } ?>
                         Upload new files <?= $upload_notice ?>:
                         <div class="chooser">
-                            <input type="file" name="<?= $category ?>[]" multiple />
+                            <input type="file" name="<?= $category ?>[]" accept="<?= $allowed_mimetypes ?>" multiple />
                         </div>
                     <?php
                     }
@@ -482,7 +493,7 @@ function description_reviews_list_html(array $reviews)
 
 }
 
-function description_reviews_html(array $reviews = null, ?int $pages = 0, PolicyCloud_Marketplace_Review $existing_review = null)
+function description_reviews_html(array $reviews = null, ?int $pages = 0, PolicyCloud_Marketplace_Review $existing_review = null, bool $provider)
 {
 ?>
     <div class="policycloud-marketplace reviews">
@@ -502,41 +513,44 @@ function description_reviews_html(array $reviews = null, ?int $pages = 0, Policy
         } else {
             show_alert('No reviews yet.', 'notice');
         }
+
+        if (!$provider) {
         ?>
-        <form>
-            <label for="comment">Comment</label>
-            <textarea name="comment" placeholder="Insert your comment here.."><?= !empty($existing_review) ? $existing_review->comment : null ?></textarea>
-            <label for="rating">Rating</label>
-            <div class="stars">
+            <form>
+                <label for="comment">Comment</label>
+                <textarea name="comment" placeholder="Insert your comment here.."><?= !empty($existing_review) ? $existing_review->comment : null ?></textarea>
+                <label for="rating">Rating</label>
+                <div class="stars">
+                    <?php
+                    for ($i = 0; $i < 5; $i++) {
+                        $rating = $i + 1;
+                    ?>
+                        <label>
+                            <input type="radio" name="rating" value="<?= $rating ?>" class="<?= ($rating <= ($existing_review->rating ?? 0)) ? 'checked' : '' ?>" <?= ($rating == ($existing_review->rating ?? 0)) ? 'checked' : '' ?> required />
+                            <span class="fas fa-star"></span>
+                        </label>
+                    <?php
+                    }
+                    ?>
+                </div>
+                <?= !empty($existing_review) ? '<input style="display:none" type="checkbox" name="update" checked/>' : '' ?>
                 <?php
-                for ($i = 0; $i < 5; $i++) {
-                    $rating = $i + 1;
-                ?>
-                    <label>
-                        <input type="radio" name="rating" value="<?= $rating ?>" class="<?= ($rating <= ($existing_review->rating ?? 0)) ? 'checked' : '' ?>" <?= ($rating == ($existing_review->rating ?? 0)) ? 'checked' : '' ?> required />
-                        <span class="fas fa-star"></span>
-                    </label>
-                <?php
-                }
-                ?>
-            </div>
-            <?= !empty($existing_review) ? '<input style="display:none" type="checkbox" name="update" checked/>' : '' ?>
-            <?php
-            if (!empty($existing_review)) { ?>
-                <p>
-                    Last submitted <?= time_elapsed_string(date('Y-m-d H:i:s', strtotime($existing_review->update_date))) ?>
-                </p>
-            <?php } ?>
-            <div class="actions">
-                <?php if (!empty($existing_review)) {
-                ?>
-                    <button class="action destructive" data-action="delete-review">Delete</button>
-                <?php
-                }
-                ?>
-                <button class="action" type="submit">Submit</button>
-            </div>
-        </form>
+                if (!empty($existing_review)) { ?>
+                    <p>
+                        Last submitted <?= time_elapsed_string(date('Y-m-d H:i:s', strtotime($existing_review->update_date))) ?>
+                    </p>
+                <?php } ?>
+                <div class="actions">
+                    <?php if (!empty($existing_review)) {
+                    ?>
+                        <button class="action destructive" data-action="delete-review">Delete</button>
+                    <?php
+                    }
+                    ?>
+                    <button class="action" type="submit">Submit</button>
+                </div>
+            </form>
+        <?php } ?>
     </div>
     <?php
 }
@@ -678,6 +692,7 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                         <span class="fas fa-star"></span> <?= $description->metadata['reviews']['average_rating'] . ' (' . $description->metadata['reviews']['no_reviews'] . ' reviews)' ?>
                     </a>
                     <span class="views">
+                        <span class="fas fa-eye"></span>
                         <?= $description->metadata['views'] ?> views
                     </span>
                     <span class="last-update-date">
@@ -733,19 +748,13 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                                 if (!empty($description->assets['videos'])) {
                                     foreach ($description->assets['videos'] as $video) { ?>
                                         <div class="item" data-asset-category="videos" data-asset-id="<?= $video->id ?>">
-                                            <video data-asset-category="videos" data-asset-id="<?= $video->id ?>" controls preload="none" poster="
-                                                <?=
-                                                (PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'marketplace_host')
-                                                    . '/videos/' . $video->id . '?thumbnail=1'
-                                                )
-                                                ?>">
-                                                <source src=" 
-                                                <?=
-                                                (PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'marketplace_host')
-                                                    . '/videos/' . $video->id
-                                                )
-                                                ?>">
-                                            </video>
+                                            <img class="play-icon" src="<?= get_site_url(null, '/wp-content/plugins/policycloud-marketplace/public/assets/svg/play.svg'); ?>" />
+                                            <img class="video-thumbnail" src="
+                                            <?=
+                                            (PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'marketplace_host')
+                                                . '/videos/' . $video->id . '?thumbnail=1'
+                                            )
+                                            ?>">
                                             <?php
                                             if ($permissions['provider']) {
                                             ?>
@@ -768,7 +777,7 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                                 }
                                 if (!empty($image_blobs)) {
                                     foreach ($image_blobs as $key => $image_blob) { ?>
-                                        <div class="item" data-asset-id="<?= $description->assets['images'][$key]->id ?>">
+                                        <div class="item" data-asset-id="<?= $description->assets['images'][$key]->id ?>" data-asset-category="images">
                                             <?php
                                             echo '<img src="data:image/*;base64,' . base64_encode($image_blob) . '" data-asset-category="images" data-asset-id="' . $description->assets['images'][$key]->id . '" draggable="false" />';
                                             if ($permissions['provider']) {
@@ -813,7 +822,8 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                     description_reviews_html(
                         $reviews['content'] ?? [],
                         $reviews['pages'] ?? null,
-                        $description->user_review ?? null
+                        $description->user_review ?? null,
+                        $permissions['provider']
                     );
                 } else {
                     show_lock($pages['login_page'], 'view reviews for this description');

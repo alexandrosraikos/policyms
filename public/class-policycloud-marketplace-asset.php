@@ -42,7 +42,6 @@ class PolicyCloud_Marketplace_Asset
                     ],
                     $token,
                     [
-                        'x-filename: ' . $file['name'],
                         'x-mimetype: ' . $file['mimetype'],
                         'x-access-token: ' . $token
                     ],
@@ -208,13 +207,12 @@ class PolicyCloud_Marketplace_Asset
                     'POST',
                     '/assets/' . $category . '/' . $description->id,
                     [
-                        'asset' => new CURLFile($file['path'], $file['mimetype'], $file['name'])
+                        'asset' => new CURLFile($file['path'], $file['mimetype'], $file['name']),
                     ],
                     $token,
                     [
+                        'x-mimetype: ' . $file['mimetype'],
                         'x-access-token: ' . $token,
-                        'x-filename: ' . $file['name'],
-                        'x-mimetype: ' . $file['mimetype']
                     ],
                     true
                 );

@@ -103,10 +103,14 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
                 '/accounts/users/password/change',
                 [
                     'old_password' => $data['current-password'],
-                    'new_password' => $data['password']
+                    'new_password' => $data['password'],
+                    'confirm_new_password' => $data['password-confirm'],
                 ],
                 $this->token
             );
+            if (!empty($response['token'])) {
+                $token = $response['token'];
+            }
         }
 
         $response = PolicyCloud_Marketplace::api_request(
@@ -135,9 +139,15 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             $this->token
         );
 
-        // Return encrypted token.
         if (!empty($response['token'])) {
+            $token = $response['token'];
+        }
+
+        // Return encrypted token.
+        if (!empty($token)) {
             return parent::persist_token($token);
+        } else {
+            return null;
         }
     }
 
@@ -212,7 +222,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
                     (!empty($this->token) ? ('x-access-token: ' . $this->token) : null)
                 ],
             );
-            $this->picture = 'data:image/*;base64,' .base64_encode($picture_data);
+            $this->picture = 'data:image/*;base64,' . base64_encode($picture_data);
         }
 
         return $this->picture;
@@ -238,7 +248,8 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
     {
 
         if ($picture['error'] == 0) {
-            if ($picture['type'] != 'image/jpeg' &&
+            if (
+                $picture['type'] != 'image/jpeg' &&
                 $picture['type'] != 'image/png'
             ) {
                 throw new PolicyCloudMarketplaceInvalidDataException(
@@ -266,7 +277,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
                 true
             );
 
-            return parent::persist_token($response['token']);
+            return $response['token'];
         } elseif ($picture['error'] == 4) {
             return null;
         }
@@ -415,7 +426,8 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
 
         // Check password and confirmation.
         if (!empty($information['password'])) {
-            if (!empty(preg_match('@[A-Z]@', $information['password'])) &&
+            if (
+                !empty(preg_match('@[A-Z]@', $information['password'])) &&
                 !empty(preg_match('@[a-z]@', $information['password'])) &&
                 !empty(preg_match('@[0-9]@', $information['password'])) &&
                 !empty(preg_match('@[^\w]@', $information['password'])) &&
