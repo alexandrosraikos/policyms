@@ -80,7 +80,7 @@ class PolicyCloud_Marketplace_Description
                 "type" => $information['type'],
                 "subtype" => $information['subtype'],
                 "owner" => $information['owner'],
-                "description" => $information['description'],
+                "description" => stripslashes($information['description']),
                 "fieldOfUse" => $information['fieldOfUse'],
                 "comments" => $information['comments']
             ];
@@ -233,12 +233,12 @@ class PolicyCloud_Marketplace_Description
         // Check arguments
         if (!empty($_GET['sort-by'])) {
             if (
-                $_GET['sort-by'] != 'newest' ||
-                $_GET['sort-by'] != 'oldest' ||
-                $_GET['sort-by'] != 'rating-asc' ||
-                $_GET['sort-by'] != 'rating-desc' ||
-                $_GET['sort-by'] != 'views-asc' ||
-                $_GET['sort-by'] != 'views-desc' ||
+                $_GET['sort-by'] != 'newest' &&
+                $_GET['sort-by'] != 'oldest' &&
+                $_GET['sort-by'] != 'rating-asc' &&
+                $_GET['sort-by'] != 'rating-desc' &&
+                $_GET['sort-by'] != 'views-asc' &&
+                $_GET['sort-by'] != 'views-desc' &&
                 $_GET['sort-by'] != 'title'
             ) {
                 throw new PolicyCloudMarketplaceInvalidDataException(

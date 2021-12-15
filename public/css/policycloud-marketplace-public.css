@@ -50,6 +50,10 @@
   transition: color 0.2s ease-in-out;
 }
 
+.policycloud-marketplace a.underline {
+  text-decoration: underline !important;
+}
+
 .policycloud-marketplace a:hover {
   text-decoration: none !important;
   display: inline;

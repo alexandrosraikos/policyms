@@ -270,7 +270,6 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
                 ],
                 $this->token,
                 [
-                    'x-mimetype: ' .  $picture['type'],
                     'x-access-token: ' . $this->token,
                     'x-more-time: ' . PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'api_access_token')
                 ],

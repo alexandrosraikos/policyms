@@ -42,7 +42,6 @@ class PolicyCloud_Marketplace_Asset
                     ],
                     $token,
                     [
-                        'x-mimetype: ' . $file['mimetype'],
                         'x-access-token: ' . $token
                     ],
                     true
@@ -211,7 +210,6 @@ class PolicyCloud_Marketplace_Asset
                     ],
                     $token,
                     [
-                        'x-mimetype: ' . $file['mimetype'],
                         'x-access-token: ' . $token,
                     ],
                     true
