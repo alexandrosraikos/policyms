@@ -20,7 +20,7 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
                     <h2>Account credentials</h2>
                     <p>The following information is required for authorization purposes.</p>
                     <label for="username">Username *</label>
-                    <input required name="username" placeholder="e.x. johndoe" type="text" />
+                    <input required name="username" placeholder="e.g. johndoe" type="text" />
                     <label for="password">Password *</label>
                     <input required name="password" placeholder="Insert your password" type="password" />
                     <label for="password-confirm">Confirm password *</label>
@@ -74,9 +74,9 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
                     <h2>Account contact details</h2>
                     <p>Fill in your contact information here. This information will be used to validate your new account, as well as optionally make them available to other logged in Marketplace visitors. Fields marked with (*) are required for registration. These details remain private by default. </p>
                     <label for="email">E-mail address *</label>
-                    <input type="email" name="email" placeholder="e.x. johndoe@example.org" required />
+                    <input type="email" name="email" placeholder="e.g. johndoe@example.org" required />
                     <label for="phone">Phone number</label>
-                    <input type="tel" name="phone" placeholder="e.x. +30 6999123456" />
+                    <input type="tel" name="phone" placeholder="e.g. +30 6999123456" />
                 </fieldset>
                 <div class="actions">
                     <button type="submit" class="action ">Create account</button>
@@ -111,7 +111,7 @@ function account_user_authentication_html($registration_url, $reset_password_pag
                     <h2>Insert your credentials</h2>
                     <p>The following information is required to log you in.</p>
                     <label for="username">Username or E-mail address *</label>
-                    <input required name="username-email" placeholder="e.x. johndoe / johndoe@example.org" type="text" />
+                    <input required name="username-email" placeholder="e.g. johndoe / johndoe@example.org" type="text" />
                     <label for="password">Password *</label>
                     <input required name="password" placeholder="Insert your password" type="password" />
                 </fieldset>
@@ -146,7 +146,7 @@ function account_user_reset_password_html($authenticated)
                     <h2>Reset your password</h2>
                     <p>Insert your e-mail address below and we will contact you with instructions to reset your password.</p>
                     <label for="username">E-mail address *</label>
-                    <input required name="email" placeholder="e.x. johndoe@example.org" type="email" />
+                    <input required name="email" placeholder="e.g. johndoe@example.org" type="email" />
                     <button type="submit" class="action">Reset password</button>
                 </fieldset>
             </form>
