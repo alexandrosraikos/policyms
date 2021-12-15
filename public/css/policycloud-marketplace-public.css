@@ -7,9 +7,6 @@
 *
 */
 
-/* TODO @alexandrosraikos: Restyle actions to match PolicyCloud. #74 */
-/* TODO @alexandrosraikos: Redesign loading indicators. #55 */
-
 :root {
   --policycloud-text-color: #111111;
   --policycloud-text-color-secondary: #464646;

@@ -158,30 +158,20 @@
         // Add loading class.
         $(this).addClass("loading");
 
-        const type = $(e.target).data("asset-category");
-        const fileIdentifier = $(e.target).data("asset-id");
-
-        // Prepare form data.
-        var formData = new FormData();
-        formData.append(
-          "description_id",
-          DescriptionEditingProperties.descriptionID
-        );
-        formData.append("subsequent_action", "asset-deletion");
-        formData.append("file-type", type);
-        formData.append("file-identifier", fileIdentifier);
-
         makeWPRequest(
           '.policycloud-marketplace.description.editor .file[data-file-identifier="' +
-          fileIdentifier +
+          $(e.target).data("asset-id") +
           '"] button.delete',
-          "policycloud_marketplace_description_editing",
-          DescriptionEditingProperties.nonce,
-          formData,
+          "policycloud_marketplace_asset_delete",
+          DescriptionEditingProperties.assetDeleteNonce,
+          {
+            'description_id': DescriptionEditingProperties.descriptionID,
+            'asset_category': $(e.target).data("asset-category"),
+            'asset_id': $(e.target).data("asset-id")
+          },
           () => {
             Modal.kill('gallery');
-            $('*[data-image-id="' + fileIdentifier + '"').remove();
-            $('*[data-asset-id="' + fileIdentifier + '"').remove();
+            $('*[data-asset-id="' + $(e.target).data("asset-id") + '"').remove();
           }
         );
       }

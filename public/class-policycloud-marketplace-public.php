@@ -444,7 +444,6 @@ class PolicyCloud_Marketplace_Public
                         'userID' => $user->id
                     ));
 
-                    // TODO @alexandrosraikos: Add account name as head meta title. #54
                     remove_action('wp_head', '_wp_render_title_tag', 1);
                     add_filter(
                         'pre_get_document_title',
@@ -816,6 +815,7 @@ class PolicyCloud_Marketplace_Public
                     'nonce' => wp_create_nonce('policycloud_marketplace_description_editing'),
                     'descriptionID' => $description->id,
                     'assetDownloadNonce' => $permissions['authenticated'] ? wp_create_nonce('policycloud_marketplace_asset_download') : null,
+                    'assetDeleteNonce' => $permissions['authenticated'] ? wp_create_nonce('policycloud_marketplace_asset_delete') : null,
                     'setDefaultImageNonce' => $permissions['authenticated'] ? wp_create_nonce('policycloud_marketplace_set_description_image') : null,
                     'removeDefaultImageNonce' => $permissions['authenticated'] ? wp_create_nonce('policycloud_marketplace_remove_description_image') : null,
                     'reviewsNonce' => $permissions['authenticated'] ? wp_create_nonce('policycloud_marketplace_get_description_reviews') : null,
@@ -826,9 +826,6 @@ class PolicyCloud_Marketplace_Public
                     'deleteRedirect' => $permissions['provider'] ? (self::get_plugin_setting(true, 'account_page') . "#descriptions") : (self::get_plugin_setting(true, 'account_page') . "#approvals"),
                     'videoURL' => $permissions['authenticated'] ? self::get_plugin_setting(true, 'marketplace_host') : ''
                 ));
-
-                // TODO @alexandrosraikos: Add description name as head meta title. #54
-                // TODO @alexandrosraikos: Add video viewer in gallery. #39
 
                 description_html(
                     $description,
@@ -981,6 +978,15 @@ class PolicyCloud_Marketplace_Public
                 return [
                     'url' => self::get_plugin_setting(true, 'marketplace_host') . '/assets/download/' . $otc . (($data['download'] == 'true') ? '' : '?na=not')
                 ];
+            }
+        );
+    }
+
+    public function asset_deletion_handler()
+    {
+        $this->ajax_handler(
+            function ($data) {
+                PolicyCloud_Marketplace_Asset::delete($data['asset_category'], $data['asset_id']);
             }
         );
     }

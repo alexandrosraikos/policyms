@@ -50,15 +50,13 @@ class PolicyCloud_Marketplace_Asset
         );
     }
 
-    public function delete(): void
+    public static function delete(string $asset_category, $asset_id): void
     {
-        $token = PolicyCloud_Marketplace_Account::retrieve_token();
-
         PolicyCloud_Marketplace::api_request(
             'DELETE',
-            '/assets/' . $this->category . '/' . $this->id,
+            '/assets/' . $asset_category . '/' . $asset_id,
             [],
-            $token
+            PolicyCloud_Marketplace_Account::retrieve_token()
         );
     }
 
