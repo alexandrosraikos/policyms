@@ -157,6 +157,8 @@
       if (window.confirm("Are you sure you want to delete this asset?")) {
         // Add loading class.
         $(this).addClass("loading");
+        const assetID = $(this).data("asset-id");
+        const assetCategory = $(this).data("asset-category");
 
         makeWPRequest(
           '.policycloud-marketplace.description.editor .file[data-file-identifier="' +
@@ -166,8 +168,8 @@
           DescriptionEditingProperties.assetDeleteNonce,
           {
             'description_id': DescriptionEditingProperties.descriptionID,
-            'asset_category': $(e.target).data("asset-category"),
-            'asset_id': $(e.target).data("asset-id")
+            'asset_category': assetCategory,
+            'asset_id': assetID
           },
           () => {
             Modal.kill('gallery');

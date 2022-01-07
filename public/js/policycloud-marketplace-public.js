@@ -349,7 +349,6 @@ function makeWPRequest(actionDOMSelector, action, nonce, data, completion) {
           completion(response.responseJSON ?? JSON.parse(response.responseText));
         }
       } catch (objError) {
-        console.error("Invalid JSON response: " + objError);
         completion();
       }
     } else if (response.status === 400 || response.status === 500) {
