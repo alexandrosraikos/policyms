@@ -162,7 +162,7 @@
 
         makeWPRequest(
           '.policycloud-marketplace.description.editor .file[data-file-identifier="' +
-          $(e.target).data("asset-id") +
+          assetID +
           '"] button.delete',
           "policycloud_marketplace_asset_delete",
           DescriptionEditingProperties.assetDeleteNonce,
@@ -173,7 +173,7 @@
           },
           () => {
             Modal.kill('gallery');
-            $('*[data-asset-id="' + $(e.target).data("asset-id") + '"').remove();
+            $('*[data-asset-id="' + assetID + '"').remove();
           }
         );
       }

@@ -17,12 +17,12 @@ function descriptions_grid_html(array $descriptions, string $description_url)
     if (empty($descriptions)) {
         echo show_alert('No assets found.', 'notice');
     } else {
-?>
+        ?>
         <div class="policycloud-marketplace descriptions-grid">
             <ul>
                 <?php
                 foreach ($descriptions as $description) {
-                ?>
+                    ?>
                     <li>
                         <a href="<?= $description_url . '?did=' . $description->id ?>">
                             <div class="cover">
@@ -79,7 +79,7 @@ function descriptions_grid_html(array $descriptions, string $description_url)
                                     </span>
                                     <?php
                                     if (!empty($description->information['subtype'])) {
-                                    ?>
+                                        ?>
                                         <span class="sub-type pill">
                                             <?= $description->information['subtype']  ?>
                                         </span>
@@ -88,12 +88,12 @@ function descriptions_grid_html(array $descriptions, string $description_url)
                             </div>
                         </a>
                     </li>
-                <?php
+                    <?php
                 }
                 ?>
             </ul>
         </div>
-    <?php
+        <?php
     }
 }
 
@@ -150,11 +150,12 @@ function featured_descriptions_html(array $categories, string $description_page)
         descriptions_grid_html($categories['suggestions'][0], $description_page);
         ?>
     </div>
-<?php
+    <?php
 }
 
 function descriptions_archive_filters_html($filters)
-{ ?>
+{
+    ?>
     <div class="filters">
         <button class="close outlined filters-toggle">Close</button>
         <h2>Filters</h2>
@@ -213,14 +214,14 @@ function descriptions_archive_filters_html($filters)
                 <div class="providers">
                     <?php
                     foreach ($filters['providers'] as $provider) {
-                    ?>
+                        ?>
                         <span>
                             <input type="checkbox" name="provider[]" value="<?= $provider ?>" <?= in_array($provider, $_GET['provider'] ?? []) ? 'checked' : ''  ?> />
                             <label for="provider[]">
                                 <?= $provider ?>
                             </label>
                         </span>
-                    <?php
+                        <?php
                     }
                     ?>
                 </div>
@@ -252,7 +253,7 @@ function descriptions_archive_filters_html($filters)
             <button type="submit" class="action">Apply filters</button>
         </form>
     </div>
-<?php
+    <?php
 }
 
 /**
@@ -267,7 +268,7 @@ function descriptions_archive_filters_html($filters)
  */
 function descriptions_archive_html(array $descriptions, array $filters, string $description_page)
 {
-?>
+    ?>
     <div class="policycloud-marketplace descriptions archive inspect">
         <?= descriptions_archive_filters_html($filters) ?>
         <div class="content">
@@ -303,7 +304,7 @@ function descriptions_archive_html(array $descriptions, array $filters, string $
             </header>
             <?php
             if (!empty($descriptions)) {
-            ?>
+                ?>
                 <div class="gallery">
                     <?php
                     descriptions_grid_html($descriptions['content'][0], $description_page);
@@ -317,20 +318,20 @@ function descriptions_archive_html(array $descriptions, array $filters, string $
                     }
                     ?>
                 </nav>
-            <?php
+                <?php
             } else {
                 show_alert('No descriptions found.', 'notice');
             }
             ?>
         </div>
     </div>
-<?php
+    <?php
 }
 
 
 /**
  * The description editing form.
- * 
+ *
  * This function prints a description editing form if a description object is passed.
  * If a description object is not passed, this function acts as a description creation form.
  *
@@ -340,7 +341,7 @@ function descriptions_archive_html(array $descriptions, array $filters, string $
 function description_editor_html(PolicyCloud_Marketplace_Description $description = null): void
 {
     // Print the main editor HTML.
-?>
+    ?>
     <div class="policycloud-marketplace description editor <?= !empty($description) ? 'modalize' : '' ?>">
         <form>
             <fieldset name="basic-information">
@@ -408,10 +409,26 @@ function description_editor_html(PolicyCloud_Marketplace_Description $descriptio
                                 $allowed_mimetypes = '';
                                 break;
                         }
-                    ?>
+                        ?>
                         <h3>
-                            <?= ucfirst($category) ?>
+                            <?php 
+                                if ($category == 'images' || $category == 'videos') {
+                                    echo ucfirst($category) + " (Gallery)";
+                                }
+                                else {
+                                    echo ucfirst($category);
+                                }
+                            ?>
                         </h3>
+                        <?php
+                            if ($category == 'videos') {
+                                echo "
+                                <p>
+                                    Uploaded gallery videos are publicly accessible. Please do not include sensitive or protected information.
+                                </p>
+                                ";
+                            }
+                        ?>
                         <?php
                         if (!empty($assets)) {
                             foreach ($assets as $asset) { ?>
@@ -427,14 +444,14 @@ function description_editor_html(PolicyCloud_Marketplace_Description $descriptio
                                     </label>
                                     <input type="file" name="<?= $category . '-' . $asset->id ?>" accept="<?= $allowed_mimetypes ?>" multiple />
                                 </div>
-                        <?php
+                                <?php
                             }
                         } ?>
                         Upload new files <?= $upload_notice ?>:
                         <div class="chooser">
                             <input type="file" name="<?= $category ?>[]" accept="<?= $allowed_mimetypes ?>" multiple />
                         </div>
-                    <?php
+                        <?php
                     }
                     ?>
                 </fieldset>
@@ -443,21 +460,21 @@ function description_editor_html(PolicyCloud_Marketplace_Description $descriptio
             <div class="actions">
                 <?php
                 if (!empty($description)) {
-                ?>
+                    ?>
                     <button data-action="delete-description" class="action destructive">Delete</button>
-                <?php
+                    <?php
                 }
                 ?>
                 <button type="submit" class="action">Submit</button>
             </div>
         </form>
     </div>
-<?php
+    <?php
 }
 
 function description_reviews_list_html(array $reviews)
 {
-?>
+    ?>
     <ul>
         <?php
         foreach ($reviews[0] as $review) { ?>
@@ -467,10 +484,10 @@ function description_reviews_list_html(array $reviews)
                     <span class="stars">
                         <?php
                         for ($i = 0; $i < $review->rating; $i++) {
-                        ?>
+                            ?>
 
                             <span class="fas fa-star"></span>
-                        <?php
+                            <?php
                         }
                         ?>
                     </span>
@@ -489,18 +506,17 @@ function description_reviews_list_html(array $reviews)
             </li>
         <?php } ?>
     </ul>
-<?php
-
+    <?php
 }
 
 function description_reviews_html(array $reviews = null, ?int $pages = 0, PolicyCloud_Marketplace_Review $existing_review = null, bool $provider)
 {
-?>
+    ?>
     <div class="policycloud-marketplace reviews">
         <?php
         if (!empty($reviews)) {
             description_reviews_list_html($reviews);
-        ?>
+            ?>
             <nav class="pagination">
                 <?php
                 for ($page = 1; $page < $pages; $page++) {
@@ -509,13 +525,13 @@ function description_reviews_html(array $reviews = null, ?int $pages = 0, Policy
                 }
                 ?>
             </nav>
-        <?php
+            <?php
         } else {
             show_alert('No reviews yet.', 'notice');
         }
 
         if (!$provider) {
-        ?>
+            ?>
             <form>
                 <label for="comment">Comment</label>
                 <textarea name="comment" placeholder="Insert your comment here.."><?= !empty($existing_review) ? $existing_review->comment : null ?></textarea>
@@ -524,12 +540,12 @@ function description_reviews_html(array $reviews = null, ?int $pages = 0, Policy
                     <?php
                     for ($i = 0; $i < 5; $i++) {
                         $rating = $i + 1;
-                    ?>
+                        ?>
                         <label>
                             <input type="radio" name="rating" value="<?= $rating ?>" class="<?= ($rating <= ($existing_review->rating ?? 0)) ? 'checked' : '' ?>" <?= ($rating == ($existing_review->rating ?? 0)) ? 'checked' : '' ?> required />
                             <span class="fas fa-star"></span>
                         </label>
-                    <?php
+                        <?php
                     }
                     ?>
                 </div>
@@ -542,9 +558,9 @@ function description_reviews_html(array $reviews = null, ?int $pages = 0, Policy
                 <?php } ?>
                 <div class="actions">
                     <?php if (!empty($existing_review)) {
-                    ?>
+                        ?>
                         <button class="action destructive" data-action="delete-review">Delete</button>
-                    <?php
+                        <?php
                     }
                     ?>
                     <button class="action" type="submit">Submit</button>
@@ -582,7 +598,7 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
      */
     function asset_viewer(string $title, string $category, array $assets, bool $collapsed = false): void
     {
-    ?>
+        ?>
         <div class="policycloud-marketplace file-viewer <?= ($collapsed) ? 'collapsed' : '' ?>">
             <button data-files-category="<?= $category ?>" class="action"><?= $title ?></button>
             <table>
@@ -595,14 +611,14 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                 <?php
                 if (!empty($assets)) {
                     foreach ($assets as $asset) {
-                ?>
+                        ?>
                         <tr data-file-id="<?= $asset->id ?>">
                             <td><a class="download" data-file-id="<?= $asset->id ?>" data-type="<?= $category ?>"><?= $asset->filename ?></a></td>
                             <td><?= $asset->version ?></td>
                             <td><?= $asset->size ?></td>
                             <td><?= time_elapsed_string(date('Y-m-d H:i:s', strtotime($asset->update_date))) ?></td>
                         </tr>
-                <?php
+                        <?php
                     }
                 } else {
                     echo '<tr><td colspan="4">';
@@ -612,21 +628,21 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                 ?>
             </table>
         </div>
-    <?php
+        <?php
     }
 
     if (!empty($description)) {
-    ?>
+        ?>
         <div class="policycloud-marketplace description">
             <?php
             if ($permissions['administrator'] && $description->metadata['approved'] == "0") {
-            ?>
+                ?>
                 <div class="policycloud-marketplace-notice" id="policycloud-marketplace-description-approval">
                     <p>This asset is not yet accessible from other authorized Marketplace users.</p>
                     <button class="action destructive" data-response="disapprove">Delete</button>
                     <button class="action" data-response="approve">Approve</button>
                 </div>
-            <?php
+                <?php
             }
             ?>
             <header>
@@ -634,21 +650,21 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                     <h1><?= $description->information['title'] ?>
                         <?php
                         if ($permissions['provider'] || $permissions['administrator']) {
-                        ?>
+                            ?>
                             <span class="status label <?= ($description->metadata['approved'] == "1") ? 'success' : 'notice' ?>">
                                 <?= ($description->metadata['approved'] == "1") ? 'Approved' : 'Pending' ?>
                             </span>
-                        <?php
+                            <?php
                         }
                         ?>
                     </h1>
                     <?php
                     if ($permissions['provider'] || $permissions['administrator']) {
-                    ?>
+                        ?>
                         <button class="outlined" data-action="edit">
                             <span class="fas fa-pen"></span> Edit
                         </button>
-                    <?php
+                        <?php
                     }
                     ?>
                 </div>
@@ -706,13 +722,13 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                     <?php
                     if ($permissions['authenticated']) {
                         asset_viewer('Files', 'files', $description->assets['files'], (empty($description->assets['files'])));
-                        asset_viewer('Videos', 'videos', $description->assets['videos'], (empty($description->assets['videos'])));
+                        asset_viewer('Videos (Gallery)', 'videos', $description->assets['videos'], (empty($description->assets['videos'])));
                         asset_viewer('Images (Gallery)', 'images', $description->assets['images'], (empty($description->assets['images'])));
                     } else {
                         show_lock($pages['login_page'], 'view and download files');
                     }
                     if ($permissions['authenticated']) {
-                    ?>
+                        ?>
                         <div class="comments">
                             <h2>Additional information</h2>
                             <?php
@@ -723,7 +739,7 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                             }
                             ?>
                         </div>
-                    <?php
+                        <?php
                     }
                     ?>
                 </div>
@@ -757,7 +773,7 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                                             ?>">
                                             <?php
                                             if ($permissions['provider']) {
-                                            ?>
+                                                ?>
                                                 <div class="toolbar">
                                                     <span>
                                                         <?= $video->filename ?>
@@ -769,10 +785,10 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                                                         </button>
                                                     </div>
                                                 </div>
-                                            <?php
+                                                <?php
                                             } ?>
                                         </div>
-                                    <?php
+                                        <?php
                                     }
                                 }
                                 if (!empty($image_blobs)) {
@@ -780,8 +796,8 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                                         <div class="item" data-asset-id="<?= $description->assets['images'][$key]->id ?>" data-asset-category="images">
                                             <?php
                                             echo '<img src="data:image/*;base64,' . base64_encode($image_blob) . '" data-asset-category="images" data-asset-id="' . $description->assets['images'][$key]->id . '" draggable="false" />';
-                                            if ($permissions['provider']) {
-                                            ?>
+                                            if ($permissions['provider'] || $permissions['administrator']) {
+                                                ?>
                                                 <div class="toolbar">
                                                     <span>
                                                         <?= $description->assets['images'][$key]->filename ?>
@@ -799,17 +815,17 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                                                         </button>
                                                     </div>
                                                 </div>
-                                            <?php
+                                                <?php
                                             } ?>
                                         </div> <?php
-                                            }
-                                        } else {
-                                            show_alert('No images or videos were found.', 'notice');
-                                        }
-                                    } else {
-                                        show_lock($pages['login_page'], 'view the image gallery');
                                     }
-                                                ?>
+                                } else {
+                                    show_alert('No images or videos were found.', 'notice');
+                                }
+                            } else {
+                                show_lock($pages['login_page'], 'view the image gallery');
+                            }
+                            ?>
                         </div>
                     </div>
                 </div>
@@ -913,7 +929,7 @@ function description_creation_html()
  */
 function entity_list_html(string $id, array $content, bool $visitor, callable $inner_html, ?string $create_page_url = null)
 {
-        ?>
+    ?>
         <header>
             <h3><?= ucfirst($id) ?></h3>
             <div class="actions">
@@ -926,7 +942,7 @@ function entity_list_html(string $id, array $content, bool $visitor, callable $i
                         <option value="rating-desc" <?= (($_GET['sort-by'] ?? '' == 'rating-desc') ? "selected" : "") ?>>Lowest rated</option>
                         <?php
                         if ($id == 'descriptions') {
-                        ?>
+                            ?>
                             <option value="views-asc" <?= (($_GET['sort-by'] ?? '' == 'views-asc') ? "selected" : "") ?>>Most viewed</option>
                             <option value="views-desc" <?= (($_GET['sort-by'] ?? '' == 'views-desc') ? "selected" : "") ?>>Least viewed</option>
                         <?php } ?>
@@ -943,7 +959,7 @@ function entity_list_html(string $id, array $content, bool $visitor, callable $i
                 </form>
                 <?php
                 if (!$visitor && $id == 'descriptions'  && !empty($create_page_url)) {
-                ?>
+                    ?>
                     <a id="policycloud-upload" href="<?= $create_page_url ?>" title="Create new"><span class="fas fa-plus"></span> Create new</a>
                 <?php } ?>
             </div>
