@@ -93,7 +93,13 @@ class PolicyCloud_Marketplace_Asset
 
     protected static function check_specs($type, array $file): void
     {
-        // TODO @alexandrosraikos: Add file size check (100MB for user, 1GB for admin). (#112)
+        $byte_size_limit = ((new PolicyCloud_Marketplace_User())->is_admin()) ? 100000000000 : 100000000;
+
+        if ($file['size'] > $byte_size_limit) {
+            throw new PolicyCloudMarketplaceInvalidDataException(
+                "The file ".$file['name']." exceeds the size limit. Please upload a file less or equal to ".($byte_size_limit/1000000)."MB in size."
+            );
+        }
         switch ($type) {
             case 'images':
                 if (
@@ -156,7 +162,8 @@ class PolicyCloud_Marketplace_Asset
                 $file = [
                     'path' => $_FILES[$name]['tmp_name'][$key],
                     'mimetype' => $_FILES[$name]['type'][$key],
-                    'name' => $_FILES[$name]['name'][$key]
+                    'name' => $_FILES[$name]['name'][$key],
+                    'size' => $_FILES[$name]['size'][$key]
                 ];
 
                 // Throw on incompatible specs.
@@ -182,7 +189,8 @@ class PolicyCloud_Marketplace_Asset
                 $file = [
                     'path' => $_FILES[$name]['tmp_name'],
                     'mimetype' => $_FILES[$name]['type'],
-                    'name' => $_FILES[$name]['name']
+                    'name' => $_FILES[$name]['name'],
+                    'size' => $_FILES[$name]['size']
                 ];
                 self::check_specs($category, $file);
                 $completion($file);
@@ -213,8 +221,7 @@ class PolicyCloud_Marketplace_Asset
                     ],
                     true
                 );
-            },
-            $index ?? null
+            }
         );
     }
 }

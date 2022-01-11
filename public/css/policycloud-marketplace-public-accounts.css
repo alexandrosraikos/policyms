@@ -17,6 +17,17 @@
 *
 */
 
+#policycloud-registration .tos-agree {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#policycloud-registration .tos-agree label {
+  padding-left: 6px;
+  margin: 0;
+}
+
 #policycloud-registration .socials div div {
   display: flex;
   align-items: center;

@@ -14,7 +14,6 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
         show_alert("You're already logged in.", 'notice');
     } else {
         // TODO @alexandrosraikos: Remove username field (#113).
-        // TODO @alexandrosraikos: Make terms URL a mandatory checkbox (#115).
 ?>
         <div class="policycloud-marketplace">
             <form id="policycloud-registration" action="">
@@ -80,11 +79,16 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
                     <label for="phone">Phone number</label>
                     <input type="tel" name="phone" placeholder="e.g. +30 6999123456" />
                 </fieldset>
+                <div class="tos-agree">
+                    <input type="checkbox" id="tos-agree" name="tos-agree" required />
+                    <label for="tos-agreee">
+                        By submitting this registration form, you agree to our <a class="underline" href="<?php echo $tos_url ?>">Terms of Service</a>.
+                    </label>
+                </div>
                 <div class="actions">
                     <button type="submit" class="action ">Create account</button>
                 </div>
-                <p>By submitting this form, you agree to our <a class="underline" href="<?php echo $tos_url ?>">Terms of Service</a>.
-                    Already have an account? Please <a class="underline" href="<?php echo $authentication_url ?>">Log in</a>.</p>
+                <p>Already have an account? Please <a class="underline" href="<?php echo $authentication_url ?>">Log in</a>.</p>
             </form>
         </div>
     <?php

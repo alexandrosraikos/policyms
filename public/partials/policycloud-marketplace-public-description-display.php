@@ -101,9 +101,9 @@ function descriptions_grid_html(array $descriptions, string $description_url)
 
 function featured_descriptions_html(array $categories, string $description_page): void
 {
-    // TODO @alexandrosraikos: Apply white background to statistics (#107).
     ?>
     <div class="policycloud-marketplace featured-descriptions">
+        <div class="white-container">
         <div class="row statistics">
             <div class="column">
                 <figure>
@@ -135,6 +135,7 @@ function featured_descriptions_html(array $categories, string $description_page)
                     </figcaption>
                 </figure>
             </div>
+        </div>
         </div>
         <h2>Top rated descriptions</h2>
         <?php
@@ -210,24 +211,6 @@ function descriptions_archive_filters_html($filters)
                         <input type="radio" name="type" value="other" <?= (($_GET['type'] ?? '') == 'other') ? 'checked' : '' ?> />
                         <label for="type">Other</label>
                     </span>
-                </div>
-            </fieldset>
-            <!-- TODO @alexandrosraikos: Remove provider filtering (#110) -->
-            <fieldset>
-                <h3>Provider</h3>
-                <div class="providers">
-                    <?php
-                    foreach ($filters['providers'] as $provider) {
-                        ?>
-                        <span>
-                            <input type="checkbox" name="provider[]" value="<?= $provider ?>" <?= in_array($provider, $_GET['provider'] ?? []) ? 'checked' : ''  ?> />
-                            <label for="provider[]">
-                                <?= $provider ?>
-                            </label>
-                        </span>
-                        <?php
-                    }
-                    ?>
                 </div>
             </fieldset>
             <fieldset>
@@ -342,7 +325,7 @@ function descriptions_archive_html(array $descriptions, array $filters, string $
  * @param PolicyCloud_Marketplace_Description|null $description
  * @return void
  */
-function description_editor_html(PolicyCloud_Marketplace_Description $description = null): void
+function description_editor_html(PolicyCloud_Marketplace_Description $description = null, array $permissions = null): void
 {
     // Print the main editor HTML.
     ?>
@@ -397,14 +380,14 @@ function description_editor_html(PolicyCloud_Marketplace_Description $descriptio
             </fieldset>
             <?php 
                 if (!empty($description)) { 
-                 // TODO @alexandrosraikos: Notify size limits (100MB for users, 1GB for admins). (#112)
                 ?>
                 <fieldset name="uploads">
                     <h2>Uploads</h2>
-                    <p>Manage your content and upload new files, images and videos.</p>
+                    <p>Manage your content and upload new files, images and videos up to <?= ($permissions['administrator'] ?? false) ? '1GB': '100MB' ?> in size.</p>
                     <?php
                     foreach ($description->assets as $category => $assets) {
-                        $upload_notice = ($category == 'images') ? '(supported file types: jpg, png)' : '';
+                        $upload_notice = ($category == 'images') ? ' (supported file types: jpg, png)' : '';
+                        $upload_notice = ($category == 'videos') ? ' (supported file types: mp4, ogg, webm)' : '';
                         switch ($category) {
                             case 'images':
                                 $allowed_mimetypes = 'image/jpeg,image/png';
@@ -447,14 +430,14 @@ function description_editor_html(PolicyCloud_Marketplace_Description $descriptio
                                         <?= $asset->filename . ' (' . $asset->size . ')' ?>
                                     </div>
                                     <label for="<?= $category . '-' . $asset->id ?>">
-                                        Replace file <?= $upload_notice ?>:
+                                        Replace file<?= $upload_notice ?>:
                                     </label>
                                     <input type="file" name="<?= $category . '-' . $asset->id ?>" accept="<?= $allowed_mimetypes ?>" multiple />
                                 </div>
                                 <?php
                             }
                         } ?>
-                        Upload new files <?= $upload_notice ?>:
+                        Upload new files<?= $upload_notice ?>:
                         <div class="chooser">
                             <input type="file" name="<?= $category ?>[]" accept="<?= $allowed_mimetypes ?>" multiple />
                         </div>
@@ -859,7 +842,7 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
             </div>
             <?php
             if ($permissions['provider'] || $permissions['administrator']) {
-                description_editor_html($description);
+                description_editor_html($description, $permissions);
             }
             ?>
         <?php

@@ -855,7 +855,6 @@ class PolicyCloud_Marketplace_Public
     {
         $this->ajax_handler(
             function ($data) {
-
                 $description = new PolicyCloud_Marketplace_Description($data['description_id']);
                 try {
                     $description->update(
