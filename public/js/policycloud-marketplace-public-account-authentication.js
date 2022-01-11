@@ -56,6 +56,9 @@
       );
     }
 
+    // TODO @alexandrosraikos: Add Google SSO pop up integration. (#114)
+    // TODO @alexandrosraikos: Add AJAX request to forward Google bearer token and log user in on token response. (#114)
+
     /**
      *
      * Generic interface actions & event listeners.

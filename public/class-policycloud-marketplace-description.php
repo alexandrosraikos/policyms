@@ -5,6 +5,8 @@ require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-mark
 
 class PolicyCloud_Marketplace_Description
 {
+    // TODO @alexandrosraikos: Add "Links" handling section (similar to "socials" on accounts). (#59)
+
     public string $id;
 
     public string $type;

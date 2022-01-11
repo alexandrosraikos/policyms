@@ -13,6 +13,8 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
     if ($authenticated) {
         show_alert("You're already logged in.", 'notice');
     } else {
+        // TODO @alexandrosraikos: Remove username field (#113).
+        // TODO @alexandrosraikos: Make terms URL a mandatory checkbox (#115).
 ?>
         <div class="policycloud-marketplace">
             <form id="policycloud-registration" action="">
@@ -104,6 +106,7 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
 function account_user_authentication_html($registration_url, $reset_password_page, $authenticated)
 {
     if (!$authenticated) {
+        // TODO @alexandrosraikos: Use only email address for authentication. (#113)
     ?>
         <div class="policycloud-marketplace">
             <form id="policycloud-authentication">
@@ -196,6 +199,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
         return count($page);
     }, $data['approvals'] ?? []));
 
+    // TODO @alexandrosraikos: Remove username fields. (#113)
     ?>
     <div id="policycloud-marketplace-account" class="policycloud-marketplace">
         <div id="policycloud-marketplace-account-sidebar">

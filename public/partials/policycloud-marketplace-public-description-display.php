@@ -1,5 +1,7 @@
 <?php
 
+// TODO @alexandrosraikos: Replace username field with full name for logged in users. (#113)
+
 
 /**
  *
@@ -99,6 +101,7 @@ function descriptions_grid_html(array $descriptions, string $description_url)
 
 function featured_descriptions_html(array $categories, string $description_page): void
 {
+    // TODO @alexandrosraikos: Apply white background to statistics (#107).
     ?>
     <div class="policycloud-marketplace featured-descriptions">
         <div class="row statistics">
@@ -209,6 +212,7 @@ function descriptions_archive_filters_html($filters)
                     </span>
                 </div>
             </fieldset>
+            <!-- TODO @alexandrosraikos: Remove provider filtering (#110) -->
             <fieldset>
                 <h3>Provider</h3>
                 <div class="providers">
@@ -391,7 +395,10 @@ function description_editor_html(PolicyCloud_Marketplace_Description $descriptio
                 <label for="comments">Comments</label>
                 <textarea name="comments" placeholder="Insert any additional comments"><?= empty($description->information['comments']) ? '' : $description->information['comments'] ?></textarea>
             </fieldset>
-            <?php if (!empty($description)) { ?>
+            <?php 
+                if (!empty($description)) { 
+                 // TODO @alexandrosraikos: Notify size limits (100MB for users, 1GB for admins). (#112)
+                ?>
                 <fieldset name="uploads">
                     <h2>Uploads</h2>
                     <p>Manage your content and upload new files, images and videos.</p>
@@ -511,6 +518,7 @@ function description_reviews_list_html(array $reviews)
 
 function description_reviews_html(array $reviews = null, ?int $pages = 0, PolicyCloud_Marketplace_Review $existing_review = null, bool $provider)
 {
+    // TODO @alexandrosraikos: Allow author and admin to delete reviews. (#108)
     ?>
     <div class="policycloud-marketplace reviews">
         <?php
@@ -583,6 +591,8 @@ function description_reviews_html(array $reviews = null, ?int $pages = 0, Policy
  */
 function description_html($description, $image_blobs, $pages, $reviews, $permissions)
 {
+
+    // TODO @alexandrosraikos: Add "Links" section (identical functionality to account links). (#59)
 
     /**
      * Print the file viewer table.

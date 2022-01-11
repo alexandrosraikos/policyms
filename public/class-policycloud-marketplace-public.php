@@ -1060,4 +1060,6 @@ class PolicyCloud_Marketplace_Public
             }
         );
     }
+
+    // TODO @alexandrosraikos / @vkoukos: Add Google SSO bearer token forwarding to the PolicyCloud Marketplace API and log user in on token response. (#114)
 }

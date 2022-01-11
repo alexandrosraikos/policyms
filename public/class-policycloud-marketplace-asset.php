@@ -93,6 +93,7 @@ class PolicyCloud_Marketplace_Asset
 
     protected static function check_specs($type, array $file): void
     {
+        // TODO @alexandrosraikos: Add file size check (100MB for user, 1GB for admin). (#112)
         switch ($type) {
             case 'images':
                 if (
