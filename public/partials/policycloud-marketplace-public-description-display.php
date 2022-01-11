@@ -413,7 +413,7 @@ function description_editor_html(PolicyCloud_Marketplace_Description $descriptio
                         <h3>
                             <?php 
                                 if ($category == 'images' || $category == 'videos') {
-                                    echo ucfirst($category) + " (Gallery)";
+                                    echo ucfirst($category)." (Gallery)";
                                 }
                                 else {
                                     echo ucfirst($category);
@@ -819,7 +819,8 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                                             } ?>
                                         </div> <?php
                                     }
-                                } else {
+                                }
+                                if (empty($description->assets['videos']) && empty($description->assets['images'])) {
                                     show_alert('No images or videos were found.', 'notice');
                                 }
                             } else {
