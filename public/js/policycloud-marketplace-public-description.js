@@ -157,31 +157,23 @@
       if (window.confirm("Are you sure you want to delete this asset?")) {
         // Add loading class.
         $(this).addClass("loading");
-
-        const type = $(e.target).data("asset-category");
-        const fileIdentifier = $(e.target).data("asset-id");
-
-        // Prepare form data.
-        var formData = new FormData();
-        formData.append(
-          "description_id",
-          DescriptionEditingProperties.descriptionID
-        );
-        formData.append("subsequent_action", "asset-deletion");
-        formData.append("file-type", type);
-        formData.append("file-identifier", fileIdentifier);
+        const assetID = $(this).data("asset-id");
+        const assetCategory = $(this).data("asset-category");
 
         makeWPRequest(
           '.policycloud-marketplace.description.editor .file[data-file-identifier="' +
-          fileIdentifier +
+          assetID +
           '"] button.delete',
-          "policycloud_marketplace_description_editing",
-          DescriptionEditingProperties.nonce,
-          formData,
+          "policycloud_marketplace_asset_delete",
+          DescriptionEditingProperties.assetDeleteNonce,
+          {
+            'description_id': DescriptionEditingProperties.descriptionID,
+            'asset_category': assetCategory,
+            'asset_id': assetID
+          },
           () => {
             Modal.kill('gallery');
-            $('*[data-image-id="' + fileIdentifier + '"').remove();
-            $('*[data-asset-id="' + fileIdentifier + '"').remove();
+            $('*[data-asset-id="' + assetID + '"').remove();
           }
         );
       }

@@ -214,6 +214,8 @@ class PolicyCloud_Marketplace
         // Support for descriptions' assets.
         $this->loader->add_action('wp_ajax_policycloud_marketplace_asset_download', $plugin_public, 'asset_download_handler');
         $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_asset_download', $plugin_public, 'asset_download_handler');
+        $this->loader->add_action('wp_ajax_policycloud_marketplace_asset_delete', $plugin_public, 'asset_deletion_handler');
+        $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_asset_delete', $plugin_public, 'asset_deletion_handler');
         $this->loader->add_action('wp_ajax_policycloud_marketplace_set_description_image', $plugin_public, 'set_description_image_handler');
         $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_set_description_image', $plugin_public, 'set_description_image_handler');
         $this->loader->add_action('wp_ajax_policycloud_marketplace_remove_description_image', $plugin_public, 'remove_description_image_handler');

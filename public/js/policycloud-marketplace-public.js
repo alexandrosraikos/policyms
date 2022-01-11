@@ -206,19 +206,23 @@ class Modal {
     }
   }
 
-  next() {
-    this.index = this.index + 1 > this.data.length - 1 ? 0 : this.index + 1;
-    this.set(this.data[this.index]);
-    this.setControls(
-      this.controls.previous(),
-      this.index + 1 <= this.data.length - 1
-    );
+  previous() {
+    if (this.index - 1 >= 0) {
+      this.index = this.index - 1 < 0 ? this.data.length - 1 : this.index - 1;
+      this.set(this.data[this.index]);
+      this.setControls(this.index - 1 >= 0, this.controls.next());
+    }
   }
 
-  previous() {
-    this.index = this.index - 1 < 0 ? this.data.length - 1 : this.index - 1;
-    this.set(this.data[this.index]);
-    this.setControls(this.index - 1 >= 0, this.controls.next());
+  next() {
+    if (this.index + 2 <= this.data.length) {
+      this.index = this.index + 1 > this.data.length - 1 ? 0 : this.index + 1;
+      this.set(this.data[this.index]);
+      this.setControls(
+        this.controls.previous(),
+        this.index + 1 <= this.data.length - 1
+      );
+    }
   }
 }
 
@@ -345,7 +349,6 @@ function makeWPRequest(actionDOMSelector, action, nonce, data, completion) {
           completion(response.responseJSON ?? JSON.parse(response.responseText));
         }
       } catch (objError) {
-        console.error("Invalid JSON response: " + objError);
         completion();
       }
     } else if (response.status === 400 || response.status === 500) {
