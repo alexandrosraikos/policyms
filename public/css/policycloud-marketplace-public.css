@@ -59,7 +59,8 @@
   transition: color 0.2s ease-in-out;
 }
 
-.policycloud-marketplace button.action {
+.policycloud-marketplace button.action,
+.policycloud-marketplace a.action {
   padding: 7px 15px;
   border: 1px solid var(--policycloud-background-notice-outline);
   border-radius: 8px;
@@ -69,10 +70,25 @@
   transition: all 0.2s ease-in-out;
 }
 
+.policycloud-marketplace button.action.minimal {
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none !important;
+  color: var(--policycloud-text-color) !important;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
 .policycloud-marketplace button.action.destructive {
   background-color: var(--policycloud-background-failure) !important;
   border-color: var(--policycloud-background-failure-outline);
   color: var(--policycloud-text-color-invert) !important;
+}
+.policycloud-marketplace button.action.minimal.destructive {
+  background-color: transparent !important;
+  border: none;
+  color: var(--policycloud-background-failure) !important;
 }
 
 .policycloud-marketplace button.action.productive {
@@ -99,7 +115,8 @@
   pointer-events: none;
 }
 
-.policycloud-marketplace button.tactile {
+.policycloud-marketplace button.tactile,
+.policycloud-marketplace a.tactile {
   display: block;
   width: 100%;
   text-align: left;
@@ -113,7 +130,8 @@
   transition: all 0.2s ease-in-out;
 }
 
-.policycloud-marketplace button.tactile:hover {
+.policycloud-marketplace button.tactile:hover,
+.policycloud-marketplace a.tactile:hover {
   transform: scale(0.98);
   background-color: rgba(0, 0, 0, 0.05) !important;
   transition: all 0.2s ease-in-out;
@@ -121,7 +139,9 @@
 }
 
 .policycloud-marketplace button.tactile.active,
-.policycloud-marketplace button.tactile:active {
+.policycloud-marketplace button.tactile:active,
+.policycloud-marketplace a.tactile.active,
+.policycloud-marketplace a.tactile:active {
   transform: scale(0.96);
   background-color: rgba(0, 0, 0, 0.1) !important;
   transition: all 0.1s ease-in-out;

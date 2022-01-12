@@ -510,7 +510,6 @@ class PolicyCloud_Marketplace_Public
             function ($data) {
 
                 return PolicyCloud_Marketplace_User::register([
-                    'username' => sanitize_user($data['username']),
                     'password' => stripslashes($data['password']),
                     'password-confirm' => stripslashes($data['password-confirm']),
                     'name' => filter_var(stripslashes($data['name']), FILTER_SANITIZE_STRING),
@@ -810,6 +809,7 @@ class PolicyCloud_Marketplace_Public
                     }
                 }
 
+                wp_enqueue_script("policycloud-marketplace-description-creation");
                 wp_enqueue_script('policycloud-marketplace-description');
                 wp_localize_script('policycloud-marketplace-description', 'DescriptionEditingProperties', array(
                     'nonce' => wp_create_nonce('policycloud_marketplace_description_editing'),
@@ -864,6 +864,18 @@ class PolicyCloud_Marketplace_Public
                             "subtype" => sanitize_text_field($data['subtype'] ?? ''),
                             "owner" => sanitize_text_field($data['owner'] ?? ''),
                             "description" => sanitize_text_field($data['description']),
+                            'links-title' => array_map(
+                                function ($title) {
+                                    return filter_var(stripslashes($title), FILTER_SANITIZE_STRING);
+                                },
+                                $data['links-title'] ?? []
+                            ),
+                            'links-url' =>  array_map(
+                                function ($url) {
+                                    return filter_var($url, FILTER_SANITIZE_URL);
+                                },
+                                $data['links-url'] ?? []
+                            ),
                             "fieldOfUse" => explode(", ", $data['fields-of-use'] ?? ''),
                             "comments" => sanitize_text_field($data['comments'] ?? '')
                         ],
@@ -931,7 +943,7 @@ class PolicyCloud_Marketplace_Public
                         );
                     }
                 }
-
+            
                 return (PolicyCloud_Marketplace_Description::create(
                     [
                         "title" => sanitize_text_field($data['title']),
@@ -939,6 +951,20 @@ class PolicyCloud_Marketplace_Public
                         "subtype" => sanitize_text_field($data['subtype'] ?? ''),
                         "owner" => sanitize_text_field($data['owner'] ?? ''),
                         "description" => sanitize_text_field($data['description']),
+                        "links" => PolicyCloud_Marketplace_User::implode_urls(
+                            array_map(
+                                function ($title) {
+                                    return filter_var(stripslashes($title), FILTER_SANITIZE_STRING);
+                                },
+                                $data['links-title'] ?? []
+                            ),
+                            array_map(
+                                function ($url) {
+                                    return filter_var($url, FILTER_SANITIZE_URL);
+                                },
+                                $data['links-url'] ?? []
+                            )
+                        ),
                         "fieldOfUse" => explode(", ", $data['fields-of-use'] ?? []),
                         "comments" => sanitize_text_field($data['comments'] ?? '')
                     ]
@@ -997,7 +1023,7 @@ class PolicyCloud_Marketplace_Public
                 $description = new PolicyCloud_Marketplace_Description($data['description_id']);
                 $reviews = $description->get_reviews($data['page']);
                 ob_start();
-                description_reviews_list_html($reviews['content']);
+                description_reviews_list_html($reviews['content'], $description->user_review->user_id ?? null);
                 $html_response = ob_get_contents();
                 ob_end_clean();
                 return $html_response;
@@ -1032,7 +1058,7 @@ class PolicyCloud_Marketplace_Public
     {
         $this->ajax_handler(
             function ($data) {
-                PolicyCloud_Marketplace_Review::delete($data['description_id']);
+                PolicyCloud_Marketplace_Review::delete($data['description_id'], $data['author_id']);
             }
         );
     }

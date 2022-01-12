@@ -13,6 +13,8 @@ class PolicyCloud_Marketplace_Description
 
     public array $information;
 
+    public array $links;
+
     public string $image_id;
 
     public array $metadata;
@@ -83,6 +85,10 @@ class PolicyCloud_Marketplace_Description
                 "subtype" => $information['subtype'],
                 "owner" => $information['owner'],
                 "description" => stripslashes($information['description']),
+                "links" => PolicyCloud_Marketplace_User::implode_urls(
+                    $information['links-title'],
+                    $information['links-url']
+                ),
                 "fieldOfUse" => $information['fieldOfUse'],
                 "comments" => $information['comments']
             ];
@@ -173,6 +179,7 @@ class PolicyCloud_Marketplace_Description
         } else {
             $this->type = $description['info']['type'];
             $this->information = $description['info'];
+            $this->links = $description['links'];
             $this->metadata = $description['metadata'];
             $this->image_id = $description['main_image'];
         }

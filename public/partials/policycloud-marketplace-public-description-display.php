@@ -1,6 +1,7 @@
 <?php
 
-// TODO @alexandrosraikos: Replace username field with full name for logged in users. (#113)
+// TODO @alexandrosraikos / @vkoukos: Show provider field as full name only for logged in users on description views. (#113)
+// TODO @alexandrosraikos / @vkoukos: Show provider field as full name on review lists. (#113)
 
 
 /**
@@ -371,6 +372,37 @@ function description_editor_html(PolicyCloud_Marketplace_Description $descriptio
                     Fields of usage
                 </label>
                 <textarea name="fields-of-use" placeholder="Separate multiple fields of usage using a comma (lorem, ipsum, etc.)"><?= empty($description->information['fieldOfUse']) ? '' : implode(', ', $description->information['fieldOfUse']) ?></textarea>
+                <label for="links">Related links</label>
+                    <div class="links">
+                        <div>
+                            <?php
+                            if (!empty($description->links)) {
+                                foreach ($description->links as $link) {
+                                    $link_title = explode(':', $link, 2)[0];
+                                    $link_url = explode(':', $link, 2)[1];
+                                    ?>
+                                    <div>
+                                        <input type="text" name="links-title[]" placeholder="Example" value="<?= $link_title ?>"/>
+                                        <input type="url" name="links-url[]" placeholder="https://www.example.org/" value="<?= $link_url ?>" />
+                                        <button class="remove-field" title="Remove this link." <?= (count($description->links) == 1) ? 'disabled' : '' ?>>
+                                            <span class="fas fa-times"></span>
+                                        </button>
+                                    </div>
+                                    <?php
+                                }
+                            } else {
+                                ?>
+                                <div>
+                                    <input type="text" name="links-title[]" placeholder="Example" />
+                                    <input type="url" name="links-url[]" placeholder="https://www.example.org/" />
+                                    <button class="remove-field" title="Remove this link." disabled><span class="fas fa-times"></span></button>
+                                </div>
+                                <?php
+                            }
+                            ?>
+                        </div>
+                        <button class="add-field" title="Add another link."><span class="fas fa-plus"></span> Add link</button>
+                    </div>
             </fieldset>
             <fieldset name="internal-information">
                 <h2>Additional information</h2>
@@ -462,7 +494,7 @@ function description_editor_html(PolicyCloud_Marketplace_Description $descriptio
     <?php
 }
 
-function description_reviews_list_html(array $reviews)
+function description_reviews_list_html(array $reviews, string $author_id = null)
 {
     ?>
     <ul>
@@ -491,6 +523,15 @@ function description_reviews_list_html(array $reviews)
                     </span>
                     <span>
                         by <a href="<?= PolicyCloud_Marketplace_Public::get_plugin_setting(false, 'account_page') . '?user=' . $review->user_id ?>"><?= $review->user_id ?></a>
+                        <?php
+                        if (!empty($author_id)) {
+                            if ($review->user_id == $author_id) {
+                                ?>
+                                | <button class="action destructive minimal" data-action="delete-review" data-author-id="<?= $author_id ?>">Delete</button>
+                                <?php
+                            }
+                        }
+                        ?>
                     </span>
                 </div>
             </li>
@@ -499,14 +540,20 @@ function description_reviews_list_html(array $reviews)
     <?php
 }
 
-function description_reviews_html(array $reviews = null, ?int $pages = 0, PolicyCloud_Marketplace_Review $existing_review = null, bool $provider)
+function description_reviews_html(array $reviews = null, ?int $pages = 0, PolicyCloud_Marketplace_Review $existing_review = null, array $permissions)
 {
+    
     // TODO @alexandrosraikos: Allow author and admin to delete reviews. (#108)
+
+    if (!empty($existing_review)) {
+        $author_id = $existing_review->user_id;
+    }
+
     ?>
     <div class="policycloud-marketplace reviews">
         <?php
         if (!empty($reviews)) {
-            description_reviews_list_html($reviews);
+            description_reviews_list_html($reviews, $author_id ?? null);
             ?>
             <nav class="pagination">
                 <?php
@@ -521,7 +568,7 @@ function description_reviews_html(array $reviews = null, ?int $pages = 0, Policy
             show_alert('No reviews yet.', 'notice');
         }
 
-        if (!$provider) {
+        if (!$permissions['provider']) {
             ?>
             <form>
                 <label for="comment">Comment</label>
@@ -748,6 +795,17 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                             }
                             ?>
                         </p>
+                        <?php
+                        if (!empty($description->links[0])) {
+                        ?>
+                            <ul>
+                                <?php
+                                foreach ($description->links as $link) {
+                                    echo '<li><a class="" href="' . explode(':', $link, 2)[1] . '" target="blank">' . explode(':', $link, 2)[0] . '</a></li>';
+                                }
+                                ?>
+                            </ul>
+                        <?php } ?>
                     </div>
                     <div class="gallery">
                         <h2>Gallery</h2>
@@ -833,7 +891,7 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                         $reviews['content'] ?? [],
                         $reviews['pages'] ?? null,
                         $description->user_review ?? null,
-                        $permissions['provider']
+                        $permissions
                     );
                 } else {
                     show_lock($pages['login_page'], 'view reviews for this description');

@@ -13,23 +13,12 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
     if ($authenticated) {
         show_alert("You're already logged in.", 'notice');
     } else {
-        // TODO @alexandrosraikos: Remove username field (#113).
 ?>
         <div class="policycloud-marketplace">
             <form id="policycloud-registration" action="">
-                <fieldset name="account-credentials">
-                    <h2>Account credentials</h2>
-                    <p>The following information is required for authorization purposes.</p>
-                    <label for="username">Username *</label>
-                    <input required name="username" placeholder="e.g. johndoe" type="text" />
-                    <label for="password">Password *</label>
-                    <input required name="password" placeholder="Insert your password" type="password" />
-                    <label for="password-confirm">Confirm password *</label>
-                    <input required name="password-confirm" placeholder="Insert your password again" type="password" />
-                </fieldset>
                 <fieldset name="account-details">
                     <h2>Account details</h2>
-                    <p>Fill in the following fields with your personal details. This information will be used to personalize your experience within the marketplace platform and showcase your profile to other visitors. Fields marked with (*) are required for registration.</p>
+                    <p>Fill in the following fields with your personal details. This information will be used to personalize your experience within the marketplace platform and showcase your profile to other registered users. Fields marked with (*) are required for registration.</p>
                     <label for="title">Title</label>
                     <select name="title">
                         <option value="Mr.">Mr.</option>
@@ -73,11 +62,19 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
                 </fieldset>
                 <fieldset name="account-contact">
                     <h2>Account contact details</h2>
-                    <p>Fill in your contact information here. This information will be used to validate your new account, as well as optionally make them available to other logged in Marketplace visitors. Fields marked with (*) are required for registration. These details remain private by default. </p>
+                    <p>Fill in your contact information here. This information will be used to validate your new account, as well as optionally make them visible to other logged in Marketplace visitors. Fields marked with (*) are required for registration. These details remain private by default. </p>
                     <label for="email">E-mail address *</label>
                     <input type="email" name="email" placeholder="e.g. johndoe@example.org" required />
                     <label for="phone">Phone number</label>
                     <input type="tel" name="phone" placeholder="e.g. +30 6999123456" />
+                </fieldset>
+                <fieldset name="account-credentials">
+                    <h2>Account credentials</h2>
+                    <p>The following information is required for authorization purposes.</p>
+                    <label for="password">Password *</label>
+                    <input required name="password" placeholder="Insert your password" type="password" />
+                    <label for="password-confirm">Confirm password *</label>
+                    <input required name="password-confirm" placeholder="Insert your password again" type="password" />
                 </fieldset>
                 <div class="tos-agree">
                     <input type="checkbox" id="tos-agree" name="tos-agree" required />
@@ -110,15 +107,14 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
 function account_user_authentication_html($registration_url, $reset_password_page, $authenticated)
 {
     if (!$authenticated) {
-        // TODO @alexandrosraikos: Use only email address for authentication. (#113)
     ?>
         <div class="policycloud-marketplace">
             <form id="policycloud-authentication">
                 <fieldset name=" account-credentials">
                     <h2>Insert your credentials</h2>
                     <p>The following information is required to log you in.</p>
-                    <label for="username">Username or E-mail address *</label>
-                    <input required name="username-email" placeholder="e.g. johndoe / johndoe@example.org" type="text" />
+                    <label for="username">E-mail address *</label>
+                    <input required name="username-email" placeholder="e.g. johndoe@example.org" type="text" />
                     <label for="password">Password *</label>
                     <input required name="password" placeholder="Insert your password" type="password" />
                 </fieldset>
@@ -487,16 +483,6 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                     <?php
                                     }
                                     ?>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    Username
-                                </td>
-                                <td>
-                                    <span>
-                                        <?php echo $data['username']; ?>
-                                    </span>
                                 </td>
                             </tr>
                             <tr>

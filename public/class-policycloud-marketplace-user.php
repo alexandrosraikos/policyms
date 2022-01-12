@@ -328,40 +328,17 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
 
     public static function register(array $information): string
     {
-        if (!function_exists('availability')) {
-            function availability($username)
-            {
-                $response = PolicyCloud_Marketplace::api_request(
-                    'GET',
-                    '/accounts/username/availability',
-                    [],
-                    null,
-                    ["x-username: " . $username],
-                );
-
-                // Return status.
-                return $response['_status'] == 'successful';
-            }
-        }
-
         self::inspect($information, [
-            'username',
             'password',
             'email',
             'name',
             'surname'
         ]);
 
-        // Username availability check.
-        if (!availability($information['username'])) {
-            throw new PolicyCloudMarketplaceInvalidDataException("Username already exists.");
-        }
-
         $response = PolicyCloud_Marketplace::api_request(
             'POST',
             '/accounts/users/registration',
             [
-                'username' => $information['username'],
                 'account' => [
                     'password' => $information['password']
                 ],
@@ -479,7 +456,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
         }
     }
 
-    protected static function implode_urls($titles, $urls): array
+    public static function implode_urls($titles, $urls): array
     {
         if (!empty($titles) && !empty($urls)) {
             if (!is_array($titles) || !is_array($urls)) {

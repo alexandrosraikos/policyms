@@ -138,13 +138,17 @@ class PolicyCloud_Marketplace_Review
         );
     }
 
-    public static function delete(string $description_id): void
+    public static function delete(string $description_id, string $author_id): void
     {
         PolicyCloud_Marketplace::api_request(
             'DELETE',
             '/descriptions/review/' . $description_id,
             [],
             PolicyCloud_Marketplace_Account::retrieve_token(),
+            [
+                'x-access-token: '.PolicyCloud_Marketplace_Account::retrieve_token(),
+                'x-username: '.$author_id
+            ]
         );
     }
 
