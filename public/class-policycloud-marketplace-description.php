@@ -13,7 +13,7 @@ class PolicyCloud_Marketplace_Description
 
     public array $information;
 
-    public array $links;
+    public ?array $links;
 
     public string $image_id;
 
@@ -179,7 +179,7 @@ class PolicyCloud_Marketplace_Description
         } else {
             $this->type = $description['info']['type'];
             $this->information = $description['info'];
-            $this->links = $description['links'];
+            $this->links = $description['links'] ?? null;
             $this->metadata = $description['metadata'];
             $this->image_id = $description['main_image'];
         }
