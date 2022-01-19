@@ -46,9 +46,6 @@ function descriptions_grid_html(array $descriptions, string $description_url)
                             </div>
                             <div class="metadata">
                                 <div>
-                                    <div class="owner">
-                                        <?= $description->metadata['provider'] ?>
-                                    </div>
                                     <div class="last-updated">
                                         Updated
                                         <?=
@@ -621,9 +618,6 @@ function description_reviews_html(array $reviews = null, ?int $pages = 0, Policy
  */
 function description_html($description, $image_blobs, $pages, $reviews, $permissions)
 {
-
-    // TODO @alexandrosraikos: Add "Links" section (identical functionality to account links). (#59)
-
     /**
      * Print the file viewer table.
      *
@@ -747,6 +741,7 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                     <a href="#reviews" class="reviews">
                         <span class="fas fa-star"></span> <?= $description->metadata['reviews']['average_rating'] . ' (' . $description->metadata['reviews']['no_reviews'] . ' reviews)' ?>
                     </a>
+                    &nbsp;
                     <span class="views">
                         <span class="fas fa-eye"></span>
                         <?= $description->metadata['views'] ?> views
@@ -801,7 +796,7 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                             <ul>
                                 <?php
                                 foreach ($description->links as $link) {
-                                    echo '<li><a class="" href="' . explode(':', $link, 2)[1] . '" target="blank">' . explode(':', $link, 2)[0] . '</a></li>';
+                                    echo '<li><a class="button outlined" href="' . explode(':', $link, 2)[1] . '" target="blank">' . explode(':', $link, 2)[0] . '</a></li>';
                                 }
                                 ?>
                             </ul>

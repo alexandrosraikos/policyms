@@ -199,7 +199,6 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
         return count($page);
     }, $data['approvals'] ?? []));
 
-    // TODO @alexandrosraikos: Remove username fields. (#113)
     ?>
     <div id="policycloud-marketplace-account" class="policycloud-marketplace">
         <div id="policycloud-marketplace-account-sidebar">

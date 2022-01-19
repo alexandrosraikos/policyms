@@ -569,7 +569,7 @@
   > .metadata
   > span:not(:last-of-type) {
   /* Display & Box Model */
-  padding-right: 15px;
+  padding-right: 10px;
   border-right: 1px solid var(--policycloud-border-color-light);
   margin-right: 10px;
 }
@@ -580,8 +580,14 @@
   font-weight: 500;
 }
 
-.policycloud-marketplace.description > header > .metadata > .type,
-.policycloud-marketplace.description > header > .metadata > .sub-type {
+.policycloud-marketplace.description
+  > header
+  > .metadata
+  > .type:not(:last-child),
+.policycloud-marketplace.description
+  > header
+  > .metadata
+  > .sub-type:not(:last-child) {
   /* Display & Box Model */
   padding-right: 10px !important;
 
@@ -593,7 +599,7 @@
   > header
   > .metadata
   > .fields-of-use
-  > span {
+  > span:not(:last-child) {
   /* Display & Box Model */
   margin-right: 10px;
 
@@ -652,7 +658,11 @@
 
 .policycloud-marketplace.description > .content > .information > div {
   /* Display & Box Model */
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+}
+
+.policycloud-marketplace.description > .content > .information p {
+  margin: 10px 0;
 }
 
 .policycloud-marketplace.description > .content > .information ul {
