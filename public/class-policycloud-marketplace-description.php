@@ -205,7 +205,7 @@ class PolicyCloud_Marketplace_Description
                 $description['your_review'][0]['comment'],
                 $description['your_review'][0]['rating'],
                 $description['id'],
-                $description['your_review'][0]['username'],
+                $description['your_review'][0]['reviewer'],
                 $description['your_review'][0]['updated_review_date'],
                 $description['your_review'][0]['review_version'],
             );

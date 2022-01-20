@@ -113,8 +113,8 @@ function account_user_authentication_html($registration_url, $reset_password_pag
                 <fieldset name=" account-credentials">
                     <h2>Insert your credentials</h2>
                     <p>The following information is required to log you in.</p>
-                    <label for="username">E-mail address *</label>
-                    <input required name="username-email" placeholder="e.g. johndoe@example.org" type="text" />
+                    <label for="email">E-mail address *</label>
+                    <input required name="email" placeholder="e.g. johndoe@example.org" type="text" />
                     <label for="password">Password *</label>
                     <input required name="password" placeholder="Insert your password" type="password" />
                 </fieldset>
@@ -148,7 +148,7 @@ function account_user_reset_password_html($authenticated)
                 <fieldset>
                     <h2>Reset your password</h2>
                     <p>Insert your e-mail address below and we will contact you with instructions to reset your password.</p>
-                    <label for="username">E-mail address *</label>
+                    <label for="email">E-mail address *</label>
                     <input required name="email" placeholder="e.g. johndoe@example.org" type="email" />
                     <button type="submit" class="action">Reset password</button>
                 </fieldset>

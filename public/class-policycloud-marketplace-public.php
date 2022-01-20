@@ -411,7 +411,7 @@ class PolicyCloud_Marketplace_Public
                                 "You need to be verify your email address in order to view other user accounts."
                             );
                         }
-                        if ($self->username === $user_id) {
+                        if ($self->uid === $user_id) {
                             show_alert(
                                 "You're currently viewing your profile as it is viewed by other registered users.
                                 <a href=\"" . self::get_plugin_setting(true, 'account_page') . "\">Return to your account page.</a>",
@@ -423,7 +423,7 @@ class PolicyCloud_Marketplace_Public
                     }
 
                     $data = [
-                        'username' => $user->username,
+                        'uid' => $user->uid,
                         'picture' => $user->picture,
                         'information' => $user->information,
                         'statistics' => $user->statistics,
@@ -470,7 +470,7 @@ class PolicyCloud_Marketplace_Public
                     } else {
                         account_user_html(
                             [
-                                'username' => $user->username,
+                                'uid' => $user->uid,
                                 'picture' => $user->picture,
                                 'information' => $user->information,
                                 'statistics' => $user->statistics,
@@ -551,7 +551,7 @@ class PolicyCloud_Marketplace_Public
             function ($data) {
 
                 return PolicyCloud_Marketplace_User::authenticate(
-                    $data['username-email'],
+                    $data['email'],
                     $data['password']
                 );
             }
@@ -582,7 +582,7 @@ class PolicyCloud_Marketplace_Public
     {
         $this->ajax_handler(
             function ($data) {
-                $user = new PolicyCloud_Marketplace_User($data['username'] ?? null);
+                $user = new PolicyCloud_Marketplace_User($data['uid'] ?? null);
                 switch ($data['subsequent_action']) {
                     case 'edit_account_user':
                         $user->update(

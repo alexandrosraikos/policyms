@@ -10,7 +10,8 @@ class PolicyCloud_Marketplace_Review
     public ?string $description_id;
     public ?string $description_title;
     public ?string $description_collection;
-    public string $user_id;
+    public string $uid;
+    public string $reviewer;
     public string $update_date;
     public int $version;
 
@@ -18,7 +19,8 @@ class PolicyCloud_Marketplace_Review
         string $comment,
         int $rating,
         ?string $description_id,
-        string $user_id,
+        string $uid,
+        string $reviewer,
         string $update_date,
         int $version,
         string $description_title = null,
@@ -29,7 +31,8 @@ class PolicyCloud_Marketplace_Review
         $this->description_id = $description_id;
         $this->description_title = $description_title ?? null;
         $this->description_collection = $description_collection ?? null;
-        $this->user_id = $user_id;
+        $this->uid = $uid;
+        $this->reviewer = $reviewer;
         $this->update_date = $update_date;
         $this->version = $version;
     }
@@ -50,7 +53,8 @@ class PolicyCloud_Marketplace_Review
                                     $review['comment'],
                                     $review['rating'],
                                     $review['did'] ?? null,
-                                    $review['username'],
+                                    $review['uid'],
+                                    $review['reviewer'],
                                     $review['updated_review_date'],
                                     $review['review_version'],
                                     $review['title'] ?? null,
@@ -73,7 +77,8 @@ class PolicyCloud_Marketplace_Review
                                 $review['comment'],
                                 $review['rating'],
                                 $review['did'] ?? null,
-                                $review['username'],
+                                $review['uid'],
+                                $review['reviewer'],
                                 $review['updated_review_date'],
                                 $review['review_version'],
                                 $review['title'] ?? null,
@@ -147,14 +152,14 @@ class PolicyCloud_Marketplace_Review
             PolicyCloud_Marketplace_Account::retrieve_token(),
             [
                 'x-access-token: '.PolicyCloud_Marketplace_Account::retrieve_token(),
-                'x-username: '.$author_id
+                'x-uid: '.$author_id
             ]
         );
     }
 
     public function get_author(): PolicyCloud_Marketplace_User
     {
-        return new PolicyCloud_Marketplace_User($this->user_id);
+        return new PolicyCloud_Marketplace_User($this->uid);
     }
 
     public function get_description(): PolicyCloud_Marketplace_Description

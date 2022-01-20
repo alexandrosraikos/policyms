@@ -495,7 +495,7 @@
       var formData = new FormData(
         $("#policycloud-marketplace-account-edit")[0]
       );
-      formData.append("username", AccountEditingProperties.userID);
+      formData.append("uid", AccountEditingProperties.userID);
       formData.append("subsequent_action", "edit_account_user");
 
       makeWPRequest(
@@ -527,7 +527,7 @@
 
       // Prepare deletion form.
       var formData = new FormData();
-      formData.append("username", AccountEditingProperties.userID ?? "");
+      formData.append("uid", AccountEditingProperties.userID ?? "");
       formData.append("subsequent_action", "delete_profile_picture");
 
       makeWPRequest(
@@ -555,7 +555,7 @@
         "policycloud_marketplace_account_user_retry_verification",
         AccountEditingProperties.verificationRetryNonce,
         {
-          username: AccountEditingProperties.userID,
+          uid: AccountEditingProperties.userID,
         },
         () => {
           showAlert(

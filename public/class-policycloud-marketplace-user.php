@@ -11,17 +11,17 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
     protected ?array $reviews;
     protected ?string $picture;
 
-    public function __construct(?string $username = null)
+    public function __construct(?string $uid = null)
     {
-        if (isset($username)) {
-            $data = $this->get_account_data($username);
-            parent::__construct($username);
+        if (isset($uid)) {
+            $data = $this->get_account_data($uid);
+            parent::__construct($uid);
         } else {
             $data = $this->get_account_data();
-            parent::__construct($data['username']);
+            parent::__construct($data['uid']);
         }
 
-        $this->username = $data['username'];
+        $this->uid = $data['uid'];
         $this->information = $data['info'];
         $this->metadata = $data['account'];
         $this->preferences = $data['profile_parameters'];
@@ -32,7 +32,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
         switch ($name) {
             case 'information':
             case 'metadata':
-            case 'username':
+            case 'uid':
             case 'preferences':
                 return $this->${$name};
             case 'statistics':
@@ -307,7 +307,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             'POST',
             '/accounts/users/authorization',
             [
-                (is_email($id) ? 'email' : 'username') => $id,
+                (is_email($id) ? 'email' : 'uid') => $id,
                 'password' => $password
             ]
         );
@@ -391,13 +391,6 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
         // Check email.
         if (!filter_var($information["email"], FILTER_VALIDATE_EMAIL)) {
             throw new PolicyCloudMarketplaceInvalidDataException("Please enter a valid email address.");
-        }
-
-        // Check username.
-        if (!empty($information['username'])) {
-            if (strlen($information['username']) <= 2) {
-                throw new PolicyCloudMarketplaceInvalidDataException("Username must be at least 2 characters.");
-            }
         }
 
         // Check password and confirmation.
