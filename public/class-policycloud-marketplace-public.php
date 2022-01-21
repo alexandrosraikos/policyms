@@ -827,9 +827,6 @@ class PolicyCloud_Marketplace_Public
                     'videoURL' => $permissions['authenticated'] ? self::get_plugin_setting(true, 'marketplace_host') : ''
                 ));
 
-                // TODO @alexandrosraikos: Add head title support (for accounts too). (#54)
-                add_theme_support( 'title-tag' );
-
                 description_html(
                     $description,
                     $image_blobs ?? null,

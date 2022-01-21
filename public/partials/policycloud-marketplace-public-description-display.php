@@ -1,9 +1,5 @@
 <?php
 
-// TODO @alexandrosraikos / @vkoukos: Show provider field as full name only for logged in users on description views. (#113)
-// TODO @alexandrosraikos / @vkoukos: Show provider field as full name on review lists. (#113)
-
-
 /**
  *
  * Print the assets grid HTML.
@@ -538,8 +534,6 @@ function description_reviews_list_html(array $reviews, string $author_id = null,
 
 function description_reviews_html(array $reviews = null, ?int $pages = 0, PolicyCloud_Marketplace_Review $existing_review = null, array $permissions)
 {
-
-    // TODO @alexandrosraikos: Allow author and admin to delete reviews. (#108)
 
     if (!empty($existing_review)) {
         $author_id = $existing_review->user_id;
