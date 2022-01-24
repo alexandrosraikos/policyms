@@ -10,6 +10,9 @@
  */
 function account_user_registration_html($authentication_url, $tos_url, $authenticated)
 {
+    // TODO @alexandrosraikos: Add "Sign in with KeyCloak" button and popup form. (#114)
+    // TODO @alexandrosraikos: Add "Sign in with Google" button and JS form. (#114)
+
     if ($authenticated) {
         show_alert("You're already logged in.", 'notice');
     } else {
@@ -106,6 +109,10 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
  */
 function account_user_authentication_html($registration_url, $reset_password_page, $authenticated)
 {
+
+    // TODO @alexandrosraikos: Add "Sign in with KeyCloak" button and popup form. (#114)
+    // TODO @alexandrosraikos: Add "Sign in with Google" button and JS form. (#114)
+
     if (!$authenticated) {
     ?>
         <div class="policycloud-marketplace">
@@ -352,9 +359,6 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                     });
                     ?>
                 </section>
-                <?php
-                if (!empty($data['approvals'])) {
-                ?>
                     <section class="policycloud-marketplace-account-approvals">
                         <?php
                         entity_list_html('approvals', $data['approvals'], $visitor, function ($pending_description) use ($pages) {
@@ -379,9 +383,6 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                         });
                         ?>
                     </section>
-                <?php
-                }
-                ?>
                 <section class="policycloud-marketplace-account-profile">
                     <header>
                         <h3>Information</h3>
@@ -672,6 +673,9 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                             </tr>
                         </table>
                         <?php
+                        // TODO @alexandrosraikos: Add KeyCloak SSO settings field (add/remove w/ new pass). (#114)
+                        // TODO @alexandrosraikos: Add Google SSO settings field (add/remove w/ new pass). (#114)
+                        // NOTE: Check if password_protected already in account array.
                         if (!$visitor || $admin) {
                         ?>
                             <div class="folding error"></div>

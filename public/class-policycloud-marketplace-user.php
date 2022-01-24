@@ -456,12 +456,17 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
                 $titles = [$titles];
                 $urls = [$urls];
             }
-            return array_map(
-                function ($k, $v) use ($urls) {
-                    return $v . ":" . $urls[$k];
-                },
-                array_keys($titles),
-                $titles
+            return array_filter(
+                array_map(
+                    function ($k, $v) use ($urls) {
+                        return $v . ":" . $urls[$k];
+                    },
+                    array_keys($titles),
+                    $titles
+                ),
+                function ($combined_string) {
+                    return $combined_string != ":";
+                }
             );
         } else {
             return [''];

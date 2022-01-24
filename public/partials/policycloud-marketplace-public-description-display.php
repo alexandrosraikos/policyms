@@ -536,7 +536,7 @@ function description_reviews_html(array $reviews = null, ?int $pages = 0, Policy
 {
 
     if (!empty($existing_review)) {
-        $author_id = $existing_review->user_id;
+        $author_id = $existing_review->uid;
     }
 
 ?>
@@ -587,7 +587,7 @@ function description_reviews_html(array $reviews = null, ?int $pages = 0, Policy
                 <div class="actions">
                     <?php if (!empty($existing_review)) {
                     ?>
-                        <button class="action destructive" data-action="delete-review">Delete</button>
+                        <button class="action destructive" data-action="delete-review" data-author-id="<?= $existing_review->uid ?>">Delete</button>
                     <?php
                     }
                     ?>
@@ -898,66 +898,6 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
         <?php
     }
 }
-
-
-/**
- * Print the asset HTML.
- *
- * @param   array $asset The PolicyCloud Marketplace API asset.
- * @param   array $args Various printing arguments.
- *
- * @since   1.0.0
- * @author  Alexandros Raikos <araikos@unipi.gr>
- */
-function description_creation_html()
-{
-    if (!empty($error)) {
-        show_alert($error);
-    } else {
-        ?>
-            <div class="policycloud-marketplace">
-                <form id="policycloud-marketplace-description-creation" action="">
-                    <fieldset name="basic-information">
-                        <h2>Basic information</h2>
-                        <p>To create a new Marketplace asset, the following fields represent basic information that will be visible to others.</p>
-                        <label for="title">Title *</label>
-                        <input required name="title" placeholder="Insert a title" type="text" />
-                        <label for="type">Primary collection type *</label>
-                        <select name="type" required>
-                            <option value="algorithms" selected>Algorithms</option>
-                            <option value="tools">Tools</option>
-                            <option value="policies">Policies</option>
-                            <option value="datasets">Datasets</option>
-                            <option value="webinars">Webinars</option>
-                            <option value="tutorials">Tutorials</option>
-                            <option value="documents">Documents</option>
-                            <option value="externals">Externals</option>
-                            <option value="other">Other</option>
-                        </select>
-                        <label for="subtype">Secondary collection type</label>
-                        <input type="text" placeholder="Insert a secondary collection type" name="subtype" />
-                        <label for="fields-of-use">Fields of usage</label>
-                        <textarea name="fields-of-use" placeholder="Separate multiple fields of usage using a comma (lorem, ipsum, etc.)"></textarea>
-                        <label for="owner">Legal owner *</label>
-                        <input required name="owner" placeholder="Insert the legal owner of the object" type="text" />
-                        <label for="description">Description *</label>
-                        <textarea name="description" placeholder="Insert a detailed description" style="resize:vertical"></textarea>
-                    </fieldset>
-                    <fieldset name="internal-information">
-                        <h2>Additional information</h2>
-                        <p>You can include additional comments for authorized visitors. This field is optional.</p>
-                        <label for="comments">Comments</label>
-                        <textarea name="comments" placeholder="Insert any additional comments"></textarea>
-                    </fieldset>
-                    <div class="error"></div>
-                    <button type="submit" class="action ">Create</button>
-                </form>
-            </div>
-        <?php
-    }
-}
-
-
 
 /**
  * Display a list of assets with filtering, sorting and custom pagination.

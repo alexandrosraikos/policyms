@@ -667,7 +667,7 @@
 
 .policycloud-marketplace.description > .content > .information ul {
   padding: 0;
-  margin: 10px 0;
+  margin: 20px 0;
   display: flex;
   list-style-type: none;
 }
@@ -967,6 +967,7 @@
   align-items: center;
   margin-bottom: 10px;
 }
+
 .policycloud-marketplace.description.editor
   .links
   div
