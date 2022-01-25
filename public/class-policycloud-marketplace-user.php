@@ -294,6 +294,22 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
         return $response['account_data'];
     }
 
+    public function disconnect_google(): string
+    {
+        $response = PolicyCloud_Marketplace::api_request(
+            // TODO @alexandrosraikos: Fill in endpoint details.
+        );
+        return parent::persist_token($response['token']);
+    }
+
+    public function disconnect_keycloak(): string
+    {
+        $response = PolicyCloud_Marketplace::api_request(
+            // TODO @alexandrosraikos: Fill in endpoint details.
+        );
+        return parent::persist_token($response['token']);
+    }
+
     /**
      * ------------
      * Basic Methods (Static)
@@ -309,6 +325,45 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             [
                 (is_email($id) ? 'email' : 'uid') => $id,
                 'password' => $password
+            ]
+        );
+
+        return parent::persist_token($response['token']);
+    }
+
+    public static function authenticate_google(string $google_token): string
+    {
+        // Get the authorized token.
+        $response = PolicyCloud_Marketplace::api_request(
+            'POST',
+            '/accounts/users/sso/google',
+            [
+                'token' => $google_token
+            ],
+            null,
+            [
+                'Content-Type: application/json',
+                'x-more-time: ' . PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'api_access_token')
+            ]
+        );
+
+        return parent::persist_token($response['token']);
+    }
+
+    public static function authenticate_keycloak(string $username, string $password): string
+    {
+        // Get the authorized token.
+        $response = PolicyCloud_Marketplace::api_request(
+            'POST',
+            '/accounts/users/sso/keycloak',
+            [
+                'username' => $username,
+                'password' => $password
+            ],
+            null,
+            [
+                'Content-Type: application/json',
+                'x-more-time: ' . PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'api_access_token')
             ]
         );
 

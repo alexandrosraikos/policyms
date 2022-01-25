@@ -642,6 +642,46 @@
       }
     }
 
+    function disconnectGoogle(e) {
+      e.preventDefault();
+      if ($(e.target).data["password-protected"] == "0") {
+        if (confirm("You need to set a new password before disconnecting your Google account. Head to the \"Reset password\" page and follow the steps provided.")) {
+          window.location.href(AccountEditingProperties.resetPasswordURL);
+        }
+      } else {
+        makeWPRequest(
+          'button[data-action="disconnect-google"]',
+          'policycloud_marketplace_account_disconnect_google',
+          AccountEditingProperties.disconnectGoogleNonce,
+          {},
+          (data) => {
+            setAuthorizedToken(data);
+            window.location.reload;
+          }
+        )
+      }
+    }
+
+    function disconnectKeyCloak(e) {
+      e.preventDefault();
+      if ($(e.target).data["password-protected"] == "0") {
+        if (confirm("You need to set a new password before disconnecting your Google account. Head to the \"Reset password\" page and follow the steps provided.")) {
+          window.location.href(AccountEditingProperties.resetPasswordURL);
+        }
+      } else {
+        makeWPRequest(
+          'button[data-action="disconnect-keycloak"]',
+          'policycloud_marketplace_account_disconnect_keycloak',
+          AccountEditingProperties.disconnectKeyCloakNonce,
+          {},
+          (data) => {
+            setAuthorizedToken(data);
+            window.location.reload;
+          }
+        )
+      }
+    }
+
     /**
      *
      * Information interface actions & event listeners.
@@ -707,5 +747,13 @@
     $("#policycloud-marketplace-delete-account").submit(
       validateDeletionRequest
     );
+
+    $("button[data-action=\"disconnect-google\"]").click(
+      disconnectGoogle
+    )
+
+    $("button[data-action=\"disconnect-google\"]").click(
+      disconnectKeyCloak
+    )
   });
 })(jQuery);

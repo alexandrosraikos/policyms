@@ -189,6 +189,14 @@ class PolicyCloud_Marketplace
         $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_registration', $plugin_public, 'account_user_registration_handler');
         $this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_authentication', $plugin_public, 'account_user_authentication_handler');
         $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_authentication', $plugin_public, 'account_user_authentication_handler');
+        $this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_authentication_google', $plugin_public, 'account_user_authentication_google_handler');
+        $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_authentication_google', $plugin_public, 'account_user_authentication_google_handler');
+        $this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_authentication_keycloak', $plugin_public, 'account_user_authentication_keycloak_handler');
+        $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_authentication_keycloak', $plugin_public, 'account_user_authentication_keycloak_handler');
+        $this->loader->add_action('wp_ajax_policycloud_marketplace_account_disconnect_google', $plugin_public, 'account_disconnect_google_handler');
+        $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_disconnect_google', $plugin_public, 'account_disconnect_google_handler');
+        $this->loader->add_action('wp_ajax_policycloud_marketplace_account_disconnect_keycloak', $plugin_public, 'account_disconnect_keycloak_handler');
+        $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_disconnect_keycloak', $plugin_public, 'account_disconnect_keycloak_handler');
         $this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_password_reset', $plugin_public, 'account_user_password_reset_handler');
         $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_password_reset', $plugin_public, 'account_user_password_reset_handler');
         $this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_retry_verification', $plugin_public, 'account_user_verification_retry_handler');

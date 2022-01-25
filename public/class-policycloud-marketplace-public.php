@@ -102,8 +102,9 @@ class PolicyCloud_Marketplace_Public
         ));
 
         // Accounts related scripts.
-        wp_register_script("policycloud-marketplace-account-registration", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-registration.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
-        wp_register_script("policycloud-marketplace-account-authentication", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-authentication.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
+        wp_register_script("google-sso","https://apis.google.com/js/client:platform.js?onload=start", ['jquery']);
+        wp_register_script("policycloud-marketplace-account-registration", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-registration.js', array('jquery', 'policycloud-marketplace', 'google-sso'), $this->version, false);
+        wp_register_script("policycloud-marketplace-account-authentication", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-authentication.js', array('jquery', 'policycloud-marketplace', 'google-sso'), $this->version, false);
         wp_register_script("policycloud-marketplace-account", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
 
         // Content related scripts.
@@ -352,10 +353,13 @@ class PolicyCloud_Marketplace_Public
      * @author  Alexandros Raikos <araikos@unipi.gr>
      */
     public static function account_user_authentication_shortcode()
-    {
+    {       
+        wp_enqueue_script("google-sso");
         wp_enqueue_script("policycloud-marketplace-account-authentication");
         wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
-            'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication')
+            'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
+            'GoogleSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_google_handler'),
+            'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak')
         ));
 
         account_user_authentication_html(
@@ -441,7 +445,10 @@ class PolicyCloud_Marketplace_Public
                         'deletionNonce' => wp_create_nonce('policycloud_marketplace_account_user_deletion'),
                         'verificationRetryNonce' => wp_create_nonce('policycloud_marketplace_account_user_retry_verification'),
                         'requestDataCopyNonce' => wp_create_nonce('policycloud_marketplace_account_user_data_request'),
-                        'userID' => $user->id
+                        'disconnectGoogleNonce' => wp_create_nonce('policycloud_marketplace_account_disconnect_google'),
+                        'disconnectKeyCloakNonce' => wp_create_nonce('policycloud_marketplace_account_disconnect_keycloak'),
+                        'userID' => $user->id,
+                        'resetPasswordURL' => self::get_plugin_setting(true, 'password_reset_page'),
                     ));
 
                     remove_action('wp_head', '_wp_render_title_tag', 1);
@@ -553,6 +560,49 @@ class PolicyCloud_Marketplace_Public
                 return PolicyCloud_Marketplace_User::authenticate(
                     $data['email'],
                     $data['password']
+                );
+            }
+        );
+    }
+
+    public function account_user_authentication_google_handler()
+    {
+        $this->ajax_handler(
+            function ($data) {
+                return PolicyCloud_Marketplace_User::authenticate_google(
+                    $data['google_token']
+                );
+            }
+        );
+    }
+
+    public function account_disconnect_google_handler()
+    {
+        $this->ajax_handler(
+            function() {
+                $user = new PolicyCloud_Marketplace_User();
+                return $user->disconnect_google();
+            }
+        );
+    }
+
+    public function account_disconnect_keycloak_handler()
+    {
+        $this->ajax_handler(
+            function() {
+                $user = new PolicyCloud_Marketplace_User();
+                return $user->disconnect_keycloak();
+            }
+        );
+    }
+
+    public function account_user_authentication_keycloak_handler()
+    {
+        $this->ajax_handler(
+            function ($data) {
+                return PolicyCloud_Marketplace_User::authenticate_keycloak(
+                    $data['keycloak-username'],
+                    $data['keycloak-password']
                 );
             }
         );
@@ -826,6 +876,13 @@ class PolicyCloud_Marketplace_Public
                     'deleteRedirect' => $permissions['provider'] ? (self::get_plugin_setting(true, 'account_page') . "#descriptions") : (self::get_plugin_setting(true, 'account_page') . "#approvals"),
                     'videoURL' => $permissions['authenticated'] ? self::get_plugin_setting(true, 'marketplace_host') : ''
                 ));
+
+                add_filter('wpseo_title', function ($title) use ($description) {
+                    if(  is_singular( 'product') ) {
+                        $title = $description->information['title'];
+                    }
+                    return $title;
+                });
 
                 description_html(
                     $description,

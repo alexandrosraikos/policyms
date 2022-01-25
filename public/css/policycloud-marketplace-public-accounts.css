@@ -9,6 +9,43 @@
 
 /*
 *
+* SSO Actions
+* ---------------------
+*
+*/
+
+.policycloud-marketplace .sso {
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--policycloud-border-color-light);
+}
+
+.policycloud-marketplace .sso .action {
+  margin-right: 8px;
+}
+
+button#keycloak-signin {
+  background-color: rgb(20, 20, 20) !important;
+  font-weight: bold;
+  border: none !important;
+  padding: 11.5px 20px !important;
+  border-radius: 0 !important;
+}
+
+button#keycloak-signin::before {
+  content: " ";
+  display: inline-block;
+  height: 14px;
+  width: 28px;
+  margin-right: 6px;
+  background-image: url(../assets/img/policycloud.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/*
+*
 * Registration
 * ---------------------
 *

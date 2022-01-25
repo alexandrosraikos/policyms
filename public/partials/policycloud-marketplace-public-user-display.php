@@ -109,19 +109,23 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
  */
 function account_user_authentication_html($registration_url, $reset_password_page, $authenticated)
 {
-
-    // TODO @alexandrosraikos: Add "Sign in with KeyCloak" button and popup form. (#114)
-    // TODO @alexandrosraikos: Add "Sign in with Google" button and JS form. (#114)
-
     if (!$authenticated) {
+
     ?>
         <div class="policycloud-marketplace">
+                <div class="sso">
+                    <p>You can connect to your account using the following services:</p>
+                    <div class="actions">
+                        <button id="google-signin" class="action minimal">Sign in with Google</button>
+                        <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with PolicyCloud (Internal)</button>
+                    </div>
+                </div>
             <form id="policycloud-authentication">
                 <fieldset name=" account-credentials">
                     <h2>Insert your credentials</h2>
                     <p>The following information is required to log you in.</p>
                     <label for="email">E-mail address *</label>
-                    <input required name="email" placeholder="e.g. johndoe@example.org" type="text" />
+                    <input required name="email" placeholder="e.g. johndoe@example.org" type="email" />
                     <label for="password">Password *</label>
                     <input required name="password" placeholder="Insert your password" type="password" />
                 </fieldset>
@@ -494,8 +498,8 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                     </td>
                                     <td>
                                         <span class="folding visible">*****************</span>
-                                        <input class="folding" type="password" name="password" placeholder="Enter your new password here" />
-                                        <input class="folding" type="password" name="password-confirm" placeholder="Confirm new password here" />
+                                        <input class="folding" type="password" name="password" placeholder="Enter your new password here" data-password-protected="<?= $data['metadata']['password_protected'] ?>" />
+                                        <input class="folding" type="password" name="password-confirm" placeholder="Confirm new password here" data-password-protected="<?= $data['metadata']['password_protected'] ?>" />
                                     <?php
                                 }
                                     ?>
@@ -661,6 +665,55 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                             <?php
                             }
                             ?>
+                            <tr>
+                                <td>
+                                    Google account
+                                </td>
+                                <td>
+                                    <?php
+                                        if ($data['metadata']['connections']['google'] == "0") {
+                                            wp_enqueue_script("google-sso");
+                                            wp_enqueue_script("policycloud-marketplace-account-authentication");
+                                            wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
+                                                'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
+                                                'GoogleSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_google_handler'),
+                                                'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak')
+                                            ));
+                                            ?>
+                                            <button id="google-signin" class="action minimal" style="padding:0;">Sign in with Google</button>
+                                            <?php
+                                        } else {
+                                            ?>
+                                            <button class="action destructive minimal" data-action="disconnect-google" data-password-protected="<?= $data['metadata']['password_protected'] ?>">Disconnect</button>
+                                            <?php 
+                                        }
+                                    ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    PolicyCloud account (Internal)
+                                </td>
+                                <td>
+                                    <?php
+                                        if ($data['metadata']['connections']['google'] == "0") {
+                                            wp_enqueue_script("policycloud-marketplace-account-authentication");
+                                            wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
+                                                'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
+                                                'GoogleSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_google_handler'),
+                                                'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak')
+                                            ));
+                                            ?>
+                                            <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with PolicyCloud (Internal)</button>                                    
+                                            <?php
+                                        } else {
+                                            ?>
+                                            <button class="action destructive minimal" data-action="disconnect-keycloak" data-password-protected="<?= $data['metadata']['password_protected'] ?>">Disconnect</button>
+                                            <?php 
+                                        }
+                                    ?>
+                                </td>
+                            </tr>
                             <tr>
                                 <td>
                                     Member since
