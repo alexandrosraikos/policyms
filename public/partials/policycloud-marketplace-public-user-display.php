@@ -18,13 +18,13 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
     } else {
 ?>
         <div class="policycloud-marketplace">
-                <div class="sso">
-                    <p>You can quickly setup your account using an existing account in the following services:</p>
-                    <div class="actions">
-                        <?= googleButton() ?>
-                        <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign up with PolicyCloud (Internal)</button>
-                    </div>
+            <div class="sso">
+                <p>You can quickly setup your account using an existing account in the following services:</p>
+                <div class="actions">
+                    <?= googleButton() ?>
+                    <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign up with PolicyCloud (Internal)</button>
                 </div>
+            </div>
             <form id="policycloud-registration" action="">
                 <fieldset name="account-details">
                     <h2>Account details</h2>
@@ -102,28 +102,45 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
     }
 }
 
-function googleButton() 
+function googleButton()
 {
     ?>
-        <script src="https://accounts.google.com/gsi/client" async defer></script>
-        <div id="g_id_onload"
-            data-client_id="861485154625-4bdkkkbihuqbsf97k8uj831ivnlb9dp2"
-            data-context="signin"
-            data-ux_mode="popup"
-            data-login_uri="http://localhost:8000"
-            data-auto_prompt="false"
-            data-callback="googleCallback">
-        </div>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+        function handleCredentialResponse(response) {
+            console.log("Encoded JWT ID token: " + response.credential);
+        }
 
-        <button class="g_id_signin action minimal"
-            data-type="standard"
-            data-shape="rectangular"
-            data-theme="filled_black"
-            data-text="signin_with"
-            data-size="large"
-            data-logo_alignment="left"
-            style="padding-left:0">
-        </button>
+        function googleCallback(response) {
+            makeWPRequest(
+                '.google-signin',
+                'policycloud_marketplace_account_user_authentication_google',
+                AccountAuthenticationProperties.GoogleSSONonce, {
+                    google_token: response.credential
+                },
+                (data) => {
+                    setAuthorizedToken(data);
+                    window.location.href = GlobalProperties.rootURLPath;
+                }
+            )
+        }
+        window.onload = function() {
+            google.accounts.id.initialize({
+                client_id: "861485154625-4bdkkkbihuqbsf97k8uj831ivnlb9dp2",
+                callback: googleCallback
+            });
+            google.accounts.id.renderButton(
+                document.getElementById("google-signin"), {
+                    type: 'standard',
+                    shape: 'rectangular',
+                    theme: "filled_black",
+                    size: "large"
+                }
+            );
+            google.accounts.id.prompt();
+        }
+    </script>
+    <button id="google-signin" class="action minimal"></button>
     <?php
 }
 
@@ -145,13 +162,13 @@ function account_user_authentication_html($registration_url, $reset_password_pag
 
     ?>
         <div class="policycloud-marketplace">
-                <div class="sso">
-                    <p>You can connect to your account using the following services:</p>
-                    <div class="actions">
-                        <?= googleButton() ?>
-                        <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with PolicyCloud (Internal)</button>
-                    </div>
+            <div class="sso">
+                <p>You can connect to your account using the following services:</p>
+                <div class="actions">
+                    <?= googleButton() ?>
+                    <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with PolicyCloud (Internal)</button>
                 </div>
+            </div>
             <form id="policycloud-authentication">
                 <fieldset name=" account-credentials">
                     <h2>Insert your credentials</h2>
@@ -395,30 +412,30 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                     });
                     ?>
                 </section>
-                    <section class="policycloud-marketplace-account-approvals">
-                        <?php
-                        entity_list_html('approvals', $data['approvals'], $visitor, function ($pending_description) use ($pages) {
-                        ?>
-                            <li data-type-filter="<?php echo $pending_description->type ?>" data-date-updated="<?php echo strtotime($pending_description->metadata['uploadDate']) ?>" data-rating="<?php echo $pending_description->metadata['reviews']['average_rating'] ?>" data-total-views="<?php echo $pending_description->metadata['views'] ?>" class="visible">
-                                <div class="description">
-                                    <a href="<?php echo $pages['description_page'] . "?did=" . $pending_description->id ?>">
-                                        <h4><?php echo $pending_description->information['title'] ?></h4>
-                                    </a>
-                                    <p><?php echo $pending_description->information['short_desc'] ?></p>
-                                    <div class="metadata">
-                                        <a class="pill"><?php echo $pending_description->type  ?></a>
-                                        <a class="pill"><?php echo $pending_description->information['subtype']  ?></a>
-                                        <span><span class="fas fa-star"></span> <?php echo $pending_description->metadata['reviews']['average_rating'] . ' (' . $pending_description->metadata['reviews']['no_reviews'] . ' reviews)' ?></span>
-                                        <span><span class="fas fa-eye"></span> <?php echo $pending_description->metadata['views'] ?> views</span>
-                                        <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($pending_description->metadata['uploadDate']))) ?></span>
-                                        <span class="label notice">Pending</span>
-                                    </div>
+                <section class="policycloud-marketplace-account-approvals">
+                    <?php
+                    entity_list_html('approvals', $data['approvals'], $visitor, function ($pending_description) use ($pages) {
+                    ?>
+                        <li data-type-filter="<?php echo $pending_description->type ?>" data-date-updated="<?php echo strtotime($pending_description->metadata['uploadDate']) ?>" data-rating="<?php echo $pending_description->metadata['reviews']['average_rating'] ?>" data-total-views="<?php echo $pending_description->metadata['views'] ?>" class="visible">
+                            <div class="description">
+                                <a href="<?php echo $pages['description_page'] . "?did=" . $pending_description->id ?>">
+                                    <h4><?php echo $pending_description->information['title'] ?></h4>
+                                </a>
+                                <p><?php echo $pending_description->information['short_desc'] ?></p>
+                                <div class="metadata">
+                                    <a class="pill"><?php echo $pending_description->type  ?></a>
+                                    <a class="pill"><?php echo $pending_description->information['subtype']  ?></a>
+                                    <span><span class="fas fa-star"></span> <?php echo $pending_description->metadata['reviews']['average_rating'] . ' (' . $pending_description->metadata['reviews']['no_reviews'] . ' reviews)' ?></span>
+                                    <span><span class="fas fa-eye"></span> <?php echo $pending_description->metadata['views'] ?> views</span>
+                                    <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($pending_description->metadata['uploadDate']))) ?></span>
+                                    <span class="label notice">Pending</span>
                                 </div>
-                            </li>
-                        <?php
-                        });
-                        ?>
-                    </section>
+                            </div>
+                        </li>
+                    <?php
+                    });
+                    ?>
+                </section>
                 <section class="policycloud-marketplace-account-profile">
                     <header>
                         <h3>Information</h3>
@@ -703,22 +720,22 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                 </td>
                                 <td>
                                     <?php
-                                        if ($data['metadata']['connections']['google'] == "0") {
-                                            wp_enqueue_script("google-sso");
-                                            wp_enqueue_script("policycloud-marketplace-account-authentication");
-                                            wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
-                                                'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
-                                                'GoogleSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_google_handler'),
-                                                'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak')
-                                            ));
-                                            ?>
-                                            <?= googleButton() ?>
-                                            <?php
-                                        } else {
-                                            ?>
-                                            <button class="action destructive minimal" data-action="disconnect-google" data-password-protected="<?= $data['metadata']['password_protected'] ?>">Disconnect</button>
-                                            <?php 
-                                        }
+                                    if ($data['metadata']['connections']['google'] == "0") {
+                                        wp_enqueue_script("google-sso");
+                                        wp_enqueue_script("policycloud-marketplace-account-authentication");
+                                        wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
+                                            'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
+                                            'GoogleSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_google_handler'),
+                                            'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak')
+                                        ));
+                                    ?>
+                                        <?= googleButton() ?>
+                                    <?php
+                                    } else {
+                                    ?>
+                                        <button class="action destructive minimal" data-action="disconnect-google" data-password-protected="<?= $data['metadata']['password_protected'] ?>">Disconnect</button>
+                                    <?php
+                                    }
                                     ?>
                                 </td>
                             </tr>
@@ -728,21 +745,21 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                 </td>
                                 <td>
                                     <?php
-                                        if ($data['metadata']['connections']['google'] == "0") {
-                                            wp_enqueue_script("policycloud-marketplace-account-authentication");
-                                            wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
-                                                'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
-                                                'GoogleSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_google_handler'),
-                                                'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak')
-                                            ));
-                                            ?>
-                                            <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with PolicyCloud (Internal)</button>                                    
-                                            <?php
-                                        } else {
-                                            ?>
-                                            <button class="action destructive minimal" data-action="disconnect-keycloak" data-password-protected="<?= $data['metadata']['password_protected'] ?>">Disconnect</button>
-                                            <?php 
-                                        }
+                                    if ($data['metadata']['connections']['google'] == "0") {
+                                        wp_enqueue_script("policycloud-marketplace-account-authentication");
+                                        wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
+                                            'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
+                                            'GoogleSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_google_handler'),
+                                            'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak')
+                                        ));
+                                    ?>
+                                        <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with PolicyCloud (Internal)</button>
+                                    <?php
+                                    } else {
+                                    ?>
+                                        <button class="action destructive minimal" data-action="disconnect-keycloak" data-password-protected="<?= $data['metadata']['password_protected'] ?>">Disconnect</button>
+                                    <?php
+                                    }
                                     ?>
                                 </td>
                             </tr>

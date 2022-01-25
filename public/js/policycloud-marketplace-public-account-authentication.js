@@ -107,54 +107,5 @@
         )
       }
     );
-
-    function onSuccess(googleUser) {
-      console.log('Logged in as: ' + googleUser.getBasicProfile().getName());
-    }
-    function onFailure(error) {
-      console.log(error);
-    }
-    function renderButton() {
-      gapi.signin2.render('google-signin', {
-        'scope': 'profile email',
-        'width': 240,
-        'height': 50,
-        'longtitle': true,
-        'theme': 'dark',
-        'onsuccess': onSuccess,
-        'onfailure': onFailure
-      });
-    }
-
-    function googleCallback(code) {
-      makeWPRequest(
-        '.google-signin',
-        'policycloud_marketplace_account_user_authentication_google',
-        AccountAuthenticationProperties.GoogleSSONonce,
-        {
-          google_token: code
-        },
-        (data) => {
-          setAuthorizedToken(data);
-          window.location.href = GlobalProperties.rootURLPath;
-        }
-      )
-    }
-
-
-    function start() {
-      gapi.load('auth2', function () {
-        auth2 = gapi.auth2.init({
-          client_id: '861485154625-4bdkkkbihuqbsf97k8uj831ivnlb9dp2.apps.googleusercontent.com',
-        });
-      });
-    }
-
-    start();
-    renderButton();
-    $('.google-signin').click(function () {
-      // signInCallback defined in step 6.
-      auth2.grantOfflineAccess().then(googleCallback);
-    });
   });
 })(jQuery);
