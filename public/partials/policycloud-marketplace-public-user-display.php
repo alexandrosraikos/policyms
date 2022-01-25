@@ -18,6 +18,13 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
     } else {
 ?>
         <div class="policycloud-marketplace">
+                <div class="sso">
+                    <p>You can quickly setup your account using an existing account in the following services:</p>
+                    <div class="actions">
+                        <button id="google-signin" class="action minimal">Sign up in with Google</button>
+                        <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign up with PolicyCloud (Internal)</button>
+                    </div>
+                </div>
             <form id="policycloud-registration" action="">
                 <fieldset name="account-details">
                     <h2>Account details</h2>

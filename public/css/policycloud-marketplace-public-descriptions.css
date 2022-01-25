@@ -203,14 +203,8 @@
 
 .policycloud-marketplace.featured-descriptions .white-container {
   background-color: #ffffff;
-  width: 100vw;
-  position: absolute;
-  left: 0;
-  padding: 30px 0 40px 0;
-}
-
-.policycloud-marketplace.featured-descriptions .white-container + * {
-  padding-top: 200px;
+  border-radius: 15px;
+  padding: 40px 0 50px 0;
 }
 
 .policycloud-marketplace.featured-descriptions .statistics {

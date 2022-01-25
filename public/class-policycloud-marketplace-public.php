@@ -335,6 +335,14 @@ class PolicyCloud_Marketplace_Public
                     'nonce' => wp_create_nonce('policycloud_marketplace_account_user_registration'),
                     'accountPage' => $options['account_page']
                 ));
+                wp_enqueue_script("google-sso");
+                wp_enqueue_script("policycloud-marketplace-account-authentication");
+                wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
+                    'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
+                    'GoogleSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_google_handler'),
+                    'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak')
+                ));
+        
 
                 account_user_registration_html(
                     $options['login_page'],
