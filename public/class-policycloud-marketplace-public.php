@@ -102,9 +102,8 @@ class PolicyCloud_Marketplace_Public
         ));
 
         // Accounts related scripts.
-        wp_register_script("google-sso","https://apis.google.com/js/client:platform.js?onload=start", ['jquery']);
-        wp_register_script("policycloud-marketplace-account-registration", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-registration.js', array('jquery', 'policycloud-marketplace', 'google-sso'), $this->version, false);
-        wp_register_script("policycloud-marketplace-account-authentication", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-authentication.js', array('jquery', 'policycloud-marketplace', 'google-sso'), $this->version, false);
+        wp_register_script("policycloud-marketplace-account-registration", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-registration.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
+        wp_register_script("policycloud-marketplace-account-authentication", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account-authentication.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
         wp_register_script("policycloud-marketplace-account", plugin_dir_url(__FILE__) . 'js/policycloud-marketplace-public-account.js', array('jquery', 'policycloud-marketplace'), $this->version, false);
 
         // Content related scripts.
@@ -335,7 +334,6 @@ class PolicyCloud_Marketplace_Public
                     'nonce' => wp_create_nonce('policycloud_marketplace_account_user_registration'),
                     'accountPage' => $options['account_page']
                 ));
-                wp_enqueue_script("google-sso");
                 wp_enqueue_script("policycloud-marketplace-account-authentication");
                 wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
                     'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
@@ -362,7 +360,6 @@ class PolicyCloud_Marketplace_Public
      */
     public static function account_user_authentication_shortcode()
     {       
-        wp_enqueue_script("google-sso");
         wp_enqueue_script("policycloud-marketplace-account-authentication");
         wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
             'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),

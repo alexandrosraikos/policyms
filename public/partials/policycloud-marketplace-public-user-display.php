@@ -21,7 +21,7 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
                 <div class="sso">
                     <p>You can quickly setup your account using an existing account in the following services:</p>
                     <div class="actions">
-                        <button id="google-signin" class="action minimal">Sign up in with Google</button>
+                        <?= googleButton() ?>
                         <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign up with PolicyCloud (Internal)</button>
                     </div>
                 </div>
@@ -102,6 +102,31 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
     }
 }
 
+function googleButton() 
+{
+    ?>
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <div id="g_id_onload"
+            data-client_id="861485154625-4bdkkkbihuqbsf97k8uj831ivnlb9dp2"
+            data-context="signin"
+            data-ux_mode="popup"
+            data-login_uri="http://localhost:8000"
+            data-auto_prompt="false"
+            data-callback="googleCallback">
+        </div>
+
+        <button class="g_id_signin action minimal"
+            data-type="standard"
+            data-shape="rectangular"
+            data-theme="filled_black"
+            data-text="signin_with"
+            data-size="large"
+            data-logo_alignment="left"
+            style="padding-left:0">
+        </button>
+    <?php
+}
+
 
 
 
@@ -123,7 +148,7 @@ function account_user_authentication_html($registration_url, $reset_password_pag
                 <div class="sso">
                     <p>You can connect to your account using the following services:</p>
                     <div class="actions">
-                        <button id="google-signin" class="action minimal">Sign in with Google</button>
+                        <?= googleButton() ?>
                         <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with PolicyCloud (Internal)</button>
                     </div>
                 </div>
@@ -687,7 +712,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                                 'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak')
                                             ));
                                             ?>
-                                            <button id="google-signin" class="action minimal" style="padding:0;">Sign in with Google</button>
+                                            <?= googleButton() ?>
                                             <?php
                                         } else {
                                             ?>

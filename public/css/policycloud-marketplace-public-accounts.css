@@ -20,16 +20,22 @@
   border: 1px solid var(--policycloud-border-color-light);
 }
 
+.policycloud-marketplace .sso .actions {
+  display: flex;
+  align-items: center;
+}
+
 .policycloud-marketplace .sso .action {
   margin-right: 8px;
 }
 
 button#keycloak-signin {
-  background-color: rgb(20, 20, 20) !important;
+  background-color: rgb(35, 36, 39) !important;
   font-weight: bold;
+  display: inline-block;
   border: none !important;
-  padding: 11.5px 20px !important;
-  border-radius: 0 !important;
+  padding: 6.5px 10px !important;
+  border-radius: 4px !important;
 }
 
 button#keycloak-signin::before {
