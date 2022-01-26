@@ -296,8 +296,6 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
 
     public function disconnect_google(): string
     {
-        $token = PolicyCloud_Marketplace_Account::retrieve_token();
-
         $response = PolicyCloud_Marketplace::api_request(
             'DELETE',
             '/accounts/users/sso/google',
@@ -306,7 +304,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             [
                 'Content-Type: application/json',
                 'x-more-time: ' . PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'api_access_token'),
-                (!empty($token)) ? 'x-access-token: '.$token : ''
+                'x-access-token: ' . $this->token,
             ]
         );
         return parent::persist_token($response['token']);
@@ -322,7 +320,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             [
                 'Content-Type: application/json',
                 'x-more-time: ' . PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'api_access_token'),
-                (!empty($token)) ? 'x-access-token: '.$token : ''
+                'x-access-token: ' . $this->token,
             ]
         );
         return parent::persist_token($response['token']);

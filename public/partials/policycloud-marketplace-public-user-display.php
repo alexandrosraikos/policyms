@@ -21,7 +21,7 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
             <div class="sso">
                 <p>You can quickly setup your account using an existing account in the following services:</p>
                 <div class="actions">
-                    <?= googleButton() ?>
+                    <?php googleButton() ?>
                     <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign up with PolicyCloud (Internal)</button>
                 </div>
             </div>
@@ -165,7 +165,7 @@ function account_user_authentication_html($registration_url, $reset_password_pag
             <div class="sso">
                 <p>You can connect to your account using the following services:</p>
                 <div class="actions">
-                    <?= googleButton() ?>
+                    <?php googleButton() ?>
                     <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with PolicyCloud (Internal)</button>
                 </div>
             </div>
@@ -545,7 +545,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                         <?php
                                         if ($data['metadata']['password_protected'] == "0") {
                                         ?>
-                                            <span class="folding visible"><i>(Not yet set)</i></span>
+                                            <span class="folding visible"><em>(Not yet set)</em></span>
                                         <?php
 
                                         } else {
@@ -736,7 +736,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                             'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak')
                                         ));
                                     ?>
-                                        <?= googleButton() ?>
+                                        <?php googleButton() ?>
                                     <?php
                                     } else {
                                     ?>

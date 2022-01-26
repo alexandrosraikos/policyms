@@ -87,8 +87,8 @@
           </form>
           </div>
         `
-      )
-    })
+      );
+    });
 
     $(document).on(
       'submit',

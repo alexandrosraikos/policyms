@@ -656,7 +656,7 @@
           {},
           (data) => {
             setAuthorizedToken(data);
-            window.location.reload;
+            window.location.reload();
           }
         )
       }
@@ -676,7 +676,7 @@
           {},
           (data) => {
             setAuthorizedToken(data);
-            window.location.reload;
+            window.location.reload();
           }
         )
       }
