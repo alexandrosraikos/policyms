@@ -665,7 +665,7 @@
     function disconnectKeyCloak(e) {
       e.preventDefault();
       if ($(e.target).attr("password-protected") === undefined) {
-        if (confirm("You need to set a new password before disconnecting your Google account. Head to the \"Reset password\" page and follow the steps provided.")) {
+        if (confirm("You need to set a new password before disconnecting your KeyCloak account. Head to the \"Reset password\" page and follow the steps provided.")) {
           window.location.href = AccountEditingProperties.resetPasswordURL;
         }
       } else {
