@@ -296,8 +296,18 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
 
     public function disconnect_google(): string
     {
+        $token = PolicyCloud_Marketplace_Account::retrieve_token();
+
         $response = PolicyCloud_Marketplace::api_request(
-            // TODO @alexandrosraikos: Fill in endpoint details.
+            'DELETE',
+            '/accounts/users/sso/google',
+            [],
+            null,
+            [
+                'Content-Type: application/json',
+                'x-more-time: ' . PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'api_access_token'),
+                (!empty($token)) ? 'x-access-token: '.$token : ''
+            ]
         );
         return parent::persist_token($response['token']);
     }
@@ -305,7 +315,15 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
     public function disconnect_keycloak(): string
     {
         $response = PolicyCloud_Marketplace::api_request(
-            // TODO @alexandrosraikos: Fill in endpoint details.
+            'DELETE',
+            '/accounts/users/sso/keycloak',
+            [],
+            null,
+            [
+                'Content-Type: application/json',
+                'x-more-time: ' . PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'api_access_token'),
+                (!empty($token)) ? 'x-access-token: '.$token : ''
+            ]
         );
         return parent::persist_token($response['token']);
     }
@@ -333,6 +351,13 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
 
     public static function authenticate_google(string $google_token): string
     {
+        try {
+            $token = PolicyCloud_Marketplace_Account::retrieve_token();
+        }
+        catch (PolicyCloudMarketplaceUnauthorizedRequestException $e) {
+            $token = false;
+        }
+
         // Get the authorized token.
         $response = PolicyCloud_Marketplace::api_request(
             'POST',
@@ -343,7 +368,8 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             null,
             [
                 'Content-Type: application/json',
-                'x-more-time: ' . PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'api_access_token')
+                'x-more-time: ' . PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'api_access_token'),
+                (!empty($token)) ? 'x-access-token: '.$token : ''
             ]
         );
 
@@ -352,7 +378,13 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
 
     public static function authenticate_keycloak(string $username, string $password): string
     {
-        // Get the authorized token.
+        try {
+            $token = PolicyCloud_Marketplace_Account::retrieve_token();
+        }
+        catch (PolicyCloudMarketplaceUnauthorizedRequestException $e) {
+            $token = false;
+        }
+
         $response = PolicyCloud_Marketplace::api_request(
             'POST',
             '/accounts/users/sso/keycloak',
@@ -363,7 +395,8 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             null,
             [
                 'Content-Type: application/json',
-                'x-more-time: ' . PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'api_access_token')
+                'x-more-time: ' . PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'api_access_token'),
+                (!empty($token)) ? 'x-access-token: '.$token : ''
             ]
         );
 

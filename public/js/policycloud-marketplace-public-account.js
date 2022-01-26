@@ -644,9 +644,9 @@
 
     function disconnectGoogle(e) {
       e.preventDefault();
-      if ($(e.target).data["password-protected"] == "0") {
+      if ($(e.target).attr("password-protected") === undefined) {
         if (confirm("You need to set a new password before disconnecting your Google account. Head to the \"Reset password\" page and follow the steps provided.")) {
-          window.location.href(AccountEditingProperties.resetPasswordURL);
+          window.location.href = AccountEditingProperties.resetPasswordURL;
         }
       } else {
         makeWPRequest(
@@ -664,9 +664,9 @@
 
     function disconnectKeyCloak(e) {
       e.preventDefault();
-      if ($(e.target).data["password-protected"] == "0") {
+      if ($(e.target).attr("password-protected") === undefined) {
         if (confirm("You need to set a new password before disconnecting your Google account. Head to the \"Reset password\" page and follow the steps provided.")) {
-          window.location.href(AccountEditingProperties.resetPasswordURL);
+          window.location.href = AccountEditingProperties.resetPasswordURL;
         }
       } else {
         makeWPRequest(
@@ -752,7 +752,7 @@
       disconnectGoogle
     )
 
-    $("button[data-action=\"disconnect-google\"]").click(
+    $("button[data-action=\"disconnect-keycloak\"]").click(
       disconnectKeyCloak
     )
   });

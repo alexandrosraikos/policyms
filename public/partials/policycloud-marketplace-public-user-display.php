@@ -140,7 +140,7 @@ function googleButton()
             google.accounts.id.prompt();
         }
     </script>
-    <button id="google-signin" class="action minimal"></button>
+    <div id="google-signin" class="action minimal"></div>
     <?php
 }
 
@@ -201,23 +201,19 @@ function account_user_authentication_html($registration_url, $reset_password_pag
  */
 function account_user_reset_password_html($authenticated)
 {
-    if (!$authenticated) {
     ?>
-        <div class="policycloud-marketplace">
-            <form id="policycloud-marketplace-password-reset">
-                <fieldset>
-                    <h2>Reset your password</h2>
-                    <p>Insert your e-mail address below and we will contact you with instructions to reset your password.</p>
-                    <label for="email">E-mail address *</label>
-                    <input required name="email" placeholder="e.g. johndoe@example.org" type="email" />
-                    <button type="submit" class="action">Reset password</button>
-                </fieldset>
-            </form>
-        </div>
+    <div class="policycloud-marketplace">
+        <form id="policycloud-marketplace-password-reset">
+            <fieldset>
+                <h2>Reset your password</h2>
+                <p>Insert your e-mail address below and we will contact you with instructions to reset your password.</p>
+                <label for="email">E-mail address *</label>
+                <input required name="email" placeholder="e.g. johndoe@example.org" type="email" />
+                <button type="submit" class="action">Reset password</button>
+            </fieldset>
+        </form>
+    </div>
     <?php
-    } else {
-        show_alert("You're already logged in.", 'notice');
-    }
 }
 
 
@@ -414,7 +410,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                 </section>
                 <section class="policycloud-marketplace-account-approvals">
                     <?php
-                    entity_list_html('approvals', $data['approvals'], $visitor, function ($pending_description) use ($pages) {
+                    entity_list_html('approvals', $data['approvals'] ?? [], $visitor, function ($pending_description) use ($pages) {
                     ?>
                         <li data-type-filter="<?php echo $pending_description->type ?>" data-date-updated="<?php echo strtotime($pending_description->metadata['uploadDate']) ?>" data-rating="<?php echo $pending_description->metadata['reviews']['average_rating'] ?>" data-total-views="<?php echo $pending_description->metadata['views'] ?>" class="visible">
                             <div class="description">
@@ -546,9 +542,20 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                         Password
                                     </td>
                                     <td>
-                                        <span class="folding visible">*****************</span>
-                                        <input class="folding" type="password" name="password" placeholder="Enter your new password here" data-password-protected="<?= $data['metadata']['password_protected'] ?>" />
-                                        <input class="folding" type="password" name="password-confirm" placeholder="Confirm new password here" data-password-protected="<?= $data['metadata']['password_protected'] ?>" />
+                                        <?php
+                                        if ($data['metadata']['password_protected'] == "0") {
+                                        ?>
+                                            <span class="folding visible"><i>(Not yet set)</i></span>
+                                        <?php
+
+                                        } else {
+                                        ?>
+                                            <span class="folding visible">*****************</span>
+                                        <?php
+                                        }
+                                        ?>
+                                        <input class="folding" type="password" name="password" placeholder="Enter your new password here" />
+                                        <input class="folding" type="password" name="password-confirm" placeholder="Confirm new password here"/>
                                     <?php
                                 }
                                     ?>
@@ -733,7 +740,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                     <?php
                                     } else {
                                     ?>
-                                        <button class="action destructive minimal" data-action="disconnect-google" data-password-protected="<?= $data['metadata']['password_protected'] ?>">Disconnect</button>
+                                        <button class="action destructive minimal" data-action="disconnect-google" <?= $data['metadata']['password_protected'] == "1" ? 'password-protected' : '' ?>>Disconnect</button>
                                     <?php
                                     }
                                     ?>
@@ -745,7 +752,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                 </td>
                                 <td>
                                     <?php
-                                    if ($data['metadata']['connections']['google'] == "0") {
+                                    if ($data['metadata']['connections']['keycloak'] == "0") {
                                         wp_enqueue_script("policycloud-marketplace-account-authentication");
                                         wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
                                             'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
@@ -757,7 +764,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                     <?php
                                     } else {
                                     ?>
-                                        <button class="action destructive minimal" data-action="disconnect-keycloak" data-password-protected="<?= $data['metadata']['password_protected'] ?>">Disconnect</button>
+                                        <button class="action destructive minimal" data-action="disconnect-keycloak" <?= $data['metadata']['password_protected'] == "1" ? 'password-protected' : '' ?>>Disconnect</button>
                                     <?php
                                     }
                                     ?>

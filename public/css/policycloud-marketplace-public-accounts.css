@@ -27,6 +27,11 @@
 
 .policycloud-marketplace .sso .action {
   margin-right: 8px;
+  width: auto;
+}
+
+#google-signin {
+  display: inline-block;
 }
 
 button#keycloak-signin {
