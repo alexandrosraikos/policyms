@@ -71,7 +71,6 @@
         new FormData($("#policycloud-registration")[0]),
         (data) => {
           setAuthorizedToken(data);
-          console.log(AccountRegistrationProperties.accountPage);
           window.location.href = AccountRegistrationProperties.accountPage;
         }
       );

@@ -105,10 +105,6 @@ function googleButton(bool $registration = false)
     ?>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
-        function handleCredentialResponse(response) {
-            console.log("Encoded JWT ID token: " + response.credential);
-        }
-
         function googleRegistrationCallback(response) {
             makeWPRequest(
                 '.google-signin',

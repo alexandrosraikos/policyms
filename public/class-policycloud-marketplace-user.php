@@ -377,8 +377,6 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
     return parent::persist_token($response["token"]);
   }
 
-  // TODO @alexandrosraikos: Implement OAuth registration endpoint.
-
   public static function register_google(string $google_token): string
   {
     // Get the authorized token.

@@ -34,7 +34,6 @@
         }
       );
       newLinksField.appendTo(container);
-      console.log(container.children());
       container.find("button.remove-field").prop(
         "disabled",
         container.children().length === 1
@@ -52,7 +51,6 @@
       e.preventDefault();
       const container = $(this).parent().parent();
       $(this).parent().remove();
-      console.log(container.children());
       container.find("button.remove-field").prop(
         "disabled",
         container.children().length === 1
