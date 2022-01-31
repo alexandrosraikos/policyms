@@ -69,7 +69,6 @@
     $("button[data-action=\"keycloak-form\"]").click((e) => {
       e.preventDefault();
       var registration = $(e.target).attr('id') === 'keycloak-registration';
-      console.log(registration);
       new Modal(
         'keycloak-form',
         `
