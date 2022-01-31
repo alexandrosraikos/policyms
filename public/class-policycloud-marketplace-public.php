@@ -363,8 +363,10 @@ class PolicyCloud_Marketplace_Public
         wp_enqueue_script("policycloud-marketplace-account-authentication");
         wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
             'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
-            'GoogleSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_google_handler'),
-            'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak')
+            'GoogleSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_google'),
+            'GoogleSSORegistrationNonce' => wp_create_nonce('policycloud_marketplace_account_user_registration_google'),
+            'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak'),
+            'KeyCloakSSORegistrationNonce' => wp_create_nonce('policycloud_marketplace_account_user_registration_keycloak')
         ));
 
         account_user_authentication_html(
@@ -581,6 +583,17 @@ class PolicyCloud_Marketplace_Public
         );
     }
 
+    public function account_user_registration_google_handler()
+    {
+        $this->ajax_handler(
+            function ($data) {
+                return PolicyCloud_Marketplace_User::register_google(
+                    $data['google_token']
+                );
+            }
+        );
+    }
+
     public function account_disconnect_google_handler()
     {
         $this->ajax_handler(
@@ -597,6 +610,18 @@ class PolicyCloud_Marketplace_Public
             function() {
                 $user = new PolicyCloud_Marketplace_User();
                 return $user->disconnect_keycloak();
+            }
+        );
+    }
+
+    public function account_user_registration_keycloak_handler()
+    {
+        $this->ajax_handler(
+            function ($data) {
+                return PolicyCloud_Marketplace_User::register_keycloak(
+                    $data['keycloak-username'],
+                    $data['keycloak-password']
+                );
             }
         );
     }
@@ -1147,6 +1172,4 @@ class PolicyCloud_Marketplace_Public
             }
         );
     }
-
-    // TODO @alexandrosraikos / @vkoukos: Add Google SSO bearer token forwarding to the PolicyCloud Marketplace API and log user in on token response. (#114)
 }

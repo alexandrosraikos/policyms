@@ -1,5 +1,5 @@
 /**
- * @file Provides global functions for PolicyCloud Marketplace shortcodes.
+ * @file Provides global functions for Policy Cloud Marketplace shortcodes.
  *
  * @author Alexandros Raikos <araikos@unipi.gr>
  * @since 1.0.0

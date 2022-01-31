@@ -1,10 +1,10 @@
-# PolicyCloud Marketplace for WordPress
+# Policy Cloud Marketplace for WordPress
 
-The official plugin for the PolicyCloud Marketplace, enabling front-end access to the PolicyCloud Marketplace API.
+The official plugin for the Policy Cloud Marketplace, enabling front-end access to the Policy Cloud Marketplace API.
 
 ## Getting started
 
-Read the sections below to get started with PolicyCloud Marketplace for WordPress.
+Read the sections below to get started with Policy Cloud Marketplace for WordPress.
 
 ### Requirements
 
@@ -17,11 +17,11 @@ Read the sections below to get started with PolicyCloud Marketplace for WordPres
 
 Clone the repository, zip and install via the WordPress dashboard.
 
-Head to the Dashboard > Settings > PolicyCloud Marketplace to enter your PolicyCloud Marketplace API credentials as provided by the API administrator.
+Head to the Dashboard > Settings > Policy Cloud Marketplace to enter your Policy Cloud Marketplace API credentials as provided by the API administrator.
 
 ### Shortcodes
 
-Use the shortcodes below for all PolicyCloud Marketplace API functionality.
+Use the shortcodes below for all Policy Cloud Marketplace API functionality.
 
 #### Log In
 
@@ -51,7 +51,7 @@ To view the upload form for creating a Description Object for authorized users, 
 
 `[policycloud-marketplace-description-creation]`
 
-#### PolicyCloud Marketplace account page
+#### Policy Cloud Marketplace account page
 
 To view the account page for an authorized user, add the following shortcode:
 
@@ -65,4 +65,4 @@ This plugin also enables the following features:
 
 ## Credits
 
-This work extends, and is schematically based upon, the PolicyCloud Marketplace API, created and maintained by [@vkoukos](https://github.com/vkoukos). Special thanks to [@elefkour](https://github.com/elefkour) for co-authoring and co-maintaining this repository.
+This work extends, and is schematically based upon, the Policy Cloud Marketplace API, created and maintained by [@vkoukos](https://github.com/vkoukos). Special thanks to [@elefkour](https://github.com/elefkour) for co-authoring and co-maintaining this repository.

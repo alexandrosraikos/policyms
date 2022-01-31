@@ -10,8 +10,6 @@
  */
 function account_user_registration_html($authentication_url, $tos_url, $authenticated)
 {
-    // TODO @alexandrosraikos: Add "Sign in with KeyCloak" button and popup form. (#114)
-    // TODO @alexandrosraikos: Add "Sign in with Google" button and JS form. (#114)
 
     if ($authenticated) {
         show_alert("You're already logged in.", 'notice');
@@ -21,8 +19,8 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
             <div class="sso">
                 <p>You can quickly setup your account using an existing account in the following services:</p>
                 <div class="actions">
-                    <?php googleButton() ?>
-                    <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign up with PolicyCloud (Internal)</button>
+                    <?php googleButton(true) ?>
+                    <button id="keycloak-registration" class="action keycloak" data-action="keycloak-form">Sign up with Policy Cloud (Internal)</button>
                 </div>
             </div>
             <form id="policycloud-registration" action="">
@@ -102,13 +100,28 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
     }
 }
 
-function googleButton()
+function googleButton(bool $registration = false)
 {
     ?>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
         function handleCredentialResponse(response) {
             console.log("Encoded JWT ID token: " + response.credential);
+        }
+
+        function googleRegistrationCallback(response) {
+            makeWPRequest(
+                '.google-signin',
+                'policycloud_marketplace_account_user_registration_google',
+                AccountAuthenticationProperties.GoogleSSORegistrationNonce, 
+                {
+                    google_token: response.credential
+                },
+                (data) => {
+                    setAuthorizedToken(data);
+                    window.location.href = GlobalProperties.rootURLPath;
+                }
+            )
         }
 
         function googleCallback(response) {
@@ -124,17 +137,19 @@ function googleButton()
                 }
             )
         }
+
         window.onload = function() {
             google.accounts.id.initialize({
                 client_id: "861485154625-4bdkkkbihuqbsf97k8uj831ivnlb9dp2",
-                callback: googleCallback
+                callback: <?= $registration ? 'googleRegistrationCallback' : 'googleCallback' ?>
             });
             google.accounts.id.renderButton(
                 document.getElementById("google-signin"), {
                     type: 'standard',
                     shape: 'rectangular',
                     theme: "filled_black",
-                    size: "large"
+                    size: "large",
+                    locale: "en-GB"
                 }
             );
             google.accounts.id.prompt();
@@ -143,8 +158,6 @@ function googleButton()
     <div id="google-signin" class="action minimal"></div>
     <?php
 }
-
-
 
 
 /**
@@ -166,7 +179,7 @@ function account_user_authentication_html($registration_url, $reset_password_pag
                 <p>You can connect to your account using the following services:</p>
                 <div class="actions">
                     <?php googleButton() ?>
-                    <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with PolicyCloud (Internal)</button>
+                    <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with Policy Cloud (Internal)</button>
                 </div>
             </div>
             <form id="policycloud-authentication">
@@ -748,7 +761,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                             </tr>
                             <tr>
                                 <td>
-                                    PolicyCloud account (Internal)
+                                    Policy Cloud account (Internal)
                                 </td>
                                 <td>
                                     <?php
@@ -760,7 +773,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                             'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak')
                                         ));
                                     ?>
-                                        <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with PolicyCloud (Internal)</button>
+                                        <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with Policy Cloud (Internal)</button>
                                     <?php
                                     } else {
                                     ?>
@@ -782,9 +795,6 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                             </tr>
                         </table>
                         <?php
-                        // TODO @alexandrosraikos: Add KeyCloak SSO settings field (add/remove w/ new pass). (#114)
-                        // TODO @alexandrosraikos: Add Google SSO settings field (add/remove w/ new pass). (#114)
-                        // NOTE: Check if password_protected already in account array.
                         if (!$visitor || $admin) {
                         ?>
                             <div class="folding error"></div>

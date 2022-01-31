@@ -34,6 +34,7 @@
   display: inline-block;
 }
 
+button#keycloak-registration,
 button#keycloak-signin {
   background-color: rgb(35, 36, 39) !important;
   font-weight: bold;
@@ -43,6 +44,7 @@ button#keycloak-signin {
   border-radius: 4px !important;
 }
 
+button#keycloak-registration::before,
 button#keycloak-signin::before {
   content: " ";
   display: inline-block;

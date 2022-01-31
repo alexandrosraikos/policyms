@@ -4,7 +4,7 @@
  *
  * Print the assets grid HTML.
  *
- * @param   array $assets The PolicyCloud Marketplace API assets.
+ * @param   array $assets The Policy Cloud Marketplace API assets.
  * @param   string $asset_url The asset page URL.
  *
  * @since   1.0.0
@@ -240,7 +240,7 @@ function descriptions_archive_filters_html($filters)
 /**
  * Print the assets archive HTML.
  *
- * @param   array $assets The PolicyCloud Marketplace API assets.
+ * @param   array $assets The Policy Cloud Marketplace API assets.
  * @param   array $args Various printing arguments.
  *
  * @since   1.0.0
@@ -602,7 +602,7 @@ function description_reviews_html(array $reviews = null, ?int $pages = 0, Policy
 /**
  * Print the asset HTML.
  *
- * @param   array $asset The PolicyCloud Marketplace API asset.
+ * @param   array $asset The Policy Cloud Marketplace API asset.
  * @param   array $args Various printing arguments.
  *
  * @since   1.0.0
