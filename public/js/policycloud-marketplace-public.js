@@ -1,5 +1,5 @@
 /**
- * @file Provides global functions for Policy Cloud Marketplace shortcodes.
+ * @file Provides global functions for PolicyCLOUD Data Marketplace shortcodes.
  *
  * @author Alexandros Raikos <araikos@unipi.gr>
  * @since 1.0.0
@@ -361,7 +361,7 @@ function makeWPRequest(actionDOMSelector, action, nonce, data, completion) {
       );
 
       // Log additional information into the console.
-      console.error("Policy Cloud Marketplace error: " + response.responseText);
+      console.error("PolicyCLOUD Data Marketplace error: " + response.responseText);
     }
 
     // Remove the loading class.

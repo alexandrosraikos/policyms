@@ -311,7 +311,7 @@ class PolicyCloud_Marketplace
 
 
     /**
-     * Send a request to the Policy Cloud Marketplace API.
+     * Send a request to the PolicyCLOUD Data Marketplace API.
      * Documentation: https://documenter.getpostman.com/view/16776360/TzsZs8kn#intro
      *
      * @param string $http_method The standardized HTTP method used for the request.
@@ -331,10 +331,10 @@ class PolicyCloud_Marketplace
         // Retrieve hostname URL.
         $options = get_option('policycloud_marketplace_plugin_settings');
         if (empty($options['marketplace_host'])) {
-            throw new InvalidArgumentException("No Policy Cloud Marketplace API hostname was defined in WordPress settings.");
+            throw new InvalidArgumentException("No PolicyCLOUD Data Marketplace API hostname was defined in WordPress settings.");
         }
         if (empty($options['api_access_token'])) {
-            throw new InvalidArgumentException("No Policy Cloud Marketplace API access key was defined in WordPress settings.");
+            throw new InvalidArgumentException("No PolicyCLOUD Data Marketplace API access key was defined in WordPress settings.");
         }
 
         if (!empty($data)) {
@@ -367,7 +367,7 @@ class PolicyCloud_Marketplace
         curl_close($curl);
         if ($curl_http != 200 && $curl_http != 201) {
             throw new PolicyCloudMarketplaceAPIError(
-                "The Policy Cloud Marketplace API encountered an HTTP " . $curl_http . " status code. More information: " . $response ?? '',
+                "The PolicyCLOUD Data Marketplace API encountered an HTTP " . $curl_http . " status code. More information: " . $response ?? '',
                 $curl_http
             );
         } else {
@@ -379,7 +379,7 @@ class PolicyCloud_Marketplace
                             return $decoded;
                         } else {
                             throw new PolicyCloudMarketplaceAPIError(
-                                'Policy Cloud Marketplace error when contacting ' . $uri . ': ' . $decoded['message'],
+                                'PolicyCLOUD Data Marketplace error when contacting ' . $uri . ': ' . $decoded['message'],
                                 $curl_http
                             );
                         }

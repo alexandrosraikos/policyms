@@ -99,7 +99,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
       $token = $this->update_picture($picture);
     }
 
-    // Contact the Policy Cloud Marketplace API for password change.
+    // Contact the PolicyCLOUD Data Marketplace API for password change.
     if (!empty($data["password"])) {
       $response = PolicyCloud_Marketplace::api_request(
         "POST",
@@ -319,7 +319,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
   public function disconnect_google(): string
   {
     $response = PolicyCloud_Marketplace::api_request(
-      "DELETE",
+      "POST",
       "/accounts/users/sso/google/disconnect",
       [],
       null,
@@ -339,7 +339,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
   public function disconnect_keycloak(): string
   {
     $response = PolicyCloud_Marketplace::api_request(
-      "DELETE",
+      "POST",
       "/accounts/users/sso/keycloak/disconnect",
       [],
       null,

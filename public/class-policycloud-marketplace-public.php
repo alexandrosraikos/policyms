@@ -287,11 +287,11 @@ class PolicyCloud_Marketplace_Public
             if (empty($options[$key])) {
                 if ($throw) {
                     throw new PolicyCloudMarketplaceMissingOptionsException(
-                        "Please finish setting up the Policy Cloud Marketplace in the WordPress settings."
+                        "Please finish setting up the PolicyCLOUD Data Marketplace in the WordPress settings."
                     );
                 } else {
                     show_alert(
-                        "Please finish setting up the Policy Cloud Marketplace in the WordPress settings.",
+                        "Please finish setting up the PolicyCLOUD Data Marketplace in the WordPress settings.",
                         'notice'
                     );
                 }

@@ -295,7 +295,7 @@ class PolicyCloud_Marketplace_Description
             'GET',
             '/descriptions/statistics/filtering',
             []
-        )['results'];
+        )['results'] ?? [];
     }
 
     public static function get_pending(?string $type = null)

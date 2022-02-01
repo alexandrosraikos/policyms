@@ -20,7 +20,7 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
                 <p>You can quickly setup your account using an existing account in the following services:</p>
                 <div class="actions">
                     <?php googleButton(true) ?>
-                    <button id="keycloak-registration" class="action keycloak" data-action="keycloak-form">Sign up with Policy Cloud (Internal)</button>
+                    <button id="keycloak-registration" class="action keycloak" data-action="keycloak-form">Sign up with PolicyCLOUD (Internal)</button>
                 </div>
             </div>
             <form id="policycloud-registration" action="">
@@ -136,7 +136,7 @@ function googleButton(bool $registration = false)
 
         window.onload = function() {
             google.accounts.id.initialize({
-                client_id: "861485154625-4bdkkkbihuqbsf97k8uj831ivnlb9dp2",
+                client_id: "129650564826-9bf7dhacn26c1hf1k0h0qcn48iv8mv8s.apps.googleusercontent.com",
                 callback: <?= $registration ? 'googleRegistrationCallback' : 'googleCallback' ?>
             });
             google.accounts.id.renderButton(
@@ -175,7 +175,7 @@ function account_user_authentication_html($registration_url, $reset_password_pag
                 <p>You can connect to your account using the following services:</p>
                 <div class="actions">
                     <?php googleButton() ?>
-                    <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with Policy Cloud (Internal)</button>
+                    <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with PolicyCLOUD (Internal)</button>
                 </div>
             </div>
             <form id="policycloud-authentication">
@@ -757,7 +757,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                             </tr>
                             <tr>
                                 <td>
-                                    Policy Cloud account (Internal)
+                                    PolicyCLOUD account (Internal)
                                 </td>
                                 <td>
                                     <?php
@@ -769,7 +769,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                             'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak')
                                         ));
                                     ?>
-                                        <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with Policy Cloud (Internal)</button>
+                                        <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with PolicyCLOUD (Internal)</button>
                                     <?php
                                     } else {
                                     ?>

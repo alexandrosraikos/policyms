@@ -243,8 +243,8 @@ class PolicyCloud_Marketplace_Admin
         require_once plugin_dir_path(dirname(__FILE__)) . 'admin/partials/policycloud-marketplace-admin-display.php';
 
         add_options_page(
-            'Policy Cloud Marketplace Settings',
-            'Policy Cloud Marketplace',
+            'PolicyCLOUD Data Marketplace Settings',
+            'PolicyCLOUD Data Marketplace',
             'manage_options',
             'policycloud-marketplace-plugin',
             'render_settings_page'

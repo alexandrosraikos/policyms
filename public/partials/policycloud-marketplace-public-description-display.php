@@ -4,7 +4,7 @@
  *
  * Print the assets grid HTML.
  *
- * @param   array $assets The Policy Cloud Marketplace API assets.
+ * @param   array $assets The PolicyCLOUD Data Marketplace API assets.
  * @param   string $asset_url The asset page URL.
  *
  * @since   1.0.0
@@ -131,22 +131,31 @@ function featured_descriptions_html(array $categories, string $description_page)
                 </div>
             </div>
         </div>
-        <h2>Top rated descriptions</h2>
         <?php
-        descriptions_grid_html($categories['top_rated'][0], $description_page);
+        if (!empty($categories['top_rated'][0])) {
         ?>
-        <h2>Most viewed descriptions</h2>
+            <h2>Top rated descriptions</h2>
         <?php
-        descriptions_grid_html($categories['most_viewed'][0], $description_page);
+            descriptions_grid_html($categories['top_rated'][0], $description_page);
+        }
+        if (!empty($categories['most_viewed'][0])) {
         ?>
-        <h2>Latest descriptions</h2>
+            <h2>Most viewed descriptions</h2>
         <?php
-        descriptions_grid_html($categories['latest'][0], $description_page);
+            descriptions_grid_html($categories['most_viewed'][0], $description_page);
+        }
+        if (!empty($categories['most_viewed'][0])) {
         ?>
-        <h2>Suggestions</h2>
+            <h2>Latest descriptions</h2>
         <?php
-        descriptions_grid_html($categories['suggestions'][0], $description_page);
+            descriptions_grid_html($categories['latest'][0], $description_page);
+        }
+        if (!empty($categories['most_viewed'][0])) {
         ?>
+            <h2>Suggestions</h2>
+        <?php
+            descriptions_grid_html($categories['suggestions'][0], $description_page);
+        } ?>
     </div>
 <?php
 }
@@ -157,6 +166,12 @@ function descriptions_archive_filters_html($filters)
     <div class="filters">
         <button class="close outlined filters-toggle">Close</button>
         <h2>Filters</h2>
+        <?php
+        if (empty($filters)) {
+            show_alert('Filters are currently unavailable.','notice');
+        }
+        else {
+        ?>
         <p>Select the options below to narrow your search.</p>
         <form>
             <fieldset>
@@ -233,6 +248,7 @@ function descriptions_archive_filters_html($filters)
             </fieldset>
             <button type="submit" class="action">Apply filters</button>
         </form>
+        <?php } ?>
     </div>
 <?php
 }
@@ -240,7 +256,7 @@ function descriptions_archive_filters_html($filters)
 /**
  * Print the assets archive HTML.
  *
- * @param   array $assets The Policy Cloud Marketplace API assets.
+ * @param   array $assets The PolicyCLOUD Data Marketplace API assets.
  * @param   array $args Various printing arguments.
  *
  * @since   1.0.0
@@ -602,7 +618,7 @@ function description_reviews_html(array $reviews = null, ?int $pages = 0, Policy
 /**
  * Print the asset HTML.
  *
- * @param   array $asset The Policy Cloud Marketplace API asset.
+ * @param   array $asset The PolicyCLOUD Data Marketplace API asset.
  * @param   array $args Various printing arguments.
  *
  * @since   1.0.0
