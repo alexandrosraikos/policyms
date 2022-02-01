@@ -109,7 +109,7 @@ function googleButton(bool $registration = false)
             makeWPRequest(
                 '.google-signin',
                 'policycloud_marketplace_account_user_registration_google',
-                AccountAuthenticationProperties.GoogleSSORegistrationNonce, 
+                '<?php echo wp_create_nonce('policycloud_marketplace_account_user_registration_google') ?>',
                 {
                     google_token: response.credential
                 },
@@ -124,7 +124,8 @@ function googleButton(bool $registration = false)
             makeWPRequest(
                 '.google-signin',
                 'policycloud_marketplace_account_user_authentication_google',
-                AccountAuthenticationProperties.GoogleSSONonce, {
+                '<?php echo wp_create_nonce('policycloud_marketplace_account_user_authentication_google') ?>', 
+                {
                     google_token: response.credential
                 },
                 (data) => {
