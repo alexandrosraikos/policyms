@@ -336,9 +336,8 @@ class PolicyCloud_Marketplace_Public
                 ));
                 wp_enqueue_script("policycloud-marketplace-account-authentication");
                 wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
-                    'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
-                    'GoogleSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_google_handler'),
-                    'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak')
+                    'GoogleSSORegistrationNonce' => wp_create_nonce('policycloud_marketplace_account_user_registration_google'),
+                    'KeyCloakSSORegistrationNonce' => wp_create_nonce('policycloud_marketplace_account_user_registration_keycloak')
                 ));
         
 
@@ -452,9 +451,7 @@ class PolicyCloud_Marketplace_Public
                         'deletionNonce' => wp_create_nonce('policycloud_marketplace_account_user_deletion'),
                         'verificationRetryNonce' => wp_create_nonce('policycloud_marketplace_account_user_retry_verification'),
                         'requestDataCopyNonce' => wp_create_nonce('policycloud_marketplace_account_user_data_request'),
-                        'GoogleSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_google'),
                         'disconnectGoogleNonce' => wp_create_nonce('policycloud_marketplace_account_disconnect_google'),
-                        'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak'),
                         'disconnectKeyCloakNonce' => wp_create_nonce('policycloud_marketplace_account_disconnect_keycloak'),
                         'userID' => $user->id,
                         'resetPasswordURL' => self::get_plugin_setting(true, 'password_reset_page'),

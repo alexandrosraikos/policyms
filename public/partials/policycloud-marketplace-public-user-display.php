@@ -107,7 +107,7 @@ function googleButton(bool $registration = false)
     <script>
         function googleRegistrationCallback(response) {
             makeWPRequest(
-                '.google-signin',
+                '#google-signin',
                 'policycloud_marketplace_account_user_registration_google',
                 '<?php echo wp_create_nonce('policycloud_marketplace_account_user_registration_google') ?>',
                 {
@@ -122,7 +122,7 @@ function googleButton(bool $registration = false)
 
         function googleCallback(response) {
             makeWPRequest(
-                '.google-signin',
+                '#google-signin',
                 'policycloud_marketplace_account_user_authentication_google',
                 '<?php echo wp_create_nonce('policycloud_marketplace_account_user_authentication_google') ?>', 
                 {
@@ -767,7 +767,8 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                         wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
                                             'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
                                             'GoogleSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_google_handler'),
-                                            'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak')
+                                            'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak'),
+                                            'RedirectSSO' => PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'account_page')
                                         ));
                                     ?>
                                         <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with PolicyCLOUD (Internal)</button>

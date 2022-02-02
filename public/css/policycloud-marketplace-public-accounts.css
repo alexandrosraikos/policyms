@@ -30,8 +30,14 @@
   width: auto;
 }
 
-#google-signin {
+#google-signin,
+#google-registration {
   display: inline-block;
+}
+
+#google-signin iframe,
+#google-registration iframe {
+  margin: 0 !important;
 }
 
 button#keycloak-registration,

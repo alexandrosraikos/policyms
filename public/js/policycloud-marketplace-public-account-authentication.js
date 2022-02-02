@@ -91,6 +91,8 @@
       );
     });
 
+    console.log(AccountAuthenticationProperties);
+
     $(document).on(
       'submit',
       'form.keycloak-sign-in',
@@ -103,11 +105,17 @@
           new FormData($("form.keycloak-sign-in")[0]),
           (data) => {
             setAuthorizedToken(data);
-            window.location.href = GlobalProperties.rootURLPath;
+            if (AccountAuthenticationProperties.RedirectSSO !== undefined) {
+              window.location.reload();
+            }
+            else {
+              window.location.href = GlobalProperties.rootURLPath;
+            }
           }
         )
       }
     );
+
 
     $(document).on(
       'submit',
@@ -117,8 +125,8 @@
         makeWPRequest(
           'form.keycloak-registration button[type="submit"]',
           'policycloud_marketplace_account_user_registration_keycloak',
-          AccountAuthenticationProperties.KeyCloakRegistrationSSONonce,
-          new FormData($("form.keycloak-sign-in")[0]),
+          AccountAuthenticationProperties.KeyCloakSSORegistrationNonce,
+          new FormData($("form.keycloak-registration")[0]),
           (data) => {
             setAuthorizedToken(data);
             window.location.href = GlobalProperties.rootURLPath;
@@ -126,5 +134,6 @@
         )
       }
     );
+
   });
 })(jQuery);

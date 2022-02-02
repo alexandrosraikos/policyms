@@ -382,7 +382,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
     // Get the authorized token.
     $response = PolicyCloud_Marketplace::api_request(
       "POST",
-      "/accounts/users/sso/google/register",
+      "/accounts/users/sso/google/registration",
       [
         "token" => $google_token,
       ],
@@ -438,7 +438,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
     // Get the authorized token.
     $response = PolicyCloud_Marketplace::api_request(
       "POST",
-      "/accounts/users/sso/keycloak/register",
+      "/accounts/users/sso/keycloak/registration",
       [
         "username" => $username,
         "password" => $password,
