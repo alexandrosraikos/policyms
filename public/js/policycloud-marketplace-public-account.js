@@ -495,7 +495,7 @@
       var formData = new FormData(
         $("#policycloud-marketplace-account-edit")[0]
       );
-      formData.append("username", AccountEditingProperties.userID);
+      formData.append("uid", AccountEditingProperties.userID);
       formData.append("subsequent_action", "edit_account_user");
 
       makeWPRequest(
@@ -527,7 +527,7 @@
 
       // Prepare deletion form.
       var formData = new FormData();
-      formData.append("username", AccountEditingProperties.userID ?? "");
+      formData.append("uid", AccountEditingProperties.userID ?? "");
       formData.append("subsequent_action", "delete_profile_picture");
 
       makeWPRequest(
@@ -555,7 +555,7 @@
         "policycloud_marketplace_account_user_retry_verification",
         AccountEditingProperties.verificationRetryNonce,
         {
-          username: AccountEditingProperties.userID,
+          uid: AccountEditingProperties.userID,
         },
         () => {
           showAlert(
@@ -642,6 +642,46 @@
       }
     }
 
+    function disconnectGoogle(e) {
+      e.preventDefault();
+      if ($(e.target).attr("password-protected") === undefined) {
+        if (confirm("You need to set a new password before disconnecting your Google account. Head to the \"Reset password\" page and follow the steps provided.")) {
+          window.location.href = AccountEditingProperties.resetPasswordURL;
+        }
+      } else {
+        makeWPRequest(
+          'button[data-action="disconnect-google"]',
+          'policycloud_marketplace_account_disconnect_google',
+          AccountEditingProperties.disconnectGoogleNonce,
+          {},
+          (data) => {
+            setAuthorizedToken(data);
+            window.location.reload();
+          }
+        )
+      }
+    }
+
+    function disconnectKeyCloak(e) {
+      e.preventDefault();
+      if ($(e.target).attr("password-protected") === undefined) {
+        if (confirm("You need to set a new password before disconnecting your KeyCloak account. Head to the \"Reset password\" page and follow the steps provided.")) {
+          window.location.href = AccountEditingProperties.resetPasswordURL;
+        }
+      } else {
+        makeWPRequest(
+          'button[data-action="disconnect-keycloak"]',
+          'policycloud_marketplace_account_disconnect_keycloak',
+          AccountEditingProperties.disconnectKeyCloakNonce,
+          {},
+          (data) => {
+            setAuthorizedToken(data);
+            window.location.reload();
+          }
+        )
+      }
+    }
+
     /**
      *
      * Information interface actions & event listeners.
@@ -707,5 +747,13 @@
     $("#policycloud-marketplace-delete-account").submit(
       validateDeletionRequest
     );
+
+    $("button[data-action=\"disconnect-google\"]").click(
+      disconnectGoogle
+    )
+
+    $("button[data-action=\"disconnect-keycloak\"]").click(
+      disconnectKeyCloak
+    )
   });
 })(jQuery);

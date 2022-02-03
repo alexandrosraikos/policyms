@@ -322,7 +322,8 @@
           'policycloud_marketplace_delete_review',
           DescriptionEditingProperties.deleteReviewNonce,
           {
-            "description_id": DescriptionEditingProperties.descriptionID
+            "description_id": DescriptionEditingProperties.descriptionID,
+            "author_id": $(this).data("author-id")
           },
           () => {
             window.location.reload()
@@ -447,7 +448,7 @@
     // Delete a review.
     $(document).on(
       'click',
-      '.policycloud-marketplace .reviews form button[data-action="delete-review"]',
+      '.policycloud-marketplace .reviews button[data-action="delete-review"]',
       deleteReview
     )
 

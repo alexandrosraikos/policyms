@@ -5,11 +5,14 @@ require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-policycloud-mark
 
 class PolicyCloud_Marketplace_Description
 {
+
     public string $id;
 
     public string $type;
 
     public array $information;
+
+    public ?array $links;
 
     public string $image_id;
 
@@ -81,6 +84,10 @@ class PolicyCloud_Marketplace_Description
                 "subtype" => $information['subtype'],
                 "owner" => $information['owner'],
                 "description" => stripslashes($information['description']),
+                "links" => PolicyCloud_Marketplace_User::implode_urls(
+                    $information['links-title'],
+                    $information['links-url']
+                ),
                 "fieldOfUse" => $information['fieldOfUse'],
                 "comments" => $information['comments']
             ];
@@ -171,6 +178,7 @@ class PolicyCloud_Marketplace_Description
         } else {
             $this->type = $description['info']['type'];
             $this->information = $description['info'];
+            $this->links = $description['links'] ?? null;
             $this->metadata = $description['metadata'];
             $this->image_id = $description['main_image'];
         }
@@ -197,7 +205,8 @@ class PolicyCloud_Marketplace_Description
                 $description['your_review'][0]['comment'],
                 $description['your_review'][0]['rating'],
                 $description['id'],
-                $description['your_review'][0]['username'],
+                $description['your_review'][0]['uid'],
+                $description['your_review'][0]['reviewer'],
                 $description['your_review'][0]['updated_review_date'],
                 $description['your_review'][0]['review_version'],
             );
@@ -286,7 +295,7 @@ class PolicyCloud_Marketplace_Description
             'GET',
             '/descriptions/statistics/filtering',
             []
-        )['results'];
+        )['results'] ?? [];
     }
 
     public static function get_pending(?string $type = null)

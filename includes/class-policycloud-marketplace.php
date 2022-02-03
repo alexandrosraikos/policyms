@@ -189,6 +189,18 @@ class PolicyCloud_Marketplace
         $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_registration', $plugin_public, 'account_user_registration_handler');
         $this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_authentication', $plugin_public, 'account_user_authentication_handler');
         $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_authentication', $plugin_public, 'account_user_authentication_handler');
+        $this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_authentication_google', $plugin_public, 'account_user_authentication_google_handler');
+        $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_authentication_google', $plugin_public, 'account_user_authentication_google_handler');
+        $this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_authentication_keycloak', $plugin_public, 'account_user_authentication_keycloak_handler');
+        $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_authentication_keycloak', $plugin_public, 'account_user_authentication_keycloak_handler');
+        $this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_registration_google', $plugin_public, 'account_user_registration_google_handler');
+        $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_registration_google', $plugin_public, 'account_user_registration_google_handler');
+        $this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_registration_keycloak', $plugin_public, 'account_user_registration_keycloak_handler');
+        $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_registration_keycloak', $plugin_public, 'account_user_registration_keycloak_handler');
+        $this->loader->add_action('wp_ajax_policycloud_marketplace_account_disconnect_google', $plugin_public, 'account_disconnect_google_handler');
+        $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_disconnect_google', $plugin_public, 'account_disconnect_google_handler');
+        $this->loader->add_action('wp_ajax_policycloud_marketplace_account_disconnect_keycloak', $plugin_public, 'account_disconnect_keycloak_handler');
+        $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_disconnect_keycloak', $plugin_public, 'account_disconnect_keycloak_handler');
         $this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_password_reset', $plugin_public, 'account_user_password_reset_handler');
         $this->loader->add_action('wp_ajax_nopriv_policycloud_marketplace_account_user_password_reset', $plugin_public, 'account_user_password_reset_handler');
         $this->loader->add_action('wp_ajax_policycloud_marketplace_account_user_retry_verification', $plugin_public, 'account_user_verification_retry_handler');
@@ -299,7 +311,7 @@ class PolicyCloud_Marketplace
 
 
     /**
-     * Send a request to the PolicyCloud Marketplace API.
+     * Send a request to the PolicyCLOUD Data Marketplace API.
      * Documentation: https://documenter.getpostman.com/view/16776360/TzsZs8kn#intro
      *
      * @param string $http_method The standardized HTTP method used for the request.
@@ -319,10 +331,10 @@ class PolicyCloud_Marketplace
         // Retrieve hostname URL.
         $options = get_option('policycloud_marketplace_plugin_settings');
         if (empty($options['marketplace_host'])) {
-            throw new InvalidArgumentException("No PolicyCloud Marketplace API hostname was defined in WordPress settings.");
+            throw new InvalidArgumentException("No PolicyCLOUD Data Marketplace API hostname was defined in WordPress settings.");
         }
         if (empty($options['api_access_token'])) {
-            throw new InvalidArgumentException("No PolicyCloud Marketplace API access key was defined in WordPress settings.");
+            throw new InvalidArgumentException("No PolicyCLOUD Data Marketplace API access key was defined in WordPress settings.");
         }
 
         if (!empty($data)) {
@@ -355,7 +367,7 @@ class PolicyCloud_Marketplace
         curl_close($curl);
         if ($curl_http != 200 && $curl_http != 201) {
             throw new PolicyCloudMarketplaceAPIError(
-                "The PolicyCloud Marketplace API encountered an HTTP " . $curl_http . " status code. More information: " . $response ?? '',
+                "The PolicyCLOUD Data Marketplace API encountered an HTTP " . $curl_http . " status code. More information: " . $response ?? '',
                 $curl_http
             );
         } else {
@@ -367,7 +379,7 @@ class PolicyCloud_Marketplace
                             return $decoded;
                         } else {
                             throw new PolicyCloudMarketplaceAPIError(
-                                'PolicyCloud Marketplace error when contacting ' . $uri . ': ' . $decoded['message'],
+                                'PolicyCLOUD Data Marketplace error when contacting ' . $uri . ': ' . $decoded['message'],
                                 $curl_http
                             );
                         }

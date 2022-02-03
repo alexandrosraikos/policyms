@@ -10,25 +10,23 @@
  */
 function account_user_registration_html($authentication_url, $tos_url, $authenticated)
 {
+
     if ($authenticated) {
         show_alert("You're already logged in.", 'notice');
     } else {
 ?>
         <div class="policycloud-marketplace">
+            <div class="sso">
+                <p>You can quickly setup your account using an existing account in the following services:</p>
+                <div class="actions">
+                    <?php googleButton(true) ?>
+                    <button id="keycloak-registration" class="action keycloak" data-action="keycloak-form">Sign up with PolicyCLOUD (Internal)</button>
+                </div>
+            </div>
             <form id="policycloud-registration" action="">
-                <fieldset name="account-credentials">
-                    <h2>Account credentials</h2>
-                    <p>The following information is required for authorization purposes.</p>
-                    <label for="username">Username *</label>
-                    <input required name="username" placeholder="e.g. johndoe" type="text" />
-                    <label for="password">Password *</label>
-                    <input required name="password" placeholder="Insert your password" type="password" />
-                    <label for="password-confirm">Confirm password *</label>
-                    <input required name="password-confirm" placeholder="Insert your password again" type="password" />
-                </fieldset>
                 <fieldset name="account-details">
                     <h2>Account details</h2>
-                    <p>Fill in the following fields with your personal details. This information will be used to personalize your experience within the marketplace platform and showcase your profile to other visitors. Fields marked with (*) are required for registration.</p>
+                    <p>Fill in the following fields with your personal details. This information will be used to personalize your experience within the marketplace platform and showcase your profile to other registered users. Fields marked with (*) are required for registration.</p>
                     <label for="title">Title</label>
                     <select name="title">
                         <option value="Mr.">Mr.</option>
@@ -72,24 +70,91 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
                 </fieldset>
                 <fieldset name="account-contact">
                     <h2>Account contact details</h2>
-                    <p>Fill in your contact information here. This information will be used to validate your new account, as well as optionally make them available to other logged in Marketplace visitors. Fields marked with (*) are required for registration. These details remain private by default. </p>
+                    <p>Fill in your contact information here. This information will be used to validate your new account, as well as optionally make them visible to other logged in Marketplace visitors. Fields marked with (*) are required for registration. These details remain private by default. </p>
                     <label for="email">E-mail address *</label>
                     <input type="email" name="email" placeholder="e.g. johndoe@example.org" required />
                     <label for="phone">Phone number</label>
                     <input type="tel" name="phone" placeholder="e.g. +30 6999123456" />
                 </fieldset>
+                <fieldset name="account-credentials">
+                    <h2>Account credentials</h2>
+                    <p>The following information is required for authorization purposes.</p>
+                    <label for="password">Password *</label>
+                    <input required name="password" placeholder="Insert your password" type="password" />
+                    <label for="password-confirm">Confirm password *</label>
+                    <input required name="password-confirm" placeholder="Insert your password again" type="password" />
+                </fieldset>
+                <div class="tos-agree">
+                    <input type="checkbox" id="tos-agree" name="tos-agree" required />
+                    <label for="tos-agreee">
+                        By submitting this registration form, you agree to our <a class="underline" href="<?php echo $tos_url ?>">Terms of Service</a>.
+                    </label>
+                </div>
                 <div class="actions">
                     <button type="submit" class="action ">Create account</button>
                 </div>
-                <p>By submitting this form, you agree to our <a class="underline" href="<?php echo $tos_url ?>">Terms of Service</a>.
-                    Already have an account? Please <a class="underline" href="<?php echo $authentication_url ?>">Log in</a>.</p>
+                <p>Already have an account? Please <a class="underline" href="<?php echo $authentication_url ?>">Log in</a>.</p>
             </form>
         </div>
     <?php
     }
 }
 
+function googleButton(bool $registration = false)
+{
+    ?>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+        function googleRegistrationCallback(response) {
+            makeWPRequest(
+                '#google-signin',
+                'policycloud_marketplace_account_user_registration_google',
+                '<?php echo wp_create_nonce('policycloud_marketplace_account_user_registration_google') ?>',
+                {
+                    google_token: response.credential
+                },
+                (data) => {
+                    setAuthorizedToken(data);
+                    window.location.href = GlobalProperties.rootURLPath;
+                }
+            )
+        }
 
+        function googleCallback(response) {
+            makeWPRequest(
+                '#google-signin',
+                'policycloud_marketplace_account_user_authentication_google',
+                '<?php echo wp_create_nonce('policycloud_marketplace_account_user_authentication_google') ?>', 
+                {
+                    google_token: response.credential
+                },
+                (data) => {
+                    setAuthorizedToken(data);
+                    window.location.href = GlobalProperties.rootURLPath;
+                }
+            )
+        }
+
+        window.onload = function() {
+            google.accounts.id.initialize({
+                client_id: "129650564826-9bf7dhacn26c1hf1k0h0qcn48iv8mv8s.apps.googleusercontent.com",
+                callback: <?= $registration ? 'googleRegistrationCallback' : 'googleCallback' ?>
+            });
+            google.accounts.id.renderButton(
+                document.getElementById("google-signin"), {
+                    type: 'standard',
+                    shape: 'rectangular',
+                    theme: "filled_black",
+                    size: "large",
+                    locale: "en-GB"
+                }
+            );
+            google.accounts.id.prompt();
+        }
+    </script>
+    <div id="google-signin" class="action minimal"></div>
+    <?php
+}
 
 
 /**
@@ -104,14 +169,22 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
 function account_user_authentication_html($registration_url, $reset_password_page, $authenticated)
 {
     if (!$authenticated) {
+
     ?>
         <div class="policycloud-marketplace">
+            <div class="sso">
+                <p>You can connect to your account using the following services:</p>
+                <div class="actions">
+                    <?php googleButton() ?>
+                    <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with PolicyCLOUD (Internal)</button>
+                </div>
+            </div>
             <form id="policycloud-authentication">
                 <fieldset name=" account-credentials">
                     <h2>Insert your credentials</h2>
                     <p>The following information is required to log you in.</p>
-                    <label for="username">Username or E-mail address *</label>
-                    <input required name="username-email" placeholder="e.g. johndoe / johndoe@example.org" type="text" />
+                    <label for="email">E-mail address *</label>
+                    <input required name="email" placeholder="e.g. johndoe@example.org" type="email" />
                     <label for="password">Password *</label>
                     <input required name="password" placeholder="Insert your password" type="password" />
                 </fieldset>
@@ -138,23 +211,19 @@ function account_user_authentication_html($registration_url, $reset_password_pag
  */
 function account_user_reset_password_html($authenticated)
 {
-    if (!$authenticated) {
     ?>
-        <div class="policycloud-marketplace">
-            <form id="policycloud-marketplace-password-reset">
-                <fieldset>
-                    <h2>Reset your password</h2>
-                    <p>Insert your e-mail address below and we will contact you with instructions to reset your password.</p>
-                    <label for="username">E-mail address *</label>
-                    <input required name="email" placeholder="e.g. johndoe@example.org" type="email" />
-                    <button type="submit" class="action">Reset password</button>
-                </fieldset>
-            </form>
-        </div>
+    <div class="policycloud-marketplace">
+        <form id="policycloud-marketplace-password-reset">
+            <fieldset>
+                <h2>Reset your password</h2>
+                <p>Insert your e-mail address below and we will contact you with instructions to reset your password.</p>
+                <label for="email">E-mail address *</label>
+                <input required name="email" placeholder="e.g. johndoe@example.org" type="email" />
+                <button type="submit" class="action">Reset password</button>
+            </fieldset>
+        </form>
+    </div>
     <?php
-    } else {
-        show_alert("You're already logged in.", 'notice');
-    }
 }
 
 
@@ -349,36 +418,30 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                     });
                     ?>
                 </section>
-                <?php
-                if (!empty($data['approvals'])) {
-                ?>
-                    <section class="policycloud-marketplace-account-approvals">
-                        <?php
-                        entity_list_html('approvals', $data['approvals'], $visitor, function ($pending_description) use ($pages) {
-                        ?>
-                            <li data-type-filter="<?php echo $pending_description->type ?>" data-date-updated="<?php echo strtotime($pending_description->metadata['uploadDate']) ?>" data-rating="<?php echo $pending_description->metadata['reviews']['average_rating'] ?>" data-total-views="<?php echo $pending_description->metadata['views'] ?>" class="visible">
-                                <div class="description">
-                                    <a href="<?php echo $pages['description_page'] . "?did=" . $pending_description->id ?>">
-                                        <h4><?php echo $pending_description->information['title'] ?></h4>
-                                    </a>
-                                    <p><?php echo $pending_description->information['short_desc'] ?></p>
-                                    <div class="metadata">
-                                        <a class="pill"><?php echo $pending_description->type  ?></a>
-                                        <a class="pill"><?php echo $pending_description->information['subtype']  ?></a>
-                                        <span><span class="fas fa-star"></span> <?php echo $pending_description->metadata['reviews']['average_rating'] . ' (' . $pending_description->metadata['reviews']['no_reviews'] . ' reviews)' ?></span>
-                                        <span><span class="fas fa-eye"></span> <?php echo $pending_description->metadata['views'] ?> views</span>
-                                        <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($pending_description->metadata['uploadDate']))) ?></span>
-                                        <span class="label notice">Pending</span>
-                                    </div>
+                <section class="policycloud-marketplace-account-approvals">
+                    <?php
+                    entity_list_html('approvals', $data['approvals'] ?? [], $visitor, function ($pending_description) use ($pages) {
+                    ?>
+                        <li data-type-filter="<?php echo $pending_description->type ?>" data-date-updated="<?php echo strtotime($pending_description->metadata['uploadDate']) ?>" data-rating="<?php echo $pending_description->metadata['reviews']['average_rating'] ?>" data-total-views="<?php echo $pending_description->metadata['views'] ?>" class="visible">
+                            <div class="description">
+                                <a href="<?php echo $pages['description_page'] . "?did=" . $pending_description->id ?>">
+                                    <h4><?php echo $pending_description->information['title'] ?></h4>
+                                </a>
+                                <p><?php echo $pending_description->information['short_desc'] ?></p>
+                                <div class="metadata">
+                                    <a class="pill"><?php echo $pending_description->type  ?></a>
+                                    <a class="pill"><?php echo $pending_description->information['subtype']  ?></a>
+                                    <span><span class="fas fa-star"></span> <?php echo $pending_description->metadata['reviews']['average_rating'] . ' (' . $pending_description->metadata['reviews']['no_reviews'] . ' reviews)' ?></span>
+                                    <span><span class="fas fa-eye"></span> <?php echo $pending_description->metadata['views'] ?> views</span>
+                                    <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($pending_description->metadata['uploadDate']))) ?></span>
+                                    <span class="label notice">Pending</span>
                                 </div>
-                            </li>
-                        <?php
-                        });
-                        ?>
-                    </section>
-                <?php
-                }
-                ?>
+                            </div>
+                        </li>
+                    <?php
+                    });
+                    ?>
+                </section>
                 <section class="policycloud-marketplace-account-profile">
                     <header>
                         <h3>Information</h3>
@@ -482,16 +545,6 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                 </td>
                             </tr>
                             <tr>
-                                <td>
-                                    Username
-                                </td>
-                                <td>
-                                    <span>
-                                        <?php echo $data['username']; ?>
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
                                 <?php
                                 if (!$visitor) {
                                 ?>
@@ -499,9 +552,20 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                         Password
                                     </td>
                                     <td>
-                                        <span class="folding visible">*****************</span>
+                                        <?php
+                                        if ($data['metadata']['password_protected'] == "0") {
+                                        ?>
+                                            <span class="folding visible"><em>(Not yet set)</em></span>
+                                        <?php
+
+                                        } else {
+                                        ?>
+                                            <span class="folding visible">*****************</span>
+                                        <?php
+                                        }
+                                        ?>
                                         <input class="folding" type="password" name="password" placeholder="Enter your new password here" />
-                                        <input class="folding" type="password" name="password-confirm" placeholder="Confirm new password here" />
+                                        <input class="folding" type="password" name="password-confirm" placeholder="Confirm new password here"/>
                                     <?php
                                 }
                                     ?>
@@ -667,6 +731,56 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                             <?php
                             }
                             ?>
+                            <tr>
+                                <td>
+                                    Google account
+                                </td>
+                                <td>
+                                    <?php
+                                    if ($data['metadata']['connections']['google'] == "0") {
+                                        wp_enqueue_script("google-sso");
+                                        wp_enqueue_script("policycloud-marketplace-account-authentication");
+                                        wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
+                                            'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
+                                            'GoogleSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_google_handler'),
+                                            'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak')
+                                        ));
+                                    ?>
+                                        <?php googleButton() ?>
+                                    <?php
+                                    } else {
+                                    ?>
+                                        <button class="action destructive minimal" data-action="disconnect-google" <?= $data['metadata']['password_protected'] == "1" ? 'password-protected' : '' ?>>Disconnect</button>
+                                    <?php
+                                    }
+                                    ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    PolicyCLOUD account (Internal)
+                                </td>
+                                <td>
+                                    <?php
+                                    if ($data['metadata']['connections']['keycloak'] == "0") {
+                                        wp_enqueue_script("policycloud-marketplace-account-authentication");
+                                        wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
+                                            'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
+                                            'GoogleSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_google_handler'),
+                                            'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak'),
+                                            'RedirectSSO' => PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'account_page')
+                                        ));
+                                    ?>
+                                        <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with PolicyCLOUD (Internal)</button>
+                                    <?php
+                                    } else {
+                                    ?>
+                                        <button class="action destructive minimal" data-action="disconnect-keycloak" <?= $data['metadata']['password_protected'] == "1" ? 'password-protected' : '' ?>>Disconnect</button>
+                                    <?php
+                                    }
+                                    ?>
+                                </td>
+                            </tr>
                             <tr>
                                 <td>
                                     Member since

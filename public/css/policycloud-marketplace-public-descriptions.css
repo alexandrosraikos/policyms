@@ -201,10 +201,16 @@
   width: 100%;
 }
 
+.policycloud-marketplace.featured-descriptions .white-container {
+  background-color: #ffffff;
+  border-radius: 15px;
+  padding: 40px 0 50px 0;
+}
+
 .policycloud-marketplace.featured-descriptions .statistics {
   display: flex;
   justify-content: space-evenly;
-  width: 60%;
+  width: 70%;
   margin: 0 auto;
 }
 
@@ -222,6 +228,12 @@
 .policycloud-marketplace.featured-descriptions .statistics figcaption {
   opacity: 0.7;
   font-size: 40%;
+}
+
+@media screen and (max-width: 700px) {
+  .policycloud-marketplace.featured-descriptions .white-container + * {
+    padding-top: 300px;
+  }
 }
 
 /*
@@ -551,7 +563,7 @@
   > .metadata
   > span:not(:last-of-type) {
   /* Display & Box Model */
-  padding-right: 15px;
+  padding-right: 10px;
   border-right: 1px solid var(--policycloud-border-color-light);
   margin-right: 10px;
 }
@@ -562,8 +574,14 @@
   font-weight: 500;
 }
 
-.policycloud-marketplace.description > header > .metadata > .type,
-.policycloud-marketplace.description > header > .metadata > .sub-type {
+.policycloud-marketplace.description
+  > header
+  > .metadata
+  > .type:not(:last-child),
+.policycloud-marketplace.description
+  > header
+  > .metadata
+  > .sub-type:not(:last-child) {
   /* Display & Box Model */
   padding-right: 10px !important;
 
@@ -575,7 +593,7 @@
   > header
   > .metadata
   > .fields-of-use
-  > span {
+  > span:not(:last-child) {
   /* Display & Box Model */
   margin-right: 10px;
 
@@ -634,7 +652,22 @@
 
 .policycloud-marketplace.description > .content > .information > div {
   /* Display & Box Model */
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+}
+
+.policycloud-marketplace.description > .content > .information p {
+  margin: 10px 0;
+}
+
+.policycloud-marketplace.description > .content > .information ul {
+  padding: 0;
+  margin: 20px 0;
+  display: flex;
+  list-style-type: none;
+}
+
+.policycloud-marketplace.description > .content > .information ul a {
+  margin-right: 10px;
 }
 
 .policycloud-marketplace.description
@@ -921,6 +954,79 @@
   display: flex;
   align-items: center;
   font-size: 16px;
+}
+
+.policycloud-marketplace.description.editor .links div div {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.policycloud-marketplace.description.editor
+  .links
+  div
+  div
+  input[name="links-title[]"] {
+  max-width: 200px;
+}
+.policycloud-marketplace.description.editor
+  .links
+  div
+  div
+  input[name="links-url[]"] {
+  min-width: 225px;
+}
+
+.policycloud-marketplace.description.editor .links div div * {
+  display: block;
+  height: auto;
+  max-height: unset;
+  margin: 0 8px 0 0;
+}
+
+.policycloud-marketplace.description.editor .links div button.remove-field,
+.policycloud-marketplace.description.editor .links div button.remove-field * {
+  padding: 0;
+  margin: 0 0 0 3px;
+  border: none;
+  box-sizing: border-box;
+  background: none !important;
+  color: var(--policycloud-text-color) !important;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.policycloud-marketplace.description.editor
+  .links
+  div
+  button.remove-field:hover {
+  opacity: 0.8;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.policycloud-marketplace.description.editor
+  .links
+  div
+  button.remove-field:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.policycloud-marketplace.description.editor .links > button.add-field {
+  display: block;
+  height: auto;
+  line-height: normal;
+  background: none !important;
+  color: var(--policycloud-text-color);
+  font-size: 75%;
+  margin: 10px 0;
+  padding: 0;
+  border: none;
+}
+
+.policycloud-marketplace.description.editor .links > button.add-field:hover {
+  cursor: pointer;
+  opacity: 0.8;
 }
 
 @media screen and (max-width: 650px) {

@@ -15,8 +15,8 @@
 function render_settings_page()
 {
 ?>
-    <h2>PolicyCloud Marketplace Settings</h2>
-    <p>This is the options page for the PolicyCloud Marketplace API.</p>
+    <h2>PolicyCLOUD Data Marketplace Settings</h2>
+    <p>This is the options page for the PolicyCLOUD Data Marketplace API.</p>
     <form action="options.php" method="post">
         <?php
         settings_fields('policycloud_marketplace_plugin_settings');

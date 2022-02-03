@@ -9,6 +9,62 @@
 
 /*
 *
+* SSO Actions
+* ---------------------
+*
+*/
+
+.policycloud-marketplace .sso {
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--policycloud-border-color-light);
+}
+
+.policycloud-marketplace .sso .actions {
+  display: flex;
+  align-items: center;
+}
+
+.policycloud-marketplace .sso .action {
+  margin-right: 8px;
+  width: auto;
+}
+
+#google-signin,
+#google-registration {
+  display: inline-block;
+}
+
+#google-signin iframe,
+#google-registration iframe {
+  margin: 0 !important;
+}
+
+button#keycloak-registration,
+button#keycloak-signin {
+  background-color: rgb(35, 36, 39) !important;
+  font-weight: bold;
+  display: inline-block;
+  border: none !important;
+  padding: 6.5px 10px !important;
+  border-radius: 4px !important;
+}
+
+button#keycloak-registration::before,
+button#keycloak-signin::before {
+  content: " ";
+  display: inline-block;
+  height: 14px;
+  width: 28px;
+  margin-right: 6px;
+  background-image: url(../assets/img/policycloud.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/*
+*
 * Registration
 * ---------------------
 *
@@ -16,6 +72,17 @@
 * [policycloud-marketplace-registration] shortcode.
 *
 */
+
+#policycloud-registration .tos-agree {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#policycloud-registration .tos-agree label {
+  padding-left: 6px;
+  margin: 0;
+}
 
 #policycloud-registration .socials div div {
   display: flex;
