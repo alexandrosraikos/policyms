@@ -99,7 +99,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
       $token = $this->update_picture($picture);
     }
 
-    // Contact the PolicyCLOUD Data Marketplace API for password change.
+    // Contact the Policy Cloud Data Marketplace API for password change.
     if (!empty($data["password"])) {
       $response = PolicyCloud_Marketplace::api_request(
         "POST",
@@ -530,6 +530,19 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
     );
 
     return parent::persist_token($response["token"]);
+  }
+
+  public static function delete_other(string $current_password, string $uid) {
+
+    PolicyCloud_Marketplace::api_request(
+      "DELETE",
+      "/accounts/users/delete/" . $uid,
+      [
+        "password" => $current_password,
+        "uid" => $uid
+      ],
+      PolicyCloud_Marketplace_Account::retrieve_token()
+    );
   }
 
   /**

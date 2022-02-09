@@ -633,10 +633,15 @@
             current_password: $(
               "#policycloud-marketplace-delete-account input[name=current-password]"
             ).val(),
+            user: $('#policycloud-marketplace-delete-account button[type=submit]').attr('user') ?? ''
           },
           () => {
-            removeAuthorization();
-            window.location.href(GlobalProperties.rootURLPath);
+            if ($('#policycloud-marketplace-delete-account button[type=submit]').attr('user').length == 0) {
+              removeAuthorization();
+              window.location.href(GlobalProperties.rootURLPath);
+            } else {
+              window.location.reload();
+            }
           }
         );
       }

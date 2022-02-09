@@ -1,5 +1,5 @@
 /**
- * @file Provides global functions for PolicyCLOUD Data Marketplace shortcodes.
+ * @file Provides global functions for Policy Cloud Data Marketplace shortcodes.
  *
  * @author Alexandros Raikos <araikos@unipi.gr>
  * @since 1.0.0
@@ -255,12 +255,17 @@ function setAuthorizedToken(encryptedToken) {
  *
  * @author Alexandros Raikos <araikos@unipi.gr>
  */
-function removeAuthorization() {
+function removeAuthorization(redirect_login = false) {
   document.cookie =
     "pcmapi-token=; Path=" +
     GlobalProperties.rootURLPath +
     "; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-  window.location.href = GlobalProperties.rootURLPath;
+  if (redirect_login) {
+    window.location.href = GlobalProperties.loginPage;
+  }
+  else {
+    window.location.href = GlobalProperties.rootURLPath;
+  }
 }
 
 /**
@@ -361,7 +366,7 @@ function makeWPRequest(actionDOMSelector, action, nonce, data, completion) {
       );
 
       // Log additional information into the console.
-      console.error("PolicyCLOUD Data Marketplace error: " + response.responseText);
+      console.error("Policy Cloud Data Marketplace error: " + response.responseText);
     }
 
     // Remove the loading class.
@@ -429,6 +434,9 @@ $(document).ready(() => {
     $(this.parentNode).addClass("seen");
   });
 
+  if ($('.policycloud-marketplace-error[logout]').length) {
+    removeAuthorization(true);
+  }
 
   // Search button listener.
   $(".policycloud-marketplace button[data-action=\"description-search\"]").click((e) => {

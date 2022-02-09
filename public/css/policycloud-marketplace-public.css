@@ -648,8 +648,7 @@
   width: 100%;
   max-width: 100%;
   font-weight: bold;
-  background-color: var(--policycloud-highlight-color-light);
-  color: var(--policycloud-text-color-invert);
+  background-color: var(--policycloud-border-color-light);
   text-align: center;
   margin: 25px auto;
   border-radius: 8px;

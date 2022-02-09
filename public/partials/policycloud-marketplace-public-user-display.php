@@ -20,7 +20,7 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
                 <p>You can quickly setup your account using an existing account in the following services:</p>
                 <div class="actions">
                     <?php googleButton(true) ?>
-                    <button id="keycloak-registration" class="action keycloak" data-action="keycloak-form">Sign up with PolicyCLOUD (Internal)</button>
+                    <button id="keycloak-registration" class="action keycloak" data-action="keycloak-form">Sign up with Policy Cloud (Internal)</button>
                 </div>
             </div>
             <form id="policycloud-registration" action="">
@@ -176,7 +176,7 @@ function account_user_authentication_html($registration_url, $reset_password_pag
                 <p>You can connect to your account using the following services:</p>
                 <div class="actions">
                     <?php googleButton() ?>
-                    <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with PolicyCLOUD (Internal)</button>
+                    <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with Policy Cloud (Internal)</button>
                 </div>
             </div>
             <form id="policycloud-authentication">
@@ -340,12 +340,22 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                             </tr>
                             <tr>
                                 <td>
-                                    <div class="large-figure"><span class="fas fa-download"></span> <?php echo $data['statistics']['total_downloads'] ?></div>
-                                    <div class="assets-caption">Total downloads</div>
-                                </td>
-                                <td>
                                     <div class="large-figure"><span class="fas fa-file"></span> <?php echo $data['statistics']['assets_uploaded'] ?></div>
                                     <div>Assets uploaded</div>
+                                </td>
+                                <td>
+                                    <div class="large-figure"><span class="fas fa-share"></span> <?php echo $data['statistics']['total_links_provided'] ?></div>
+                                    <div>Total links provided</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="large-figure"><span class="fas fa-eye"></span> <?php echo $data['statistics']['total_views'] ?></div>
+                                    <div class="assets-caption">Total views</div>
+                                </td>
+                                <td>
+                                    <div class="large-figure"><span class="fas fa-download"></span> <?php echo $data['statistics']['total_downloads'] ?></div>
+                                    <div class="assets-caption">Total downloads</div>
                                 </td>
                             </tr>
                             <tr>
@@ -356,12 +366,6 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                 <td>
                                     <div class="large-figure"><span class="fas fa-star"></span> <?php echo $data['statistics']['average_rating'] ?></div>
                                     <div class="assets-caption">Average rating</div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="large-figure"><span class="fas fa-eye"></span> <?php echo $data['statistics']['total_views'] ?></div>
-                                    <div class="assets-caption">Total views</div>
                                 </td>
                             </tr>
                         </table>
@@ -730,6 +734,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                 </tr>
                             <?php
                             }
+                            if (!$visitor) {
                             ?>
                             <tr>
                                 <td>
@@ -758,7 +763,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                             </tr>
                             <tr>
                                 <td>
-                                    PolicyCLOUD account (Internal)
+                                    Policy Cloud account (Internal)
                                 </td>
                                 <td>
                                     <?php
@@ -771,7 +776,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                             'RedirectSSO' => PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'account_page')
                                         ));
                                     ?>
-                                        <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with PolicyCLOUD (Internal)</button>
+                                        <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with Policy Cloud (Internal)</button>
                                     <?php
                                     } else {
                                     ?>
@@ -781,6 +786,9 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                     ?>
                                 </td>
                             </tr>
+                            <?php
+                            }
+                            ?>
                             <tr>
                                 <td>
                                     Member since
@@ -814,12 +822,12 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                     }
                     if (!$visitor || $admin) {
                     ?>
-                        <form id="policycloud-marketplace-delete-account">
+                        <form id="policycloud-marketplace-delete-account"">
                             <div>
                                 <label for="current-password">Please type your current password to continue.</label>
                                 <input name="current-password" type="password" placeholder="Insert your current password here">
                             </div>
-                            <button type="submit" class="action destructive">Delete account</button>
+                            <button type="submit" class="action destructive" user="<?= $_GET['user'] ?? '' ?>">Delete account</button>
                         </form>
                     <?php } ?>
                 </section>

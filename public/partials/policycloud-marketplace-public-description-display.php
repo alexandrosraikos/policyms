@@ -4,7 +4,7 @@
  *
  * Print the assets grid HTML.
  *
- * @param   array $assets The PolicyCLOUD Data Marketplace API assets.
+ * @param   array $assets The Policy Cloud Data Marketplace API assets.
  * @param   string $asset_url The asset page URL.
  *
  * @since   1.0.0
@@ -256,7 +256,7 @@ function descriptions_archive_filters_html($filters)
 /**
  * Print the assets archive HTML.
  *
- * @param   array $assets The PolicyCLOUD Data Marketplace API assets.
+ * @param   array $assets The Policy Cloud Data Marketplace API assets.
  * @param   array $args Various printing arguments.
  *
  * @since   1.0.0
@@ -302,7 +302,7 @@ function descriptions_archive_html(array $descriptions, array $filters, string $
             <?php
             if (!empty($descriptions)) {
             ?>
-                <div class="gallery">
+                <div class="description-gallery">
                     <?php
                     descriptions_grid_html($descriptions['content'][0], $description_page);
                     ?>
@@ -428,7 +428,7 @@ function description_editor_html(PolicyCloud_Marketplace_Description $descriptio
                     <?php
                     foreach ($description->assets as $category => $assets) {
                         $upload_notice = ($category == 'images') ? ' (supported file types: jpg, png)' : '';
-                        $upload_notice = ($category == 'videos') ? ' (supported file types: mp4, ogg, webm)' : '';
+                        $upload_notice = ($category == 'videos') ? ' (supported file types: mp4, ogg, webm)' : $upload_notice;
                         switch ($category) {
                             case 'images':
                                 $allowed_mimetypes = 'image/jpeg,image/png';
@@ -618,7 +618,7 @@ function description_reviews_html(array $reviews = null, ?int $pages = 0, Policy
 /**
  * Print the asset HTML.
  *
- * @param   array $asset The PolicyCLOUD Data Marketplace API asset.
+ * @param   array $asset The Policy Cloud Data Marketplace API asset.
  * @param   array $args Various printing arguments.
  *
  * @since   1.0.0
@@ -643,7 +643,7 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
     {
     ?>
         <div class="policycloud-marketplace file-viewer <?= ($collapsed) ? 'collapsed' : '' ?>">
-            <button data-files-category="<?= $category ?>" class="action"><?= $title ?></button>
+            <button data-files-category="<?= $category ?>" class="action" <?= empty($assets) ? 'disabled' : '' ?>><?= $title ?></button>
             <table>
                 <tr>
                     <th>Name</th>

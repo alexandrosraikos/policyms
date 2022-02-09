@@ -98,6 +98,7 @@ class PolicyCloud_Marketplace_Public
         wp_localize_script("policycloud-marketplace", 'GlobalProperties', array(
             "rootURLPath" => (empty(parse_url(get_site_url())['path']) ? "/" : parse_url(get_site_url())['path']),
             "archivePage" => self::get_plugin_setting(true, 'archive_page'),
+            "loginPage" => self::get_plugin_setting(true, 'login_page'),
             "ajaxURL" => admin_url('admin-ajax.php')
         ));
 
@@ -185,9 +186,10 @@ class PolicyCloud_Marketplace_Public
         try {
             // Run completion function.
             $completion();
+        } catch (PolicyCloudMarketplaceAPIError $e) {
+            show_alert($e->getMessage(), 'error', $e->http_status);
         } catch (\Exception $e) {
             // Display the error.
-
             show_alert($e->getMessage());
         }
     }
@@ -287,11 +289,11 @@ class PolicyCloud_Marketplace_Public
             if (empty($options[$key])) {
                 if ($throw) {
                     throw new PolicyCloudMarketplaceMissingOptionsException(
-                        "Please finish setting up the PolicyCLOUD Data Marketplace in the WordPress settings."
+                        "Please finish setting up the Policy Cloud Data Marketplace in the WordPress settings."
                     );
                 } else {
                     show_alert(
-                        "Please finish setting up the PolicyCLOUD Data Marketplace in the WordPress settings.",
+                        "Please finish setting up the Policy Cloud Data Marketplace in the WordPress settings.",
                         'notice'
                     );
                 }
@@ -737,9 +739,13 @@ class PolicyCloud_Marketplace_Public
     {
         $this->ajax_handler(
             function ($data) {
-
-                $user = new PolicyCloud_Marketplace_User();
-                $user->delete($data['current_password']);
+                if (!empty($data['user'])) {
+                    PolicyCloud_Marketplace_User::delete_other($data['current_password'], $data['user']);
+                }
+                else {
+                    $user = new PolicyCloud_Marketplace_User();
+                    $user->delete($data['current_password']);
+                }
             }
         );
     }

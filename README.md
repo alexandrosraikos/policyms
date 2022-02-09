@@ -1,10 +1,10 @@
-# PolicyCLOUD Data Marketplace for WordPress
+# Policy Cloud Data Marketplace for WordPress
 
-The official plugin for the PolicyCLOUD Data Marketplace, enabling front-end access to the PolicyCLOUD Data Marketplace API.
+The official plugin for the Policy Cloud Data Marketplace, enabling front-end access to the Policy Cloud Data Marketplace API.
 
 ## Getting started
 
-Read the sections below to get started with PolicyCLOUD Data Marketplace for WordPress.
+Read the sections below to get started with Policy Cloud Data Marketplace for WordPress.
 
 ### Requirements
 
@@ -17,11 +17,11 @@ Read the sections below to get started with PolicyCLOUD Data Marketplace for Wor
 
 Clone the repository, zip and install via the WordPress dashboard.
 
-Head to the Dashboard > Settings > PolicyCLOUD Data Marketplace to enter your PolicyCLOUD Data Marketplace API credentials as provided by the API administrator.
+Head to the Dashboard > Settings > Policy Cloud Data Marketplace to enter your Policy Cloud Data Marketplace API credentials as provided by the API administrator.
 
 ### Shortcodes
 
-Use the shortcodes below for all PolicyCLOUD Data Marketplace API functionality.
+Use the shortcodes below for all Policy Cloud Data Marketplace API functionality.
 
 #### Log In
 
@@ -51,7 +51,7 @@ To view the upload form for creating a Description Object for authorized users, 
 
 `[policycloud-marketplace-description-creation]`
 
-#### PolicyCLOUD Data Marketplace account page
+#### Policy Cloud Data Marketplace account page
 
 To view the account page for an authorized user, add the following shortcode:
 
@@ -65,4 +65,4 @@ This plugin also enables the following features:
 
 ## Credits
 
-This work extends, and is schematically based upon, the PolicyCLOUD Data Marketplace API, created and maintained by [@vkoukos](https://github.com/vkoukos). Special thanks to [@elefkour](https://github.com/elefkour) for co-authoring and co-maintaining this repository.
+This work extends, and is schematically based upon, the Policy Cloud Data Marketplace API, created and maintained by [@vkoukos](https://github.com/vkoukos). Special thanks to [@elefkour](https://github.com/elefkour) for co-authoring and co-maintaining this repository.
