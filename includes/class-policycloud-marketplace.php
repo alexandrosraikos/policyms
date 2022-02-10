@@ -364,8 +364,6 @@ class PolicyCloud_Marketplace
             throw new Exception("Unable to reach the Marketplace server. More details: " . curl_error($curl));
         }
 
-
-
         curl_close($curl);
         if ($curl_http != 200 && $curl_http != 201 && $curl_http != 403) {
             throw new PolicyCloudMarketplaceAPIError(
