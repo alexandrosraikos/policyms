@@ -29,7 +29,7 @@
  */
 function show_alert(string $message, string $type = 'error', int $http_status = null)
 {
-    echo  '<div class="policycloud-marketplace-' . $type . ' " '. (($http_status ?? 0 == 403) ? 'logout' : '' ).'><span>' . $message . '</span></div>';
+    echo  '<div class="policycloud-marketplace-' . $type . ' " '. ((($http_status ?? 0) == 403) ? 'logout' : '' ).'><span>' . $message . '</span></div>';
 }
 
 /**
