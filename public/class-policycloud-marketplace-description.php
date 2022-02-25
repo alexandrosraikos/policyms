@@ -79,17 +79,17 @@ class PolicyCloud_Marketplace_Description
 
         $data =
             [
-                "title" => $information['title'],
+                "title" => stripslashes($information['title']),
                 "type" => $information['type'],
-                "subtype" => $information['subtype'],
-                "owner" => $information['owner'],
+                "subtype" => strtolower($information['subtype']),
+                "owner" => stripslashes($information['owner']),
                 "description" => stripslashes($information['description']),
                 "links" => PolicyCloud_Marketplace_User::implode_urls(
                     $information['links-title'],
                     $information['links-url']
                 ),
                 "fieldOfUse" => $information['fieldOfUse'],
-                "comments" => $information['comments']
+                "comments" => stripslashes($information['comments'])
             ];
 
         PolicyCloud_Marketplace::api_request(

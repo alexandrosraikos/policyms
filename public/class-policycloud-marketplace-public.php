@@ -951,11 +951,11 @@ class PolicyCloud_Marketplace_Public
                 try {
                     $description->update(
                         [
-                            "title" => sanitize_text_field($data['title']),
+                            "title" => stripslashes(sanitize_text_field($data['title'])),
                             "type" => sanitize_text_field($data['type']),
                             "subtype" => sanitize_text_field($data['subtype'] ?? ''),
-                            "owner" => sanitize_text_field($data['owner'] ?? ''),
-                            "description" => sanitize_text_field($data['description']),
+                            "owner" => stripslashes(sanitize_text_field($data['owner'] ?? '')),
+                            "description" => stripslashes(sanitize_text_field($data['description'])),
                             'links-title' => array_map(
                                 function ($title) {
                                     return filter_var(stripslashes($title), FILTER_SANITIZE_STRING);
@@ -969,7 +969,7 @@ class PolicyCloud_Marketplace_Public
                                 $data['links-url'] ?? []
                             ),
                             "fieldOfUse" => explode(", ", $data['fields-of-use'] ?? ''),
-                            "comments" => sanitize_text_field($data['comments'] ?? '')
+                            "comments" => stripslashes(sanitize_text_field($data['comments'] ?? ''))
                         ],
                         array_filter(
                             array_keys($_FILES),
@@ -1038,11 +1038,11 @@ class PolicyCloud_Marketplace_Public
             
                 return (PolicyCloud_Marketplace_Description::create(
                     [
-                        "title" => sanitize_text_field($data['title']),
+                        "title" => stripslashes(sanitize_text_field($data['title'])),
                         "type" => sanitize_text_field($data['type']),
-                        "subtype" => sanitize_text_field($data['subtype'] ?? ''),
-                        "owner" => sanitize_text_field($data['owner'] ?? ''),
-                        "description" => sanitize_text_field($data['description']),
+                        "subtype" => strtolower(sanitize_text_field($data['subtype'] ?? '')),
+                        "owner" => stripslashes(sanitize_text_field($data['owner'] ?? '')),
+                        "description" => stripslashes(sanitize_text_field($data['description'])),
                         "links" => PolicyCloud_Marketplace_User::implode_urls(
                             array_map(
                                 function ($title) {
@@ -1058,7 +1058,7 @@ class PolicyCloud_Marketplace_Public
                             )
                         ),
                         "fieldOfUse" => explode(", ", $data['fields-of-use'] ?? []),
-                        "comments" => sanitize_text_field($data['comments'] ?? '')
+                        "comments" => stripslashes(sanitize_text_field($data['comments'] ?? ''))
                     ]
                 ));
             }

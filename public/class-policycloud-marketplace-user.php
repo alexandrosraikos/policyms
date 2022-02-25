@@ -513,14 +513,14 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
           "password" => $information["password"],
         ],
         "info" => [
-          "name" => $information["name"],
-          "surname" => $information["surname"],
+          "name" => stripslashes($information["name"]),
+          "surname" => stripslashes($information["surname"]),
           "title" => $information["title"] ?? "",
           "gender" => $information["gender"] ?? "",
-          "organization" => $information["organization"] ?? "",
+          "organization" => stripslashes($information["organization"] ?? ""),
           "phone" => $information["phone"] ?? "",
           "email" => $information["email"],
-          "about" => $information["about"],
+          "about" => stripslashes($information["about"]),
           "social" => self::implode_urls(
             $information["social-title"],
             $information["social-url"]

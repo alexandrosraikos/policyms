@@ -25,7 +25,7 @@
      */
     function addSocialField(e) {
       e.preventDefault();
-      const newSocialField = $("#policycloud-registration .socials > div > div:last-of-type").clone();
+      const newSocialField = $("<div><input type='text' name='socials-title[]' placeholder='Example' /><input type='url' name='socials-url[]' placeholder='https://www.example.org/' /><button class='remove-field' title='Remove this link.' ><span class='fas fa-times'></span></button></div>");
       newSocialField.find('input[name*=socials]').each(
         (index, element) => {
           $(element).val("");
@@ -33,10 +33,6 @@
       )
 
       newSocialField.appendTo("#policycloud-registration .socials > div");
-      $("#policycloud-registration .socials button.remove-field").prop(
-        "disabled",
-        $("#policycloud-registration .socials button.remove-field").length === 1
-      );
     }
     /**
      *
@@ -49,10 +45,6 @@
     function removeSocialField(e) {
       e.preventDefault();
       $(this).parent().remove();
-      $("#policycloud-registration .socials button.remove-field").prop(
-        "disabled",
-        $("#policycloud-registration .socials button.remove-field").length === 1
-      );
     }
 
     /**

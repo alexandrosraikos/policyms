@@ -62,7 +62,7 @@ function account_user_registration_html($authentication_url, $tos_url, $authenti
                             <div>
                                 <input type="text" name="socials-title[]" placeholder="Example" />
                                 <input type="url" name="socials-url[]" placeholder="https://www.example.org/" />
-                                <button class="remove-field" title="Remove this link." disabled><span class="fas fa-times"></span></button>
+                                <button class="remove-field" title="Remove this link."><span class="fas fa-times"></span></button>
                             </div>
                         </div>
                         <button class="add-field" title="Add another link."><span class="fas fa-plus"></span> Add link</button>

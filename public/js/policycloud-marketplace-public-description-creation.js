@@ -27,17 +27,13 @@
     function addLinksField(e) {
       e.preventDefault();
       const container = $(this).prev();
-      const newLinksField = container.children("div:last-of-type").clone();
+      const newLinksField = $("<div><input type='text' name='links-title[]' placeholder='Example' /><input type='url' name='links-url[]' placeholder='https://www.example.org/' /><button class='remove-field' title='Remove this link.' ><span class='fas fa-times'></span></button></div>");
       newLinksField.find('input[name*=links]').each(
         (index, element) => {
           $(element).val("");
         }
       );
       newLinksField.appendTo(container);
-      container.find("button.remove-field").prop(
-        "disabled",
-        container.children().length === 1
-      );
     }
     /**
      *
@@ -51,10 +47,6 @@
       e.preventDefault();
       const container = $(this).parent().parent();
       $(this).parent().remove();
-      container.find("button.remove-field").prop(
-        "disabled",
-        container.children().length === 1
-      );
     }
 
     /**

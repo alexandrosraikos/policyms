@@ -429,13 +429,6 @@
       $(
         "<div><input type='text' name='socials-title[]' placeholder='Example' /><input type='url' name='socials-url[]' placeholder='https://www.example.org/' /><button class='remove-field' title='Remove this link.' ><span class='fas fa-times'></span></button></div>"
       ).appendTo("#policycloud-marketplace-account-edit .socials > div");
-      $(
-        "#policycloud-marketplace-account-edit .socials button.remove-field"
-      ).prop(
-        "disabled",
-        $("#policycloud-marketplace-account-edit .socials button.remove-field")
-          .length === 1
-      );
     }
 
     /**
@@ -447,13 +440,6 @@
     function removeWeblinkField(e) {
       e.preventDefault();
       $(this).parent().remove();
-      $(
-        "#policycloud-marketplace-account-edit .socials button.remove-field"
-      ).prop(
-        "disabled",
-        $("#policycloud-marketplace-account-edit .socials button.remove-field")
-          .length === 1
-      );
     }
 
     /**

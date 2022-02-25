@@ -115,7 +115,7 @@
 .policycloud-marketplace.descriptions-grid > ul > li > a > .metadata {
   /* Display & Box Model */
   margin-top: 0;
-  width: 100%;
+  width: 90%;
 }
 
 .policycloud-marketplace.descriptions-grid > ul > li > a > .metadata > * {
@@ -595,13 +595,21 @@
   > header
   > .metadata
   > .fields-of-use
-  > span:not(:last-child) {
+  > span {
   /* Display & Box Model */
   margin-right: 10px;
 
   /* Other */
   font-size: 16px;
   text-decoration: underline;
+}
+
+.policycloud-marketplace.description
+  > header
+  > .metadata
+  > .fields-of-use
+  > span:last-child {
+  margin-right: 0;
 }
 
 /**
@@ -670,6 +678,7 @@
 
 .policycloud-marketplace.description > .content > .information ul a {
   margin-right: 10px;
+  display: block !important;
 }
 
 .policycloud-marketplace.description

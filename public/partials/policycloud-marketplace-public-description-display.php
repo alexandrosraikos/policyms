@@ -226,10 +226,10 @@ function descriptions_archive_filters_html($filters)
                 <h3>Views</h3>
                 <div class="views">
                     <div>
-                        <input type="number" name="views-gte" placeholder="0" value="<?= $_GET['views-gte'] ?? '' ?>" min="0" />
+                        <input type="number" name="views-gte" placeholder="0" value="<?= $_GET['views-gte'] ?? '' ?>" min="0" max="<?= $filters['max_views'] ?>" />
                     </div>
                     <div>
-                        <input type="number" name="views-lte" placeholder="<?= $filters['max_views'] ?>" value="<?= $_GET['views-lte'] ?? "" ?>" max="<?= $filters['max_views'] ?>" />
+                        <input type="number" name="views-lte" placeholder="<?= $filters['max_views'] ?>" value="<?= $_GET['views-lte'] ?? "" ?>" min="0" max="<?= $filters['max_views'] ?>" />
                     </div>
                 </div>
             </fieldset>
@@ -393,7 +393,7 @@ function description_editor_html(PolicyCloud_Marketplace_Description $descriptio
                                 <div>
                                     <input type="text" name="links-title[]" placeholder="Example" value="<?= $link_title ?>" />
                                     <input type="url" name="links-url[]" placeholder="https://www.example.org/" value="<?= $link_url ?>" />
-                                    <button class="remove-field" title="Remove this link." <?= (count($description->links) == 1) ? 'disabled' : '' ?>>
+                                    <button class="remove-field" title="Remove this link.">
                                         <span class="fas fa-times"></span>
                                     </button>
                                 </div>
@@ -404,7 +404,7 @@ function description_editor_html(PolicyCloud_Marketplace_Description $descriptio
                             <div>
                                 <input type="text" name="links-title[]" placeholder="Example" />
                                 <input type="url" name="links-url[]" placeholder="https://www.example.org/" />
-                                <button class="remove-field" title="Remove this link." disabled><span class="fas fa-times"></span></button>
+                                <button class="remove-field" title="Remove this link."><span class="fas fa-times"></span></button>
                             </div>
                         <?php
                         }
