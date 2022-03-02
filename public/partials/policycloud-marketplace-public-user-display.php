@@ -379,7 +379,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                 </section>
                 <section class="policycloud-marketplace-account-descriptions">
                     <?php
-                    entity_list_html('descriptions', $data['descriptions'], $visitor, function ($description) use ($pages, $visitor) {
+                    entity_list_html('descriptions', $data['descriptions'], $visitor, function ($description) use ($pages, $visitor, $admin) {
                     ?>
                         <li data-type-filter="<?php echo $description->type ?>" data-date-updated="<?php echo strtotime($description->metadata['uploadDate']) ?>" data-rating="<?php echo $description->metadata['reviews']['average_rating'] ?>" data-total-views="<?php echo $description->metadata['views'] ?>" class="visible">
                             <div class="description">
@@ -394,7 +394,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                     <span><span class="fas fa-eye"></span> <?php echo $description->metadata['views'] ?> views</span>
                                     <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($description->metadata['updateDate']))) ?></span>
                                     <?php 
-                                    if (!$visitor) {
+                                    if (!$visitor || $admin) {
                                         ?>
                                     <span class="label <?php echo ($description->metadata['approved'] == 1) ? 'success' : 'notice' ?>"><?= ($description->metadata['approved'] == 1) ? 'Approved' : 'Pending' ?></span>
                                     <?php } ?>
