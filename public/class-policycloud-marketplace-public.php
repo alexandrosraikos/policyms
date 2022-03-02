@@ -534,17 +534,17 @@ class PolicyCloud_Marketplace_Public
                     'organization' => filter_var(stripslashes($data['organization'] ?? ''), FILTER_SANITIZE_STRING),
                     'email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
                     'phone' => filter_var($data['phone'] ?? '', FILTER_SANITIZE_NUMBER_INT),
-                    'social-title' => array_map(
+                    'socials-title' => array_map(
                         function ($title) {
                             return filter_var(stripslashes($title), FILTER_SANITIZE_STRING);
                         },
-                        $data['social-title'] ?? []
+                        $data['socials-title'] ?? []
                     ),
-                    'social-url' =>  array_map(
+                    'socials-url' =>  array_map(
                         function ($url) {
                             return filter_var($url, FILTER_SANITIZE_URL);
                         },
-                        $data['social-url'] ?? []
+                        $data['socials-url'] ?? []
                     ),
                     'about' => $data['about'] ?? '',
                 ]);

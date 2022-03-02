@@ -538,9 +538,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                                         <div>
                                                             <input type="text" name="socials-title[]" placeholder="Example" value="<?php echo $link_title ?>" />
                                                             <input type="url" name="socials-url[]" placeholder="https://www.example.org/" value="<?php echo $link_url ?>" />
-                                                            <button class="remove-field" title="Remove this link." <?php if (count($data['information']['social']) == 1) {
-                                                                                                                        echo 'disabled';
-                                                                                                                    } ?>><span class="fas fa-times"></span></button>
+                                                            <button class="remove-field" title="Remove this link." ><span class="fas fa-times"></span></button>
                                                         </div>
                                                 <?php
                                                     }

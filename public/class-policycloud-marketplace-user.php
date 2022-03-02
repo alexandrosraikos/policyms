@@ -521,8 +521,8 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             "email" => $information["email"],
             "about" => stripslashes($information["about"]),
             "social" => self::implode_urls(
-                $information["social-title"],
-                $information["social-url"]
+                $information["socials-title"],
+                $information["socials-url"]
             ),
             ],
             ]
