@@ -864,9 +864,9 @@ function description_html($description, $image_blobs, $pages, $reviews, $permiss
                                                     </span>
                                                     <div class="tools">
                                                         <?php if ($description->assets['images'][$key]->id == $description->image_id) { ?>
-                                                            <button data-action="remove-default" data-asset-id="<?= $description->assets['images'][$key]->id ?>" class="action outlined">Remove default image</button>
+                                                            <button data-action="remove-default" data-asset-id="<?= $description->assets['images'][$key]->id ?>" class="action outlined">Remove cover image</button>
                                                         <?php } else { ?>
-                                                            <button data-action="set-default" data-asset-id="<?= $description->assets['images'][$key]->id ?>" class="action outlined">Set as default image</button>
+                                                            <button data-action="set-default" data-asset-id="<?= $description->assets['images'][$key]->id ?>" class="action outlined">Set as cover image</button>
                                                         <?php } ?>
                                                         <button data-action="delete" data-asset-category="images" data-asset-id="<?= $description->assets['images'][$key]->id ?>" class="action outlined">
                                                             Delete

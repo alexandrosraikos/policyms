@@ -360,7 +360,7 @@ class PolicyCloud_Marketplace_Public
      * @author  Alexandros Raikos <araikos@unipi.gr>
      */
     public static function account_user_authentication_shortcode()
-    {       
+    {
         wp_enqueue_script("policycloud-marketplace-account-authentication");
         wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
             'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
@@ -598,7 +598,7 @@ class PolicyCloud_Marketplace_Public
     public function account_disconnect_google_handler()
     {
         $this->ajax_handler(
-            function() {
+            function () {
                 $user = new PolicyCloud_Marketplace_User();
                 return $user->disconnect_google();
             }
@@ -608,7 +608,7 @@ class PolicyCloud_Marketplace_Public
     public function account_disconnect_keycloak_handler()
     {
         $this->ajax_handler(
-            function() {
+            function () {
                 $user = new PolicyCloud_Marketplace_User();
                 return $user->disconnect_keycloak();
             }
@@ -741,8 +741,7 @@ class PolicyCloud_Marketplace_Public
             function ($data) {
                 if (!empty($data['user'])) {
                     PolicyCloud_Marketplace_User::delete_other($data['current_password'], $data['user']);
-                }
-                else {
+                } else {
                     $user = new PolicyCloud_Marketplace_User();
                     $user->delete($data['current_password']);
                 }
@@ -870,7 +869,6 @@ class PolicyCloud_Marketplace_Public
                     $user = new PolicyCloud_Marketplace_User();
 
                     if ($user->is_verified() || $description->is_provider($user)) {
-
                         $permissions['provider'] = $description->is_provider($user);
                         $permissions['administrator'] = $user->is_admin();
 
@@ -913,7 +911,7 @@ class PolicyCloud_Marketplace_Public
                 ));
 
                 add_filter('wpseo_title', function ($title) use ($description) {
-                    if(  is_singular( 'product') ) {
+                    if (is_singular('product')) {
                         $title = $description->information['title'];
                     }
                     return $title;
@@ -1007,7 +1005,6 @@ class PolicyCloud_Marketplace_Public
 
                 $user = new PolicyCloud_Marketplace_User();
                 if ($user->is_admin()) {
-
                     $description = new PolicyCloud_Marketplace_Description($data['description_id']);
                     $description->approve($data['approval']);
                 }
@@ -1131,14 +1128,14 @@ class PolicyCloud_Marketplace_Public
                     PolicyCloud_Marketplace_Review::update(
                         $data['description_id'],
                         $data['rating'],
-                        $data['comment'],
+                        stripslashes($data['comment']),
                         $data['update']
                     );
                 } else {
                     PolicyCloud_Marketplace_Review::create(
                         $data['description_id'],
                         $data['rating'],
-                        $data['comment'],
+                        stripslashes($data['comment']),
                         $data['update']
                     );
                 }

@@ -219,7 +219,9 @@ function account_user_reset_password_html($authenticated)
                 <p>Insert your e-mail address below and we will contact you with instructions to reset your password.</p>
                 <label for="email">E-mail address *</label>
                 <input required name="email" placeholder="e.g. johndoe@example.org" type="email" />
-                <button type="submit" class="action">Reset password</button>
+                <div class="actions">
+                    <button type="submit" class="action">Reset password</button>
+                </div>
             </fieldset>
         </form>
     </div>
@@ -377,7 +379,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                 </section>
                 <section class="policycloud-marketplace-account-descriptions">
                     <?php
-                    entity_list_html('descriptions', $data['descriptions'], $visitor, function ($description) use ($pages) {
+                    entity_list_html('descriptions', $data['descriptions'], $visitor, function ($description) use ($pages, $visitor) {
                     ?>
                         <li data-type-filter="<?php echo $description->type ?>" data-date-updated="<?php echo strtotime($description->metadata['uploadDate']) ?>" data-rating="<?php echo $description->metadata['reviews']['average_rating'] ?>" data-total-views="<?php echo $description->metadata['views'] ?>" class="visible">
                             <div class="description">
@@ -390,8 +392,12 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                     <a class="pill"><?php echo $description->information['subtype']  ?></a>
                                     <span><span class="fas fa-star"></span> <?php echo $description->metadata['reviews']['average_rating'] . ' (' . $description->metadata['reviews']['no_reviews'] . ' reviews)' ?></span>
                                     <span><span class="fas fa-eye"></span> <?php echo $description->metadata['views'] ?> views</span>
-                                    <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($description->metadata['uploadDate']))) ?></span>
-                                    <span class="label <?php echo ($description->metadata['approved'] == 1) ? 'success' : 'notice' ?>"><?php echo ($description->metadata['approved'] == 1) ? 'Approved' : 'Pending' ?></span>
+                                    <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($description->metadata['updateDate']))) ?></span>
+                                    <?php 
+                                    if (!$visitor) {
+                                        ?>
+                                    <span class="label <?php echo ($description->metadata['approved'] == 1) ? 'success' : 'notice' ?>"><?= ($description->metadata['approved'] == 1) ? 'Approved' : 'Pending' ?></span>
+                                    <?php } ?>
                                 </div>
                             </div>
                         </li>

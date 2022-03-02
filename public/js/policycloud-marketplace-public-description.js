@@ -347,14 +347,14 @@
           $('.gallery .toolbar button[data-action="remove-default"]').each(
             (index, element) => {
               $(element).data("action", "set-default");
-              $(element).html('Set as default image');
+              $(element).html('Set as cover image');
             }
           );
           // Transform current button.
           const setButton = $('.gallery .toolbar button[data-action="set-default"][data-asset-id="' + $(e.target).data('asset-id') + '"]').each(
             (index, element) => {
               $(element).attr("data-action", "remove-default");
-              $(element).html('Remove default image');
+              $(element).html('Remove cover image');
             }
           );
         }
@@ -375,7 +375,7 @@
           $('.gallery .toolbar button[data-action*="default"]').each(
             (index, element) => {
               $(element).attr("data-action", "set-default");
-              $(element).html('Set as default image');
+              $(element).html('Set as cover image');
             }
           );
         }
@@ -452,14 +452,14 @@
       deleteReview
     )
 
-    // Set default image.
+    // Set cover image.
     $(document).on(
       "click",
       ".policycloud-marketplace.modal.gallery .toolbar button[data-action=\"set-default\"]",
       setDefaultImage
     );
 
-    // Remove default image.
+    // Remove cover image.
     $(document).on(
       "click",
       ".policycloud-marketplace.modal.gallery .toolbar button[data-action=\"remove-default\"]",
