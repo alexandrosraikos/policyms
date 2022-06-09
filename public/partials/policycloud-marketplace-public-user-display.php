@@ -109,8 +109,7 @@ function googleButton(bool $registration = false)
             makeWPRequest(
                 '#google-signin',
                 'policycloud_marketplace_account_user_registration_google',
-                '<?php echo wp_create_nonce('policycloud_marketplace_account_user_registration_google') ?>',
-                {
+                '<?php echo wp_create_nonce('policycloud_marketplace_account_user_registration_google') ?>', {
                     google_token: response.credential
                 },
                 (data) => {
@@ -124,8 +123,7 @@ function googleButton(bool $registration = false)
             makeWPRequest(
                 '#google-signin',
                 'policycloud_marketplace_account_user_authentication_google',
-                '<?php echo wp_create_nonce('policycloud_marketplace_account_user_authentication_google') ?>', 
-                {
+                '<?php echo wp_create_nonce('policycloud_marketplace_account_user_authentication_google') ?>', {
                     google_token: response.credential
                 },
                 (data) => {
@@ -225,7 +223,7 @@ function account_user_reset_password_html($authenticated)
             </fieldset>
         </form>
     </div>
-    <?php
+<?php
 }
 
 
@@ -248,6 +246,9 @@ function account_user_reset_password_html($authenticated)
  */
 function account_user_html(array $data, bool $admin, bool $visitor, array $pages)
 {
+    // TODO @alexandrosraikos: Add EGI connection status.
+    // TODO @alexandrosraikos: Add EGI disconnect button.
+
     // Show account verification notice.
     if (isset($data['metadata']['verified'])) {
         if ($data['metadata']['verified'] !== '1') {
@@ -267,7 +268,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
         return count($page);
     }, $data['approvals'] ?? []));
 
-    ?>
+?>
     <div id="policycloud-marketplace-account" class="policycloud-marketplace">
         <div id="policycloud-marketplace-account-sidebar">
             <?php
@@ -393,10 +394,10 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                     <span><span class="fas fa-star"></span> <?php echo $description->metadata['reviews']['average_rating'] . ' (' . $description->metadata['reviews']['no_reviews'] . ' reviews)' ?></span>
                                     <span><span class="fas fa-eye"></span> <?php echo $description->metadata['views'] ?> views</span>
                                     <span>Last updated <?php echo time_elapsed_string(date('Y-m-d H:i:s', strtotime($description->metadata['updateDate']))) ?></span>
-                                    <?php 
+                                    <?php
                                     if (!$visitor || $admin) {
-                                        ?>
-                                    <span class="label <?php echo ($description->metadata['approved'] == 1) ? 'success' : 'notice' ?>"><?= ($description->metadata['approved'] == 1) ? 'Approved' : 'Pending' ?></span>
+                                    ?>
+                                        <span class="label <?php echo ($description->metadata['approved'] == 1) ? 'success' : 'notice' ?>"><?= ($description->metadata['approved'] == 1) ? 'Approved' : 'Pending' ?></span>
                                     <?php } ?>
                                 </div>
                             </div>
@@ -538,7 +539,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                                         <div>
                                                             <input type="text" name="socials-title[]" placeholder="Example" value="<?php echo $link_title ?>" />
                                                             <input type="url" name="socials-url[]" placeholder="https://www.example.org/" value="<?php echo $link_url ?>" />
-                                                            <button class="remove-field" title="Remove this link." ><span class="fas fa-times"></span></button>
+                                                            <button class="remove-field" title="Remove this link."><span class="fas fa-times"></span></button>
                                                         </div>
                                                 <?php
                                                     }
@@ -573,7 +574,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                         }
                                         ?>
                                         <input class="folding" type="password" name="password" placeholder="Enter your new password here" />
-                                        <input class="folding" type="password" name="password-confirm" placeholder="Confirm new password here"/>
+                                        <input class="folding" type="password" name="password-confirm" placeholder="Confirm new password here" />
                                     <?php
                                 }
                                     ?>
@@ -740,56 +741,56 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                             }
                             if (!$visitor) {
                             ?>
-                            <tr>
-                                <td>
-                                    Google account
-                                </td>
-                                <td>
-                                    <?php
-                                    if ($data['metadata']['connections']['google'] == "0") {
-                                        wp_enqueue_script("google-sso");
-                                        wp_enqueue_script("policycloud-marketplace-account-authentication");
-                                        wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
-                                            'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
-                                            'GoogleSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_google_handler'),
-                                            'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak')
-                                        ));
-                                    ?>
-                                        <?php googleButton() ?>
-                                    <?php
-                                    } else {
-                                    ?>
-                                        <button class="action destructive minimal" data-action="disconnect-google" <?= $data['metadata']['password_protected'] == "1" ? 'password-protected' : '' ?>>Disconnect</button>
-                                    <?php
-                                    }
-                                    ?>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    Policy Cloud account (Internal)
-                                </td>
-                                <td>
-                                    <?php
-                                    if ($data['metadata']['connections']['keycloak'] == "0") {
-                                        wp_enqueue_script("policycloud-marketplace-account-authentication");
-                                        wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
-                                            'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
-                                            'GoogleSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_google_handler'),
-                                            'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak'),
-                                            'RedirectSSO' => PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'account_page')
-                                        ));
-                                    ?>
-                                        <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with Policy Cloud (Internal)</button>
-                                    <?php
-                                    } else {
-                                    ?>
-                                        <button class="action destructive minimal" data-action="disconnect-keycloak" <?= $data['metadata']['password_protected'] == "1" ? 'password-protected' : '' ?>>Disconnect</button>
-                                    <?php
-                                    }
-                                    ?>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td>
+                                        Google account
+                                    </td>
+                                    <td>
+                                        <?php
+                                        if ($data['metadata']['connections']['google'] == "0") {
+                                            wp_enqueue_script("google-sso");
+                                            wp_enqueue_script("policycloud-marketplace-account-authentication");
+                                            wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
+                                                'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
+                                                'GoogleSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_google_handler'),
+                                                'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak')
+                                            ));
+                                        ?>
+                                            <?php googleButton() ?>
+                                        <?php
+                                        } else {
+                                        ?>
+                                            <button class="action destructive minimal" data-action="disconnect-google" <?= $data['metadata']['password_protected'] == "1" ? 'password-protected' : '' ?>>Disconnect</button>
+                                        <?php
+                                        }
+                                        ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Policy Cloud account (Internal)
+                                    </td>
+                                    <td>
+                                        <?php
+                                        if ($data['metadata']['connections']['keycloak'] == "0") {
+                                            wp_enqueue_script("policycloud-marketplace-account-authentication");
+                                            wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
+                                                'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
+                                                'GoogleSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_google_handler'),
+                                                'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak'),
+                                                'RedirectSSO' => PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'account_page')
+                                            ));
+                                        ?>
+                                            <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with Policy Cloud (Internal)</button>
+                                        <?php
+                                        } else {
+                                        ?>
+                                            <button class="action destructive minimal" data-action="disconnect-keycloak" <?= $data['metadata']['password_protected'] == "1" ? 'password-protected' : '' ?>>Disconnect</button>
+                                        <?php
+                                        }
+                                        ?>
+                                    </td>
+                                </tr>
                             <?php
                             }
                             ?>
@@ -828,15 +829,15 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                     ?>
                         <form id="policycloud-marketplace-delete-account"">
                             <div>
-                                <label for="current-password">Please type your current password to continue.</label>
-                                <input name="current-password" type="password" placeholder="Insert your current password here">
-                            </div>
-                            <button type="submit" class="action destructive" user="<?= $_GET['user'] ?? '' ?>">Delete account</button>
-                        </form>
-                    <?php } ?>
-                </section>
+                                <label for=" current-password">Please type your current password to continue.</label>
+                            <input name="current-password" type="password" placeholder="Insert your current password here">
             </div>
+            <button type="submit" class="action destructive" user="<?= $_GET['user'] ?? '' ?>">Delete account</button>
+            </form>
+        <?php } ?>
+        </section>
         </div>
+    </div>
     </div>
 <?php
 }

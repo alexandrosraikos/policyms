@@ -221,6 +221,8 @@ class PolicyCloud_Marketplace_Public
 
         // Account page shortcode.
         add_shortcode('policycloud-marketplace-user', 'PolicyCloud_Marketplace_Public::account_user_shortcode');
+
+        // TODO @alexandrosraikos: Add EGI redirection shortcode.
     }
 
     /**
@@ -341,7 +343,7 @@ class PolicyCloud_Marketplace_Public
                     'GoogleSSORegistrationNonce' => wp_create_nonce('policycloud_marketplace_account_user_registration_google'),
                     'KeyCloakSSORegistrationNonce' => wp_create_nonce('policycloud_marketplace_account_user_registration_keycloak')
                 ));
-        
+
 
                 account_user_registration_html(
                     $options['login_page'],
@@ -376,6 +378,8 @@ class PolicyCloud_Marketplace_Public
             PolicyCloud_Marketplace_Account::is_authenticated()
         );
     }
+
+    // TODO @alexandrosraikos: Add EGI authentication shortcode.
 
     /**
      * Register the shortcode for account password reset.
@@ -638,6 +642,9 @@ class PolicyCloud_Marketplace_Public
             }
         );
     }
+
+    // TODO @alexandrosraikos: Create EGI authentication handler.
+    // TODO @alexandrosraikos: Create EGI disconnect handler.
 
     public function account_user_password_reset_handler()
     {
@@ -1032,7 +1039,7 @@ class PolicyCloud_Marketplace_Public
                         );
                     }
                 }
-            
+
                 return (PolicyCloud_Marketplace_Description::create(
                     [
                         "title" => stripslashes(sanitize_text_field($data['title'])),
