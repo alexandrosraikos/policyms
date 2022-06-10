@@ -156,6 +156,67 @@ function policycloud_marketplace_plugin_section_three()
 }
 
 
+function policycloud_marketplace_plugin_egi_redirection_page()
+{
+    $options = get_option('policycloud_marketplace_plugin_settings');
+    $pages = get_pages([
+        'post_status' => 'publish'
+    ]);
+?>
+    <select name="policycloud_marketplace_plugin_settings[egi_redirection_page]">
+        <option value="" selected>-</option>
+        <?php
+        foreach ($pages as $page) {
+            echo '<option value="' . ($page->ID) . '" ' . ($options['egi_redirection_page'] == ($page->ID) ? 'selected' : '') . '>' . $page->post_title . '</option>';
+        }
+        ?>
+    </select>
+    <p>Select the page where you've inserted the EGI redirection shortcode.</p>
+<?php
+}
+
+
+
+function policycloud_marketplace_plugin_egi_client_id()
+{
+    $options = get_option('policycloud_marketplace_plugin_settings');
+?>
+    <input type="text" name="policycloud_marketplace_plugin_settings[egi_client_id]" value="<?php echo ((!empty($options['egi_client_id'])) ? $options['egi_client_id'] : '') ?>" />
+    <p>The Client ID registered with EGI.</p>
+<?php
+}
+
+
+
+function policycloud_marketplace_plugin_egi_client_secret()
+{
+    $options = get_option('policycloud_marketplace_plugin_settings');
+?>
+    <input type="text" name="policycloud_marketplace_plugin_settings[egi_client_secret]" value="<?php echo ((!empty($options['egi_client_secret'])) ? $options['egi_client_secret'] : '') ?>" />
+    <p>The client secret provided by EGI.</p>
+<?php
+}
+
+
+function policycloud_marketplace_plugin_egi_code_challenge()
+{
+    $options = get_option('policycloud_marketplace_plugin_settings');
+?>
+    <input type="text" name="policycloud_marketplace_plugin_settings[egi_code_challenge]" value="<?php echo ((!empty($options['egi_code_challenge'])) ? $options['egi_code_challenge'] : '') ?>" />
+    <p>An SHA256 encoded code challenge.</p>
+<?php
+}
+
+
+function policycloud_marketplace_plugin_egi_code_verifier()
+{
+    $options = get_option('policycloud_marketplace_plugin_settings');
+?>
+    <input type="text" name="policycloud_marketplace_plugin_settings[egi_code_verifier]" value="<?php echo ((!empty($options['egi_code_verifier'])) ? $options['egi_code_verifier'] : '') ?>" />
+    <p>An SHA256 code verifier alphanumeric string.</p>
+<?php
+}
+
 function policycloud_marketplace_plugin_password_reset_page_selector()
 {
     $options = get_option('policycloud_marketplace_plugin_settings');

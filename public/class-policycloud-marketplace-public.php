@@ -222,7 +222,8 @@ class PolicyCloud_Marketplace_Public
         // Account page shortcode.
         add_shortcode('policycloud-marketplace-user', 'PolicyCloud_Marketplace_Public::account_user_shortcode');
 
-        // TODO @alexandrosraikos: Add EGI redirection shortcode.
+
+        add_shortcode('policycloud-marketplace-user-egi-redirection', 'PolicyCloud_Marketplace_Public::account_user_egi_redirection');
     }
 
     /**
@@ -264,7 +265,8 @@ class PolicyCloud_Marketplace_Public
                 $links .= list_url_wrap('<a href="' . $options['account_page'] . '">My Account</a>');
                 $links .= list_url_wrap('<a class="policycloud-logout">Log out</a>');
             } else {
-                $links = list_url_wrap('<a href="' . $options['login_page'] . '">Log In</a>');
+                $links = list_url_wrap('<a href="' . $options['upload_page'] . '">Create</a>');
+                $links .= list_url_wrap('<a href="' . $options['login_page'] . '">Log In</a>');
                 $links .= list_url_wrap('<a href="' . $options['registration_page'] . '">Register</a>');
             }
             $links .= list_url_wrap(
@@ -348,6 +350,7 @@ class PolicyCloud_Marketplace_Public
                 account_user_registration_html(
                     $options['login_page'],
                     $options['tos_url'] ?? '',
+                    self::get_plugin_setting(true, 'egi_redirection_page', 'egi_client_id', 'egi_code_challenge'),
                     PolicyCloud_Marketplace_Account::is_authenticated()
                 );
             }
@@ -363,23 +366,27 @@ class PolicyCloud_Marketplace_Public
      */
     public static function account_user_authentication_shortcode()
     {
-        wp_enqueue_script("policycloud-marketplace-account-authentication");
-        wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
-            'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
-            'GoogleSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_google'),
-            'GoogleSSORegistrationNonce' => wp_create_nonce('policycloud_marketplace_account_user_registration_google'),
-            'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak'),
-            'KeyCloakSSORegistrationNonce' => wp_create_nonce('policycloud_marketplace_account_user_registration_keycloak')
-        ));
+        self::exception_handler(
+            function () {
 
-        account_user_authentication_html(
-            self::get_plugin_setting(true, 'registration_page'),
-            self::get_plugin_setting(true, 'password_reset_page'),
-            PolicyCloud_Marketplace_Account::is_authenticated()
+                wp_enqueue_script("policycloud-marketplace-account-authentication");
+                wp_localize_script('policycloud-marketplace-account-authentication', 'AccountAuthenticationProperties', array(
+                    'nonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication'),
+                    'GoogleSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_google'),
+                    'GoogleSSORegistrationNonce' => wp_create_nonce('policycloud_marketplace_account_user_registration_google'),
+                    'KeyCloakSSONonce' => wp_create_nonce('policycloud_marketplace_account_user_authentication_keycloak'),
+                    'KeyCloakSSORegistrationNonce' => wp_create_nonce('policycloud_marketplace_account_user_registration_keycloak')
+                ));
+
+                account_user_authentication_html(
+                    self::get_plugin_setting(true, 'registration_page'),
+                    self::get_plugin_setting(true, 'password_reset_page'),
+                    self::get_plugin_setting(true, 'egi_redirection_page', 'egi_client_id', 'egi_code_challenge'),
+                    PolicyCloud_Marketplace_Account::is_authenticated()
+                );
+            }
         );
     }
-
-    // TODO @alexandrosraikos: Add EGI authentication shortcode.
 
     /**
      * Register the shortcode for account password reset.
@@ -459,6 +466,7 @@ class PolicyCloud_Marketplace_Public
                         'requestDataCopyNonce' => wp_create_nonce('policycloud_marketplace_account_user_data_request'),
                         'disconnectGoogleNonce' => wp_create_nonce('policycloud_marketplace_account_disconnect_google'),
                         'disconnectKeyCloakNonce' => wp_create_nonce('policycloud_marketplace_account_disconnect_keycloak'),
+                        'disconnectEGINonce' => wp_create_nonce('policycloud_marketplace_account_disconnect_egi'),
                         'userID' => $user->id,
                         'resetPasswordURL' => self::get_plugin_setting(true, 'password_reset_page'),
                     ));
@@ -510,6 +518,25 @@ class PolicyCloud_Marketplace_Public
                     }
                 } else {
                     show_alert("You need to be logged in to view accounts.");
+                }
+            }
+        );
+    }
+
+    public static function account_user_egi_redirection()
+    {
+        self::exception_handler(
+            function () {
+                if (isset($_GET['code'])) {
+                    $token = PolicyCloud_Marketplace_User::authenticate_egi($_GET['code']);
+                    show_alert("Please wait while you're being redirected...", 'notice');
+                    wp_enqueue_script("policycloud-marketplace-account-authentication");
+                    wp_localize_script("policycloud-marketplace-account-authentication", 'AccountAuthenticationProperties', array(
+                        "EGISuccessRedirect" => get_home_url(),
+                        "EGISuccessToken" => $token
+                    ));
+                } else {
+                    show_alert("An EGI code was not found.");
                 }
             }
         );
@@ -619,6 +646,16 @@ class PolicyCloud_Marketplace_Public
         );
     }
 
+    public function account_disconnect_egi_handler()
+    {
+        $this->ajax_handler(
+            function () {
+                $user = new PolicyCloud_Marketplace_User();
+                return $user->disconnect_egi();
+            }
+        );
+    }
+
     public function account_user_registration_keycloak_handler()
     {
         $this->ajax_handler(
@@ -642,9 +679,6 @@ class PolicyCloud_Marketplace_Public
             }
         );
     }
-
-    // TODO @alexandrosraikos: Create EGI authentication handler.
-    // TODO @alexandrosraikos: Create EGI disconnect handler.
 
     public function account_user_password_reset_handler()
     {

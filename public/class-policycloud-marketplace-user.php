@@ -48,19 +48,19 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             default:
                 throw new Exception(
                     "The property \"" .
-                    $name .
-                    "\" does not exist in " .
-                    get_class($this) .
-                    "."
+                        $name .
+                        "\" does not exist in " .
+                        get_class($this) .
+                        "."
                 );
         }
     }
 
-  /**
-   * ------------
-   * Basic Methods
-   * ------------
-   */
+    /**
+     * ------------
+     * Basic Methods
+     * ------------
+     */
 
     public function is_admin(): bool
     {
@@ -83,7 +83,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             "POST",
             "/accounts/users/verification/resend",
             [
-            "email" => $this->information["email"],
+                "email" => $this->information["email"],
             ],
             $this->token
         );
@@ -91,23 +91,23 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
 
     public function update(array $data, ?array $picture = null): ?string
     {
-      // Inspect uploaded information.
+        // Inspect uploaded information.
         self::inspect($data);
 
-      // Upload new profile picture.
+        // Upload new profile picture.
         if (isset($picture)) {
             $token = $this->update_picture($picture);
         }
 
-      // Contact the Policy Cloud Data Marketplace API for password change.
+        // Contact the Policy Cloud Data Marketplace API for password change.
         if (!empty($data["password"])) {
             $response = PolicyCloud_Marketplace::api_request(
                 "POST",
                 "/accounts/users/password/change",
                 [
-                "old_password" => $data["current-password"],
-                "new_password" => $data["password"],
-                "confirm_new_password" => $data["password-confirm"],
+                    "old_password" => $data["current-password"],
+                    "new_password" => $data["password"],
+                    "confirm_new_password" => $data["password-confirm"],
                 ],
                 $this->token
             );
@@ -120,24 +120,24 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             "PUT",
             "/accounts/users/information/" . $this->id,
             [
-            "info" => [
-            "name" => $data["name"],
-            "surname" => $data["surname"],
-            "title" => $data["title"],
-            "gender" => $data["gender"],
-            "organization" => $data["organization"],
-            "email" => $data["email"],
-            "phone" => $data["phone"],
-            "social" => $this->implode_urls(
-                $data["socials-title"],
-                $data["socials-url"]
-            ),
-            "about" => $data["about"],
-            ],
-            "profile_parameters" => [
-            "public_email" => intval($data["public-email"]),
-            "public_phone" => intval($data["public-phone"]),
-            ],
+                "info" => [
+                    "name" => $data["name"],
+                    "surname" => $data["surname"],
+                    "title" => $data["title"],
+                    "gender" => $data["gender"],
+                    "organization" => $data["organization"],
+                    "email" => $data["email"],
+                    "phone" => $data["phone"],
+                    "social" => $this->implode_urls(
+                        $data["socials-title"],
+                        $data["socials-url"]
+                    ),
+                    "about" => $data["about"],
+                ],
+                "profile_parameters" => [
+                    "public_email" => intval($data["public-email"]),
+                    "public_phone" => intval($data["public-phone"]),
+                ],
             ],
             $this->token
         );
@@ -146,7 +146,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             $token = $response["token"];
         }
 
-      // Return encrypted token.
+        // Return encrypted token.
         if (!empty($token)) {
             return parent::persist_token($token);
         } else {
@@ -164,18 +164,18 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
         );
     }
 
-  /**
-   * ------------
-   * Internal Methods
-   * ------------
-   */
+    /**
+     * ------------
+     * Internal Methods
+     * ------------
+     */
 
-  /**
-   *
-   * User Data
-   * ------------
-   *
-   */
+    /**
+     *
+     * User Data
+     * ------------
+     *
+     */
 
     protected function get_statistics(): array
     {
@@ -192,7 +192,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
     protected function get_descriptions(): array
     {
         require_once plugin_dir_path(dirname(__FILE__)) .
-        "public/class-policycloud-marketplace-description.php";
+            "public/class-policycloud-marketplace-description.php";
         $this->descriptions = PolicyCloud_Marketplace_Description::get_owned(
             $this,
             $this->token
@@ -203,7 +203,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
     protected function get_reviews(): array
     {
         require_once plugin_dir_path(dirname(__FILE__)) .
-        "public/class-policycloud-marketplace-review.php";
+            "public/class-policycloud-marketplace-review.php";
         $this->reviews = PolicyCloud_Marketplace_Review::get_owned(
             $this,
             $this->token
@@ -211,12 +211,12 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
         return $this->reviews;
     }
 
-  /**
-   *
-   * User Picture
-   * ------------
-   *
-   */
+    /**
+     *
+     * User Picture
+     * ------------
+     *
+     */
 
     public function get_picture()
     {
@@ -232,8 +232,8 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
                 [],
                 $this->token,
                 [
-                "Content-Type: application/octet-stream",
-                !empty($this->token) ? "x-access-token: " . $this->token : null,
+                    "Content-Type: application/octet-stream",
+                    !empty($this->token) ? "x-access-token: " . $this->token : null,
                 ]
             );
             $this->picture = "data:image/*;base64," . base64_encode($picture_data);
@@ -250,13 +250,13 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             [],
             $this->token,
             [
-            "Content-Type: application/json",
-            "x-access-token: " . $this->token,
-            "x-more-time: " .
-            PolicyCloud_Marketplace_Public::get_plugin_setting(
-                true,
-                "api_access_token"
-            ),
+                "Content-Type: application/json",
+                "x-access-token: " . $this->token,
+                "x-more-time: " .
+                    PolicyCloud_Marketplace_Public::get_plugin_setting(
+                        true,
+                        "api_access_token"
+                    ),
             ]
         );
         return parent::persist_token($response["token"]);
@@ -280,20 +280,20 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
                 "PUT",
                 "/accounts/users/image",
                 [
-                "asset" => new CURLFile(
-                    $picture["tmp_name"],
-                    $picture["type"],
-                    $this->id
-                ),
+                    "asset" => new CURLFile(
+                        $picture["tmp_name"],
+                        $picture["type"],
+                        $this->id
+                    ),
                 ],
                 $this->token,
                 [
-                "x-access-token: " . $this->token,
-                "x-more-time: " .
-                PolicyCloud_Marketplace_Public::get_plugin_setting(
-                    true,
-                    "api_access_token"
-                ),
+                    "x-access-token: " . $this->token,
+                    "x-more-time: " .
+                        PolicyCloud_Marketplace_Public::get_plugin_setting(
+                            true,
+                            "api_access_token"
+                        ),
                 ],
                 true
             );
@@ -324,13 +324,13 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             [],
             null,
             [
-            "Content-Type: application/json",
-            "x-more-time: " .
-            PolicyCloud_Marketplace_Public::get_plugin_setting(
-                true,
-                "api_access_token"
-            ),
-            "x-access-token: " . $this->token,
+                "Content-Type: application/json",
+                "x-more-time: " .
+                    PolicyCloud_Marketplace_Public::get_plugin_setting(
+                        true,
+                        "api_access_token"
+                    ),
+                "x-access-token: " . $this->token,
             ]
         );
         return parent::persist_token($response["token"]);
@@ -344,33 +344,53 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             [],
             null,
             [
-            "Content-Type: application/json",
-            "x-more-time: " .
-            PolicyCloud_Marketplace_Public::get_plugin_setting(
-                true,
-                "api_access_token"
-            ),
-            "x-access-token: " . $this->token,
+                "Content-Type: application/json",
+                "x-more-time: " .
+                    PolicyCloud_Marketplace_Public::get_plugin_setting(
+                        true,
+                        "api_access_token"
+                    ),
+                "x-access-token: " . $this->token,
             ]
         );
         return parent::persist_token($response["token"]);
     }
 
-  /**
-   * ------------
-   * Basic Methods (Static)
-   * ------------
-   */
+    public function disconnect_egi(): string
+    {
+        $response = PolicyCloud_Marketplace::api_request(
+            "POST",
+            "/accounts/users/sso/egi-check-in/disconnect",
+            [],
+            null,
+            [
+                "Content-Type: application/json",
+                "x-more-time: " .
+                    PolicyCloud_Marketplace_Public::get_plugin_setting(
+                        true,
+                        "api_access_token"
+                    ),
+                "x-access-token: " . $this->token,
+            ]
+        );
+        return parent::persist_token($response["token"]);
+    }
+
+    /**
+     * ------------
+     * Basic Methods (Static)
+     * ------------
+     */
 
     public static function authenticate(string $id, string $password): string
     {
-      // Get the authorised token.
+        // Get the authorised token.
         $response = PolicyCloud_Marketplace::api_request(
             "POST",
             "/accounts/users/authorization",
             [
-            is_email($id) ? "email" : "uid" => $id,
-            "password" => $password,
+                is_email($id) ? "email" : "uid" => $id,
+                "password" => $password,
             ]
         );
 
@@ -379,21 +399,21 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
 
     public static function register_google(string $google_token): string
     {
-      // Get the authorized token.
+        // Get the authorized token.
         $response = PolicyCloud_Marketplace::api_request(
             "POST",
             "/accounts/users/sso/google/registration",
             [
-            "token" => $google_token,
+                "token" => $google_token,
             ],
             null,
             [
-            "Content-Type: application/json",
-            "x-more-time: " .
-            PolicyCloud_Marketplace_Public::get_plugin_setting(
-                true,
-                "api_access_token"
-            )
+                "Content-Type: application/json",
+                "x-more-time: " .
+                    PolicyCloud_Marketplace_Public::get_plugin_setting(
+                        true,
+                        "api_access_token"
+                    )
             ]
         );
 
@@ -408,48 +428,86 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             $token = false;
         }
 
-      // Get the authorized token.
+        // Get the authorized token.
         $response = PolicyCloud_Marketplace::api_request(
             "POST",
             "/accounts/users/sso/google/login",
             [
-            "token" => $google_token,
+                "token" => $google_token,
             ],
             null,
             [
-            "Content-Type: application/json",
-            "x-more-time: " .
-            PolicyCloud_Marketplace_Public::get_plugin_setting(
-                true,
-                "api_access_token"
-            ),
-            !empty($token) ? "x-access-token: " . $token : "",
+                "Content-Type: application/json",
+                "x-more-time: " .
+                    PolicyCloud_Marketplace_Public::get_plugin_setting(
+                        true,
+                        "api_access_token"
+                    ),
+                !empty($token) ? "x-access-token: " . $token : "",
             ]
         );
 
         return parent::persist_token($response["token"]);
     }
 
+    public static function authenticate_egi(string $egi_code)
+    {
+        $options = PolicyCloud_Marketplace_Public::get_plugin_setting(
+            true,
+            'egi_redirection_page',
+            'egi_client_id',
+            'egi_client_secret',
+            'egi_code_challenge',
+            'egi_code_verifier'
+        );
+
+        // Retrieve EGI data.
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://aai-demo.egi.eu/auth/realms/egi/protocol/openid-connect/token');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, "grant_type=authorization_code&code=" . $egi_code . "&client_id=" . $options['egi_client_id'] . "&redirect_uri=" . $options['egi_redirection_page'] . "&code_verifier=" . $options['egi_code_verifier'] . "&client_secret=" . $options['egi_client_secret']);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);
+
+        $result = curl_exec($ch);
+        if (curl_errno($ch)) {
+            show_alert("There was an unexpected error when contacting the EGI authentication server.");
+            curl_close($ch);
+            return;
+        }
+        curl_close($ch);
+
+        // Get final user token.
+        $response = PolicyCloud_Marketplace::api_request(
+            'POST',
+            '/accounts/users/sso/egi-check-in/registration',
+            $result,
+            (self::is_authenticated()) ? self::retrieve_token() : null
+        );
+
+        return parent::persist_token($response['token']);
+    }
+
     public static function register_keycloak(
         string $username,
         string $password
     ): string {
-      // Get the authorized token.
+        // Get the authorized token.
         $response = PolicyCloud_Marketplace::api_request(
             "POST",
             "/accounts/users/sso/keycloak/registration",
             [
-            "username" => $username,
-            "password" => $password,
+                "username" => $username,
+                "password" => $password,
             ],
             null,
             [
-            "Content-Type: application/json",
-            "x-more-time: " .
-            PolicyCloud_Marketplace_Public::get_plugin_setting(
-                true,
-                "api_access_token"
-            )
+                "Content-Type: application/json",
+                "x-more-time: " .
+                    PolicyCloud_Marketplace_Public::get_plugin_setting(
+                        true,
+                        "api_access_token"
+                    )
             ]
         );
 
@@ -471,18 +529,18 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             "POST",
             "/accounts/users/sso/keycloak/login",
             [
-            "username" => $username,
-            "password" => $password,
+                "username" => $username,
+                "password" => $password,
             ],
             null,
             [
-            "Content-Type: application/json",
-            "x-more-time: " .
-            PolicyCloud_Marketplace_Public::get_plugin_setting(
-                true,
-                "api_access_token"
-            ),
-            !empty($token) ? "x-access-token: " . $token : "",
+                "Content-Type: application/json",
+                "x-more-time: " .
+                    PolicyCloud_Marketplace_Public::get_plugin_setting(
+                        true,
+                        "api_access_token"
+                    ),
+                !empty($token) ? "x-access-token: " . $token : "",
             ]
         );
 
@@ -495,7 +553,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             "POST",
             "/accounts/users/password/reset",
             [
-            "email" => $email,
+                "email" => $email,
             ]
         );
     }
@@ -508,23 +566,23 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             "POST",
             "/accounts/users/registration",
             [
-            "account" => [
-            "password" => $information["password"],
-            ],
-            "info" => [
-            "name" => stripslashes($information["name"]),
-            "surname" => stripslashes($information["surname"]),
-            "title" => $information["title"] ?? "",
-            "gender" => $information["gender"] ?? "",
-            "organization" => stripslashes($information["organization"] ?? ""),
-            "phone" => $information["phone"] ?? "",
-            "email" => $information["email"],
-            "about" => stripslashes($information["about"]),
-            "social" => self::implode_urls(
-                $information["socials-title"],
-                $information["socials-url"]
-            ),
-            ],
+                "account" => [
+                    "password" => $information["password"],
+                ],
+                "info" => [
+                    "name" => stripslashes($information["name"]),
+                    "surname" => stripslashes($information["surname"]),
+                    "title" => $information["title"] ?? "",
+                    "gender" => $information["gender"] ?? "",
+                    "organization" => stripslashes($information["organization"] ?? ""),
+                    "phone" => $information["phone"] ?? "",
+                    "email" => $information["email"],
+                    "about" => stripslashes($information["about"]),
+                    "social" => self::implode_urls(
+                        $information["socials-title"],
+                        $information["socials-url"]
+                    ),
+                ],
             ]
         );
 
@@ -538,18 +596,18 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             "DELETE",
             "/accounts/users/delete/" . $uid,
             [
-            "password" => $current_password,
-            "uid" => $uid
+                "password" => $current_password,
+                "uid" => $uid
             ],
             PolicyCloud_Marketplace_Account::retrieve_token()
         );
     }
 
-  /**
-   * ------------
-   * Internal Methods (Static)
-   * ------------
-   */
+    /**
+     * ------------
+     * Internal Methods (Static)
+     * ------------
+     */
 
     protected static function get_account_data(string $id = null): array
     {
@@ -567,7 +625,7 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
         array $information,
         array $required = null
     ): void {
-      // Check required fields.
+        // Check required fields.
         if (isset($required)) {
             foreach ($required as $field) {
                 if (empty($information[$field])) {
@@ -578,20 +636,21 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             }
         }
 
-      // Check email.
+        // Check email.
         if (!filter_var($information["email"], FILTER_VALIDATE_EMAIL)) {
             throw new PolicyCloudMarketplaceInvalidDataException(
                 "Please enter a valid email address."
             );
         }
 
-      // Check password and confirmation.
+        // Check password and confirmation.
         if (!empty($information["password"])) {
-            if (!empty(preg_match("@[A-Z]@", $information["password"])) &&
-            !empty(preg_match("@[a-z]@", $information["password"])) &&
-            !empty(preg_match("@[0-9]@", $information["password"])) &&
-            !empty(preg_match("@[^\w]@", $information["password"])) &&
-            strlen($information["password"]) < 8
+            if (
+                !empty(preg_match("@[A-Z]@", $information["password"])) &&
+                !empty(preg_match("@[a-z]@", $information["password"])) &&
+                !empty(preg_match("@[0-9]@", $information["password"])) &&
+                !empty(preg_match("@[^\w]@", $information["password"])) &&
+                strlen($information["password"]) < 8
             ) {
                 throw new PolicyCloudMarketplaceInvalidDataException(
                     "Password should be at least 8 characters and  include at least one uppercase letter, a number, and a special character."
@@ -606,35 +665,33 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
             }
         }
 
-      // Check title.
+        // Check title.
         if (!empty($information["title"])) {
             if (!in_array($information["title"], [
-            "Mr.",
-            "Ms.",
-            "Mrs.",
-            "Dr.",
-            "Prof.",
-            "Sir",
-            "Miss",
-            "Mx.",
-            "-",
-            ])
-            ) {
+                "Mr.",
+                "Ms.",
+                "Mrs.",
+                "Dr.",
+                "Prof.",
+                "Sir",
+                "Miss",
+                "Mx.",
+                "-",
+            ])) {
                 throw new InvalidArgumentException("Please select a valid title.");
             }
         }
 
-      // Check gender.
+        // Check gender.
         if (!empty($information["gender"])) {
             if (!in_array($information["gender"], [
-            "male",
-            "female",
-            "transgender",
-            "genderqueer",
-            "questioning",
-            "-",
-            ])
-            ) {
+                "male",
+                "female",
+                "transgender",
+                "genderqueer",
+                "questioning",
+                "-",
+            ])) {
                 throw new InvalidArgumentException(
                     "Please select a gender from the list."
                 );

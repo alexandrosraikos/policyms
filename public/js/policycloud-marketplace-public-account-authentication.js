@@ -114,7 +114,6 @@
       }
     );
 
-
     $(document).on(
       'submit',
       'form.keycloak-registration',
@@ -132,6 +131,11 @@
         )
       }
     );
+
+    if (AccountAuthenticationProperties.EGISuccessRedirect) {
+      setAuthorizedToken(AccountAuthenticationProperties.EGISuccessToken);
+      window.location.href = AccountAuthenticationProperties.EGISuccessRedirect;
+    }
 
   });
 })(jQuery);

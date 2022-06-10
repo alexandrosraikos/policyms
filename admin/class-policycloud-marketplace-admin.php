@@ -100,6 +100,11 @@ class PolicyCloud_Marketplace_Admin
         $output['description_page'] = esc_url($input['description_page']);
         $output['upload_page'] = esc_url($input['upload_page']);
         $output['archive_page'] = esc_url($input['archive_page']);
+        $output['egi_redirection_page'] = esc_url($input['egi_redirection_page']);
+        $output['egi_redirection_client_id'] = esc_url($input['egi_redirection_client_id']);
+        $output['egi_redirection_client_secret'] = esc_url($input['egi_redirection_client_secret']);
+        $output['egi_redirection_code_challenge'] = esc_url($input['egi_redirection_code_challenge']);
+        $output['egi_redirection_code_verifier'] = esc_url($input['egi_redirection_code_verifier']);
         return $output;
     }
 
@@ -147,6 +152,47 @@ class PolicyCloud_Marketplace_Admin
             'encryption_key',
             'Encryption Key',
             'policycloud_marketplace_plugin_encryption_key',
+            'policycloud_marketplace_plugin',
+            'section_one'
+        );
+
+
+        add_settings_field(
+            'egi_redirection_page',
+            'EGI Redirection page',
+            'policycloud_marketplace_plugin_egi_redirection_page',
+            'policycloud_marketplace_plugin',
+            'section_one'
+        );
+
+        add_settings_field(
+            'egi_client_id',
+            'EGI Client ID',
+            'policycloud_marketplace_plugin_egi_client_id',
+            'policycloud_marketplace_plugin',
+            'section_one'
+        );
+
+        add_settings_field(
+            'egi_client_secret',
+            'EGI Client Secret',
+            'policycloud_marketplace_plugin_egi_client_secret',
+            'policycloud_marketplace_plugin',
+            'section_one'
+        );
+
+        add_settings_field(
+            'egi_code_challenge',
+            'EGI Code Challenge',
+            'policycloud_marketplace_plugin_egi_code_challenge',
+            'policycloud_marketplace_plugin',
+            'section_one'
+        );
+
+        add_settings_field(
+            'egi_code_verifier',
+            'EGI Code Verifier',
+            'policycloud_marketplace_plugin_egi_code_verifier',
             'policycloud_marketplace_plugin',
             'section_one'
         );

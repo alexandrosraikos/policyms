@@ -673,6 +673,26 @@
       }
     }
 
+    function disconnectEGI(e) {
+      e.preventDefault();
+      if ($(e.target).attr("password-protected") === undefined) {
+        if (confirm("You need to set a new password before disconnecting your EGI credentials. Head to the \"Reset password\" page and follow the steps provided.")) {
+          window.location.href = AccountEditingProperties.resetPasswordURL;
+        }
+      } else {
+        makeWPRequest(
+          'button[data-action="disconnect-keycloak"]',
+          'policycloud_marketplace_account_disconnect_egi',
+          AccountEditingProperties.disconnectEGINonce,
+          {},
+          (data) => {
+            setAuthorizedToken(data);
+            window.location.reload();
+          }
+        )
+      }
+    }
+
     /**
      *
      * Information interface actions & event listeners.
@@ -745,6 +765,10 @@
 
     $("button[data-action=\"disconnect-keycloak\"]").click(
       disconnectKeyCloak
+    )
+
+    $("button[data-action=\"disconnect-egi\"]").click(
+      disconnectEGI
     )
   });
 })(jQuery);

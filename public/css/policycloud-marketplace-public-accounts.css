@@ -63,6 +63,28 @@ button#keycloak-signin::before {
   background-position: center;
 }
 
+button#egi-signin {
+  background-color: rgb(35, 36, 39) !important;
+  font-weight: bold;
+  display: inline-block;
+  border: 1px solid !important;
+  padding: 6.5px 10px !important;
+  border-radius: 4px !important;
+}
+
+button#egi-signin::before {
+  content: " ";
+  display: inline-block;
+  height: 18px;
+  width: 32px;
+  margin-right: 6px;
+  margin-bottom: -3px;
+  background-image: url(../assets/img/egi.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 /*
 *
 * Registration
