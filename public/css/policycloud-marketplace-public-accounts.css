@@ -63,16 +63,21 @@ button#keycloak-signin::before {
   background-position: center;
 }
 
-button#egi-signin {
+button#egi-signin,
+a#egi-signin {
   background-color: rgb(35, 36, 39) !important;
   font-weight: bold;
   display: inline-block;
   border: 1px solid !important;
   padding: 6.5px 10px !important;
   border-radius: 4px !important;
+  display: inline-block;
+  color: white;
+  font-size: var(--btnFs, var(--bodyFontSize));
 }
 
-button#egi-signin::before {
+button#egi-signin::before,
+a#egi-signin::before {
   content: " ";
   display: inline-block;
   height: 18px;

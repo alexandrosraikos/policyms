@@ -21,7 +21,7 @@ function account_user_registration_html($authentication_url, $tos_url, $egi_opti
                 <div class="actions">
                     <?php googleButton(true) ?>
                     <button id="keycloak-registration" class="action keycloak" data-action="keycloak-form">Sign up with Policy Cloud (Internal)</button>
-                    <button id="egi-signin" class="action egi" onClick="window.location.href = 'https://aai-demo.egi.eu/oidc/authorize?client_id=<?= $egi_options['egi_client_id'] ?>&scope=profile%20openid%20email&redirect_uri=<?= $egi_options['egi_redirection_page'] ?>&response_type=code&code_challenge=<?= $egi_options['egi_code_challenge'] ?>&code_challenge_method=S256'">
+                    <button id="egi-signin" class="action egi" onClick="window.location.href = 'https://aai-demo.egi.eu/auth/realms/egi/protocol/openid-connect/auth?client_id=<?= $egi_options['egi_client_id'] ?>&scope=profile%20openid%20email&redirect_uri=<?= substr($egi_options['egi_redirection_page'], 0, -1) ?>&response_type=code&code_challenge=<?= $egi_options['egi_code_challenge'] ?>&code_challenge_method=S256'">
                         Sign in with EGI Check-in
                     </button>
                 </div>
@@ -178,7 +178,7 @@ function account_user_authentication_html($registration_url, $reset_password_pag
                 <div class="actions">
                     <?php googleButton() ?>
                     <button id="keycloak-signin" class="action keycloak" data-action="keycloak-form">Sign in with Policy Cloud (Internal)</button>
-                    <button id="egi-signin" class="action egi" onClick="window.location.href = 'https://aai-demo.egi.eu/oidc/authorize?client_id=<?= $egi_options['egi_client_id'] ?>&scope=profile%20openid%20email&redirect_uri=<?= $egi_options['egi_redirection_page'] ?>&response_type=code&code_challenge=<?= $egi_options['egi_code_challenge'] ?>&code_challenge_method=S256'">
+                    <button id="egi-signin" class="action egi" onClick="window.location.href = 'https://aai-demo.egi.eu/auth/realms/egi/protocol/openid-connect/auth?client_id=<?= $egi_options['egi_client_id'] ?>&scope=profile%20openid%20email&redirect_uri=<?= substr($egi_options['egi_redirection_page'], 0, -1) ?>&response_type=code&code_challenge=<?= $egi_options['egi_code_challenge'] ?>&code_challenge_method=S256'">
                         Sign in with EGI Check-in
                     </button>
                 </div>
@@ -804,9 +804,7 @@ function account_user_html(array $data, bool $admin, bool $visitor, array $pages
                                         if ($data['metadata']['connections']['egi-check-in'] == "0") {
                                             $egi_options = PolicyCloud_Marketplace_Public::get_plugin_setting(true, 'egi_redirection_page', 'egi_client_id', 'egi_code_challenge');
                                         ?>
-                                            <button id="egi-signin" class="action egi" onClick="window.location.href = 'https://aai-demo.egi.eu/oidc/authorize?client_id=<?= $egi_options['egi_client_id'] ?>&scope=profile%20openid%20email&redirect_uri=<?= $egi_options['egi_redirection_page'] ?>&response_type=code&code_challenge=<?= $egi_options['egi_code_challenge'] ?>&code_challenge_method=S256'">
-                                                Sign in with EGI Check-in
-                                            </button>
+                                            <a id="egi-signin" href="https://aai-demo.egi.eu/auth/realms/egi/protocol/openid-connect/auth?client_id=<?= $egi_options['egi_client_id'] ?>&scope=profile%20openid%20email&redirect_uri=<?= substr($egi_options['egi_redirection_page'], 0, -1) ?>&response_type=code&code_challenge=<?= $egi_options['egi_code_challenge'] ?>&code_challenge_method=S256"> Sign in with EGI Check-in</a>
                                         <?php
                                         } else {
                                         ?>
