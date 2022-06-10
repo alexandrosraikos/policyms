@@ -462,20 +462,26 @@ class PolicyCloud_Marketplace_User extends PolicyCloud_Marketplace_Account
         );
 
         // Retrieve EGI data.
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://aai-demo.egi.eu/auth/realms/egi/protocol/openid-connect/token');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, "grant_type=authorization_code&code=" . $egi_code . "&client_id=" . $options['egi_client_id'] . "&redirect_uri=" . $options['egi_redirection_page'] . "&code_verifier=" . $options['egi_code_verifier'] . "&client_secret=" . $options['egi_client_secret']);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, 'https://aai-demo.egi.eu/auth/realms/egi/protocol/openid-connect/token');
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, "grant_type=authorization_code&code=" . $egi_code . "&client_id=" . $options['egi_client_id'] . "&redirect_uri=" . $options['egi_redirection_page'] . "&code_verifier=" . $options['egi_code_verifier'] . "&client_secret=" . $options['egi_client_secret']);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);
 
-        $result = curl_exec($ch);
-        if (curl_errno($ch)) {
+        $result = curl_exec($curl);
+        $curl_http = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        if (curl_errno($curl)) {
             show_alert("There was an unexpected error when contacting the EGI authentication server.");
-            curl_close($ch);
+            curl_close($curl);
             return;
         }
-        curl_close($ch);
+        curl_close($curl);
+
+        if ($curl_http != 200) {
+            show_alert($result['error_description']);
+            return;
+        }
 
         // Get final user token.
         $response = PolicyCloud_Marketplace::api_request(

@@ -532,7 +532,7 @@ class PolicyCloud_Marketplace_Public
                     show_alert("Please wait while you're being redirected...", 'notice');
                     wp_enqueue_script("policycloud-marketplace-account-authentication");
                     wp_localize_script("policycloud-marketplace-account-authentication", 'AccountAuthenticationProperties', array(
-                        "EGISuccessRedirect" => get_home_url(),
+                        "EGISuccessRedirect" => self::get_plugin_setting(true, 'account_page'),
                         "EGISuccessToken" => $token
                     ));
                 } else {
