@@ -16,7 +16,7 @@
  * Plugin Name:       Policy Cloud Data Marketplace for WordPress
  * Plugin URI:        https://dac.ds.unipi.gr/policycloud-eu/
  * Description:       The official plugin for the Policy Cloud Data Marketplace, enabling front-end access to the Policy Cloud API.
- * Version:           1.3.0
+ * Version:           1.4.0
  * Author:            University of Piraeus Research Center
  * Author URI:        https://dac.ds.unipi.gr/
  * Text Domain:       policycloud-marketplace
