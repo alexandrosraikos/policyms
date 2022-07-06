@@ -1,10 +1,12 @@
-# Policy Cloud Data Marketplace for WordPress
+![The PolicyMS logotype.](docs/img/policyms-repo.png)
 
-The official plugin for the Policy Cloud Data Marketplace, enabling front-end access to the Policy Cloud Data Marketplace API.
+# PolicyMS for WordPress
+
+PolicyMS for WordPress enables front-end access to the PolicyMS API for managing policy-related data.
 
 ## Getting started
 
-Read the sections below to get started with Policy Cloud Data Marketplace for WordPress.
+Read the sections below to get started with PolicyMS for WordPress.
 
 ### Requirements
 
@@ -17,45 +19,45 @@ Read the sections below to get started with Policy Cloud Data Marketplace for Wo
 
 Clone the repository, zip and install via the WordPress dashboard.
 
-Head to the Dashboard > Settings > Policy Cloud Data Marketplace to enter your Policy Cloud Data Marketplace API credentials as provided by the API administrator.
+Head to the Dashboard > Settings > PolicyMS to enter your PolicyMS API credentials as provided by the API administrator.
 
 ### Shortcodes
 
-Use the shortcodes below for all Policy Cloud Data Marketplace API functionality.
+Use the shortcodes below for all PolicyMS API functionality.
 
 #### Log In
 
 To add a log in form to a requested page, add the following shortcode:
 
-`[policycloud-marketplace-user-authentication]`
+`[policyms-user-authentication]`
 
 #### Registration
 
 To add a registration form to a requested page, add the following shortcode:
 
-`[policycloud-marketplace-user-registration]`
+`[policyms-user-registration]`
 
 #### Show available Descriptions
 
 To view Descriptions, add the following shortcodes:
 
-`[policycloud-marketplace-descriptions-featured]`
+`[policyms-descriptions-featured]`
 
-`[policycloud-marketplace-description-archive]`
+`[policyms-description-archive]`
 
-`[policycloud-marketplace-description]`
+`[policyms-description]`
 
 #### Upload Description Object
 
 To view the upload form for creating a Description Object for authorized users, add the following shortcode:
 
-`[policycloud-marketplace-description-creation]`
+`[policyms-description-creation]`
 
-#### Policy Cloud Data Marketplace account page
+#### PolicyMS account page
 
 To view the account page for an authorized user, add the following shortcode:
 
-`[policycloud-marketplace-user]`
+`[policyms-user]`
 
 ### Other features
 
@@ -65,4 +67,4 @@ This plugin also enables the following features:
 
 ## Credits
 
-This work extends, and is schematically based upon, the Policy Cloud Data Marketplace API, created and maintained by [@vkoukos](https://github.com/vkoukos). Special thanks to [@elefkour](https://github.com/elefkour) for co-authoring and co-maintaining this repository.
+This work extends, and is schematically based upon, the PolicyMS API, created and maintained by [@vkoukos](https://github.com/vkoukos). Special thanks to [@elefkour](https://github.com/elefkour) for co-authoring and co-maintaining this repository.
