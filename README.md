@@ -1,6 +1,8 @@
+![The PolicyMS logotype.](docs/img/policyms-repo.png)
+
 # PolicyMS for WordPress
 
-The official plugin for the PolicyMS, enabling front-end access to the PolicyMS API.
+PolicyMS for WordPress enables front-end access to the PolicyMS API for managing policy-related data.
 
 ## Getting started
 

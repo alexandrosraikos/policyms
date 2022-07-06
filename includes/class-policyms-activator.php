@@ -3,7 +3,7 @@
 /**
  * Fired during plugin activation
  *
- * @link       https://dac.ds.unipi.gr/policycloud-eu/
+ * @link       https://github.com/alexandrosraikos/policyms/
  * @since      1.0.0
  *
  * @package    PolicyMS
@@ -20,17 +20,16 @@
  * @subpackage PolicyMS/includes
  * @author     Alexandros Raikos <araikos@unipi.gr>
  */
-class PolicyMS_Activator
-{
+class PolicyMS_Activator {
 
-    /**
-     * Short Description. (use period)
-     *
-     * Long Description.
-     *
-     * @since    1.0.0
-     */
-    public static function activate()
-    {
-    }
+
+	/**
+	 * Short Description. (use period)
+	 *
+	 * Long Description.
+	 *
+	 * @since    1.0.0
+	 */
+	public static function activate() {
+	}
 }

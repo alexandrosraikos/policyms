@@ -3,7 +3,7 @@
 /**
  * The public-facing functionality of the plugin.
  *
- * @link       https://dac.ds.unipi.gr/policycloud-eu/
+ * @link       https://github.com/alexandrosraikos/policyms/
  * @since      1.0.0
  *
  * @package    PolicyMS
@@ -63,7 +63,7 @@ class PolicyMS_Public {
 	 *
 	 * This section refers to global functionality.
 	 */
-	
+
 	public function enqueue_head_scripts() {
 		echo '<script>FontAwesomeConfig = { autoA11y: true }</script><script src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>';
 	}
@@ -259,7 +259,7 @@ class PolicyMS_Public {
 			if ( PolicyMS_User::is_authenticated() ) {
 				$links  = list_url_wrap( '<a href="' . $options['upload_page'] . '">Create</a>' );
 				$links .= list_url_wrap( '<a href="' . $options['account_page'] . '">My Account</a>' );
-				$links .= list_url_wrap( '<a class="policycloud-logout">Log out</a>' );
+				$links .= list_url_wrap( '<a class="policyms-logout">Log out</a>' );
 			} else {
 				$links  = list_url_wrap( '<a href="' . $options['upload_page'] . '">Create</a>' );
 				$links .= list_url_wrap( '<a href="' . $options['login_page'] . '">Log In</a>' );

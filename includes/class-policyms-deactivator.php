@@ -3,7 +3,7 @@
 /**
  * Fired during plugin deactivation
  *
- * @link       https://dac.ds.unipi.gr/policycloud-eu/
+ * @link       https://github.com/alexandrosraikos/policyms/
  * @since      1.0.0
  *
  * @package    PolicyMS
@@ -20,17 +20,16 @@
  * @subpackage PolicyMS/includes
  * @author     Alexandros Raikos <araikos@unipi.gr>
  */
-class PolicyMS_Deactivator
-{
+class PolicyMS_Deactivator {
 
-    /**
-     * Short Description. (use period)
-     *
-     * Long Description.
-     *
-     * @since    1.0.0
-     */
-    public static function deactivate()
-    {
-    }
+
+	/**
+	 * Short Description. (use period)
+	 *
+	 * Long Description.
+	 *
+	 * @since    1.0.0
+	 */
+	public static function deactivate() {
+	}
 }

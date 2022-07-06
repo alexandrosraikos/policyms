@@ -180,8 +180,6 @@ class PolicyMS_User extends PolicyMS_Account {
 	}
 
 	protected function get_descriptions(): array {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) .
-			'public/class-policyms-description.php';
 		$this->descriptions = PolicyMS_Description::get_owned(
 			$this,
 			$this->token
@@ -190,8 +188,6 @@ class PolicyMS_User extends PolicyMS_Account {
 	}
 
 	protected function get_reviews(): array {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) .
-			'public/class-policyms-review.php';
 		$this->reviews = PolicyMS_Review::get_owned(
 			$this,
 			$this->token
