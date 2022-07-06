@@ -1,0 +1,910 @@
+/*
+* ---------------------
+* Accounts
+* ---------------------
+*
+* These are the styles for the accounts related shortcodes.
+*
+*/
+
+/*
+*
+* SSO Actions
+* ---------------------
+*
+*/
+
+.policyms .sso {
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--policyms-border-color-light);
+}
+
+.policyms .sso .actions {
+  display: flex;
+  align-items: center;
+}
+
+.policyms .sso .action {
+  margin-right: 8px;
+  width: auto;
+}
+
+#google-signin,
+#google-registration {
+  display: inline-block;
+}
+
+#google-signin iframe,
+#google-registration iframe {
+  margin: 0 !important;
+}
+
+button#keycloak-registration,
+button#keycloak-signin {
+  background-color: rgb(35, 36, 39) !important;
+  font-weight: bold;
+  display: inline-block;
+  border: none !important;
+  padding: 6.5px 10px !important;
+  border-radius: 4px !important;
+}
+
+button#keycloak-registration::before,
+button#keycloak-signin::before {
+  content: " ";
+  display: inline-block;
+  height: 14px;
+  width: 28px;
+  margin-right: 6px;
+  background-image: url(../assets/img/policycloud.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+button#egi-signin,
+a#egi-signin {
+  background-color: rgb(35, 36, 39) !important;
+  font-weight: bold;
+  display: inline-block;
+  border: 1px solid !important;
+  padding: 6.5px 10px !important;
+  border-radius: 4px !important;
+  display: inline-block;
+  color: white;
+  font-size: var(--btnFs, var(--bodyFontSize));
+}
+
+button#egi-signin::before,
+a#egi-signin::before {
+  content: " ";
+  display: inline-block;
+  height: 18px;
+  width: 32px;
+  margin-right: 6px;
+  margin-bottom: -3px;
+  background-image: url(../assets/img/egi.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/*
+*
+* Registration
+* ---------------------
+*
+* These are the styles for the 
+* [policyms-registration] shortcode.
+*
+*/
+
+#policyms-registration .tos-agree {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#policyms-registration .tos-agree label {
+  padding-left: 6px;
+  margin: 0;
+}
+
+#policyms-registration .socials div div {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+#policyms-registration .socials div div input[name="socials-title[]"] {
+  max-width: 200px;
+}
+#policyms-registration .socials div div input[name="socials-url[]"] {
+  min-width: 225px;
+}
+
+#policyms-registration .socials div div * {
+  display: block;
+  height: auto;
+  max-height: unset;
+  margin: 0 8px 0 0;
+}
+
+#policyms-registration .socials div button.remove-field,
+#policyms-registration .socials div button.remove-field * {
+  padding: 0;
+  margin: 0 0 0 3px;
+  border: none;
+  box-sizing: border-box;
+  background: none !important;
+  color: var(--policyms-text-color) !important;
+  transition: opacity 0.2s ease-in-out;
+}
+
+#policyms-registration .socials div button.remove-field:hover {
+  opacity: 0.8;
+  transition: opacity 0.2s ease-in-out;
+}
+
+#policyms-registration .socials div button.remove-field:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transition: opacity 0.2s ease-in-out;
+}
+
+#policyms-registration .socials > button.add-field {
+  padding: 3px 5px;
+  display: block;
+  height: auto;
+  line-height: normal;
+  background: none !important;
+  color: var(--policyms-text-color);
+  font-size: 75%;
+  margin: 10px 0;
+  padding: 0;
+  border: none;
+}
+
+#policyms-registration .socials > button.add-field:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+/*
+*
+* My Account
+* ---------------------
+*
+* These are the styles for the 
+* [policyms-account] shortcode.
+*
+*/
+
+/* Generic layout */
+
+#policyms-account {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  padding: 0;
+  height: auto;
+}
+
+#policyms-account-sidebar {
+  flex: 0 0 30%;
+  padding: 20px;
+  border-right: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+#policyms-account-sidebar > .policyms-account-title {
+  display: none;
+}
+
+#policyms-account-sidebar > img {
+  display: block;
+  width: 90%;
+  object-fit: cover;
+  max-width: 256px;
+  max-height: 256px;
+  min-width: 256px;
+  min-height: 256px;
+  margin: 10px auto;
+  border-radius: 1000px;
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+#policyms-account-sidebar > nav {
+  margin-top: 30px;
+}
+
+#policyms-account-sidebar > nav button {
+  display: block;
+  text-align: left;
+}
+
+#policyms-account-sidebar > nav button.active {
+  background-color: rgba(0, 0, 0, 0.05);
+  transition: all 0.1s ease-in-out;
+}
+
+#policyms-account-sidebar > nav button .pill {
+  display: inline-block;
+  font-size: 75%;
+  font-weight: bold;
+  margin-left: 4px;
+}
+
+#policyms-account-sidebar > nav > hr {
+  display: block;
+  border-collapse: collapse;
+  border: 0.5px solid var(--policyms-border-color-light);
+  height: 0px;
+  margin: 15px 0;
+}
+
+#policyms-account-sidebar > nav button.policyms-logout {
+  color: rgba(185, 16, 16, 0.842) !important;
+}
+
+#policyms-account-content {
+  flex: 1;
+  margin: 20px;
+}
+
+#policyms-account-content .policyms-account-title {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+  padding-bottom: 15px;
+  margin-left: -20px;
+  padding-left: 20px;
+}
+
+.policyms-account-title h2 {
+  font-weight: bold;
+}
+
+.policyms-account-title div {
+  font-size: 80%;
+  opacity: 0.8;
+}
+
+#policyms-account-content section {
+  display: none;
+  max-height: 0px;
+  margin: 0;
+  padding: 0;
+}
+
+#policyms-account-content section.focused {
+  display: block;
+  max-height: 1000vh;
+  opacity: 0;
+  margin: 20px 0;
+  padding: 0;
+  transform: translateY(-10px);
+  animation: sweep-in 0.3s ease-in-out forwards;
+}
+
+#policyms-account-content section header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 20px 0;
+}
+
+#policyms-account-content section header h3,
+#policyms-account-content section h3 {
+  font-weight: bold;
+  font-size: 110% !important;
+  margin-bottom: 0;
+}
+
+#policyms-account-content section header .actions {
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#policyms-account-content section header a,
+#policyms-account-content section header button {
+  font-weight: bold;
+  background-color: #000000;
+  color: white;
+  border-radius: 10px;
+  padding: 5px 10px;
+  text-decoration: none;
+  font-size: 80% !important;
+  border: none;
+  margin-left: 10px;
+  transition: all 0.2s ease-in-out;
+}
+
+#policyms-account-content section header a:hover,
+#policyms-account-content section header button:hover {
+  transform: scale(0.98);
+  cursor: pointer;
+  text-decoration: none;
+  opacity: 0.9;
+  transition: all 0.2s ease-in-out;
+}
+
+#policyms-account-content section header a:active,
+#policyms-account-content section header button:active {
+  transform: scale(0.97);
+  cursor: pointer;
+  text-decoration: none;
+  opacity: 0.8;
+  transition: all 0.1s ease-in-out;
+}
+
+#policyms-account-content section header a {
+  white-space: nowrap;
+}
+
+#policyms-account-content section header a img,
+#policyms-account-content section header button img {
+  max-width: 15px;
+  margin: -3px 5px 0 0;
+  display: inline-block;
+}
+
+/* Overview tab */
+
+#policyms-account section.policyms-account-overview p {
+  font-size: 90%;
+  color: var(--policyms-text-color-secondary);
+}
+
+#policyms-account section.policyms-account-overview ul {
+  padding: 0;
+  margin: 10px 0;
+  font-size: 80%;
+  list-style-type: none;
+}
+
+#policyms-account section.policyms-account-overview ul li {
+  margin-right: 7px;
+  display: inline-block;
+}
+
+#policyms-account section.policyms-account-overview h4 {
+  font-size: 18px;
+  margin: 20px 0;
+}
+
+#policyms-account section.policyms-account-overview table,
+#policyms-account section.policyms-account-overview tr,
+#policyms-account section.policyms-account-overview td,
+#policyms-account section.policyms-account-profile table,
+#policyms-account section.policyms-account-profile tr,
+#policyms-account section.policyms-account-profile td {
+  border: none;
+}
+
+#policyms-account section.policyms-account-overview table.statistics {
+  margin-bottom: 20px;
+}
+
+#policyms-account section.policyms-account-overview table .large-figure {
+  font-size: 150%;
+  font-weight: bold;
+}
+
+@media screen and (max-width: 900px) {
+  #policyms-account-content section header {
+    align-items: flex-start;
+  }
+
+  #policyms-account-content section header .actions {
+    align-self: flex-end;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
+
+  #policyms-account-content section header a,
+  #policyms-account-content section header button {
+    margin-bottom: 8px;
+  }
+}
+
+/* Assets tab */
+
+#policyms-account-content section header form.selector {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+#policyms-account-content section header form.selector * {
+  height: 100%;
+  width: auto;
+  margin: 0 5px;
+  padding: 0;
+  white-space: nowrap;
+}
+
+#policyms-account-content section header form.selector select {
+  padding: 0 10px 0 6px;
+}
+
+#policyms-account-content section .collection-filters {
+  margin-bottom: 20px;
+  border-top: 1px solid var(--policyms-border-color-light);
+  border-bottom: 1px solid var(--policyms-border-color-light);
+  padding: 15px 0;
+  font-size: 75%;
+  font-weight: bold;
+}
+
+#policyms-account-content section .collection-filters div {
+  margin-bottom: 5px;
+}
+
+#policyms-account-content section .collection-filters button {
+  margin: 0 5px 5px 0;
+}
+
+#policyms-account-content section .paginated-list .hidden {
+  display: none;
+}
+
+#policyms-account-content section .paginated-list .page {
+  display: none;
+  padding: 0 10px 0 0;
+  margin: 0;
+}
+
+#policyms-account-content section .paginated-list .page.visible {
+  display: block;
+}
+
+#policyms-account-content section .paginated-list .page li {
+  display: none;
+  max-height: 0;
+  overflow: hidden;
+}
+
+#policyms-account-content section .paginated-list .page li.visible {
+  display: block;
+  max-height: 1000vh;
+  margin: 5px 0;
+  padding: 15px 10px;
+  border-top: 1px solid var(--policyms-border-color-light);
+  animation: sweep-in 0.3s ease-in-out forwards;
+}
+
+#policyms-account-content section .paginated-list .page li h4 {
+  margin-bottom: 10px;
+}
+
+#policyms-account-content section .paginated-list .page li > div > a {
+  text-decoration: none;
+  border-radius: 10px;
+  display: block !important;
+  transition: all 0.2s ease-in-out;
+}
+
+#policyms-account-content section .paginated-list .page li > div > p {
+  color: var(--policyms-text-color-secondary);
+  font-size: 80%;
+}
+
+#policyms-account-content section .paginated-list .page li .metadata {
+  font-size: 70%;
+  margin-top: 10px;
+  color: var(--policyms-text-color-secondary);
+}
+
+#policyms-account-content
+  section
+  .paginated-list
+  .page
+  li
+  .metadata
+  a:last-of-type,
+#policyms-account-content section .paginated-list .page li .metadata span {
+  display: inline-block;
+  margin-right: 8px;
+}
+
+/* Reviews tab */
+
+#policyms-account
+  section.policyms-account-reviews
+  #policyms-account-reviews-list
+  .rating {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+#policyms-account
+  section.policyms-account-reviews
+  .paginated-list
+  .rating
+  span:first-of-type {
+  font-size: 32px;
+  font-weight: bold;
+}
+
+#policyms-account
+  section.policyms-account-reviews
+  .paginated-list
+  .rating
+  span:last-of-type {
+  font-size: 16px;
+  margin-left: 10px;
+  color: var(--policyms-text-color-secondary);
+}
+
+#policyms-account section.policyms-account-reviews .paginated-list .review p {
+  color: var(--policyms-text-color);
+  margin: 15px 0;
+}
+
+#policyms-account section.policyms-account-reviews .paginated-list .review a {
+  text-decoration: none;
+}
+
+#policyms-account
+  section.policyms-account-reviews
+  .paginated-list
+  .review
+  .metadata {
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+/* Information tab */
+
+#policyms-account section.policyms-account-profile table.information {
+  margin-top: 20px;
+  font-size: 80%;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  table.information
+  tr
+  > td:first-of-type {
+  max-width: 80px;
+  font-weight: bold;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  .folding,
+#policyms-description-create .folding {
+  display: none;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  .critical-action {
+  display: none;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  .critical-action.visible {
+  display: block;
+  animation: sweep-in 0.3s ease-in-out;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  .folding.visible,
+#policyms-description-create .folding.visible {
+  display: table-cell;
+  animation: sweep-in 0.3s ease-in-out;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  td:first-of-type {
+  min-width: 100px;
+}
+
+#policyms-account section.policyms-account-profile #policyms-account-edit input,
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  select {
+  padding: 5px 10px;
+  min-width: 100%;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  border: 1px solid rgba(140, 140, 140, 0.2);
+  box-sizing: border-box;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  label {
+  font-size: 80%;
+  opacity: 0.8;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  .socials
+  input {
+  min-width: unset;
+  margin-right: 8px;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  .socials
+  div
+  div {
+  display: flex;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  .socials
+  button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  .socials
+  input {
+  line-height: normal;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  div.error,
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  div.notice {
+  margin: 10px;
+  width: 100%;
+  padding: 10px 15px;
+  font-size: 80% !important;
+  font-weight: bold !important;
+  border-radius: 8px;
+  display: none;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  div.error {
+  background-color: var(--policyms-background-failure);
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  div.notice {
+  background-color: var(--policyms-background-notice);
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  div.error.visible,
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  div.notice.visible {
+  display: block;
+}
+
+#policyms-account section.policyms-account-profile #policyms-account-edit img {
+  max-width: 200px;
+  border-radius: 8px;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  input[type="file"] {
+  font-size: 125%;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  button {
+  font-weight: bold;
+  background-color: #000000;
+  color: white;
+  border-radius: 10px;
+  padding: 5px 10px;
+  text-decoration: none;
+  text-align: left;
+  border: none;
+  margin: 15px 0;
+  transition: all 0.2s ease-in-out;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  button:hover {
+  transform: scale(0.98);
+  cursor: pointer;
+  text-decoration: none;
+  opacity: 0.9;
+  transition: all 0.2s ease-in-out;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  button:active {
+  transform: scale(0.97);
+  cursor: pointer;
+  text-decoration: none;
+  opacity: 0.8;
+  transition: all 0.1s ease-in-out;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  .unverified {
+  font-weight: bold;
+  color: darkred;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-account-edit
+  button#policyms-resend-verification-email {
+  color: inherit;
+  background: none;
+  padding: 0;
+  margin: 0 5px;
+  font-size: 100%;
+  text-decoration: underline;
+}
+
+#policyms-account section.policyms-account-profile button.action {
+  display: block;
+  margin: 15px 0;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-delete-account
+  div {
+  display: none;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-delete-account
+  div.policyms-error {
+  display: block;
+}
+
+#policyms-account
+  section.policyms-account-profile
+  #policyms-delete-account
+  div.visible {
+  display: block;
+}
+
+button#policyms-resend-verification-email.disabled,
+a#policyms-resend-verification-email.disabled {
+  opacity: 0.8;
+}
+
+button#policyms-resend-verification-email.disabled:hover,
+a#policyms-resend-verification-email.disabled:hover {
+  opacity: 0.8;
+  cursor: not-allowed;
+  text-decoration: none;
+  pointer-events: none;
+}
+
+@keyframes sweep-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media screen and (max-width: 650px) {
+  #policyms-account-content > .policyms-account-title {
+    display: none;
+  }
+
+  #policyms-account {
+    flex-direction: column;
+  }
+
+  #policyms-account-sidebar {
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+    padding: 0 10px 10px 10px;
+  }
+
+  #policyms-account-sidebar > img {
+    max-width: 128px;
+  }
+
+  #policyms-account-sidebar > .policyms-account-title {
+    display: block;
+    text-align: center;
+  }
+
+  #policyms-account-content {
+    padding: 0 10px;
+    margin: 0;
+  }
+
+  #policyms-account-content section #policyms-account-descriptions-list {
+    padding: 0;
+    margin: 0;
+    max-height: unset;
+    overflow-y: visible;
+  }
+
+  #policyms-account-content section #policyms-account-descriptions-list li a {
+    flex-direction: column;
+  }
+
+  #policyms-account-content
+    section
+    #policyms-account-descriptions-list
+    li
+    .thumbnail {
+    flex: unset;
+    height: 200px;
+    margin-bottom: 25px;
+  }
+
+  #policyms-account
+    section.policyms-account-reviews
+    #policyms-account-reviews-list
+    li {
+    margin: 10px 0;
+  }
+
+  #policyms-account
+    section.policyms-account-profile
+    #policyms-account-edit
+    input,
+  #policyms-account
+    section.policyms-account-profile
+    #policyms-account-edit
+    select {
+    max-width: 50vw;
+    max-width: 50vw;
+  }
+
+  #policyms-account
+    section.policyms-account-profile
+    #policyms-account-edit
+    td:first-of-type {
+    min-width: 110px;
+  }
+}

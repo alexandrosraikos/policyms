@@ -1,0 +1,679 @@
+/*
+*
+* Generic
+* ---------------------
+*
+* These are the styles for generic shortcode elements
+*
+*/
+
+:root {
+  --policyms-text-color: #111111;
+  --policyms-text-color-secondary: #464646;
+  --policyms-text-color-invert: #f0f0f0;
+  --policyms-text-color-invert-secondary: #c2c2c2;
+  --policyms-highlight-color-dark: #03204a;
+  --policyms-highlight-color-mid: #005cf9;
+  --policyms-highlight-color-light: #00bdf5;
+  --policyms-border-color-light: rgba(0, 0, 0, 0.1);
+  --policyms-background-color: rgba(253, 253, 253);
+  --policyms-background-notice: var(--policyms-highlight-color-mid);
+  --policyms-background-notice-outline: var(--policyms-highlight-color-mid);
+  --policyms-background-failure: #e73d3d;
+  --policyms-background-failure-outline: #e73d3d;
+  --policyms-background-warning: #fffce8;
+  --policyms-background-warning-outline: #dfaf2b;
+  --policyms-background-success: var(--policyms-highlight-color-light);
+  --policyms-background-success-outline: var(--policyms-highlight-color-light);
+}
+
+/* Links & buttons */
+
+.policyms {
+  margin: 0 auto;
+}
+
+.policyms a {
+  display: inline !important;
+  margin: 0 auto;
+  text-decoration: none !important;
+  font-size: inherit;
+  font-weight: bold;
+  color: var(--policyms-text-color);
+  transition: color 0.2s ease-in-out;
+}
+
+.policyms a.underline {
+  text-decoration: underline !important;
+}
+
+.policyms a:hover {
+  text-decoration: none !important;
+  display: inline;
+  color: var(--policyms-highlight-color-mid);
+  cursor: pointer !important;
+  transition: color 0.2s ease-in-out;
+}
+
+.policyms button.action,
+.policyms a.action {
+  padding: 7px 15px;
+  border: 1px solid var(--policyms-background-notice-outline);
+  border-radius: 8px;
+  background: var(--policyms-background-notice) !important;
+  color: var(--policyms-text-color-invert) !important;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.policyms button.action.minimal {
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none !important;
+  color: var(--policyms-text-color) !important;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.policyms button.action.destructive {
+  background-color: var(--policyms-background-failure) !important;
+  border-color: var(--policyms-background-failure-outline);
+  color: var(--policyms-text-color-invert) !important;
+}
+.policyms button.action.minimal.destructive {
+  background-color: transparent !important;
+  border: none;
+  color: var(--policyms-background-failure) !important;
+}
+
+.policyms button.action.productive {
+  background-color: var(--policyms-background-success) !important;
+  border-color: var(--policyms-background-success-outline);
+  color: var(--policyms-text-color-invert) !important;
+}
+
+.policyms button.action:hover {
+  cursor: pointer;
+  transform: scale(0.98);
+  transition: all 0.2s ease-in-out;
+}
+
+.policyms button.action:active {
+  opacity: 0.7;
+  transform: scale(0.95);
+  transition: all 0.1s ease-in-out;
+}
+
+.policyms .loading {
+  opacity: 0.6;
+  cursor: wait;
+  pointer-events: none;
+}
+
+.policyms button.tactile,
+.policyms a.tactile {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background-color: transparent !important;
+  padding: 10px 0 10px 8px;
+  margin: 3px 0;
+  color: inherit !important;
+  border: none;
+  border-radius: 8px;
+  text-transform: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.policyms button.tactile:hover,
+.policyms a.tactile:hover {
+  transform: scale(0.98);
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+}
+
+.policyms button.tactile.active,
+.policyms button.tactile:active,
+.policyms a.tactile.active,
+.policyms a.tactile:active {
+  transform: scale(0.96);
+  background-color: rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.1s ease-in-out;
+}
+
+.policyms button.outlined {
+  padding: 4px 8px;
+  margin: 0 5px 5px 0;
+  background: transparent !important;
+  font-size: 100%;
+  border: 2px solid rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit !important;
+  text-transform: unset;
+  transition: all 0.2s ease-in-out;
+}
+
+.policyms button.outlined:hover {
+  text-decoration: none;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.15) !important;
+  opacity: 0.9;
+  transform: scale(0.99);
+  transition: all 0.2s ease-in-out;
+}
+
+.policyms button.outlined.active,
+.policyms button.outlined:active {
+  text-decoration: none;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.25) !important;
+  opacity: 0.8;
+  transform: scale(0.97);
+  transition: all 0.1s ease-in-out;
+}
+
+.policyms *.pill {
+  display: inline-block !important;
+  font-size: 90%;
+  font-weight: 500;
+  padding: 0 10px;
+  background-color: var(--policyms-border-color-light);
+  border-radius: 100px;
+}
+
+.policyms h1 {
+  /* Other */
+  font-size: 40px;
+  font-weight: bold;
+}
+
+.policyms h2 {
+  /* Other */
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.policyms h3 {
+  margin-bottom: 10px;
+
+  /* Other */
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.policyms h4 {
+  /* Other */
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.policyms p {
+  line-height: 1.3em;
+}
+
+.policyms span.label {
+  background-color: var(--policyms-background-notice);
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block !important;
+  padding: 0 10px;
+  border: 1px solid var(--policyms-background-notice-outline);
+  color: var(--policyms-text-color-invert);
+}
+
+.policyms span.label.success {
+  background-color: var(--policyms-background-success);
+  color: var(--policyms-text-color-invert);
+  border: 1px solid var(--policyms-background-success-outline);
+}
+
+/* Pagination */
+
+.policyms nav.pagination {
+  text-align: center;
+}
+
+.policyms nav.pagination button {
+  border: none;
+  border-radius: 5px;
+  padding: 0 8px;
+  margin: 0 2px;
+  background: transparent !important;
+  color: inherit !important;
+  font-size: 16px;
+  transition: all 0.1s ease-in-out;
+}
+
+.policyms nav.pagination button:hover {
+  background: rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.1s ease-in-out;
+}
+
+.policyms nav.pagination button:active {
+  transform: scale(0.98);
+  opacity: 0.5;
+  transition: all 0.1s ease-in-out;
+}
+
+.policyms nav.pagination button.active {
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+/**
+* Forms
+* -----------
+* Generic forms styling.
+*/
+
+.policyms form {
+  margin: 0 auto;
+  padding: 0;
+}
+
+.policyms form fieldset {
+  border: none;
+  padding: 10px 0;
+  margin: 0 auto;
+}
+
+.policyms form fieldset > * {
+  margin-bottom: 20px;
+}
+
+.policyms form input[type="text"],
+.policyms form input[type="number"],
+.policyms form input[type="email"],
+.policyms form input[type="tel"],
+.policyms form textarea {
+  display: block;
+  margin: 0 auto 10px auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.policyms form fieldset:not(.policyms form fieldset:last-of-type) {
+  border-bottom: 1px solid var(--policyms-border-color-light);
+  padding-bottom: 20px;
+}
+
+.policyms form label {
+  display: block;
+  font-weight: 500;
+  margin: 10px 0 5px 0;
+  padding: 0;
+}
+
+.policyms
+  form
+  input:not(input[type="file"], input[type="checkbox"], input[type="radio"]),
+.policyms form textarea,
+.policyms form select {
+  display: block;
+  font-size: 16px;
+  padding: 10px;
+  margin: 0 0 10px 0;
+  background-color: #ffffff;
+  border: 1px double #222222 !important;
+  border-radius: 10px;
+}
+
+.policyms form > p {
+  text-align: center;
+}
+
+.policyms form select:hover {
+  cursor: pointer;
+  background-color: #ececec;
+}
+
+.policyms form button[type="submit"] {
+  display: block;
+  margin: 0 auto;
+}
+
+.policyms form .actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.policyms form .actions button {
+  margin: 10px;
+}
+
+/* Locked content */
+.policyms .lock {
+  min-height: 300px;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--policyms-border-color-light);
+  border-radius: 12px;
+}
+
+.policyms .lock > img {
+  margin-bottom: 10px;
+  width: 60px;
+}
+
+.policyms .lock > p {
+  margin-top: 10px;
+  text-align: center;
+  width: 80%;
+}
+
+/**
+* Header search box
+* -----------
+* Style the inline menu bar search box.
+*/
+
+.policyms.menu-search {
+  margin: 0;
+  margin-top: -6px;
+}
+
+.policyms.menu-search button[data-action="description-search"] {
+  padding: 3px 6px;
+  color: inherit;
+}
+
+.policyms.modal .menu-search {
+  margin: 10px;
+}
+
+.policyms.menu-search form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.policyms.menu-search form input {
+  margin: 10px !important;
+  min-width: 50vw;
+  background-color: transparent !important;
+  color: inherit !important;
+}
+
+.policyms.menu-search form button[type="submit"] {
+  width: 36px;
+  height: 36px;
+  padding: 0 !important;
+  text-align: center;
+}
+
+/**
+* Modal
+* -----------
+* Dynamically display a modal.
+*/
+
+/**
+* Don't display modalized content
+* when echoed by PHP.
+*
+* Hint: Use HTML class `modalize` on PHP echo.
+*/
+.policyms.modalize {
+  /* Display & Box Model */
+  display: none;
+}
+
+/**
+* Display content when added to modal.
+*/
+.policyms.modal .modalize,
+.policyms.modal .content > * {
+  /* Display & Box Model */
+  display: block;
+}
+
+/**
+* The modal's dark backdrop.
+*/
+.policyms.modal .backdrop {
+  /* Positioning */
+  position: absolute;
+  z-index: 550;
+  top: 0;
+  left: 0;
+
+  /* Display & Box Model */
+  width: 100vw;
+  height: 100vh;
+
+  /* Other */
+  background-color: rgba(0, 0, 0, 0.5);
+  content: " ";
+  cursor: pointer;
+}
+
+/**
+* The modal's root positioning
+* which covers the page.
+*/
+.policyms.modal {
+  /* Positioning */
+  position: fixed;
+  z-index: 500;
+  top: 0;
+  left: 0;
+
+  /* Display & Box Model */
+  display: block;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+
+  /* Other */
+  animation: fade-in 0.2s ease-in-out forwards;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/**
+* The common modal control attributes.
+*/
+.policyms.modal > .close,
+.policyms.modal > .container > .previous,
+.policyms.modal > .container > .next {
+  /* Positioning */
+  z-index: 600;
+  position: absolute;
+
+  /* Display & Box Model */
+  width: 40px;
+  height: 40px;
+  padding: 0;
+
+  /* Other */
+  text-align: center;
+  vertical-align: middle;
+  color: white !important;
+}
+
+/**
+* The modal's "close" button position.
+*/
+.policyms.modal > .close {
+  /* Positioning */
+  top: 20px;
+  right: 20px;
+}
+
+/**
+* The modal's centered content container.
+*/
+.policyms.modal > .container {
+  /* Positioning */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 600;
+
+  /* Display & Box Model */
+  width: auto;
+  max-width: 60vw;
+  min-height: 50px;
+  /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);*/
+
+  /* Other */
+  transform: translate(-50%, calc(-50% - 0.5px));
+}
+
+/**
+* The modal's iterable controls positions.
+*/
+.policyms.modal > .container > .previous,
+.policyms.modal > .container > .next {
+  /* Positioning */
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.policyms.modal > .container > .previous {
+  /* Positioning */
+  left: -50px;
+}
+
+.policyms.modal > .container > .next {
+  /* Positioning */
+  right: -50px;
+}
+
+/**
+* The modal's iterable controls on start or end.
+*/
+.policyms.modal > .container > .previous:disabled,
+.policyms.modal > .container > .next:disabled {
+  /* Other */
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/**
+* The modal's content box.
+*/
+.policyms.modal > .container > .content {
+  /* Display & Box Model */
+  max-height: 90.2vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  margin: 0;
+  background-color: var(--policyms-background-color);
+  border-radius: 12px;
+  perspective: 1px;
+  position: relative;
+}
+
+/** 
+* Errors & notices
+*/
+
+.policyms-error {
+  width: 100%;
+  max-width: 100%;
+  max-height: auto;
+  font-weight: bold;
+  background-color: salmon;
+  color: darkred;
+  text-align: center;
+  margin: 10px auto !important;
+  border-radius: 8px;
+  padding: 10px 15px;
+  position: relative;
+}
+
+.policyms-error.animated,
+.policyms-notice.animated {
+  animation: show-error 0.2s ease-in-out;
+}
+
+.policyms-error.animated.seen,
+.policyms-notice.animated.seen {
+  max-height: 0;
+  padding: 0;
+  margin: 0;
+  opacity: 0;
+  transition: opacity 0.1s, max-height 0.2s, padding 0.2s, margin 0.2s;
+}
+
+.policyms-error.animated.seen.dismissed,
+.policyms-notice.animated.seen.dismissed {
+  display: none;
+}
+
+@keyframes show-error {
+  0% {
+    max-height: 0;
+    padding: 0;
+    margin: 0;
+    opacity: 0;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    max-height: inherit;
+    padding: 10px 15px;
+    margin: inherit;
+    opacity: inherit;
+  }
+}
+
+.policyms-notice {
+  width: 100%;
+  max-width: 100%;
+  font-weight: bold;
+  background-color: var(--policyms-border-color-light);
+  text-align: center;
+  margin: 25px auto;
+  border-radius: 8px;
+  padding: 10px 15px;
+  position: relative;
+}
+
+.policyms-notice p {
+  margin: 5px;
+}
+
+.policyms-alert-close {
+  border: none;
+  background: red !important;
+  position: absolute;
+  border-radius: 10px;
+  display: inline-block;
+  height: 32px;
+  font-size: 60%;
+  font-weight: bold;
+  padding: 0 8px;
+  top: -15px;
+  color: white !important;
+  right: -20px;
+}
+
+.policyms-alert-close div {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: black;
+  height: 5px;
+}
