@@ -68,8 +68,8 @@ class PolicyMS {
 	 * @since    1.0.0
 	 */
 	public function __construct() {
-		if ( defined( 'POLICYCLOUD_MARKETPLACE_VERSION' ) ) {
-			$this->version = POLICYCLOUD_MARKETPLACE_VERSION;
+		if ( defined( 'POLICYMS_VERSION' ) ) {
+			$this->version = POLICYMS_VERSION;
 		} else {
 			$this->version = '1.0.0';
 		}
@@ -128,13 +128,21 @@ class PolicyMS {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-policyms-exceptions.php';
 
 		/**
-		 * The classes responsible for initializing the object model and core functionality of the plugin.
+		 * The classes responsible for defining the controllers of the plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'model/class-policyms-communication-controller.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'controller/class-policyms-communication-controller.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'controller/class-policyms-oauth-controller.php';
+
+		/**
+		 * The classes responsible for defining the object model and core functionality of the plugin.
+		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'model/class-policyms-account.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'model/class-policyms-user.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'model/class-policyms-description.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'model/class-policyms-asset-type.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'model/class-policyms-asset.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'model/class-policyms-description.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'model/class-policyms-description-collection.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'model/class-policyms-description-filters.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'model/class-policyms-review.php';
 
 		$this->loader = new PolicyMS_Loader();
@@ -186,10 +194,10 @@ class PolicyMS {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
-		$this->loader->add_action( 'wp_head', $plugin_public, 'enqueue_head_scripts' );
 
 		// Support for user accounts.
 		$this->loader->add_action( 'init', $plugin_public, 'add_accounts_shortcodes' );
+		// TODO @alexandrosraikos: Find a way to add this through the Appearance > Menus.
 		$this->loader->add_filter( 'wp_nav_menu_items', $plugin_public, 'add_menu_items', 10, 2 );
 		$this->loader->add_action( 'wp_ajax_policyms_account_user_registration', $plugin_public, 'account_user_registration_handler' );
 		$this->loader->add_action( 'wp_ajax_nopriv_policyms_account_user_registration', $plugin_public, 'account_user_registration_handler' );

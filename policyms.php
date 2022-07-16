@@ -28,7 +28,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define( 'POLICYCLOUD_MARKETPLACE_VERSION', '1.0.2' );
+define( 'POLICYMS_VERSION', '1.0.2' );
 
 /**
  * The code that runs during plugin activation.

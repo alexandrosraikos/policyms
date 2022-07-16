@@ -57,6 +57,7 @@
      * @author Alexandros Raikos <araikos@unipi.gr>
      */
     function createAsset(e) {
+      // TODO @alexandrosraikos: Correct required fields prompting. (#129)
       e.preventDefault();
       makeWPRequest(
         ".policyms.description.editor button[type=submit]",

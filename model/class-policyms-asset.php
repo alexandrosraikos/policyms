@@ -1,10 +1,6 @@
 <?php
 
 class PolicyMS_Asset {
-
-	public string $id;
-	public string $category;
-
 	public string $filename;
 	public string $checksum;
 	public string $size;
@@ -13,7 +9,11 @@ class PolicyMS_Asset {
 	public int $downloads;
 
 
-	public function __construct( string $id, string $category, array $metadata ) {
+	public function __construct(
+		public string $id,
+		public string $category,
+		array $metadata
+		) {
 		$this->id       = $id;
 		$this->category = $category;
 

@@ -55,6 +55,7 @@
      * @author Alexandros Raikos <araikos@unipi.gr>
      */
     function registerUser(e) {
+      // TODO @alexandrosraikos: Correct required fields prompting. (#129)
       e.preventDefault();
       makeWPRequest(
         "#policyms-registration button[type=submit]",

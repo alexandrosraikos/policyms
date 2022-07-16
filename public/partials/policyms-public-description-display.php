@@ -1,233 +1,205 @@
 <?php
+/**
+ * The HTML generating functions for description-related content.
+ *
+ * @link       https://github.com/alexandrosraikos/policyms/
+ * @since      1.0.0
+ *
+ * @package    PolicyMS
+ * @subpackage PolicyMS/public/partials
+ */
 
 /**
+ * Print the standard HTML of a sorting selector.
  *
- * Print the assets grid HTML.
+ * The `action` attribute is `policyms-sort-content`.
  *
- * @param   array  $assets The PolicyMS API assets.
- * @param   string $asset_url The asset page URL.
+ * @param string $content_type The object class identifier for use in the `content-type` attribute.
+ * @param string $selected_option The value of the selected type (must be slugified). Defaults to `newest`.
+ * @return string The selector HTML.
+ * @throws PolicyMSInvalidDataException On invalid sorting options.
  *
- * @since   1.0.0
- * @author  Alexandros Raikos <araikos@unipi.gr>
- * @author  Eleftheria Kouremenou <elkour@unipi.gr>
+ * @since 2.0.0
+ * @author Alexandros Raikos <alexandros@araikos.gr>
  */
-function descriptions_grid_html( array $descriptions, string $description_url ) {
-	if ( empty( $descriptions ) ) {
-		echo show_alert( 'No assets found.', 'notice' );
-	} else {
-		?>
-		<div class="policyms descriptions-grid">
-			<ul>
-				<?php
-				foreach ( $descriptions as $description ) {
-					?>
-					<li>
-						<a href="<?php echo $description_url . '?did=' . $description->id; ?>">
-							<div class="cover">
-								<img src="
-									<?php
-									echo ( PolicyMS_Public::get_plugin_setting( true, 'marketplace_host' )
-										. '/descriptions/image/' . $description->id
-									)
-									?>
-									" alt="" />
-								<div class="content">
-									<h4>
-										<?php echo $description->information['title']; ?>
-									</h4>
-									<p>
-										<?php echo $description->information['short_desc']; ?>
-									</p>
-								</div>
-							</div>
-							<div class="metadata">
-								<div>
-									<div class="last-updated">
-										Updated
-										<?php
-										echo time_elapsed_string(
-											date(
-												'Y-m-d H:i:s',
-												strtotime( $description->metadata['updateDate'] )
-											)
-										)
-										?>
-									</div>
-								</div>
-								<div>
-									<span class="reviews">
-										<span class="fas fa-star"></span>
-										<span>
-											<?php
-											echo ( $description->metadata['reviews']['average_rating']
-												. ' (' . $description->metadata['reviews']['no_reviews'] . ' reviews)'
-											)
-											?>
-										</span>
-										<span class="views">
-											<span class="fas fa-eye"></span>
-											<?php echo $description->metadata['views']; ?> views
-										</span>
-								</div>
-								<div>
-									<span class="type pill">
-										<?php echo $description->type; ?>
-									</span>
-									<?php
-									if ( ! empty( $description->information['subtype'] ) ) {
-										?>
-										<span class="sub-type pill">
-											<?php echo $description->information['subtype']; ?>
-										</span>
-									<?php } ?>
-								</div>
-							</div>
-						</a>
-					</li>
-					<?php
-				}
-				?>
-			</ul>
-		</div>
-		<?php
+function sorting_selector_html( string $content_type, string $selected_option = 'newest' ): string {
+
+	// Populate the sorting options.
+	$sorting_options = array(
+		'newest' => __( 'Most recent', 'policyms' ),
+		'oldest' => __( 'Oldest', 'policyms' ),
+		'title'  => __( 'A-Z', 'policyms' ),
+	);
+	if ( 'PolicyMS_Description' === $content_type ) {
+		$sorting_options['views-asc']  = __( 'Least viewed', 'policyms' );
+		$sorting_options['views-desc'] = __( 'Most viewed', 'policyms' );
 	}
+	if ( 'PolicyMS_Review' === $content_type || 'PolicyMS_Description' === $content_type ) {
+		$sorting_options['rating-desc'] = __( 'Highest rating', 'policyms' );
+		$sorting_options['rating-asc']  = __( 'Lowest rating', 'policyms' );
+	}
+
+	// Check for valid data.
+	if ( ! in_array( $selected_option, $sorting_options, true ) ) {
+		throw new PolicyMSInvalidDataException(
+			'The sorting option can only be one of the following: ' . print_r( $sorting_options )
+		);
+	}
+
+	// Create the HTML form options.
+	$html_options = array();
+	foreach ( $sorting_options as $option => $option_label ) {
+		$selected_label = ( ! empty( $selected_option ) ) ?
+			( ( $selected_option === $option ) ? 'selected' : '' ) :
+			'';
+		$html_options  .= <<<HTML
+			<option value="{$option}" {$selected_label}> {$option_label} </option>
+		HTML;
+	}
+
+	// Translated strings.
+	$sorting_label = __( 'Sort by', 'policyms' );
+
+	// Return the entire sorting selector form HTML.
+	return <<<HTML
+			<form action="policyms-sort-content" content-type="{$content_type}">
+				<label for="sorting">{$sorting_label}</label>
+				<select name="sorting">
+					{$html_options}
+				</select>
+			</form>
+		HTML;
 }
 
-function featured_descriptions_html( array $categories, string $description_page ): void {
-	?>
-	<div class="policyms featured-descriptions">
-		<div class="white-container">
-			<div class="row statistics">
-				<div class="column">
-					<figure>
-						<?php echo $categories['statistics']['sum']; ?>
-						<figcaption>Total descriptions</figcaption>
-					</figure>
-				</div>
-				<div class="column">
-					<figure>
-						<?php echo $categories['statistics']['top'][0]['descriptions']; ?>
-						<figcaption>
-							<?php echo ucfirst( $categories['statistics']['top'][0]['collection'] ); ?>
-						</figcaption>
-					</figure>
-				</div>
-				<div class="column">
-					<figure>
-						<?php echo $categories['statistics']['top'][1]['descriptions']; ?>
-						<figcaption>
-							<?php echo ucfirst( $categories['statistics']['top'][1]['collection'] ); ?>
-						</figcaption>
-					</figure>
-				</div>
-				<div class="column">
-					<figure>
-						<?php echo $categories['statistics']['top'][2]['descriptions']; ?>
-						<figcaption>
-							<?php echo ucfirst( $categories['statistics']['top'][2]['collection'] ); ?>
-						</figcaption>
-					</figure>
-				</div>
-			</div>
-		</div>
-		<?php
-		if ( ! empty( $categories['top_rated'][0] ) ) {
-			?>
-			<h2>Top rated descriptions</h2>
-			<?php
-			descriptions_grid_html( $categories['top_rated'][0], $description_page );
-		}
-		if ( ! empty( $categories['most_viewed'][0] ) ) {
-			?>
-			<h2>Most viewed descriptions</h2>
-			<?php
-			descriptions_grid_html( $categories['most_viewed'][0], $description_page );
-		}
-		if ( ! empty( $categories['most_viewed'][0] ) ) {
-			?>
-			<h2>Latest descriptions</h2>
-			<?php
-			descriptions_grid_html( $categories['latest'][0], $description_page );
-		}
-		if ( ! empty( $categories['most_viewed'][0] ) ) {
-			?>
-			<h2>Suggestions</h2>
-			<?php
-			descriptions_grid_html( $categories['suggestions'][0], $description_page );
-		}
-		?>
-	</div>
-	<?php
+/**
+ * Print the standard HTML of a page size selector (items per page).
+ *
+ * The `action` attribute is `policyms-change-page-size`.
+ *
+ * @param int $selected_size The pre-selected size of the page, if any.
+ * @return string The selector HTML.
+ * @throws PolicyMSInvalidDataException On invalid page sizes.
+ *
+ * @since 2.0.0
+ * @author Alexandros Raikos <alexandros@araikos.gr>
+ */
+function sizing_selector_html( int $selected_size = 12 ): string {
+
+	// Populate the available sizing options.
+	$size_options = array( 12, 30, 60, 90 );
+
+	// Check for valid data.
+	if ( ! in_array( $selected_size, $size_options, true ) ) {
+		throw new PolicyMSInvalidDataException(
+			'The page size can only be one of the following sizes: ' . print_r( $size_options )
+		);
+	}
+
+	// Create the HTML form options.
+	$html_options = array();
+	foreach ( $size_options as $option ) {
+		$selected_label = ( ! empty( $selected_option ) ) ?
+			( ( $selected_option === $option ) ? 'selected' : '' ) :
+			'';
+		$html_options  .= <<<HTML
+			<option value="{$option}" {$selected_label}> {$option} </option>
+		HTML;
+	}
+
+	// Translated strings.
+	$size_label = __( 'Items per page', 'policyms' );
+
+	// Return the entire sorting selector form HTML.
+	return <<<HTML
+		<form action="policyms-change-page-size">
+			<label for="sizing">{$size_label}</label>
+			<select name="sizing">
+				{$html_options}
+			</select>
+		</form>
+	HTML;
 }
 
-function descriptions_archive_filters_html( $filters ) {
-	?>
+
+/**
+ * The descriptions' archive filter aside HTML.
+ *
+ * @param PolicyMS_Description_Filters $defaults The default filter values.
+ * @param PolicyMS_Description_Filters $selected The selected filter values.
+ * @return string
+ *
+ * @since 1.0.0
+ * @author Alexandros Raikos <alexandros@araikos.gr>
+ */
+function descriptions_archive_filters_html(
+	PolicyMS_Description_Filters $defaults,
+	PolicyMS_Description_Filters $selected ):string {
+	$type_radios = '';
+	$checked     = false;
+	foreach ( PolicyMS_Description::$categories as $type => $label ) {
+		$checked           = ( $selected->type ?? '' ) === $type;
+		$checked_attribute = $checked ? 'checked' : '';
+		$type_radios      .= <<<HTML
+			<span>
+				<input 
+				type="radio" 
+				name="type" 
+				value="{$type}" 
+				{$checked_attribute}/>
+				<label for="type">{$label}</label>
+			</span>	
+		HTML;
+	}
+
+	// Prepend the default 'All' option and check if none is checked.
+	$checked_attribute = ! $checked ? 'checked' : '';
+	$type_radios       = <<<HTML
+		<span>
+			<input type="radio" name="type" value="" {$checked_attribute} />
+			<label for="type">All</label>
+		</span>
+		{$type_radios}
+	HTML;
+
+	return <<<HTML
 	<div class="filters">
 		<button class="close outlined filters-toggle">Close</button>
 		<h2>Filters</h2>
-		<?php
-		if ( empty( $filters ) ) {
-			show_alert( 'Filters are currently unavailable.', 'notice' );
-		} else {
-			?>
 		<p>Select the options below to narrow your search.</p>
 		<form>
 			<fieldset>
-				<input type="text" name="search" placeholder="Search descriptions" value="<?php echo $_GET['search'] ?? ''; ?>" />
+				<input 
+					type="text" 
+					name="search" 
+					placeholder="Search descriptions" 
+					value="{$selected->query}" />
 			</fieldset>
 			<fieldset>
 				<h3>Types</h3>
 				<div class="types">
-					<span>
-						<input type="radio" name="type" value="" <?php echo ( empty( $_GET['type'] ) ) ? 'checked' : ''; ?> />
-						<label for="type">All</label>
-					</span>
-					<span>
-						<input type="radio" name="type" value="algorithms" <?php echo ( ( $_GET['type'] ?? '' ) == 'algorithms' ) ? 'checked' : ''; ?> />
-						<label for="type">Algorithms</label>
-					</span>
-					<span>
-						<input type="radio" name="type" value="tools" <?php echo ( ( $_GET['type'] ?? '' ) == 'tools' ) ? 'checked' : ''; ?> />
-						<label for="type">Tools</label>
-					</span>
-					<span>
-						<input type="radio" name="type" value="policies" <?php echo ( ( $_GET['type'] ?? '' ) == 'policies' ) ? 'checked' : ''; ?> />
-						<label for="type">Policies</label>
-					</span>
-					<span>
-						<input type="radio" name="type" value="datasets" <?php echo ( ( $_GET['type'] ?? '' ) == 'datasets' ) ? 'checked' : ''; ?> />
-						<label for="type">Datasets</label>
-					</span>
-					<span>
-						<input type="radio" name="type" value="webinars" <?php echo ( ( $_GET['type'] ?? '' ) == 'webinars' ) ? 'checked' : ''; ?> />
-						<label for="type">Webinars</label>
-					</span>
-					<span>
-						<input type="radio" name="type" value="tutorials" <?php echo ( ( $_GET['type'] ?? '' ) == 'tutorials' ) ? 'checked' : ''; ?> />
-						<label for="type">Tutorials</label>
-					</span>
-					<span>
-						<input type="radio" name="type" value="documents" <?php echo ( ( $_GET['type'] ?? '' ) == 'documents' ) ? 'checked' : ''; ?> />
-						<label for="type">Documents</label>
-					</span>
-					<span>
-						<input type="radio" name="type" value="externals" <?php echo ( ( $_GET['type'] ?? '' ) == 'externals' ) ? 'checked' : ''; ?> />
-						<label for="type">Externals</label>
-					</span>
-					<span>
-						<input type="radio" name="type" value="other" <?php echo ( ( $_GET['type'] ?? '' ) == 'other' ) ? 'checked' : ''; ?> />
-						<label for="type">Other</label>
-					</span>
+					{$type_radios}
 				</div>
 			</fieldset>
 			<fieldset>
 				<h3>Views</h3>
 				<div class="views">
 					<div>
-						<input type="number" name="views-gte" placeholder="0" value="<?php echo $_GET['views-gte'] ?? ''; ?>" min="0" max="<?php echo $filters['max_views']; ?>" />
+						<input 
+							type="number" 
+							name="views-gte" 
+							placeholder="0" 
+							value="{$selected->views_gte}" 
+							min="0" 
+							max="{$defaults->views_gte}" />
 					</div>
 					<div>
-						<input type="number" name="views-lte" placeholder="<?php echo $filters['max_views']; ?>" value="<?php echo $_GET['views-lte'] ?? ''; ?>" min="0" max="<?php echo $filters['max_views']; ?>" />
+						<input 
+							type="number" 
+							name="views-lte" 
+							placeholder="{$defaults->views_gte}" 
+							value="{$selected->views_lte}" 
+							min="0" 
+							max="{$defaults->views_gte}" />
 					</div>
 				</div>
 			</fieldset>
@@ -236,11 +208,24 @@ function descriptions_archive_filters_html( $filters ) {
 				<div class="dates">
 					<div>
 						<label for="update-date-gte">From</label>
-						<input type="date" onfocus="(this.type='date')" name="update-date-gte" placeholder="<?php echo date( 'Y-m-d', strtotime( $filters['oldest'] ) ); ?>" value="<?php echo $_GET['update-date-gte'] ?? ''; ?>" min="<?php echo date( 'Y-m-d', strtotime( $filters['oldest'] ) ); ?>" max="<?php echo date( 'Y-m-d' ); ?>" />
+						<input 
+							type="date" 
+							onfocus="(this.type='date')" 
+							name="update-date-gte" 
+							placeholder="{$defaults->date_gte}" 
+							value="{$selected->date_gte}" 
+							min="{$defaults->date_gte}" 
+							max="{$defaults->date_lte}" />
 					</div>
 					<div>
 						<label for="update-date-lte">To</label>
-						<input type="date" name="update-date-lte" placeholder="<?php echo date( 'Y-m-d' ); ?>" value="<?php echo $_GET['update-date-lte'] ?? ''; ?>" min="<?php echo date( 'Y-m-d', strtotime( $filters['oldest'] ) ); ?>" max="<?php echo date( 'Y-m-d' ); ?>" />
+						<input 
+							type="date" 
+							name="update-date-lte" 
+							placeholder="{$defaults->date_lte}" 
+							value="{$selected->date_lte}" 
+							min="{$defaults->date_gte}" 
+							max="{$defaults->date_lte}" />
 					</div>
 				</div>
 			</fieldset>
@@ -248,399 +233,842 @@ function descriptions_archive_filters_html( $filters ) {
 		</form>
 		<?php } ?>
 	</div>
-	<?php
+	HTML;
 }
 
 /**
- * Print the assets archive HTML.
+ * The descriptions' grid HTML.
  *
- * @param   array $assets The PolicyMS API assets.
- * @param   array $args Various printing arguments.
+ * @param   array $descriptions The descriptions.
+ * @param   bool  $empty_notice Whether to notify on blank descriptions collection.
  *
  * @since   1.0.0
  * @author  Alexandros Raikos <araikos@unipi.gr>
  * @author  Eleftheria Kouremenou <elkour@unipi.gr>
  */
-function descriptions_archive_html( array $descriptions, array $filters, string $description_page ) {
-	?>
-	<div class="policyms descriptions archive inspect">
-		<?php echo descriptions_archive_filters_html( $filters ); ?>
-		<div class="content">
-			<header>
-				<button class="filters-toggle tactile">
-					<div></div>
-					<div></div>
-					<div></div>
-				</button>
-				<form action="" class="sorting-selector">
-					<fieldset>
-						<label for="sort-by">Sort by</label>
-						<select name="sort-by">
-							<option value="newest" <?php echo ( ( ( ( $_GET['sort-by'] ?? '' ) == 'newest' ) || empty( $_GET['sort-by'] ) ) ? 'selected' : '' ); ?>>Newest</option>
-							<option value="oldest" <?php echo ( ( ( $_GET['sort-by'] ?? '' ) == 'oldest' ) ? 'selected' : '' ); ?>>Oldest</option>
-							<option value="rating-desc" <?php echo ( ( ( $_GET['sort-by'] ?? '' ) == 'rating-desc' ) ? 'selected' : '' ); ?>>Highest rated</option>
-							<option value="rating-asc" <?php echo ( ( ( $_GET['sort-by'] ?? '' ) == 'rating-asc' ) ? 'selected' : '' ); ?>>Lowest rated</option>
-							<option value="views-desc" <?php echo ( ( ( $_GET['sort-by'] ?? '' ) == 'views-desc' ) ? 'selected' : '' ); ?>>Most viewed</option>
-							<option value="views-asc" <?php echo ( ( ( $_GET['sort-by'] ?? '' ) == 'views-asc' ) ? 'selected' : '' ); ?>>Least viewed</option>
-							<option value="title" <?php echo ( ( ( $_GET['sort-by'] ?? '' ) == 'title' ) ? 'selected' : '' ); ?>>Title</option>
-						</select>
-					</fieldset>
-					<fieldset>
-						<label for="items-per-page">Items per page</label>
-						<select name="items-per-page">
-							<option value="10" <?php echo ( ( ( ( $_GET['items-per-page'] ?? '' ) == 10 ) || empty( $_GET['sort-by'] ) ) ? 'selected' : '' ); ?>>10</option>
-							<option value="25" <?php echo ( ( ( $_GET['items-per-page'] ?? '' ) == '25' ) ? 'selected' : '' ); ?>>25</option>
-							<option value="50" <?php echo ( ( ( $_GET['items-per-page'] ?? '' ) == '50' ) ? 'selected' : '' ); ?>>50</option>
-							<option value="100" <?php echo ( ( ( $_GET['items-per-page'] ?? '' ) == '100' ) ? 'selected' : '' ); ?>>100</option>
-						</select>
-					</fieldset>
-				</form>
-			</header>
-			<?php
-			if ( ! empty( $descriptions ) ) {
-				?>
-				<div class="description-gallery">
-					<?php
-					descriptions_grid_html( $descriptions['content'][0], $description_page );
-					?>
+function descriptions_grid_html( array $descriptions, bool $empty_notice = true ): string {
+	if ( ! $descriptions && $empty_notice ) {
+		return notice_html( 'No descriptions found.', 'notice' );
+	} else {
+		$description_cards = '';
+		foreach ( $descriptions as $description ) {
+			$last_updated_label = time_elapsed_string(
+				gmdate(
+					'Y-m-d H:i:s',
+					strtotime( $description->metadata['updateDate'] )
+				)
+			);
+			$description_cards .= <<<HTML
+				<li>
+					<a href="{$description->url}">
+						<div class="cover">
+							<img src="{$description->cover_thumbnail_url}" alt="" />
+							<div class="content">
+								<h4>
+									{$description->information['title']}
+								</h4>
+								<p>
+									{$description->information['short_desc']}
+								</p>
+							</div>
+						</div>
+						<div class="metadata">
+							<div>
+								<div class="last-updated">
+									Updated {$last_updated_label}
+								</div>
+							</div>
+							<div>
+								<span class="reviews">
+									<span class="fas fa-star"></span>
+									<span>
+										{$description->metadata['reviews']['average_rating']} ({$description->metadata['reviews']['no_reviews']} reviews)
+									</span>
+									<span class="views">
+										<span class="fas fa-eye"></span>
+										{$description->metadata['views']} views
+									</span>
+							</div>
+							<div>
+								<span class="type pill">
+									{$description->type}
+								</span>
+							</div>
+						</div>
+					</a>
+				</li>
+			HTML;
+		}
+		return <<<HTML
+			<div class="policyms-descriptions-grid">
+				<ul>
+					{$description_cards}
+				</ul>
+			</div>
+		HTML;
+	}
+}
+
+/**
+ * Get the featured descriptions view.
+ *
+ * @param array $categories The specially formatted categories array.
+ * @see PolicyMS_Description_Collection::get_featured()
+ * @return string The generated HTML.
+ *
+ * @since 1.0.0
+ * @author Alexandros Raikos <alexandros@araikos.gr>
+ */
+function featured_descriptions_html( array $categories ): string {
+	$top_collections_labels = array(
+		ucfirst( $categories['statistics']['top'][0]['collection'] ),
+		ucfirst( $categories['statistics']['top'][1]['collection'] ),
+		ucfirst( $categories['statistics']['top'][2]['collection'] ),
+	);
+
+	// Prepare the description showcasing grids.
+	$top_rated_grid   = descriptions_grid_html( $categories['top_rated']->descriptions );
+	$most_viewed_grid = descriptions_grid_html( $categories['most_viewed']->descriptions );
+	$latest_grid      = descriptions_grid_html( $categories['latest']->descriptions );
+	$suggested_grid   = descriptions_grid_html( $categories['suggestions']->descriptions );
+
+	return <<<HTML
+		<div class="policyms featured-descriptions">
+			<div class="white-container">
+				<div class="row statistics">
+					<div class="column">
+						<figure>
+							{$categories['statistics']['sum']}
+							<figcaption>Total descriptions</figcaption>
+						</figure>
+					</div>
+					<div class="column">
+						<figure>
+							{$categories['statistics']['top'][0]['descriptions']}
+							<figcaption>
+								{$top_collections_labels[0]}
+							</figcaption>
+						</figure>
+					</div>
+					<div class="column">
+						<figure>
+							{$categories['statistics']['top'][1]['descriptions']}
+							<figcaption>
+								{$top_collections_labels[1]}
+							</figcaption>
+						</figure>
+					</div>
+					<div class="column">
+						<figure>
+							{$categories['statistics']['top'][2]['descriptions']}
+							<figcaption>
+								{$top_collections_labels[2]}
+							</figcaption>
+						</figure>
+					</div>
 				</div>
-				<nav class="pagination">
-					<?php
-					for ( $page = 1; $page < $descriptions['pages'] + 1; $page++ ) {
-						$activePage = $_GET['descriptions-page'] ?? 1;
-						echo '<button class="page-selector ' . ( ( $activePage == ( $page ) ) ? 'active' : '' ) . '" data-page-number="' . $page . '">' . ( $page ) . '</button>';
-					}
-					?>
-				</nav>
-				<?php
-			} else {
-				show_alert( 'No descriptions found.', 'notice' );
-			}
-			?>
+			</div>
+			<h2>Top rated descriptions</h2>
+			{$top_rated_grid}
+			<h2>Most viewed descriptions</h2>
+			{$most_viewed_grid}
+			<h2>Latest descriptions</h2>
+			{$latest_grid}
+			<h2>Suggestions</h2>
+			{$suggested_grid}
 		</div>
-	</div>
-	<?php
+	HTML;
+}
+
+/**
+ * The descriptions archive HTML.
+ *
+ * @param   PolicyMS_Description_Collection $collection The description collection.
+ * @param   PolicyMS_Description_Filters    $filter_defaults The default values of the filters.
+ * @param   PolicyMS_Description_Filters    $selected_filters The selected values of the filters.
+ * @param   string                          $sorting The sorting setting.
+ * @param   string                          $sizing The sizing setting.
+ * @param   int                             $selected_page The selected page.
+ * @return string The descriptions archive HTML.
+ * @since   1.0.0
+ * @author  Alexandros Raikos <araikos@unipi.gr>
+ * @author  Eleftheria Kouremenou <elkour@unipi.gr>
+ */
+function descriptions_archive_html(
+	PolicyMS_Description_Collection $collection,
+	PolicyMS_Description_Filters $filter_defaults,
+	PolicyMS_Description_Filters $selected_filters,
+	string $sorting = null,
+	string $sizing = null,
+	int $selected_page = 1,
+	): string {
+	$filters    = descriptions_archive_filters_html( $filter_defaults, $selected_filters );
+	$sorting    = sorting_selector_html( 'PolicyMS_Description', $sorting );
+	$sizing     = sizing_selector_html( $sizing );
+	$grid       = descriptions_grid_html( $collection->get_page( $selected_page ) );
+	$pagination = ( $collection->is_paginated )
+		? show_pagination_html( $collection->total_pages, $selected_page )
+		: '';
+
+	return <<<HTML
+		<div class="policyms-descriptions-archive inspect">
+			{$filters}
+			<div class="content">
+				<header>
+					<button class="filters-toggle tactile">
+						<div></div>
+						<div></div>
+						<div></div>
+					</button>
+					{$sorting}
+					{$sizing}
+				</header>
+				{$grid}
+				{$pagination}
+			</div>
+		</div>
+	HTML;
 }
 
 
 /**
- * The description editing form.
+ * Prints the description editing contained form.
  *
- * This function prints a description editing form if a description object is passed.
+ * This function prints a description editing form with a modal flag if a description object is passed.
  * If a description object is not passed, this function acts as a description creation form.
  *
- * @param PolicyMS_Description|null $description
- * @return void
+ * @param PolicyMS_Description $description An existing description to edit, if any.
+ * @param bool                 $administrator Whether the requester is an administrator.
+ * @return string The contained form HTML.
+ *
+ * @since 1.0.0
+ * @author Alexandros Raikos <alexandros@araikos.gr>
  */
-function description_editor_html( PolicyMS_Description $description = null, array $permissions = null ): void {
-	// Print the main editor HTML.
-	?>
-	<div class="policyms description editor <?php echo ! empty( $description ) ? 'modalize' : ''; ?>">
-		<form>
-			<fieldset name="basic-information">
-				<h2>Basic information</h2>
-				<p>
-					To create a new Marketplace asset, the following fields
-					represent basic information that will be visible to others.
-				</p>
-				<label for="title">
-					Title *
-				</label>
-				<input required name="title" placeholder="Insert a title" type="text" value="<?php echo $description->information['title'] ?? ''; ?>" />
-				<label for="type">
-					Primary collection type *
-				</label>
-				<select name="type" required>
-					<option value="algorithms" <?php echo ( ( $description->type ?? '' ) == 'algorithms' ) ? 'selected' : ''; ?>>Algorithms</option>
-					<option value="tools" <?php echo ( ( $description->type ?? '' ) == 'tools' ) ? 'selected' : ''; ?>>Tools</option>
-					<option value="policies" <?php echo ( ( $description->type ?? '' ) == 'policies' ) ? 'selected' : ''; ?>>Policies</option>
-					<option value="datasets" <?php echo ( ( $description->type ?? '' ) == 'datasets' ) ? 'selected' : ''; ?>>Datasets</option>
-					<option value="webinars" <?php echo ( ( $description->type ?? '' ) == 'webinars' ) ? 'selected' : ''; ?>>Webinars</option>
-					<option value="tutorials" <?php echo ( ( $description->type ?? '' ) == 'tutorials' ) ? 'selected' : ''; ?>>Tutorials</option>
-					<option value="documents" <?php echo ( ( $description->type ?? '' ) == 'documents' ) ? 'selected' : ''; ?>>Documents</option>
-					<option value="externals" <?php echo ( ( $description->type ?? '' ) == 'externals' ) ? 'selected' : ''; ?>>Externals</option>
-					<option value="other" <?php echo ( ( $description->type ?? '' ) == 'other' ) ? 'selected' : ''; ?>>Other</option>
-				</select>
-				<label for="subtype">
-					Secondary collection type
-				</label>
-				<input name="subtype" placeholder="Insert a secondary category" type="text" value="<?php echo empty( $description->information['subtype'] ) ? '' : $description->information['subtype']; ?>" />
-				<label for="owner">
-					Legal owner *
-				</label>
-				<input required name="owner" placeholder="Insert the legal owner of the object" type="text" value="<?php echo empty( $description->information['owner'] ) ? '' : $description->information['owner']; ?>" />
-				<label for="description">
-					Description *
-				</label>
-				<textarea name="description" placeholder="Insert a detailed description" style="resize:vertical"><?php echo empty( $description->information['description'] ) ? '' : $description->information['description']; ?></textarea>
-				<label for="fields-of-use">
-					Fields of usage
-				</label>
-				<textarea name="fields-of-use" placeholder="Separate multiple fields of usage using a comma (lorem, ipsum, etc.)"><?php echo empty( $description->information['fieldOfUse'] ) ? '' : implode( ', ', $description->information['fieldOfUse'] ); ?></textarea>
-				<label for="links">Related links</label>
-				<div class="links">
-					<div>
-						<?php
-						if ( ! empty( $description->links ) ) {
-							foreach ( $description->links as $link ) {
-								$link_title = explode( ':', $link, 2 )[0];
-								$link_url   = explode( ':', $link, 2 )[1];
-								?>
-								<div>
-									<input type="text" name="links-title[]" placeholder="Example" value="<?php echo $link_title; ?>" />
-									<input type="url" name="links-url[]" placeholder="https://www.example.org/" value="<?php echo $link_url; ?>" />
-									<button class="remove-field" title="Remove this link.">
-										<span class="fas fa-times"></span>
-									</button>
-								</div>
-								<?php
-							}
-						} else {
-							?>
-							<div>
-								<input type="text" name="links-title[]" placeholder="Example" />
-								<input type="url" name="links-url[]" placeholder="https://www.example.org/" />
-								<button class="remove-field" title="Remove this link."><span class="fas fa-times"></span></button>
-							</div>
-							<?php
-						}
-						?>
-					</div>
-					<button class="add-field" title="Add another link."><span class="fas fa-plus"></span> Add link</button>
+function description_editor_html( PolicyMS_Description $description = null, bool $administrator = false ) {
+
+	/**
+	 * Used for editing or creation context.
+	 *
+	 * @var string The context.
+	 */
+	$is_editing = ! empty( $description );
+
+	/**
+	 * Appended as a class to parse as a modal in the front-end.
+	 *
+	 * @var string The modal class indicator.
+	 */
+	$is_modal = $is_editing ? 'modalize' : '';
+
+	/**
+	 * Appended for existing title value.
+	 *
+	 * @var string The description.
+	 */
+	$existing_title = $description->information['title'] ?? '';
+
+	/**
+	 * Appended for selecting type.
+	 *
+	 * @var string The select options.
+	 */
+	$existing_type_options = '';
+	$allowed_type_editing  = $is_editing ? 'disabled' : 'required';
+	foreach ( PolicyMS_Description::$categories as $type => $label ) {
+		$is_selected            = ( ( $description->type ?? '' ) === $type )
+			? 'selected' : '';
+		$existing_type_options .= <<<HTML
+			<option value="{$type}" {$is_selected}>{$label}</option>
+		HTML;
+	}
+
+	/**
+	 * Appended for existing owner value.
+	 *
+	 * @var string The owner.
+	 */
+	$existing_owner = empty( $description->information['owner'] )
+		? ''
+		: $description->information['owner'];
+
+	/**
+	 * Appended for existing description value.
+	 *
+	 * @var string The description.
+	 */
+	$existing_description = empty( $description->information['description'] )
+		? ''
+		: $description->information['description'];
+
+	/**
+	 * Appended for existing keyword values.
+	 *
+	 * @var string The comma-separated keywords.
+	 */
+	$existing_keywords = empty( $description->information['keywords'] )
+		? ''
+		: implode( ', ', $description->information['keywords'] );
+
+	/**
+	 * Appended for creating and managing existing hyperlinks.
+	 *
+	 * @var string Existing form inputs.
+	 */
+	$existing_links = '';
+	if ( ! empty( $description->links ) ) {
+		foreach ( $description->links as $link ) {
+			$link_title      = explode( ':', $link, 2 )[0];
+			$link_url        = explode( ':', $link, 2 )[1];
+			$existing_links .= <<<HTML
+				<div>
+					<input type="text" name="links-title[]" placeholder="Example" value="{$link_title}" />
+					<input type="url" name="links-url[]" placeholder="https://www.example.org/" value="{$link_url}" />
+					<button class="remove-field" title="Remove this link.">
+						<span class="fas fa-times"></span>
+					</button>
 				</div>
-			</fieldset>
-			<fieldset name="internal-information">
-				<h2>Additional information</h2>
-				<p>You can include additional comments for authorized visitors. This field is optional.</p>
-				<label for="comments">Comments</label>
-				<textarea name="comments" placeholder="Insert any additional comments"><?php echo empty( $description->information['comments'] ) ? '' : $description->information['comments']; ?></textarea>
-			</fieldset>
-			<?php
-			if ( ! empty( $description ) ) {
-				?>
-				<fieldset name="uploads">
-					<h2>Uploads</h2>
-					<p>Manage your content and upload new files, images and videos up to <?php echo ( $permissions['administrator'] ?? false ) ? '1GB' : '100MB'; ?> in size.</p>
-					<?php
-					foreach ( $description->assets as $category => $assets ) {
-						$upload_notice = ( $category == 'images' ) ? ' (supported file types: jpg, png)' : '';
-						$upload_notice = ( $category == 'videos' ) ? ' (supported file types: mp4, ogg, webm)' : $upload_notice;
-						switch ( $category ) {
-							case 'images':
-								$allowed_mimetypes = 'image/jpeg,image/png';
-								break;
-							case 'videos':
-								$allowed_mimetypes = 'video/mp4,video/ogg,video/webm';
-								break;
-							default:
-								$allowed_mimetypes = '';
-								break;
-						}
-						?>
-						<h3>
-							<?php
-							if ( $category == 'images' || $category == 'videos' ) {
-								echo ucfirst( $category ) . ' (Gallery)';
-							} else {
-								echo ucfirst( $category );
-							}
-							?>
-						</h3>
-						<?php
-						if ( $category == 'videos' ) {
-							echo '
-                                <p>
-                                    Uploaded gallery videos are publicly accessible. Please do not include sensitive or protected information.
-                                </p>
-                                ';
-						}
-						?>
-						<?php
-						if ( ! empty( $assets ) ) {
-							foreach ( $assets as $asset ) {
-								?>
-								<div class="asset-editor" data-asset-type="<?php echo $category; ?>" data-asset-id="<?php echo $asset->id; ?>">
-									<div>
-										<button class="delete" data-asset-category="<?php echo $category; ?>" data-asset-id="<?php echo $asset->id; ?>" data-action="delete">
-											<span class="fas fa-times"></span>
-										</button>
-										<?php echo $asset->filename . ' (' . $asset->size . ')'; ?>
-									</div>
-									<label for="<?php echo $category . '-' . $asset->id; ?>">
-										Replace file<?php echo $upload_notice; ?>:
-									</label>
-									<input type="file" name="<?php echo $category . '-' . $asset->id; ?>" accept="<?php echo $allowed_mimetypes; ?>" multiple />
-								</div>
-								<?php
-							}
-						}
-						?>
-						Upload new files<?php echo $upload_notice; ?>:
-						<div class="chooser">
-							<input type="file" name="<?php echo $category; ?>[]" accept="<?php echo $allowed_mimetypes; ?>" multiple />
+			HTML;
+		}
+	} else {
+		$existing_links .= <<<HTML
+			<div>
+				<input type="text" name="links-title[]" placeholder="Example" />
+				<input type="url" name="links-url[]" placeholder="https://www.example.org/" />
+				<button class="remove-field" title="Remove this link."><span class="fas fa-times"></span></button>
+			</div>
+		HTML;
+	}
+
+	/**
+	 * Appended for existing comment values.
+	 *
+	 * @var string The comment.
+	 */
+	$existing_comment = empty( $description->information['comments'] ) ? '' : $description->information['comments'];
+
+	/**
+	 * Appended to allow the upload of assets.
+	 *
+	 * @var string The additional asset-related form elements.
+	 */
+	$asset_editor = '';
+
+	/**
+	 * Appended to notify of allowed sizes.
+	 *
+	 * @var string The size limit.
+	 */
+	$upload_limit_label = ( $administrator ?? false ) ? '1GB' : '100MB';
+
+	foreach ( PolicyMS_Asset_Type::get_supported_types() as $asset_type ) {
+
+		/**
+		 * Appended to notify for media which will be part of the gallery.
+		 *
+		 * @var string The appended gallery string.
+		 */
+		$type_title = $asset_type->label_plural . ( $asset_type->in_gallery() ? ' (Gallery)' : '' );
+
+		/**
+		 * Appended to notify of special media handling.
+		 *
+		 * @var string The HTML paragraph.
+		 */
+		$asset_type_notice = $asset_type->notice ? "<p>{$asset_type->notice}</p> " : '';
+
+		/**
+		 * Appended to notify the user of the
+		 * supported asset extensions.
+		 *
+		 * @var string The supported extensions string.
+		 */
+		$extensions = $asset_type->get_extensions();
+		if ( $extensions ) {
+			$extensions = ' (' . implode( ', ', $asset_type->get_extensions() ) . ')';
+		} else {
+			$extensions = '';
+		}
+
+		/**
+		 * Appended to manage existing assets.
+		 *
+		 * @var string The asset management fields.
+		 */
+		$existing_assets = '';
+		foreach ( ( $description->assets[ $asset_type->id ] ?? array() ) as $asset ) {
+
+			/**
+			 * Appended to allow cover setting on image assets.
+			 *
+			 * @var string The button.
+			 */
+			$cover_button = '';
+			if ( 'image' === $asset_type->id ) {
+				if ( $asset->id === $description->image_id ) {
+					$cover_button = <<<HTML
+						<button 
+							data-action="policyms-remove-cover-asset" 
+							data-asset-id="{$asset->id}}"
+							class="action outlined">
+						Remove cover image
+						</button>
+					HTML;
+				} else {
+					$cover_button = <<<HTML
+						<button 
+							data-action="policyms-set-cover-asset"
+							data-asset-id="{$asset->id}"
+							class="action outlined">
+						Set as cover image
+						</button>
+					HTML;
+				}
+			}
+
+			/**
+			 * Appended to manage existing assets.
+			 *
+			 * @var string The existing asset controls.
+			 */
+			$existing_assets .= <<<HTML
+				<div 
+					class="asset-editor" 
+					data-asset-type="{$asset_type->id}" 
+					data-asset-id="{$asset->id}">
+					<div>
+						<button 
+							class="delete" 
+							data-action="policyms-delete-asset">
+							<span class="fas fa-times"></span>
+						</button>
+						{$asset->filename} ({$asset->size})
+					</div>
+					<label for="{$asset_type->id}-{$asset->id}">
+						Replace file{$extensions}:
+					</label>
+					{$cover_button}
+					<input 
+						type="file" 
+						name="{$asset_type->id}-{$asset->id}" 
+						accept="{$asset_type->mimetypes}" 
+						multiple />
+				</div>
+			HTML;
+		}
+
+		/**
+		 * Appended to allow new assets to be uploaded.
+		 *
+		 * @var string The new asset upload field.
+		 */
+		$new_assets = <<<HTML
+			Upload {$extensions}:
+			<div class="chooser">
+				<input 
+					type="file" 
+					name="{$asset_type->id}[]" 
+					accept="{$asset_type->mimetypes}" 
+					multiple />
+			</div>
+		HTML;
+
+		// Append editor sections.
+		$asset_editor .= <<<HTML
+			<h3>{$type_title}</h3>
+			{$asset_type_notice}
+			{$existing_assets}
+			{$new_assets}
+		HTML;
+	}
+
+	/**
+	 * Appended to allow deletion of an existing description.
+	 *
+	 * @var string The new asset upload field.
+	 */
+	$delete_button = '';
+	if ( ! $description ) {
+		$delete_button = <<<HTML
+			<button data-action="delete-description" class="action destructive">Delete</button>
+		HTML;
+	}
+
+	/**
+	 * Appended to notify of (re)approval.
+	 *
+	 * @var string The paragraph.
+	 */
+	$approval_notice = '';
+	if ( $is_editing ) {
+		$approval_notice = '<p>Please note that after submitting your changes, the description will need to be reapproved by an administrator.</p>';
+	} else {
+		$approval_notice = '<p>Please note that after submitting, an administrator needs to approve of the content before other users can view it.</p>';
+	}
+
+	/**
+	 * Appended to allow closing the modal when modalized.
+	 *
+	 * @var string The button.
+	 */
+	$cancel_button = $is_editing ? <<<HTML
+		<button
+			action="policyms-close-modal">
+			Cancel
+		</button>
+	HTML : '';
+
+	return <<<HTML
+		<div class="policyms-description-editor {$is_modal}">
+			<form action="policyms-edit-description">
+				<fieldset name="basic-information">
+					<h2>Basic information</h2>
+					<p>
+						To create a new description, the following fields
+						represent basic information that will be visible to others.
+					</p>
+					<label for="title">
+						Title *
+					</label>
+					<input 
+						required 
+						name="title" 
+						placeholder="Insert a title" 
+						type="text" 
+						value="{$existing_title}" />
+					<label for="type">
+						Primary collection type *
+					</label>
+					<select name="type" {$allowed_type_editing}>
+						{$existing_type_options}
+					</select>
+					<label for="owner">
+						Legal owner *
+					</label>
+					<input 
+						required 
+						name="owner" 
+						placeholder="Insert the legal owner of the object" 
+						type="text" 
+						value="{$existing_owner}" />
+					<label for="description">
+						Description *
+					</label>
+					<textarea 
+						name="description" 
+						placeholder="Insert a detailed description" 
+						style="resize:vertical">
+						{$existing_description}
+					</textarea>
+					<label for="fields-of-use">
+						Keywords
+					</label>
+					<textarea 
+						name="keywords" 
+						placeholder="Separate multiple keywords using a comma (lorem, ipsum, etc.)">
+						{$existing_keywords}
+					</textarea>
+					<label for="links">Related links</label>
+					<div class="links">
+						<div>
+							{$existing_links}
 						</div>
-						<?php
-					}
-					?>
+						<button class="add-field" title="Add another link.">
+							<span class="fas fa-plus"></span> Add link
+						</button>
+					</div>
 				</fieldset>
-			<?php } ?>
+				<fieldset name="internal-information">
+					<h2>Additional information</h2>
+					<p>You can include additional comments for authorized visitors. This field is optional.</p>
+					<label for="comments">Comments</label>
+					<textarea 
+						name="comments" 
+						placeholder="Insert any additional comments">
+						{$existing_comment}
+					</textarea>
+				</fieldset>
+				<fieldset name="assets">
+					<h2>Assets</h2>
+					<p>Manage your content and upload new files, images and videos up to {$upload_limit_label} in size.</p>
+					{$asset_editor}
+				</fieldset>
 			<div class="error"></div>
 			<div class="actions">
-				<?php
-				if ( ! empty( $description ) ) {
-					?>
-					<button data-action="delete-description" class="action destructive">Delete</button>
-					<?php
-				}
-				?>
+				{$delete_button}
+				{$cancel_button}
 				<button type="submit" class="action">Submit</button>
 			</div>
-		</form>
-	</div>
-	<?php
+			{$approval_notice}
+			</form>
+		</div>
+	HTML;
 }
 
-function description_reviews_list_html( array $reviews, string $author_id = null, bool $administrator = false ) {
-	?>
-	<ul>
-		<?php
-		foreach ( $reviews[0] as $review ) {
-			?>
-			<li class="review">
-				<div class="rating">
-					<?php echo $review->rating; ?>
+/**
+ * The reviews list.
+ *
+ * @param   array  $reviews The array of reviews in the given page.
+ * @param   string $author_id The author ID.
+ * @param   bool   $administrator Whether the requester is an administrator.
+ *
+ * @since   1.0.0
+ * @author  Alexandros Raikos <araikos@unipi.gr>
+ * @author  Eleftheria Kouremenou <elkour@unipi.gr>
+ */
+function description_reviews_list_html(
+	array $reviews,
+	string $author_id = null,
+	bool $administrator = false ) {
+	$reviews_list = '';
+	foreach ( $reviews[0] as $review ) {
+		$stars = '';
+		for ( $i = 0; $i < $review->rating; $i++ ) {
+			$stars .= <<<HTML
+				<span class="fas fa-star"></span>
+			HTML;
+		}
+		$last_updated     = time_elapsed_string(
+			gmdate( 'Y-m-d H:i:s', strtotime( $review->update_date ) )
+		);
+		$user_account_url = PolicyMS_Public::get_setting( false, 'account_page' )
+			. '?user=' . $review->uid;
+		$delete_button    = '';
+		if ( ! empty( $author_id ) || $administrator ) {
+			if ( $review->uid === $author_id || $administrator ) {
+				$delete_button .= <<<HTML
+				| 
+					<button 
+						class="action destructive minimal" 
+						data-action="delete-review" 
+						data-author-id="{$review->uid}">
+						Delete
+					</button>
+				HTML;
+				?>
+				<?php
+			}
+		}
+		$reviews_list .= <<< HTML
+			<li class="review" >
+				<div class="rating" >
+					{$review->rating}
 					<span class="stars">
-						<?php
-						for ( $i = 0; $i < $review->rating; $i++ ) {
-							?>
-
-							<span class="fas fa-star"></span>
-							<?php
-						}
-						?>
+						{$stars}
 					</span>
 				</div>
 				<div class="comment">
-					<?php echo $review->comment; ?>
+					{$review->comment}
 				</div>
 				<div class="metadata">
 					<span>
-						<?php echo time_elapsed_string( date( 'Y-m-d H:i:s', strtotime( $review->update_date ) ) ); ?>
+						{$last_updated}
 					</span>
 					<span>
-						by <a href="<?php echo PolicyMS_Public::get_plugin_setting( false, 'account_page' ) . '?user=' . $review->uid; ?>"><?php echo $review->reviewer; ?></a>
-						<?php
-						if ( ! empty( $author_id ) || $administrator ) {
-							if ( $review->uid == $author_id || $administrator ) {
-								?>
-								| <button class="action destructive minimal" data-action="delete-review" data-author-id="<?php echo $review->uid; ?>">Delete</button>
-								<?php
-							}
-						}
-						?>
+						by <a href="{$user_account_url}">{$review->reviewer}</a>
+						{$delete_button}
 					</span>
 				</div>
 			</li>
-		<?php } ?>
-	</ul>
-	<?php
+		HTML;
+	}
+
+	return <<<HTML
+		<ul>
+			{$reviews_list}
+		</ul>
+	HTML;
 }
 
-function description_reviews_html( array $reviews = null, ?int $pages = 0, PolicyMS_Review $existing_review = null, array $permissions ) {
+/**
+ * The reviews container for each description.
+ *
+ * @param   array           $reviews The array of reviews.
+ * @param   int             $pages The number of total pages.
+ * @param   PolicyMS_Review $existing_review The existing review.
+ * @param   array           $permissions The permissions array in
+ *                          `['authenticated' => bool, 'administrator' => bool, 'provider' =>bool]` format.
+ *
+ * @since   1.0.0
+ * @author  Alexandros Raikos <araikos@unipi.gr>
+ * @author  Eleftheria Kouremenou <elkour@unipi.gr>
+ */
+function description_reviews_html(
+	array $reviews = null,
+	?int $pages = 0,
+	PolicyMS_Review $existing_review = null,
+	array $permissions
+	) {
 
 	if ( ! empty( $existing_review ) ) {
 		$author_id = $existing_review->uid;
 	}
 
-	?>
-	<div class="policyms reviews">
-		<?php
-		if ( ! empty( $reviews ) ) {
-			description_reviews_list_html( $reviews, $author_id ?? null, $permissions['administrator'] );
-			?>
-			<nav class="pagination">
-				<?php
-				for ( $page = 1; $page < $pages; $page++ ) {
-					$activePage = $_GET['reviews-page'] ?? 1;
-					echo '<button class="page-selector ' . ( ( $activePage == ( $page ) ) ? 'active' : '' ) . '" data-page-number="' . $page . '" data-action="change-review-page">' . ( $page ) . '</button>';
-				}
-				?>
-			</nav>
-			<?php
-		} else {
-			show_alert( 'No reviews yet.', 'notice' );
+	if ( ! empty( $reviews ) ) {
+		$description_reviews_list = description_reviews_list_html(
+			$reviews,
+			$author_id ?? null,
+			$permissions['administrator']
+		);
+	} else {
+		$description_reviews_list = notice_html( 'No reviews yet.', 'notice' );
+	}
+
+	$description_reviews_pagination = '';
+	for ( $page = 1; $page < $pages; $page++ ) {
+		$active_page                     = $selected_page ?? 1;
+		$active_attribute                = ( ( $page === $active_page ) ? 'active' : '' );
+		$description_reviews_pagination .= <<<HTML
+			<button 
+				class="page-selector {$active_attribute}" 
+				data-page-number="{$page}" 
+				data-action="change-review-page">
+				{$page}
+			</button>';
+		HTML;
+	}
+
+	$description_review_editor = '';
+	if ( ! $permissions['provider'] ) {
+		$update_review_attribute = ! empty( $existing_review ) ? 'update-review' : '';
+		$existing_comment        = ! empty( $existing_review ) ? $existing_review->comment : '';
+		$last_submitted          = '';
+		$delete_review_button    = '';
+		if ( ! empty( $existing_review ) ) {
+			$existing_review_date = time_elapsed_string(
+				gmdate( 'Y-m-d H:i:s', strtotime( $existing_review->update_date ) )
+			);
+			$last_submitted       = <<<HTML
+				<p>
+					Last submitted {$existing_review_date}
+				</p>
+			HTML;
+			$delete_review_button = <<<HTML
+				<button 
+					class="action destructive" 
+					data-action="delete-review" 
+					data-author-id="{$existing_review->uid}">
+					Delete
+				</button>
+			HTML;
+		}
+		$review_stars = '';
+		for ( $i = 0; $i < 5; $i++ ) {
+			$rating            = $i + 1;
+			$checked_attribute = ( $rating <= ( $existing_review->rating ?? 0 ) ) ? 'checked' : '';
+			$review_stars     .= <<<HTML
+			<label>
+				<input type="radio" name="rating" value="{$rating}" {$checked_attribute} required />
+				<span class="fas fa-star"></span>
+			</label>
+			HTML;
 		}
 
-		if ( ! $permissions['provider'] ) {
-			?>
-			<form>
+		$description_review_editor .= <<<HTML
+			<form action="policyms-add-review" {$update_review_attribute}>
 				<label for="comment">Comment</label>
-				<textarea name="comment" placeholder="Insert your comment here.."><?php echo ! empty( $existing_review ) ? $existing_review->comment : null; ?></textarea>
+				<textarea name="comment" placeholder="Insert your comment here..">{$existing_comment}</textarea>
 				<label for="rating">Rating</label>
 				<div class="stars">
-					<?php
-					for ( $i = 0; $i < 5; $i++ ) {
-						$rating = $i + 1;
-						?>
-						<label>
-							<input type="radio" name="rating" value="<?php echo $rating; ?>" class="<?php echo ( $rating <= ( $existing_review->rating ?? 0 ) ) ? 'checked' : ''; ?>" <?php echo ( $rating == ( $existing_review->rating ?? 0 ) ) ? 'checked' : ''; ?> required />
-							<span class="fas fa-star"></span>
-						</label>
-						<?php
-					}
-					?>
+					{$review_stars}
 				</div>
-				<?php echo ! empty( $existing_review ) ? '<input style="display:none" type="checkbox" name="update" checked/>' : ''; ?>
-				<?php
-				if ( ! empty( $existing_review ) ) {
-					?>
-					<p>
-						Last submitted <?php echo time_elapsed_string( date( 'Y-m-d H:i:s', strtotime( $existing_review->update_date ) ) ); ?>
-					</p>
-				<?php } ?>
+				{$last_submitted}
 				<div class="actions">
-					<?php
-					if ( ! empty( $existing_review ) ) {
-						?>
-						<button class="action destructive" data-action="delete-review" data-author-id="<?php echo $existing_review->uid; ?>">Delete</button>
-						<?php
-					}
-					?>
+					{$delete_review_button}
 					<button class="action" type="submit">Submit</button>
 				</div>
 			</form>
-		<?php } ?>
-	</div>
-	<?php
+		HTML;
+	}
+
+	return <<<HTML
+		<div class="policyms-reviews">
+			{$description_reviews_list}
+			<nav class="pagination">
+				{$description_reviews_pagination}
+			</nav>
+			{$description_review_editor}
+		</div>
+	HTML;
 }
 
 /**
  * Print the asset HTML.
  *
- * @param   array $asset The PolicyMS API asset.
- * @param   array $args Various printing arguments.
+ * @param   PolicyMS_Description $description The description.
+ * @param   array                $urls The predefined page URLs.
+ * @param   array                $permissions The permissions array in
+ *                               `['authenticated' => bool, 'administrator' => bool, 'provider' =>bool]` format.
+ * @param   array                $reviews The array of reviews as returned by @see description_reviews_html.
+ * @param   array                $image_blobs The array of image blob data.
  *
  * @since   1.0.0
  * @author  Alexandros Raikos <araikos@unipi.gr>
  * @author  Eleftheria Kouremenou <elkour@unipi.gr>
  */
-function description_html( $description, $image_blobs, $pages, $reviews, $permissions ) {
+function description_html(
+		PolicyMS_Description $description,
+		array $urls,
+		array $permissions,
+		array $reviews = array(),
+		array $image_blobs = array(),
+	) {
+
 	/**
-	 * Print the file viewer table.
+	 * The interactive file information table.
 	 *
-	 * @param   string $title The title of the collection.
-	 * @param   string $id The id of the collection.
-	 * @param   array  $files A collection of files.
-	 * @param   bool   $collapsed Whether the view is collapsed by default.
-	 *
-	 * @since   1.0.0
-	 * @author  Alexandros Raikos <araikos@unipi.gr>
-	 * @author  Eleftheria Kouremenou <elkour@unipi.gr>
+	 * @var callable $asset_information_table Prints the HTML.
+	 * @since 2.0.0
 	 */
-	function asset_viewer( string $title, string $category, array $assets, bool $collapsed = false ): void {
-		?>
-		<div class="policyms file-viewer <?php echo ( $collapsed ) ? 'collapsed' : ''; ?>">
-			<button data-files-category="<?php echo $category; ?>" class="action" <?php echo empty( $assets ) ? 'disabled' : ''; ?>><?php echo $title; ?></button>
+	$asset_information_table = function(
+		string $title,
+		string $category_slug,
+		array $assets
+		): string {
+
+		// Attribute preparation.
+		$disabled_attribute  = ( empty( $assets ) ) ? 'disabled' : '';
+		$collapsed_attribute = ( empty( $assets ) ) ? 'collapsed' : '';
+
+		// Expand / collapse control.
+		$interactive_title = <<<HTML
+			<button file-type="{$category_slug}" class="action" {$disabled_attribute}>
+				{$title}
+			</button>
+		HTML;
+
+		$asset_information_cells = '';
+		if ( ! empty( $assets ) ) {
+			foreach ( $assets as $asset ) {
+				$formatted_updated_time   = time_elapsed_string(
+					gmdate( 'Y-m-d H:i:s', strtotime( $asset->update_date ) )
+				);
+				$asset_information_cells .= <<<HTML
+					<tr asset-type="{$category_slug}" asset-identifier="{$asset->id}">
+						<td>
+							<a class="download">{$asset->filename}</a>
+						</td>
+						<td>
+							{$asset->version}
+						</td>
+						<td>
+							{$asset->size}
+						</td>
+						<td>
+							{$formatted_updated_time}
+						</td>
+					</tr>
+				HTML;
+			}
+		} else {
+			$asset_information_cells .= '<tr><td colspan="4">';
+			$asset_information_cells .= notice_html( 'Nothing to display yet.', 'notice' );
+			$asset_information_cells .= '</td></tr>';
+		}
+
+		return <<<HTML
+			<div class="policyms-asset-information-table" {$collapsed_attribute}>
+				{$interactive_title}
+			</div>
 			<table>
 				<tr>
 					<th>Name</th>
@@ -648,358 +1076,316 @@ function description_html( $description, $image_blobs, $pages, $reviews, $permis
 					<th>Size</th>
 					<th>Added</th>
 				</tr>
-				<?php
-				if ( ! empty( $assets ) ) {
-					foreach ( $assets as $asset ) {
-						?>
-						<tr data-file-id="<?php echo $asset->id; ?>">
-							<td><a class="download" data-file-id="<?php echo $asset->id; ?>" data-type="<?php echo $category; ?>"><?php echo $asset->filename; ?></a></td>
-							<td><?php echo $asset->version; ?></td>
-							<td><?php echo $asset->size; ?></td>
-							<td><?php echo time_elapsed_string( date( 'Y-m-d H:i:s', strtotime( $asset->update_date ) ) ); ?></td>
-						</tr>
-						<?php
-					}
-				} else {
-					echo '<tr><td colspan="4">';
-					show_alert( 'No ' . $category . ' found.', 'notice' );
-					echo '</td></tr>';
-				}
-				?>
+				{$asset_information_cells}
 			</table>
-		</div>
-		<?php
+		HTML;
+	};
+
+	/**
+	 * Approval / Rejection notice for administrators.
+	 *
+	 * @var string $administrator_approval The printed HTML.
+	 * @since 2.0.0
+	 */
+	$administrator_approval = '';
+	if ( $permissions['administrator'] && ! $description->is_approved() ) {
+		$administrator_approval_label         = __( 'This description requires manual approval.', 'policyms' );
+		$administrator_rejection_reason_label = __( 'What is the reason for rejection?', 'policyms' );
+		$administrator_approval               = <<<HTML
+			<form action="policyms-approve-description">
+				<p>{$administrator_approval_label}.</p>
+				<label>
+					<input type="radio" name="approval" value="reject">
+					Reject
+				</label>
+				<label>
+					<input type="radio" name="approval" value="approve">
+					Approve
+				</label>
+				<div class="hidden">
+					<label for="rejection-reason">{$administrator_rejection_reason_label}</label>
+					<textarea name="rejection-reason" required></textarea>
+				</div>
+			</form>
+		HTML;
 	}
 
-	if ( ! empty( $description ) ) {
-		?>
-		<div class="policyms description">
-			<?php
-			if ( $permissions['administrator'] && $description->metadata['approved'] == '0' ) {
-				?>
-				<div class="policyms-notice" id="policyms-description-approval">
-					<p>This asset is not yet accessible from other authorized Marketplace users.</p>
-					<button class="action destructive" data-response="disapprove">Delete</button>
-					<button class="action" data-response="approve">Approve</button>
-				</div>
-				<?php
+	$approval_tag = '';
+	if ( $permissions['provider'] || $permissions['administrator'] ) {
+		$status       = ( $description->is_approved() ) ? 'approved' : 'pending';
+		$status_label = ( $description->is_approved() ) ? __( 'Approved', 'policyms' ) : __( 'Pending', 'policyms' );
+		$approval_tag = <<<HTML
+			<span class="policyms-status-label" status="{$status}">
+				{$status_label}
+			</span>
+		HTML;
+	}
+
+	$description_metadata_provider = '';
+	if ( $permissions['authenticated'] ) {
+		$description_metadata_provider = <<<HTML
+			<span class="provider">
+				<a href="{$urls['account_page']}?user={$description->metadata['provider']}">
+					{$description->metadata['provider_name']}
+				</a>
+			</span>
+		HTML;
+	}
+
+	$description_metadata_keywords = '';
+	if ( ! empty( $description->information['keywords'] ) ) {
+		$description_metadata_keyword_urls = '';
+		foreach ( $description->information['keywords'] as $keyword ) {
+			$description_metadata_keyword_urls .= <<<HTML
+				<a href="{$urls['archive_page']}?keyword={$keyword}">{$keyword}</a>
+			HTML;
+		}
+		$description_metadata_keywords = <<<HTML
+			<span class="keywords">
+				{$description_metadata_keyword_urls}
+			</span>
+		HTML;
+	}
+
+	$formatted_updated_time = time_elapsed_string(
+		gmdate( 'Y-m-d H:i:s', strtotime( $description->metadata['updateDate'] ) )
+	);
+
+	/**
+	 * The description's side bar asset information table.
+	 *
+	 * @var string $description_sidebar_assets The container HTML table.
+	 * @since 2.0.0
+	 */
+	$description_sidebar_assets = '';
+	if ( $permissions['authenticated'] ) {
+		foreach ( $description->assets as $category_slug => $assets ) {
+			$description_sidebar_assets .= $asset_information_table(
+				ucfirst( $category_slug ),
+				$category_slug,
+				$assets
+			);
+		}
+	} else {
+		$description_sidebar_assets .= show_lock(
+			$urls['login_page']
+		);
+	}
+
+	/**
+	 * The description's side bar asset additional comments section.
+	 *
+	 * @var string $description_sidebar_assets The container HTML table.
+	 * @since 2.0.0
+	 */
+	$description_sidebar_comments = '';
+	if ( $permissions['authenticated'] && ! empty( $description->information['comments'] ) ) {
+		$description_sidebar_comments .= <<<HTML
+			<div class="comments">
+				<h2>Additional information</h2>
+				<p>{$description->information['comments']}</p>
+			</div>
+		HTML;
+	}
+
+	$description_text = $permissions['authenticated'] ?
+		$description->information['description'] :
+		$description->information['short_desc'];
+
+	$description_links = '';
+	if ( ! empty( $description->links[0] ) ) {
+		$description_links .= '<ul>';
+		foreach ( $description->links as $link ) {
+			$url                = explode( ':', $link, 2 )[1];
+			$label              = explode( ':', $link, 2 )[0];
+			$description_links .= <<<HTML
+				<li>
+					<a class="button outlined" href="{$url}" target="blank">
+						{$label}
+					</a>
+				</li>
+			HTML;
+		}
+		$description_links .= '</ul>';
+	}
+
+	$description_gallery_slider = '';
+	if ( $permissions['authenticated'] ) {
+		if ( ! empty( $description->assets['videos'] ) ) {
+			foreach ( $description->assets['videos'] as $video ) {
+				$play_icon_src = get_site_url(
+					null,
+					'/wp-content/plugins/policyms/public/assets/svg/play.svg'
+				);
+				$thumbnail_url = PolicyMS_Public::get_setting( true, 'marketplace_host' )
+					. '/videos/' . $video->id . '?thumbnail=1';
+				$toolbar       = '';
+				if ( $permissions['provider'] || $permissions['administrator'] ) {
+					$toolbar = <<<HTML
+						<div class="toolbar">
+							<span>
+								{$video->filename} ({$video->size})
+							</span>
+							<div class="tools">
+								<button 
+									data-action="delete" 
+									data-asset-category="videos" 
+									data-asset-id="{$video->id}" 
+									class="action outlined">
+									Delete
+								</button>
+							</div>
+						</div>
+					HTML;
+				}
+				$description_gallery_slider .= <<<HTML
+					<div class="item" data-asset-category="videos" data-asset-id="{$video->id}">
+						<img class="play-icon" src="{$play_icon_src}" />
+						<img class="video-thumbnail" src="{$thumbnail_url}">
+						{$toolbar}
+					</div>
+				HTML;
 			}
-			?>
+		}
+		if ( ! empty( $image_blobs ) ) {
+			foreach ( $image_blobs as $key => $image_blob ) {
+				$thumbnail_blob = base64_encode( $image_blob );
+				$toolbar        = '';
+				if ( $permissions['provider'] || $permissions['administrator'] ) {
+					if ( $description->assets['images'][ $key ]->id === $description->image_id ) {
+						$toolbar_cover_action = <<<HTML
+							<button 
+								data-action="remove-default" 
+								data-asset-id="{$description->assets['images'][ $key ]->id}"
+								class="action outlined">
+							Remove cover image
+							</button>
+						HTML;
+					} else {
+						$toolbar_cover_action = <<<HTML
+							<button 
+								data-action="set-default"
+								data-asset-id="{$description->assets['images'][ $key ]->id}"
+								class="action outlined">
+							Set as cover image
+							</button>
+						HTML;
+					}
+					$toolbar = <<<HTML
+						<div class="toolbar">
+							<span>
+								{$description->assets['images'][ $key ]->filename} ({$description->assets['images'][ $key ]->size})
+							</span>
+							<div class="tools">
+								{$toolbar_cover_action}
+								<button
+									data-action="delete"
+									data-asset-category="images"
+									data-asset-id="{$description->assets['images'][ $key ]->id}"
+									class="action outlined">
+									Delete
+								</button>
+							</div>
+						</div>
+					HTML;
+				}
+				$description_gallery_slider .= <<<HTML
+					<div 
+						class="item" 
+						data-asset-id="{$description->assets['images'][ $key ]->id}" 
+						data-asset-category="images">
+						<img 
+							src="data:image/*;base64,{$thumbnail_blob}" 
+							data-asset-category="images" 
+							data-asset-id="{$description->assets['images'][ $key ]->id}" 
+							draggable="false"/>
+						{$toolbar}
+					</div> 
+				HTML;
+			}
+		}
+		if ( empty( $description->assets['videos'] ) && empty( $description->assets['images'] ) ) {
+			$description_gallery_slider .= notice_html( 'No images or videos were found.', 'notice' );
+		}
+	} else {
+		$description_gallery_slider = show_lock( $urls['login_page'] );
+	}
+
+	if ( $permissions['authenticated'] ) {
+		$description_review_list = description_reviews_html(
+			$reviews['content'] ?? array(),
+			$reviews['pages'] ?? null,
+			$description->user_review ?? null,
+			$permissions
+		);
+	} else {
+		$description_review_list = show_lock( $urls['login_page'], );
+	}
+
+	$description_editor = '';
+	if ( $permissions['provider'] || $permissions['administrator'] ) {
+		$description_editor .= description_editor_html( $description, $permissions['administrator'] );
+	}
+
+	return <<<HTML
+		<div class="policyms-description-single">
+			{$administrator_approval}
 			<header>
 				<div class="title">
-					<h1><?php echo $description->information['title']; ?>
-						<?php
-						if ( $permissions['provider'] || $permissions['administrator'] ) {
-							?>
-							<span class="status label <?php echo ( $description->metadata['approved'] == '1' ) ? 'success' : 'notice'; ?>">
-								<?php echo ( $description->metadata['approved'] == '1' ) ? 'Approved' : 'Pending'; ?>
-							</span>
-							<?php
-						}
-						?>
+					<h1>
+						{$description->information['title']}
 					</h1>
-					<?php
-					if ( $permissions['provider'] || $permissions['administrator'] ) {
-						?>
-						<button class="outlined" data-action="edit">
-							<span class="fas fa-pen"></span> Edit
-						</button>
-						<?php
-					}
-					?>
+					{$approval_tag}
 				</div>
 				<div class="metadata">
-					<?php if ( $permissions['authenticated'] ) { ?>
-						<span class="provider">
-							<a href="<?php echo $pages['account_page'] . '?user=' . $description->metadata['provider']; ?>">
-								<?php echo $description->metadata['provider_name']; ?>
-							</a>
-						</span>
-						<?php
-					}
-
-					if ( ! empty( $description->information['owner'] ) ) {
-						?>
-						<span class="owner">
-							&copy; <?php echo $description->information['owner']; ?>
-						</span>
-					<?php } ?>
+					{$description_metadata_provider}
+					<span class="owner">
+						&copy; {$description->information['owner']}
+					</span>
 					<span class="type pill">
-						<a href="<?php echo $pages['archive_page'] . '?type=' . $description->type; ?>">
-							<?php echo $description->type; ?>
+						<a href="{$urls['archive_page']}?type={$description->type}">
+							{$description->type}
 						</a>
 					</span>
-					<?php
-					if ( ! empty( $description->information['subtype'] ) ) {
-						if ( $description->information['subtype'] != '-' ) {
-							?>
-							<span class="sub-type pill">
-								<a href="<?php echo $pages['archive_page'] . '?subtype=' . $description->information['subtype']; ?>">
-									<?php echo $description->information['subtype']; ?>
-								</a>
-							</span>
-							<?php
-						}
-					}
-					if ( ! empty( $description->information['fieldOfUse'] ) ) {
-						?>
-						<span class="fields-of-use">
-							<?php
-							foreach ( $description->information['fieldOfUse'] as $field_of_use ) {
-								if ( ! empty( $field_of_use ) ) {
-									echo '<span>' . $field_of_use . '</span>';
-								}
-							}
-							?>
-						</span>
-					<?php } ?>
+					{$description_metadata_keywords}
 					<a href="#reviews" class="reviews">
-						<span class="fas fa-star"></span> <?php echo $description->metadata['reviews']['average_rating'] . ' (' . $description->metadata['reviews']['no_reviews'] . ' reviews)'; ?>
+						<span class="fas fa-star"></span> {$description->metadata['reviews']['average_rating']} ({$description->metadata['reviews']['no_reviews']} reviews)'; ?>
 					</a>
 					&nbsp;
 					<span class="views">
 						<span class="fas fa-eye"></span>
-						<?php echo $description->metadata['views']; ?> views
+						{$description->metadata['views']} views
 					</span>
-					<span class="last-update-date">
-						Last updated <?php echo time_elapsed_string( date( 'Y-m-d H:i:s', strtotime( $description->metadata['updateDate'] ) ) ); ?>
+					<span class="last-updated">
+						Last updated {$formatted_updated_time}
 					</span>
 				</div>
 			</header>
 			<div class="content">
-				<div class="files <?php echo ( $permissions['authenticated'] ) ? '' : 'locked'; ?>">
+				<aside>
 					<h2>Uploads</h2>
-					<?php
-					if ( $permissions['authenticated'] ) {
-						asset_viewer( 'Files', 'files', $description->assets['files'], ( empty( $description->assets['files'] ) ) );
-						asset_viewer( 'Videos (Gallery)', 'videos', $description->assets['videos'], ( empty( $description->assets['videos'] ) ) );
-						asset_viewer( 'Images (Gallery)', 'images', $description->assets['images'], ( empty( $description->assets['images'] ) ) );
-					} else {
-						show_lock( $pages['login_page'], 'view and download files' );
-					}
-					if ( $permissions['authenticated'] ) {
-						?>
-						<div class="comments">
-							<h2>Additional information</h2>
-							<?php
-							if ( ! empty( $description->information['comments'] ) ) {
-								echo '<p>' . $description->information['comments'] . '</p>';
-							} else {
-								show_alert( 'No additional information.', 'notice' );
-							}
-							?>
-						</div>
-						<?php
-					}
-					?>
-				</div>
+					{$description_sidebar_assets}
+					{$description_sidebar_comments}
+				</aside>
 				<div class="information">
 					<h2>Description</h2>
 					<div class="description">
-						<p>
-							<?php
-							if ( $permissions['authenticated'] ) {
-								echo $description->information['description'];
-							} else {
-								echo $description->information['short_desc'];
-							}
-							?>
-						</p>
-						<?php
-						if ( ! empty( $description->links[0] ) ) {
-							?>
-							<ul>
-								<?php
-								foreach ( $description->links as $link ) {
-									echo '<li><a class="button outlined" href="' . explode( ':', $link, 2 )[1] . '" target="blank">' . explode( ':', $link, 2 )[0] . '</a></li>';
-								}
-								?>
-							</ul>
-						<?php } ?>
-					</div>
-					<div class="gallery">
-						<h2>Gallery</h2>
-						<div class="slider">
-							<?php
-							if ( $permissions['authenticated'] ) {
-								if ( ! empty( $description->assets['videos'] ) ) {
-									foreach ( $description->assets['videos'] as $video ) {
-										?>
-										<div class="item" data-asset-category="videos" data-asset-id="<?php echo $video->id; ?>">
-											<img class="play-icon" src="<?php echo get_site_url( null, '/wp-content/plugins/policyms/public/assets/svg/play.svg' ); ?>" />
-											<img class="video-thumbnail" src="
-											<?php
-											echo ( PolicyMS_Public::get_plugin_setting( true, 'marketplace_host' )
-												. '/videos/' . $video->id . '?thumbnail=1'
-											)
-											?>
-											">
-											<?php
-											if ( $permissions['provider'] ) {
-												?>
-												<div class="toolbar">
-													<span>
-														<?php echo $video->filename; ?>
-														(<?php echo $video->size; ?>)
-													</span>
-													<div class="tools">
-														<button data-action="delete" data-asset-category="images" data-asset-id="<?php echo $video->id; ?>" class="action outlined">
-															Delete
-														</button>
-													</div>
-												</div>
-												<?php
-											}
-											?>
-										</div>
-										<?php
-									}
-								}
-								if ( ! empty( $image_blobs ) ) {
-									foreach ( $image_blobs as $key => $image_blob ) {
-										?>
-										<div class="item" data-asset-id="<?php echo $description->assets['images'][ $key ]->id; ?>" data-asset-category="images">
-											<?php
-											echo '<img src="data:image/*;base64,' . base64_encode( $image_blob ) . '" data-asset-category="images" data-asset-id="' . $description->assets['images'][ $key ]->id . '" draggable="false" />';
-											if ( $permissions['provider'] || $permissions['administrator'] ) {
-												?>
-												<div class="toolbar">
-													<span>
-														<?php echo $description->assets['images'][ $key ]->filename; ?>
-
-														(<?php echo $description->assets['images'][ $key ]->size; ?>)
-													</span>
-													<div class="tools">
-														<?php if ( $description->assets['images'][ $key ]->id == $description->image_id ) { ?>
-															<button data-action="remove-default" data-asset-id="<?php echo $description->assets['images'][ $key ]->id; ?>" class="action outlined">Remove cover image</button>
-														<?php } else { ?>
-															<button data-action="set-default" data-asset-id="<?php echo $description->assets['images'][ $key ]->id; ?>" class="action outlined">Set as cover image</button>
-														<?php } ?>
-														<button data-action="delete" data-asset-category="images" data-asset-id="<?php echo $description->assets['images'][ $key ]->id; ?>" class="action outlined">
-															Delete
-														</button>
-													</div>
-												</div>
-												<?php
-											}
-											?>
-										</div> 
-										<?php
-									}
-								}
-								if ( empty( $description->assets['videos'] ) && empty( $description->assets['images'] ) ) {
-									show_alert( 'No images or videos were found.', 'notice' );
-								}
-							} else {
-								show_lock( $pages['login_page'], 'view the gallery' );
-							}
-							?>
+						<p>{$description_text}</p>
+						{$description_links}
+						<div class="gallery">
+							<h2>Gallery</h2>
+							<div class="slider">
+								{$description_gallery_slider}
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-
 			<div class="reviews" id="reviews">
 				<h2>Reviews</h2>
-				<?php
-				if ( $permissions['authenticated'] ) {
-					description_reviews_html(
-						$reviews['content'] ?? array(),
-						$reviews['pages'] ?? null,
-						$description->user_review ?? null,
-						$permissions
-					);
-				} else {
-					show_lock( $pages['login_page'], 'view reviews for this description' );
-				}
-				?>
+				{$description_review_list}
 			</div>
-			<?php
-			if ( $permissions['provider'] || $permissions['administrator'] ) {
-				description_editor_html( $description, $permissions );
-			}
-			?>
-		<?php
-	}
-}
-
-/**
- * Display a list of assets with filtering, sorting and custom pagination.
- *
- * @param string   $id The identifier for the viewer.
- * @param array    $content The asset structure to be displayed.
- * @param callable $inner_html The callback that prints the list item HTML.
- * @param array    $args The arguments of the parent function
- *
- * @since   1.0.0
- * @author  Alexandros Raikos <araikos@unipi.gr>
- */
-function entity_list_html( string $id, array $content, bool $visitor, callable $inner_html, ?string $create_page_url = null ) {
-	?>
-		<header>
-			<h3><?php echo ucfirst( $id ); ?></h3>
-			<div class="actions">
-				<form action="" class="selector">
-					<label for="sort-by">Sort by</label>
-					<select name="sort-by" data-category="<?php echo $id; ?>">
-						<option value="newest" <?php echo ( ( ( $_GET['sort-by'] ?? '' == 'newest' ) || empty( $_GET['sort-by'] ) ) ? 'selected' : '' ); ?>>Newest</option>
-						<option value="oldest" <?php echo ( ( $_GET['sort-by'] ?? '' == 'oldest' ) ? 'selected' : '' ); ?>>Oldest</option>
-						<option value="rating-asc" <?php echo ( ( $_GET['sort-by'] ?? '' == 'rating-asc' ) ? 'selected' : '' ); ?>>Highest rated</option>
-						<option value="rating-desc" <?php echo ( ( $_GET['sort-by'] ?? '' == 'rating-desc' ) ? 'selected' : '' ); ?>>Lowest rated</option>
-						<?php
-						if ( $id == 'descriptions' ) {
-							?>
-							<option value="views-asc" <?php echo ( ( $_GET['sort-by'] ?? '' == 'views-asc' ) ? 'selected' : '' ); ?>>Most viewed</option>
-							<option value="views-desc" <?php echo ( ( $_GET['sort-by'] ?? '' == 'views-desc' ) ? 'selected' : '' ); ?>>Least viewed</option>
-						<?php } ?>
-						<option value="title" <?php echo ( ( $_GET['sort-by'] ?? '' == 'title' ) ? 'selected' : '' ); ?>>Title</option>
-					</select>
-					<label for="items-per-page">Items per page</label>
-					<select name="items-per-page" data-category="<?php echo $id; ?>">
-						<option value="5" <?php echo ( ( ( $_GET['items-per-page'] ?? '' == '5' ) ) ? 'selected' : '' ); ?>>5</option>
-						<option value="10" <?php echo ( ( $_GET['items-per-page'] ?? '' == '10' || empty( $_GET['items-per-page'] ) ) ? 'selected' : '' ); ?>>10</option>
-						<option value="25" <?php echo ( ( $_GET['items-per-page'] ?? '' == '25' ) ? 'selected' : '' ); ?>>25</option>
-						<option value="50" <?php echo ( ( $_GET['items-per-page'] ?? '' == '50' ) ? 'selected' : '' ); ?>>50</option>
-						<option value="100" <?php echo ( ( $_GET['items-per-page'] ?? '' == '100' ) ? 'selected' : '' ); ?>>100</option>
-					</select>
-				</form>
-				<?php
-				if ( ! $visitor && $id == 'descriptions' && ! empty( $create_page_url ) ) {
-					?>
-					<a id="policyms-upload" href="<?php echo $create_page_url; ?>" title="Create new"><span class="fas fa-plus"></span> Create new</a>
-				<?php } ?>
-			</div>
-		</header>
-		<div class="collection-filters" data-category="<?php echo $id; ?>">
-			<div>Filter by type:</div>
+			{$description_editor}
 		</div>
-		<div class="paginated-list" data-category="<?php echo $id; ?>">
-			<?php
-			if ( ! empty( $content ) ) {
-				foreach ( $content as $page => $page_items ) {
-					echo '<ul data-page="' . ( $page + 1 ) . '" class="page ' . $id . ' ' . ( $page == 0 ? 'visible' : '' ) . '">';
-					if ( ! empty( $content ) ) {
-						foreach ( $page_items as $item ) {
-							$inner_html( $item );
-						}
-					} else {
-						show_alert( "You don't have any " . $id . ' yet.' );
-					}
-					echo '</ul>';
-				}
-			} else {
-				show_alert( 'This user does not have any ' . $id . '.', 'notice' );
-			}
-			?>
-			<nav class="pagination">
-				<?php
-				if ( count( $content ?? array() ) > 1 ) {
-					foreach ( $content as $page => $page_items ) {
-						echo '<button data-category="' . $id . '" class="page-selector ' . ( ( $page == ( $_GET['page'] ?? 0 ) ) ? 'active' : '' ) . '" data-' . $id . '-page="' . ( $page + 1 ) . '">' . ( $page + 1 ) . '</button>';
-					}
-				}
-				?>
-			</nav>
-		</div>
-	<?php
+	HTML;
 }

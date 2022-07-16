@@ -10,7 +10,7 @@ Read the sections below to get started with PolicyMS for WordPress.
 
 ### Requirements
 
-- PHP >= 7.4
+- PHP >= 8.0
 - Set PHP's `upload_max_filesize` directive to the desired Marketplace limit, up to **500MB**.
 - Set PHP's `post_max_size` directive to match the previous value.
 - WordPress >= 5.0

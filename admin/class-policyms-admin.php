@@ -105,6 +105,10 @@ class PolicyMS_Admin {
 
 	function register_settings() {
 
+		// TODO @alexandrosraikos: Make standalone EGI section.
+		// TODO @alexandrosraikos: Add branding name settings field. (#131)
+		// TODO @alexandrosraikos: Add accent color selector. (#132)
+
 		register_setting(
 			'policyms_plugin_settings',
 			'policyms_plugin_settings',

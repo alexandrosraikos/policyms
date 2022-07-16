@@ -1,64 +1,185 @@
 <?php
+/**
+ * The class definition for descriptions.
+ *
+ * @link       https://github.com/alexandrosraikos/policyms/
+ * @since      1.1.0
+ *
+ * @package    PolicyMS
+ * @subpackage PolicyMS/model
+ */
 
+/**
+ * The class definition for descriptions.
+ *
+ * Defines description information and functionality.
+ *
+ * @package    PolicyMS
+ * @subpackage PolicyMS/model
+ * @author     Alexandros Raikos <alexandros@araikos.gr>
+ */
 class PolicyMS_Description {
 
-
+	/**
+	 * The unique description ID.
+	 *
+	 * @var string The unique alphanumeric ID.
+	 *
+	 * @since 1.1.0
+	 */
 	public string $id;
 
+	/**
+	 * The primary taxonomy (type/collection) of the description.
+	 *
+	 * @var string The type.
+	 *
+	 * @since 1.1.0
+	 */
 	public string $type;
 
+	/**
+	 * The basic decription information.
+	 *
+	 * @var array The formatted information
+	 *
+	 * @since 1.1.0
+	 */
 	public array $information;
 
+	/**
+	 * The line formatted array of related links.
+	 *
+	 * @var ?array The links.
+	 *
+	 * @since 1.1.0
+	 */
 	public ?array $links;
 
+	/**
+	 * The ID of the cover image.
+	 *
+	 * @var string The ID of the cover image.
+	 *
+	 * @since 1.1.0
+	 */
 	public string $image_id;
 
+	/**
+	 * The description's metadata.
+	 *
+	 * @var array The formatted metadata array.
+	 *
+	 * @since 1.1.0
+	 */
 	public array $metadata;
 
+	/**
+	 * The description's assets, if any.
+	 *
+	 * @var ?array The formatted assets array.
+	 *
+	 * @since 1.1.0
+	 */
 	public ?array $assets;
 
+	/**
+	 * The description's unique site URL.
+	 *
+	 * @var ?string The unique description URL.
+	 *
+	 * @since 1.1.0
+	 */
+	public ?string $url;
+
+	/**
+	 * The URL for the cover's thumbnail.
+	 *
+	 * @var ?string The cover thumbnail URL.
+	 *
+	 * @since 1.1.0
+	 */
+	public ?string $cover_thumbnail_url;
+
+	/**
+	 * The requesting user's review of the description instance.
+	 *
+	 * @var ?PolicyMS_Review The user's review.
+	 *
+	 * @since 1.1.0
+	 */
 	public ?PolicyMS_Review $user_review;
 
-	public function __construct( string $id, ?array $fetched = null ) {
+	/**
+	 * The default description categories.
+	 *
+	 * @var array The categories.
+	 *
+	 * @since 2.0.0
+	 */
+	public static array $categories = array(
+		'tools'     => 'Tools',
+		'policies'  => 'Policies',
+		'datasets'  => 'Datasets',
+		'webinars'  => 'Webinars',
+		'tutorials' => 'Tutorials',
+		'documents' => 'Documents',
+		'other'     => 'Other',
+	);
 
-		if ( empty( $fetched ) ) {
-			$response = PolicyMS_Communication_Controller::api_request(
+	/**
+	 * Initialize a description object instance from data or via the API.
+	 *
+	 * @param string $id The unique description ID.
+	 * @param ?array $fetched Any pre-fetched description data from the API.
+	 *
+	 * @since 1.1.0
+	 */
+	public function __construct( string $id, ?array $fetched = null ) {
+		$this->match_field(
+			$fetched ?? PolicyMS_Communication_Controller::api_request(
 				'GET',
 				'/descriptions/all/' . $id,
 				array(),
 				PolicyMS_User::is_authenticated() ?
-					PolicyMS_Account::retrieve_token() :
-					null
-			);
-
-			$this->match_field( $response['results'][0][0] );
-		} else {
-			$this->match_field( $fetched );
-		}
+				PolicyMS_Account::retrieve_token() :
+				null
+			)[0][0]
+		);
 	}
 
+	/**
+	 * Update the description's information.
+	 *
+	 * @param array  $information The new information fields.
+	 * @param ?array $file_identifiers Any available new uploaded file IDs
+	 * for including and forwarding uploaded $_FILES.
+	 *
+	 * @since 1.1.0
+	 */
 	public function update( array $information, ?array $file_identifiers = null ) {
+		// Upload new or update existing files.
 		if ( ! empty( $file_identifiers ) ) {
 			foreach ( $file_identifiers as $file_id ) {
 				// Check for new files.
-				if ( $file_id == 'files' ||
-					$file_id == 'images' ||
-					$file_id == 'videos'
+				if ( 'files' === $file_id ||
+					'images' === $file_id ||
+					'videos' === $file_id
 				) {
 					PolicyMS_Asset::create(
 						$file_id,
 						$this
 					);
 				} elseif ( substr( $file_id, 0, 6 ) === 'files-' ||
-					substr( $file_id, 0, 7 ) === 'images-' ||
-					substr( $file_id, 0, 7 ) === 'videos-'
+				substr( $file_id, 0, 7 ) === 'images-' ||
+				substr( $file_id, 0, 7 ) === 'videos-'
 				) {
 					foreach ( $this->assets as $category => $assets ) {
 						$file_category = explode( '-', $file_id )[0];
-						if ( $category == $file_category ) {
+						if ( $category === $file_category ) {
 							foreach ( $assets as $asset ) {
 								$id = explode( '-', $file_id, 2 )[1];
-								if ( $asset->id == $id ) {
+								if ( $asset->id === $id ) {
 									$asset->update(
 										$file_id
 									);
@@ -70,21 +191,24 @@ class PolicyMS_Description {
 			}
 		}
 
-		$data =
-			array(
-				'title'       => stripslashes( $information['title'] ),
-				'type'        => $information['type'],
-				'subtype'     => strtolower( $information['subtype'] ),
-				'owner'       => stripslashes( $information['owner'] ),
-				'description' => stripslashes( $information['description'] ),
-				'links'       => PolicyMS_User::implode_urls(
-					$information['links-title'],
-					$information['links-url']
-				),
-				'fieldOfUse'  => $information['fieldOfUse'],
-				'comments'    => stripslashes( $information['comments'] ),
-			);
+		// TODO @alexandrosraikos: Remove 'subtype' entirely. (#128)
+		// TODO @alexandrosraikos: Rename 'Fields of Use' to 'Keywords'. (#128)
+		// Prepare the data.
+		$data = array(
+			'title'       => stripslashes( $information['title'] ),
+			'type'        => $information['type'],
+			'subtype'     => strtolower( $information['subtype'] ),
+			'owner'       => stripslashes( $information['owner'] ),
+			'description' => stripslashes( $information['description'] ),
+			'links'       => PolicyMS_User::implode_urls(
+				$information['links-title'],
+				$information['links-url']
+			),
+			'keywords'    => $information['keywords'],
+			'comments'    => stripslashes( $information['comments'] ),
+		);
 
+		// Submit to the API.
 		PolicyMS_Communication_Controller::api_request(
 			'PUT',
 			'/descriptions/all/' . $this->id,
@@ -93,6 +217,11 @@ class PolicyMS_Description {
 		);
 	}
 
+	/**
+	 * Delete the description.
+	 *
+	 * @since 1.1.0
+	 */
 	public function delete() {
 		PolicyMS_Communication_Controller::api_request(
 			'DELETE',
@@ -102,11 +231,35 @@ class PolicyMS_Description {
 		);
 	}
 
+	/**
+	 * Check if the given user is the provider.
+	 *
+	 * @param PolicyMS_User $provider The user to check.
+	 *
+	 * @since 1.1.0
+	 */
 	public function is_provider( PolicyMS_User $provider ) {
-		return $this->metadata['provider'] == $provider->id;
+		return $this->metadata['provider'] === $provider->id;
 	}
 
+	/**
+	 * Check if the description is approved.
+	 *
+	 * @since 2.0.0
+	 */
+	public function is_approved() {
+		return 0 !== $this->metadata['approved'];
+	}
+
+	/**
+	 * Approve or reject the description (administrators only).
+	 *
+	 * @param string $decision Either 'approve' or 'disapprove'.
+	 *
+	 * @since 1.1.0
+	 */
 	public function approve( string $decision ) {
+		// TODO @alexandrosraikos: Handle disapproval also, with reason for rejection (#135).
 		PolicyMS_Communication_Controller::api_request(
 			'POST',
 			'/descriptions/permit/all/' . $this->id,
@@ -119,6 +272,14 @@ class PolicyMS_Description {
 		);
 	}
 
+	/**
+	 * Set the default cover image for the description.
+	 *
+	 * @param string $description_id The ID of the description.
+	 * @param string $image_id The ID of the image.
+	 *
+	 * @since 1.1.0
+	 */
 	public static function set_default_image( string $description_id, string $image_id ) {
 		PolicyMS_Communication_Controller::api_request(
 			'PUT',
@@ -128,6 +289,14 @@ class PolicyMS_Description {
 		);
 	}
 
+
+	/**
+	 * Remove the default cover image for the description.
+	 *
+	 * @param string $description_id The ID of the description.
+	 *
+	 * @since 1.1.0
+	 */
 	public static function remove_default_image( string $description_id ) {
 		PolicyMS_Communication_Controller::api_request(
 			'DELETE',
@@ -137,6 +306,13 @@ class PolicyMS_Description {
 		);
 	}
 
+	/**
+	 * Get all of the description's reviews.
+	 *
+	 * @param int $page The page number.
+	 *
+	 * @since 1.1.0
+	 */
 	public function get_reviews( int $page = 1 ) {
 		if ( empty( $this->reviews ) ) {
 			$this->reviews = PolicyMS_Review::get_reviews( $this, $page );
@@ -144,7 +320,17 @@ class PolicyMS_Description {
 		return $this->reviews;
 	}
 
+	/**
+	 * Parse the API response fields to populate `PolicyMS_Description` properties.
+	 *
+	 * @param array $description The description data.
+	 * @throws PolicyMSInvalidDataException When the ID cannot be found.
+	 *
+	 * @since 1.1.0
+	 */
 	protected function match_field( array $description ) {
+
+		// Check for existing IDs.
 		if ( empty( $description['id'] ) ) {
 			if ( empty( $description['_id'] ) ) {
 				throw new PolicyMSInvalidDataException(
@@ -157,18 +343,24 @@ class PolicyMS_Description {
 			$this->id = $description['id'];
 		}
 
+		// Populate main variables.
 		if ( empty( $description['info'] || empty( $description['metadata'] ) || empty( $description['main_image'] ) ) ) {
 			throw new PolicyMSInvalidDataException(
 				'The description did not match the expected schema.'
 			);
 		} else {
-			$this->type        = $description['info']['type'];
-			$this->information = $description['info'];
-			$this->links       = $description['links'] ?? null;
-			$this->metadata    = $description['metadata'];
-			$this->image_id    = $description['main_image'];
+			$this->type                = $description['info']['type'];
+			$this->information         = $description['info'];
+			$this->links               = $description['links'] ?? null;
+			$this->metadata            = $description['metadata'];
+			$this->image_id            = $description['main_image'];
+			$this->url                 = PolicyMS_Public::get_setting( true, 'description_page' )
+				. '?did=' . $description['id'];
+			$this->cover_thumbnail_url = PolicyMS_Public::get_setting( true, 'marketplace_host' )
+				. '/descriptions/image/' . $description['id'];
 		}
 
+		// Populate assets.
 		if ( ! empty( $description['assets'] ) ) {
 			$this->assets = array();
 			foreach ( $description['assets'] as $category => $assets ) {
@@ -186,6 +378,7 @@ class PolicyMS_Description {
 			}
 		}
 
+		// Populate user created review.
 		if ( ! empty( $description['your_review'][0] ) ) {
 			$this->user_review = new PolicyMS_Review(
 				$description['your_review'][0]['comment'],
@@ -199,163 +392,13 @@ class PolicyMS_Description {
 		}
 	}
 
-	protected static function parse( array $response, bool $specify_pages = true, string $container_key = 'results' ) {
-		$descriptions = array();
-		if ( isset( $response[ $container_key ] ) ) {
-			foreach ( $response[ $container_key ] as $number => $page ) {
-				$descriptions[ $number ] = array();
-				foreach ( $page as $description ) {
-					$descriptions[ $number ][] = new self( $description['id'], $description );
-				}
-			}
-			if ( $specify_pages ) {
-				return array(
-					'pages'   => $response['pages'],
-					'content' => $descriptions,
-				);
-			} else {
-				return $descriptions;
-			}
-		} else {
-			return array();
-		}
-	}
-
-	protected static function parse_filter_query( bool $pagination = true ) {
-
-		// Check arguments
-		if ( ! empty( $_GET['sort-by'] ) ) {
-			if ( $_GET['sort-by'] != 'newest' &&
-				$_GET['sort-by'] != 'oldest' &&
-				$_GET['sort-by'] != 'rating-asc' &&
-				$_GET['sort-by'] != 'rating-desc' &&
-				$_GET['sort-by'] != 'views-asc' &&
-				$_GET['sort-by'] != 'views-desc' &&
-				$_GET['sort-by'] != 'title'
-			) {
-				throw new PolicyMSInvalidDataException(
-					'The ' . $_GET['sort-by'] . ' sorting setting was not found.'
-				);
-			}
-		}
-
-		// Page parameter.
-		$page = ( $pagination ) ? ( filter_var( $_GET['descriptions-page'] ?? 1, FILTER_SANITIZE_NUMBER_INT ) ) : null;
-
-		// Provider parameter.
-		$provider = '';
-		if ( empty( $_GET['provider'][0] ) ) {
-			$provider = null;
-		} else {
-			$provider = implode( ',', $_GET['provider'] );
-		}
-
-		return '?' . http_build_query(
-			array(
-				'sortBy'                   => ! empty( $_GET['sort-by'] ) ? sanitize_key( $_GET['sort-by'] ) : null,
-				'page'                     => $page,
-				'itemsPerPage'             => filter_var( $_GET['items-per-page'] ?? 10, FILTER_SANITIZE_NUMBER_INT ),
-				'info.owner'               => ! empty( $_GET['owner'] ) ? sanitize_key( $_GET['owner'] ) : null,
-				'info.title'               => ! empty( $_GET['search'] ) ? sanitize_text_field( $_GET['search'] ) : null,
-				'info.subtype'             => ! empty( $_GET['subtype'] ) ? sanitize_key( $_GET['subtype'] ) : null,
-				'info.comments.in'         => ! empty( $_GET['comments'] ) ? sanitize_key( $_GET['comments'] ) : null,
-				'info.contact'             => ! empty( $_GET['contact'] ) ? sanitize_key( $_GET['contact'] ) : null,
-				'info.description.in'      => ! empty( $_GET['search'] ) ? sanitize_text_field( $_GET['search'] ) : null,
-				'info.fieldOfUse'          => ! empty( $_GET['field-of-use'] ) ? sanitize_key( $_GET['field-of-use'] ) : null,
-				'metadata.provider'        => $provider,
-				'metadata.uploadDate.gte'  => ! empty( $_GET['upload-date-gte'] ) ? $_GET['upload-date-gte'] : null,
-				'metadata.uploadDate.lte'  => ! empty( $_GET['upload-date-lte'] ) ? $_GET['upload-date-lte'] : null,
-				'metadata.last_updated_by' => ! empty( $_GET['last-updated-by'] ) ? sanitize_key( $_GET['last-updated-by'] ) : null,
-				'metadata.views.gte'       => ! empty( $_GET['views-gte'] ) ? filter_var( $_GET['views-gte'], FILTER_VALIDATE_INT ) : null,
-				'metadata.views.lte'       => ! empty( $_GET['views-lte'] ) ? filter_var( $_GET['views-lte'], FILTER_VALIDATE_INT ) : null,
-				'metadata.updateDate.gte'  => ! empty( $_GET['update-date-gte'] ) ? $_GET['update-date-gte'] : null,
-				'metadata.updateDate.lte'  => ! empty( $_GET['upload-date-lte'] ) ? $_GET['upload-date-lte'] : null,
-			)
-		);
-	}
-
-	public static function get_filters_range() {
-		return PolicyMS_Communication_Controller::api_request(
-			'GET',
-			'/descriptions/statistics/filtering',
-			array()
-		)['results'] ?? array();
-	}
-
-	public static function get_pending( ?string $type = null ) {
-		$token = PolicyMS_Account::retrieve_token();
-
-		// Get all descriptions.
-		if ( empty( $type ) ) {
-			$response = PolicyMS_Communication_Controller::api_request(
-				'GET',
-				'/descriptions/permit/all?itemsPerPage=5',
-				array(),
-				$token
-			);
-		}
-
-		// Filtering by type.
-		else {
-			$response = PolicyMS_Communication_Controller::api_request(
-				'GET',
-				'/descriptions/permit/' . $type,
-				array(),
-				$token
-			);
-		}
-
-		return self::parse( $response, false );
-	}
-
-	public static function get_owned( PolicyMS_User $user, string $token ) {
-		$response = PolicyMS_Communication_Controller::api_request(
-			'GET',
-			'/descriptions/provider/' . $user->id . '/all' . self::parse_filter_query( false ),
-			array(),
-			$token
-		);
-
-		return self::parse( $response, false );
-	}
-
-	public static function get_featured() {
-		$response = PolicyMS_Communication_Controller::api_request(
-			'GET',
-			'/frontend/homepage'
-		);
-
-		$featured = array(
-			'latest'      => self::parse( $response, false, 'latest' ),
-			'most_viewed' => self::parse( $response, false, 'most_viewed' ),
-			'statistics'  => $response['statistics'],
-			'suggestions' => self::parse( $response, false, 'suggestions' ),
-			'top_rated'   => self::parse( $response, false, 'top_rated' ),
-		);
-
-		return $featured;
-	}
-
-	public static function get_all() {
-		$filters = self::parse_filter_query();
-
-		if ( ! empty( $_GET['type'] ) ) {
-			// Filter by type.
-			$response = PolicyMS_Communication_Controller::api_request(
-				'GET',
-				'/descriptions/' . sanitize_key( $_GET['type'] ) . $filters
-			);
-		} else {
-			// Get all descriptions.
-			$response = PolicyMS_Communication_Controller::api_request(
-				'GET',
-				'/descriptions/all' . $filters,
-			);
-		}
-
-		return self::parse( $response );
-	}
-
+	/**
+	 * Create a new description.
+	 *
+	 * @param array $information The new description's information.
+	 *
+	 * @return string The new description's ID.
+	 */
 	public static function create( array $information ): string {
 		return PolicyMS_Communication_Controller::api_request(
 			'POST',

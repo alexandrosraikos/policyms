@@ -7,6 +7,8 @@
 
 var $ = jQuery;
 
+FontAwesomeConfig = { autoA11y: true }
+
 /**
  * Global
  *
