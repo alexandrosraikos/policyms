@@ -17,7 +17,7 @@
  *
  * @package    PolicyMS
  * @subpackage PolicyMS/public
- * @author     Alexandros Raikos <araikos@unipi.gr>
+ * @author     Alexandros Raikos <alexandros@araikos.gr>
  */
 class PolicyMS_Public {
 
@@ -236,9 +236,10 @@ class PolicyMS_Public {
 			// Run completion function.
 			$completion();
 		} catch ( PolicyMSAPIError $e ) {
+			// NOTE: No need to escape this self-created HTML output.
 			print notice_html( $e->getMessage(), 'error', $e->http_status );
 		} catch ( \Exception $e ) {
-			// Display the error.
+			// NOTE: No need to escape this self-created HTML output.
 			print notice_html( $e->getMessage() );
 		}
 	}
@@ -254,7 +255,6 @@ class PolicyMS_Public {
 	 * @since 1.2.0
 	 */
 	public static function get_setting( bool $throw, string ...$option_ids ) {
-
 		$options  = get_option( 'policyms_plugin_settings' );
 		$settings = array();
 		foreach ( $option_ids as $id ) {
@@ -267,6 +267,7 @@ class PolicyMS_Public {
 				if ( $throw ) {
 					throw new PolicyMSMissingOptionsException( $message );
 				} else {
+					// NOTE: No need to escape this self-created HTML output.
 					print notice_html( $message, 'notice' );
 				}
 			}
@@ -333,7 +334,7 @@ class PolicyMS_Public {
 				'account_page',
 				'registration_page',
 			);
-		} catch ( PolicyMSMissingOptionsException $e ) {
+		} catch ( \Exception $e ) {
 			return $items;
 		}
 
@@ -354,7 +355,6 @@ class PolicyMS_Public {
 	 * Register the shortcodes for user registration.
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <araikos@unipi.gr>
 	 */
 	public static function account_user_registration_shortcode() {
 		self::exception_handler(
@@ -362,29 +362,15 @@ class PolicyMS_Public {
 				$options = self::get_setting( true, 'login_page', 'account_page', 'tos_url' );
 
 				wp_enqueue_script( 'policyms-account-registration' );
-				wp_localize_script(
-					'policyms-account-registration',
-					'AccountRegistrationProperties',
-					array(
-						'nonce'       => wp_create_nonce( 'policyms_account_user_registration' ),
-						'accountPage' => $options['account_page'],
-					)
-				);
-				wp_enqueue_script( 'policyms-account-authentication' );
-				wp_localize_script(
-					'policyms-account-authentication',
-					'AccountAuthenticationProperties',
-					array(
-						'GoogleSSORegistrationNonce'   => wp_create_nonce( 'policyms_account_user_registration_google' ),
-						'KeyCloakSSORegistrationNonce' => wp_create_nonce( 'policyms_account_user_registration_keycloak' ),
-					)
-				);
 
-				account_user_registration_html(
+				// NOTE: No need to escape this self-created HTML output.
+				print user_registration_html(
+					PolicyMS_Account::is_authenticated(),
+					wp_create_nonce( 'policyms_account_user_registration' ),
 					$options['login_page'],
-					$options['tos_url'] ?? '',
-					self::get_setting( true, 'egi_redirection_page', 'egi_client_id', 'egi_code_challenge' ),
-					PolicyMS_Account::is_authenticated()
+					$options['account_page'],
+					$options['tos_url'],
+					new PolicyMS_OAuth_Controller()
 				);
 			}
 		);
@@ -395,29 +381,21 @@ class PolicyMS_Public {
 	 * Register the shortcode for account authentication
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <araikos@unipi.gr>
+	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public static function account_user_authentication_shortcode() {
 		self::exception_handler(
 			function () {
+				$home_url = ( empty( wp_parse_url( get_site_url() )['path'] )
+					? '/'
+					: wp_parse_url( get_site_url() )['path'] );
 
-				wp_enqueue_script( 'policyms-account-authentication' );
-				wp_localize_script(
-					'policyms-account-authentication',
-					'AccountAuthenticationProperties',
-					array(
-						'nonce'                        => wp_create_nonce( 'policyms_account_user_authentication' ),
-						'GoogleSSONonce'               => wp_create_nonce( 'policyms_account_user_authentication_google' ),
-						'GoogleSSORegistrationNonce'   => wp_create_nonce( 'policyms_account_user_registration_google' ),
-						'KeyCloakSSONonce'             => wp_create_nonce( 'policyms_account_user_authentication_keycloak' ),
-						'KeyCloakSSORegistrationNonce' => wp_create_nonce( 'policyms_account_user_registration_keycloak' ),
-					)
-				);
-
-				account_user_authentication_html(
+				print user_authentication_html(
+					wp_create_nonce( 'policyms_account_user_authentication' ),
+					$home_url,
 					self::get_setting( true, 'registration_page' ),
 					self::get_setting( true, 'password_reset_page' ),
-					self::get_setting( true, 'egi_redirection_page', 'egi_client_id', 'egi_code_challenge' ),
+					new PolicyMS_OAuth_Controller(),
 					PolicyMS_Account::is_authenticated()
 				);
 			}
@@ -448,7 +426,7 @@ class PolicyMS_Public {
 	 * @uses    account_html()
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <araikos@unipi.gr>
+	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public static function account_user_shortcode() {
 
@@ -569,7 +547,7 @@ class PolicyMS_Public {
 	 * @uses    PolicyMS_Public::account_registration()
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <araikos@unipi.gr>
+	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public function account_user_registration_handler() {
 		$this->ajax_handler(
@@ -611,7 +589,7 @@ class PolicyMS_Public {
 	 * @uses    PolicyMS_Public::account_authentication)
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <araikos@unipi.gr>
+	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public function account_user_authentication_handler() {
 		$this->ajax_handler(
@@ -711,7 +689,7 @@ class PolicyMS_Public {
 	 * @uses    PolicyMS_Public::account_registration()
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <araikos@unipi.gr>
+	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public function account_user_editing_handler() {
 		$this->ajax_handler(
@@ -767,7 +745,7 @@ class PolicyMS_Public {
 	 * Handle user account editing AJAX requests.
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <araikos@unipi.gr>
+	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public function account_user_data_request_handler() {
 		$this->ajax_handler(
@@ -784,7 +762,7 @@ class PolicyMS_Public {
 	 * Handle user account deletion AJAX requests.
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <araikos@unipi.gr>
+	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public function account_user_deletion_handler() {
 		$this->ajax_handler(
@@ -810,7 +788,7 @@ class PolicyMS_Public {
 	 * Register all the shortcodes concerning content handling.
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <araikos@unipi.gr>
+	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public function add_description_shortcodes() {
 		add_shortcode( 'policyms-descriptions-featured', 'PolicyMS_Public::descriptions_featured_shortcode' );
@@ -829,7 +807,7 @@ class PolicyMS_Public {
 	 * Display multiple Description Objects for visitors and authenticated users.
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <araikos@unipi.gr>
+	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public static function descriptions_archive_shortcode() {
 		self::exception_handler(
@@ -849,7 +827,7 @@ class PolicyMS_Public {
 	 * Display featured descriptions for visitors and authenticated users.
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <araikos@unipi.gr>
+	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public static function descriptions_featured_shortcode() {
 		self::exception_handler(
@@ -867,7 +845,7 @@ class PolicyMS_Public {
 	 * Display the description creation form for authenticated users.
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <araikos@unipi.gr>
+	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public static function description_creation_shortcode() {
 		self::exception_handler(
@@ -895,7 +873,7 @@ class PolicyMS_Public {
 	 * Display a single description object for authenticated users.
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <araikos@unipi.gr>
+	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public static function description_shortcode() {
 		self::exception_handler(
@@ -993,7 +971,7 @@ class PolicyMS_Public {
 	 * @uses    PolicyMS_Public::description_editing()
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <araikos@unipi.gr>
+	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public function description_editing_handler() {
 		$this->ajax_handler(
@@ -1052,7 +1030,7 @@ class PolicyMS_Public {
 	 * @uses    PolicyMS_Public::description_approval()
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <araikos@unipi.gr>
+	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	function description_approval_handler() {
 		$this->ajax_handler(
@@ -1073,7 +1051,7 @@ class PolicyMS_Public {
 	 * @uses    PolicyMS_Public::description_creation()
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <araikos@unipi.gr>
+	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public function description_creation_handler() {
 		$this->ajax_handler(
@@ -1123,7 +1101,7 @@ class PolicyMS_Public {
 	 * @uses    PolicyMS_Public::description_creation()
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <araikos@unipi.gr>
+	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public function description_deletion_handler() {
 		$this->ajax_handler(

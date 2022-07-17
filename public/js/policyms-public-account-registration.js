@@ -2,8 +2,14 @@
  * @file Provides dynamic fields and handles AJAX requests for forms and buttons
  * in the account registration shortcode.
  *
- * @author Alexandros Raikos <araikos@unipi.gr>
+ * @author Alexandros Raikos <alexandros@araikos.gr>
  */
+
+var presetElementQueries = {
+  registrationForm: 'form[data-action="policyms-user-registration"]',
+  addSocialFieldButton: 'form[data-action="policyms-user-registration"] > fieldset[name="account-details"] > .socials > button[data-action="add-field"]',
+  removeSocialFieldButton: 'form[data-action="policyms-user-registration"] > fieldset[name="account-details"] > .socials button[data-action="remove-field"]'
+};
 
 (function ($) {
   "use strict";
@@ -21,7 +27,7 @@
      *
      * @param {Event} e
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function addSocialField(e) {
       e.preventDefault();
@@ -40,7 +46,7 @@
      *
      * @param {Event} e
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function removeSocialField(e) {
       e.preventDefault();
@@ -52,19 +58,19 @@
      *
      * @param {Event} e
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function registerUser(e) {
       // TODO @alexandrosraikos: Correct required fields prompting. (#129)
       e.preventDefault();
       makeWPRequest(
-        "#policyms-registration button[type=submit]",
+        presetElementQueries.registrationForm,
         "policyms_account_user_registration",
-        AccountRegistrationProperties.nonce,
-        new FormData($("#policyms-registration")[0]),
+        $(presetElementQueries.registrationForm).data('nonce'),
+        new FormData($(presetElementQueries.registrationForm)[0]),
         (data) => {
           setAuthorizedToken(data);
-          window.location.href = AccountRegistrationProperties.accountPage;
+          window.location.href = $(presetElementQueries.registrationForm).data('redirect');
         }
       );
     }
@@ -76,18 +82,20 @@
      */
 
     // Add another social field.
-    $("#policyms-registration .socials button.add-field").click(
+    $(presetElementQueries.addSocialFieldButton).click(
       addSocialField
     );
 
     // Remove last social field.
     $(document).on(
       "click",
-      "#policyms-registration .socials button.remove-field",
+      presetElementQueries.removeSocialFieldButton,
       removeSocialField
     );
 
     // Submit the registration.
-    $("#policyms-registration").submit(registerUser);
+    $(presetElementQueries.registrationForm).submit(
+      registerUser
+    );
   });
 })(jQuery);

@@ -2,7 +2,7 @@
  * @file Provides dynamic fields and handles AJAX requests for forms and buttons
  * in the account shortcode.
  *
- * @author Alexandros Raikos <araikos@unipi.gr>
+ * @author Alexandros Raikos <alexandros@araikos.gr>
  */
 
 (function ($) {
@@ -84,7 +84,7 @@
      * @param {Int} sortBy Defaults to form value and can be used
      * to rearrange based on a custom sorting rule: `newest`, `oldest`, `rating-asc`, `rating-desc`, `views-asc`, `views-desc` and `title`.
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function rearrangeAssetsLists(
       category,
@@ -210,7 +210,7 @@
      * (currently only supports `description`, `review` and `approval`).
      * @param {[String]} collections
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function calculateCollectionFilters(category, collections = null) {
       if (collections == null) {
@@ -245,7 +245,7 @@
      * @param {jQuery} button The filter button.
      * @param {String} category The category of the list.
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function applyFilters(category, collection) {
       // Highlight active button.
@@ -301,7 +301,7 @@
      *
      * @param {Event} e
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function changePage(e) {
       e.preventDefault();
@@ -342,7 +342,7 @@
        * @listens change
        * @param {Event} e
        *
-       * @author Alexandros Raikos <araikos@unipi.gr>
+       * @author Alexandros Raikos <alexandros@araikos.gr>
        */
       function (e) {
         e.preventDefault();
@@ -360,7 +360,7 @@
        * @listens change
        * @param {Event} e
        *
-       * @author Alexandros Raikos <araikos@unipi.gr>
+       * @author Alexandros Raikos <alexandros@araikos.gr>
        */
       function (e) {
         e.preventDefault();
@@ -403,7 +403,7 @@
      *
      * @param {Event} e
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function toggleFormFields(e) {
       e.preventDefault();
@@ -422,7 +422,7 @@
      *
      * @param {Event} e
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function addWeblinkField(e) {
       e.preventDefault();
@@ -435,7 +435,7 @@
      * Remove the weblink field.
      * @param {Event} e
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function removeWeblinkField(e) {
       e.preventDefault();
@@ -447,7 +447,7 @@
      *
      * @param {Boolean} active Set to `true` if you want to display the prompt.
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function setCurrentPasswordRequirement(enabled = false) {
       if (enabled) {
@@ -472,7 +472,7 @@
      *
      * @param {Event} e
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function updateInformation(e) {
       e.preventDefault();
@@ -501,7 +501,7 @@
      *
      * @param {Event} e
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function deleteProfilePicture(e) {
       e.preventDefault();
@@ -532,7 +532,7 @@
      *
      * @param {Event} e
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function retryVerification(e) {
       e.preventDefault();
@@ -562,7 +562,7 @@
      *
      * @param {Event} e
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function requestDataCopy(e) {
       e.preventDefault();
@@ -594,7 +594,7 @@
      *
      * @param {Event} e
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function validateDeletionRequest(e) {
       e.preventDefault();

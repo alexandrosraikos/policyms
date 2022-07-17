@@ -18,7 +18,7 @@
  *
  * @package    PolicyMS
  * @subpackage PolicyMS/admin
- * @author     Alexandros Raikos <araikos@unipi.gr>
+ * @author     Alexandros Raikos <alexandros@araikos.gr>
  */
 class PolicyMS_Admin {
 

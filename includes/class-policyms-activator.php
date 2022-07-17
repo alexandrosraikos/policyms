@@ -18,7 +18,7 @@
  * @since      1.0.0
  * @package    PolicyMS
  * @subpackage PolicyMS/includes
- * @author     Alexandros Raikos <araikos@unipi.gr>
+ * @author     Alexandros Raikos <alexandros@araikos.gr>
  */
 class PolicyMS_Activator {
 

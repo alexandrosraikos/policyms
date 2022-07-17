@@ -243,7 +243,7 @@ function descriptions_archive_filters_html(
  * @param   bool  $empty_notice Whether to notify on blank descriptions collection.
  *
  * @since   1.0.0
- * @author  Alexandros Raikos <araikos@unipi.gr>
+ * @author  Alexandros Raikos <alexandros@araikos.gr>
  * @author  Eleftheria Kouremenou <elkour@unipi.gr>
  */
 function descriptions_grid_html( array $descriptions, bool $empty_notice = true ): string {
@@ -391,7 +391,7 @@ function featured_descriptions_html( array $categories ): string {
  * @param   int                             $selected_page The selected page.
  * @return string The descriptions archive HTML.
  * @since   1.0.0
- * @author  Alexandros Raikos <araikos@unipi.gr>
+ * @author  Alexandros Raikos <alexandros@araikos.gr>
  * @author  Eleftheria Kouremenou <elkour@unipi.gr>
  */
 function descriptions_archive_html(
@@ -812,7 +812,7 @@ function description_editor_html( PolicyMS_Description $description = null, bool
  * @param   bool   $administrator Whether the requester is an administrator.
  *
  * @since   1.0.0
- * @author  Alexandros Raikos <araikos@unipi.gr>
+ * @author  Alexandros Raikos <alexandros@araikos.gr>
  * @author  Eleftheria Kouremenou <elkour@unipi.gr>
  */
 function description_reviews_list_html(
@@ -889,7 +889,7 @@ function description_reviews_list_html(
  *                          `['authenticated' => bool, 'administrator' => bool, 'provider' =>bool]` format.
  *
  * @since   1.0.0
- * @author  Alexandros Raikos <araikos@unipi.gr>
+ * @author  Alexandros Raikos <alexandros@araikos.gr>
  * @author  Eleftheria Kouremenou <elkour@unipi.gr>
  */
 function description_reviews_html(
@@ -1002,7 +1002,7 @@ function description_reviews_html(
  * @param   array                $image_blobs The array of image blob data.
  *
  * @since   1.0.0
- * @author  Alexandros Raikos <araikos@unipi.gr>
+ * @author  Alexandros Raikos <alexandros@araikos.gr>
  * @author  Eleftheria Kouremenou <elkour@unipi.gr>
  */
 function description_html(

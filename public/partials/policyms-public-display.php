@@ -92,7 +92,7 @@ function menu_items_html(
  * @param   array $login_page The login page defined in the WordPress Settings.
  *
  * @since   1.0.0
- * @author  Alexandros Raikos <araikos@unipi.gr>
+ * @author  Alexandros Raikos <alexandros@araikos.gr>
  * @author  Eleftheria Kouremenou <elkour@unipi.gr>
  */
 function show_lock( $login_page ) {
@@ -209,7 +209,7 @@ function time_elapsed_string( $datetime, $full = false ) {
  * @throws PolicyMSInvalidDataException On non-default page sorting, sizing selections or category mismatching.
  *
  * @since   1.0.0
- * @author  Alexandros Raikos <araikos@unipi.gr>
+ * @author  Alexandros Raikos <alexandros@araikos.gr>
  */
 function content_list_html(
 	bool $visitor,

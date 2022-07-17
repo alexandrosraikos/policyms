@@ -1,7 +1,7 @@
 /**
  * @file Provides global functions for PolicyMS shortcodes.
  *
- * @author Alexandros Raikos <araikos@unipi.gr>
+ * @author Alexandros Raikos <alexandros@araikos.gr>
  * @since 1.0.0
  */
 
@@ -234,7 +234,7 @@ class Modal {
  *
  * @param {string} encryptedToken
  *
- * @author Alexandros Raikos <araikos@unipi.gr>
+ * @author Alexandros Raikos <alexandros@araikos.gr>
  */
 function setAuthorizedToken(encryptedToken) {
   let date = new Date();
@@ -255,7 +255,7 @@ function setAuthorizedToken(encryptedToken) {
  *
  * @param {Boolean} reload Choose `true` if you want to reload into the same page.
  *
- * @author Alexandros Raikos <araikos@unipi.gr>
+ * @author Alexandros Raikos <alexandros@araikos.gr>
  */
 function removeAuthorization(redirect_login = false) {
   document.cookie =
@@ -279,7 +279,7 @@ function removeAuthorization(redirect_login = false) {
  * @param {string} type The type of alert (either an `'error'` or `'notice'`)/
  * @param {Boolean} placeBefore Whether the alert is placed before the selected element.
  *
- * @author Alexandros Raikos <araikos@unipi.gr>
+ * @author Alexandros Raikos <alexandros@araikos.gr>
  */
 function showAlert(
   selector,
@@ -320,7 +320,7 @@ function showAlert(
  *
  * @param {Event} e The click event
  *
- * @author Alexandros Raikos <araikos@unipi.gr>
+ * @author Alexandros Raikos <alexandros@araikos.gr>
  * @author Eleftheria Kouremenou <elkour@unipi.gr>
  */
 function toggleFileList(e) {

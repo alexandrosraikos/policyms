@@ -2,7 +2,7 @@
  * @file Provides dynamic fields and handles form requests for forms and buttons
  * in the asset shortcode.
  *
- * @author Alexandros Raikos <araikos@unipi.gr>
+ * @author Alexandros Raikos <alexandros@araikos.gr>
  * @author Eleftheria Kouremenou <elkour@unipi.gr>
  */
 
@@ -97,7 +97,7 @@
      *
      * @param {Event} e
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function updateDescription(e) {
       e.preventDefault();
@@ -125,7 +125,7 @@
      *
      * @param {Event} e
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function deleteDescription(e) {
       e.preventDefault();
@@ -150,7 +150,7 @@
      *
      * @param {Event} e
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function deleteAsset(e) {
       e.preventDefault();
@@ -227,7 +227,7 @@
      *
      * @param {Event} e
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function approvalRequest(e) {
       e.preventDefault();

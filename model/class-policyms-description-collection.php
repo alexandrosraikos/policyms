@@ -3,7 +3,7 @@
  * The class definition for description collections.
  *
  * @link       https://github.com/alexandrosraikos/policyms/
- * @since      1.1.0
+ * @since      2.0.0
  *
  * @package    PolicyMS
  * @subpackage PolicyMS/model
@@ -188,18 +188,19 @@ class PolicyMS_Description_Collection {
 	/**
 	 * Get all the descriptions, with any existing filter queries.
 	 *
+	 * @param string $category The description category, if any.
 	 * @return self The description collection.
 	 *
 	 * @since 2.0.0
 	 */
-	public static function get_all(): self {
+	public static function get_all( string $category = '' ): self {
 		$filters = PolicyMS_Description_Filters::build_query();
 
-		if ( ! empty( $_GET['type'] ) ) {
+		if ( $category ) {
 			// Filter by type.
 			$response = PolicyMS_Communication_Controller::api_request(
 				'GET',
-				'/descriptions/' . sanitize_key( $_GET['type'] ) . $filters
+				'/descriptions/' . $category . $filters
 			);
 		} else {
 			// Get all descriptions.

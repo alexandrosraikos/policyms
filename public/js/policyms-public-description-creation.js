@@ -2,7 +2,7 @@
  * @file Provides dynamic fields and handles the AJAX request
  * for the asset creation form.
  *
- * @author Alexandros Raikos <araikos@unipi.gr>
+ * @author Alexandros Raikos <alexandros@araikos.gr>
  */
 
 (function ($) {
@@ -22,7 +22,7 @@
      *
      * @param {Event} e
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function addLinksField(e) {
       e.preventDefault();
@@ -41,7 +41,7 @@
      *
      * @param {Event} e
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function removeLinksField(e) {
       e.preventDefault();
@@ -54,7 +54,7 @@
      *
      * @param {Event} e
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      */
     function createAsset(e) {
       // TODO @alexandrosraikos: Correct required fields prompting. (#129)

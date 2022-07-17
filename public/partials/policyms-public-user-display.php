@@ -21,10 +21,14 @@
  * @author  Alexandros Raikos <alexandros@araikos.gr>
  */
 function user_registration_html(
+	bool $authenticated,
+	string $nonce,
 	string $authentication_url,
+	string $account_page_url,
 	string $tos_url,
-	PolicyMS_OAuth_Controller $oauth_controller,
-	bool $authenticated ) {
+	PolicyMS_OAuth_Controller $oauth_controller
+
+) {
 	if ( $authenticated ) {
 		return notice_html( "You're already logged in.", 'notice' );
 	} else {
@@ -32,7 +36,11 @@ function user_registration_html(
 		return <<<HTML
 			<div class="policyms-user-registration">
 				{$sso_buttons}
-				<form id="policyms-registration" action="">
+				<form 
+					data-action="policyms-user-registration"
+					data-redirect="{$account_page_url}"
+					data-nonce="{$nonce}"
+					action="">
 					<fieldset name="account-details">
 						<h2>Account details</h2>
 						<p>Fill in the following fields with your personal details. This information will be used to personalize your experience within the marketplace platform and showcase your profile to other registered users. Fields marked with (*) are required for registration.</p>
@@ -71,10 +79,10 @@ function user_registration_html(
 								<div>
 									<input type="text" name="socials-title[]" placeholder="Example" />
 									<input type="url" name="socials-url[]" placeholder="https://www.example.org/" />
-									<button class="remove-field" title="Remove this link."><span class="fas fa-times"></span></button>
+									<button data-action="remove-field" title="Remove this link."><span class="fas fa-times"></span></button>
 								</div>
 							</div>
-							<button class="add-field" title="Add another link."><span class="fas fa-plus"></span> Add link</button>
+							<button data-action="add-field" title="Add another link."><span class="fas fa-plus"></span> Add link</button>
 						</div>
 					</fieldset>
 					<fieldset name="account-contact">
@@ -122,6 +130,8 @@ function user_registration_html(
  * @author Alexandros Raikos <alexandros@araikos.gr>
  */
 function user_authentication_html(
+	string $nonce,
+	string $home_url,
 	string $registration_url,
 	string $reset_password_page_url,
 	PolicyMS_OAuth_Controller $oauth_controller,
@@ -134,7 +144,11 @@ function user_authentication_html(
 		return <<<HTML
 			<div class="policyms-user-authentication">
 				{$sso_buttons}
-				<form action="policyms-user-authentication">
+				<form 
+					data-action="policyms-user-authentication"
+					data-redirect="{$home_url}"
+					data-nonce="{$nonce}"
+					action="">
 					<fieldset name=" account-credentials">
 						<h2>Insert your credentials</h2>
 						<p>The following information is required to log you in.</p>
@@ -1001,7 +1015,7 @@ function user_profile_details_html(
  * @return string The account page HTML.
  *
  * @since   1.0.0
- * @author  Alexandros Raikos <araikos@unipi.gr>
+ * @author  Alexandros Raikos <alexandros@araikos.gr>
  */
 function user_html(
 		PolicyMS_User $user,

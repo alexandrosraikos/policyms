@@ -2,7 +2,7 @@
  * @file Provides dynamic fields and handles form requests for forms and buttons
  * in the description archive shortcode.
  *
- * @author Alexandros Raikos <araikos@unipi.gr>
+ * @author Alexandros Raikos <alexandros@araikos.gr>
  * @author Eleftheria Kouremenou <elkour@unipi.gr>
  */
 
@@ -22,7 +22,7 @@
      *
      * @param {Event} e The click event
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      * @author Eleftheria Kouremenou <elkour@unipi.gr>
      */
     function switchPage(e) {
@@ -44,7 +44,7 @@
      *
      * @param {Event} e The click event
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      * @author Eleftheria Kouremenou <elkour@unipi.gr>
      */
     function addSortFilter(e) {
@@ -63,7 +63,7 @@
      *
      * @param {Event} e The click event
      *
-     * @author Alexandros Raikos <araikos@unipi.gr>
+     * @author Alexandros Raikos <alexandros@araikos.gr>
      * @author Eleftheria Kouremenou <elkour@unipi.gr>
      */
     function addSizeFilter(e) {

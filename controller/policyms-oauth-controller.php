@@ -86,16 +86,15 @@ class PolicyMS_OAuth_Controller {
 	 * @since 2.0.0
 	 */
 	private function get_connect_html( string $service, bool $register ) {
-		$context = $register ? 'registration' : 'authentication';
+		$context  = $register ? 'registration' : 'authentication';
+		$home_url = ( empty( wp_parse_url( get_site_url() )['path'] )
+		? '/'
+		: wp_parse_url( get_site_url() )['path'] );
 		switch ( $service ) {
 			case 'google':
 				$nonce = ( $register )
 				? wp_create_nonce( 'policyms_account_user_registration_google' )
 				: wp_create_nonce( 'policyms_account_user_authentication_google' );
-
-				$home_url = ( empty( wp_parse_url( get_site_url() )['path'] )
-				? '/'
-				: wp_parse_url( get_site_url() )['path'] );
 
 				return <<<HTML
 					<div 
@@ -119,8 +118,9 @@ class PolicyMS_OAuth_Controller {
 						id="keycloak" 
 						class="action keycloak" 
 						data-context="{$context}"
-						data-action="policyms-connect-keycloak"
-						data-nonce="{$nonce}">
+						data-action="show-keycloak-modal"
+						data-nonce="{$nonce}"
+						data-redirect="{$home_url}">
 						{$keycloak_button_label}
 					</button>
 				HTML;

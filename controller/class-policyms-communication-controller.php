@@ -8,7 +8,7 @@ class PolicyMS_Communication_Controller {
 	 * @uses    PolicyMS_Public::account_registration()
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <araikos@unipi.gr>
+	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public static function fileUploadErrorInterpreter( $code ) {
 		$errors = array(
@@ -38,7 +38,7 @@ class PolicyMS_Communication_Controller {
 	 * @throws ErrorException For connectivity and other API issues.
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <araikos@unipi.gr>
+	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public static function api_request( $http_method, $uri, $data = array(), $token = null, $headers = null, $skip_encoding = false ) {
 

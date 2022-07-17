@@ -1,21 +1,83 @@
 <?php
+/**
+ * The class definition for description assets.
+ *
+ * @link       https://github.com/alexandrosraikos/policyms/
+ * @since      1.1.0
+ *
+ * @package    PolicyMS
+ * @subpackage PolicyMS/model
+ */
 
+/**
+ * The class definition for description assets.
+ *
+ * Defines description asset properties and helper methods.
+ *
+ * @package    PolicyMS
+ * @subpackage PolicyMS/model
+ * @author     Alexandros Raikos <alexandros@araikos.gr>
+ */
 class PolicyMS_Asset {
+	/**
+	 * The asset's filename.
+	 *
+	 * @var string The file name.
+	 */
 	public string $filename;
+
+	/**
+	 * The asset's checksum type.
+	 *
+	 * @var string The checksum type.
+	 */
 	public string $checksum;
+
+	/**
+	 * The asset's size.
+	 *
+	 * @var string The size.
+	 */
 	public string $size;
+
+	/**
+	 * The asset's update date.
+	 *
+	 * @var string The update date.
+	 */
 	public string $update_date;
+
+	/**
+	 * The asset's version.
+	 *
+	 * @var int The version number.
+	 */
 	public int $version;
+
+	/**
+	 * The asset's number of downloads.
+	 *
+	 * @var int The number of downloads.
+	 */
 	public int $downloads;
 
 
+	/**
+	 * Initialize a description asset object instance.
+	 *
+	 * @param string                     $id The asset ID.
+	 * @param PolicyMS_Asset_Type|string $type The asset type instance or ID.
+	 * @param array                      $metadata The raw API metadata array.
+	 *
+	 * @since 1.1.0
+	 */
 	public function __construct(
 		public string $id,
-		public string $category,
+		public PolicyMS_Asset_Type $type,
 		array $metadata
 		) {
-		$this->id       = $id;
-		$this->category = $category;
+		$this->id   = $id;
+		$this->type = $type;
 
 		$this->filename    = $metadata['filename'];
 		$this->checksum    = $metadata['md5'];
@@ -25,16 +87,23 @@ class PolicyMS_Asset {
 		$this->downloads   = $metadata['downloads'];
 	}
 
-	public function update( string $file_identifier ): void {
+	/**
+	 * Update an asset.
+	 *
+	 * @param string $key The identifier in the `$_FILES` cache.
+	 *
+	 * @since 1.1.0
+	 */
+	public function update( string $key ): void {
 		$token = PolicyMS_Account::retrieve_token();
 
-		self::handle_retrieved_file(
-			$file_identifier,
-			$this->category,
+		self::handle_upload(
+			$key,
+			$this->type,
 			function ( $file ) use ( $token ) {
 				PolicyMS_Communication_Controller::api_request(
 					'PUT',
-					'/assets/' . $this->category . '/' . $this->id,
+					'/assets/' . $this->type->id . '/' . $this->id,
 					array(
 						'asset' => new CURLFile( $file['path'], $file['mimetype'], $file['name'] ),
 					),
@@ -48,7 +117,15 @@ class PolicyMS_Asset {
 		);
 	}
 
-	public static function delete( string $asset_category, $asset_id ): void {
+	/**
+	 * Delete an asset.
+	 *
+	 * @param string $asset_category The asset's category.
+	 * @param string $asset_id The asset's ID.
+	 *
+	 * @since 1.1.0
+	 */
+	public static function delete( string $asset_category, string $asset_id ): void {
 		PolicyMS_Communication_Controller::api_request(
 			'DELETE',
 			'/assets/' . $asset_category . '/' . $asset_id,
@@ -57,10 +134,13 @@ class PolicyMS_Asset {
 		);
 	}
 
+	/**
+	 * Pull the asset data (currently only supports image thumbnails).
+	 *
+	 * @since 1.1.0
+	 */
 	public function pull() {
-		$token = PolicyMS_Account::retrieve_token();
-
-		// Currently only supports images.
+		$token    = PolicyMS_Account::retrieve_token();
 		$response = PolicyMS_Communication_Controller::api_request(
 			'GET',
 			'/images/' . $this->id . '?thumbnail=yes',
@@ -75,6 +155,16 @@ class PolicyMS_Asset {
 		return $response;
 	}
 
+	/**
+	 * Generate a temporary asset one time download code.
+	 *
+	 * @param string $category The asset's category.
+	 * @param string $id The asset's ID.
+	 *
+	 * @return string The download OTC.
+	 *
+	 * @since 1.2.0
+	 */
 	public static function get_download_url( string $category, string $id ): string {
 		$response = PolicyMS_Communication_Controller::api_request(
 			'GET',
@@ -86,122 +176,147 @@ class PolicyMS_Asset {
 		return $response['otc'];
 	}
 
-	protected static function check_specs( $type, array $file ): void {
-		$byte_size_limit = ( ( new PolicyMS_User() )->is_admin() ) ? 100000000000 : 100000000;
+	/**
+	 * Abstracts all file upload checks and allows for direct
+	 * file usage on success using a completion.
+	 *
+	 * @param string              $key The `$_FILES` array key for the upload.
+	 * @param PolicyMS_Asset_Type $type The assorted type for the file.
+	 * @param callable            $completion The succeeding actions with the successfully checked file.
+	 * @throws PolicyMSInvalidDataException On invalid or missing file.
+	 *
+	 * @since 1.1.0
+	 */
+	protected static function handle_upload(
+		string $key,
+		PolicyMS_Asset_Type $type,
+		callable $completion
+	) {
 
-		if ( $file['size'] > $byte_size_limit ) {
-			throw new PolicyMSInvalidDataException(
-				'The file ' . $file['name'] . ' exceeds the size limit. Please upload a file less or equal to ' . ( $byte_size_limit / 1000000 ) . 'MB in size.'
-			);
-		}
-		switch ( $type ) {
-			case 'images':
-				if ( $file['mimetype'] != 'image/jpeg' &&
-					$file['mimetype'] != 'image/png'
-				) {
-					throw new PolicyMSInvalidDataException(
-						'Supported formats for asset images are .png and .jpg/.jpeg.'
-					);
-				}
-				break;
-			case 'videos':
-				if ( $file['mimetype'] != 'video/mp4' &&
-					$file['mimetype'] != 'video/ogg' &&
-					$file['mimetype'] != 'video/webm'
-				) {
-					throw new PolicyMSInvalidDataException(
-						'Supported formats for asset videos are .mp4, .ogg and .webm.'
-					);
-				}
-				break;
-			case 'files':
-				break;
-			default:
+		/**
+		 * Check size and type compatibility.
+		 *
+		 * @var callable
+		 */
+		$validate = function (
+			stdClass $file,
+			PolicyMS_Asset_Type $type
+		) {
+			$byte_size_limit = ( ( new PolicyMS_User() )->is_admin() ) ? 100000000000 : 100000000;
+
+			if ( $file->size > $byte_size_limit ) {
 				throw new PolicyMSInvalidDataException(
-					'There is no asset category of this type.'
+					'The file ' . $file->name . ' exceeds the size limit. Please upload a file less or equal to ' . ( $byte_size_limit / 1000000 ) . 'MB in size.'
 				);
-				break;
-		}
-	}
+			}
+			if ( ! $type->is_supported( $file->mimetype ) ) {
+				throw new PolicyMSInvalidDataException(
+					'Please provide a supported file format.'
+				);
+			}
+		};
 
-	protected static function handle_retrieved_file( string $name, string $category, callable $completion ) {
-		if ( empty( $_FILES[ $name ] ) ) {
-			throw new PolicyMSInvalidDataException(
-				sprintf(
-					'The file %s has not been received.',
-					$name
-				)
-			);
-		}
+		/**
+		 * Check for PHP errors, optionally ignores code 4 (UPLOAD_ERR_NO_FILE).
+		 *
+		 * @var callable
+		 */
+		$upload_errors = function ( int $error_id, bool $include_missing_files ): bool {
+			// Throw on file error.
+			if ( 0 !== $error_id ) {
+				if ( 4 === $error_id ) {
+					return $include_missing_files || false;
+				} else {
+					throw new PolicyMSInvalidDataException(
+						'An error occured when uploading the new files: ' . PolicyMS_Communication_Controller::fileUploadErrorInterpreter( $error_id )
+					);
+				}
+			}
+		};
 
 		// Check if multiple files were uploaded.
-		if ( is_array( $_FILES[ $name ]['name'] ) ) {
-			$files = array();
-			// Check for errors on each file before proceeding.
-			foreach ( $_FILES[ $name ]['error'] as $key => $error ) {
-				// Throw on file error.
-				if ( $error != 0 ) {
-					if ( $error == 4 ) {
-						continue;
-					} else {
-						throw new PolicyMSInvalidDataException(
-							'An error occured when uploading the new files: ' . PolicyMS::fileUploadErrorInterpreter( $error )
-						);
+		if ( ! empty( $_FILES[ $key ]['tmp_name'] ) &&
+			! empty( $_FILES[ $key ]['type'] ) &&
+			! empty( $_FILES[ $key ]['name'] ) &&
+			! empty( $_FILES[ $key ]['size'] ) &&
+			! empty( $_FILES[ $key ]['error'] )
+		) {
+			if ( is_array( $_FILES[ $key ]['name'] ) ) {
+				// Check for errors on each file before proceeding.
+				// NOTE: The `$error_id` traversed in this foreach is sanitized by typecasting.
+				foreach ( $_FILES[ $key ]['error'] as $index => $error_id ) {
+					if ( ! $upload_errors( (int) $error_id, false ) ) {
+						if (
+							! empty( $_FILES[ $key ]['tmp_name'][ $index ] ) &&
+							! empty( $_FILES[ $key ]['type'][ $index ] ) &&
+							! empty( $_FILES[ $key ]['name'][ $index ] ) &&
+							! empty( $_FILES[ $key ]['size'][ $index ] )
+						) {
+							$file           = new stdClass();
+							$file->path     = sanitize_text_field( wp_unslash( $_FILES[ $key ]['tmp_name'][ $index ] ) );
+							$file->mimetype = sanitize_mime_type( wp_unslash( $_FILES[ $key ]['type'][ $index ] ) );
+							$file->name     = sanitize_file_name( wp_unslash( $_FILES[ $key ]['name'][ $index ] ) );
+							$file->size     = (int) $_FILES[ $key ]['size'][ $index ];
+
+							// Throw on incompatible specs.
+							$validate( $file, $type );
+
+							// Run file callback.
+							$completion( $file );
+						}
 					}
 				}
+			} else {
+				if ( ! $upload_errors( (int) $_FILES[ $key ]['error'], true ) ) {
+					$file           = new stdClass();
+					$file->path     = sanitize_text_field( wp_unslash( $_FILES[ $key ]['tmp_name'] ) );
+					$file->mimetype = sanitize_mime_type( wp_unslash( $_FILES[ $key ]['type'] ) );
+					$file->name     = sanitize_file_name( wp_unslash( $_FILES[ $key ]['name'] ) );
+					$file->size     = (int) $_FILES[ $key ]['size'];
 
-				$file = array(
-					'path'     => $_FILES[ $name ]['tmp_name'][ $key ],
-					'mimetype' => $_FILES[ $name ]['type'][ $key ],
-					'name'     => $_FILES[ $name ]['name'][ $key ],
-					'size'     => $_FILES[ $name ]['size'][ $key ],
-				);
+					// Throw on incompatible specs.
+					$validate( $file, $type );
 
-				// Throw on incompatible specs.
-				self::check_specs( $category, $file );
-
-				// Add accepted file to array.
-				array_push( $files, $file );
-			}
-
-			// Get data and run completion.
-			foreach ( $files as $file ) {
-				$completion( $file );
-			}
-		} else {
-			$error = $_FILES[ $name ]['error'];
-			if ( $error != 0 ) {
-				if ( $error != 4 ) {
+					// Run file callback.
+					$completion( $file );
+				} else {
 					throw new PolicyMSInvalidDataException(
-						'An error occured when uploading the new file: ' . PolicyMS::fileUploadErrorInterpreter( $error )
+						'The file has not been received.'
 					);
 				}
-			} else {
-				$file = array(
-					'path'     => $_FILES[ $name ]['tmp_name'],
-					'mimetype' => $_FILES[ $name ]['type'],
-					'name'     => $_FILES[ $name ]['name'],
-					'size'     => $_FILES[ $name ]['size'],
-				);
-				self::check_specs( $category, $file );
-				$completion( $file );
 			}
+		} else {
+			throw new PolicyMSInvalidDataException(
+				'The file has not been received.'
+			);
 		}
 	}
 
-	public static function create( string $name, PolicyMS_Description $description, int $index = null ): void {
-		$token    = PolicyMS_Account::retrieve_token();
-		$category = $name;
+	/**
+	 * Create a new asset.
+	 *
+	 * @param string               $key The `$_FILES` array key for the upload.
+	 * @param PolicyMS_Description $description The associated description.
+	 *
+	 * @since 1.1.0
+	 */
+	public static function create(
+		string $key,
+		PolicyMS_Description $description,
+	): void {
+		$token = PolicyMS_Account::retrieve_token();
+
+		// When creating, the key is identical.
+		$type = PolicyMS_Asset_Type::get( $key );
 
 		// Handle file whether array or singular ID.
-		self::handle_retrieved_file(
-			$name,
-			$category,
-			function ( $file ) use ( $category, $token, $description ) {
-
+		self::handle_upload(
+			$key,
+			$type,
+			function ( $file ) use ( $type, $token, $description ) {
 				PolicyMS_Communication_Controller::api_request(
 					'POST',
-					'/assets/' . $category . '/' . $description->id,
+					'/assets/' . $type->id . '/' . $description->id,
 					array(
 						'asset' => new CURLFile( $file['path'], $file['mimetype'], $file['name'] ),
 					),
