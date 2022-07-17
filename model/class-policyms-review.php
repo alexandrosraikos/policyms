@@ -137,7 +137,7 @@ class PolicyMS_Review {
 			$user->token
 		);
 
-		return self::parse( $response, false );
+		return self::parse( $response, true );
 	}
 
 	/**

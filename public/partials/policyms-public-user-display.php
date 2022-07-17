@@ -306,29 +306,27 @@ function user_overview_html( array $information, array $statistics ): string {
 /**
  * Get the user description list HTML container.
  *
- * @param array  $descriptions The list of the user's PolicyMS_Description instances.
- * @param bool   $visitor Whether the requester is a visitor.
- * @param bool   $administrator Whether the requester is aan administrator.
- * @param string $single_url The base url for the single description page.
- * @param int    $total_pages The available number of pages.
- * @param array  $total_categories The available categories for the content type in `[slug => label]` format.
- * @param string $creation_url The URL of the creation page of a given type.
- * @param int    $active_page The currently selected page, if any.
- * @param string $active_category  The selected category, if any.
- * @param string $sorting  The selected item sorting, if any.
- * @param int    $sizing  The selected size of the page, if any.
+ * @param PolicyMS_Description_Collection $descriptions The list of the user's PolicyMS_Description instances.
+ * @param bool                            $visitor Whether the requester is a visitor.
+ * @param bool                            $administrator Whether the requester is aan administrator.
+ * @param string                          $single_url The base url for the single description page.
+ * @param int                             $total_pages The available number of pages.
+ * @param array                           $total_categories The available categories for the content type in `[slug => label]` format.
+ * @param string                          $creation_url The URL of the creation page of a given type.
+ * @param int                             $active_page The currently selected page, if any.
+ * @param string                          $active_category  The selected category, if any.
+ * @param string                          $sorting  The selected item sorting, if any.
+ * @param int                             $sizing  The selected size of the page, if any.
  * @return string The user description list HTML container.
  *
  * @since 2.0.0
  * @author Alexandros Raikos <alexandros@araikos.gr>
  */
 function user_descriptions_list_html(
-	array $descriptions,
+	PolicyMS_Description_Collection $descriptions,
 	bool $visitor,
 	bool $administrator,
-	string $single_url,
-	int $total_pages,
-	array $total_categories,
+	string $description_url_base,
 	string $creation_url = null,
 	int $active_page = 1,
 	string $active_category = null,
@@ -338,8 +336,8 @@ function user_descriptions_list_html(
 	$description_list = content_list_html(
 		$visitor,
 		'PolicyMS_Description',
-		$descriptions,
-		function ( $description ) use ( $single_url, $visitor, $administrator ) {
+		$descriptions->get_page( $active_page ),
+		function ( $description ) use ( $description_url_base, $visitor, $administrator ) {
 			$updated_date_unix      = strtotime( $description->metadata['uploadDate'] );
 			$updated_date_formatted = time_elapsed_string(
 				gmdate( 'Y-m-d H:i:s', strtotime( $description->metadata['updateDate'] ) )
@@ -363,7 +361,7 @@ function user_descriptions_list_html(
 				data-total-views="{$description->metadata['views']}" 
 				class="visible">
 				<div class="description">
-					<a href="{$single_url}?did={$description->id}">
+					<a href="{$description_url_base}?did={$description->id}">
 						<h4>{$description->information['title']}</h4>
 					</a>
 					<p>{$description->information['short_desc']}</p>
@@ -382,8 +380,8 @@ function user_descriptions_list_html(
 			</li>
 			HTML;
 		},
-		$total_pages,
-		$total_categories,
+		$descriptions->total_pages,
+		PolicyMS_Description::$categories,
 		$active_page,
 		$active_category,
 		$sorting,
@@ -417,7 +415,6 @@ function user_reviews_list_html(
 	array $reviews,
 	bool $visitor,
 	string $single_url,
-	int $total_pages,
 	int $active_page = 1,
 	string $sorting = null,
 	int $sizing = null
@@ -425,7 +422,7 @@ function user_reviews_list_html(
 	$review_list = content_list_html(
 		$visitor,
 		'PolicyMS_Review',
-		$reviews,
+		$reviews['content'],
 		function ( $review ) use ( $single_url ) {
 			$updated_date_unix      = strtotime( $review->update_date );
 			$updated_date_formatted = time_elapsed_string(
@@ -455,7 +452,7 @@ function user_reviews_list_html(
 				</li>
 			HTML;
 		},
-		$total_pages,
+		$reviews['pages'],
 		null,
 		$active_page,
 		null,
@@ -474,36 +471,32 @@ function user_reviews_list_html(
 /**
  * Get the user description approval list HTML container.
  *
- * @param array  $approvals The list of the user's PolicyMS_Description instances to be approved.
- * @param string $single_url The base url for the single description page.
- * @param int    $total_pages The available number of pages.
- * @param array  $total_categories The available categories for the content type in `[slug => label]` format.
- * @param int    $active_page The currently selected page, if any.
- * @param string $active_category  The selected category, if any.
- * @param string $sorting  The selected item sorting, if any.
- * @param int    $sizing  The selected size of the page, if any.
+ * @param PolicyMS_Description_Collection $approvals The list of the user's PolicyMS_Description instances to be approved.
+ * @param string                          $single_url The base url for the single description page.
+ * @param int                             $total_pages The available number of pages.
+ * @param array                           $total_categories The available categories for the content type in `[slug => label]` format.
+ * @param int                             $active_page The currently selected page, if any.
+ * @param string                          $active_category  The selected category, if any.
+ * @param string                          $sorting  The selected item sorting, if any.
+ * @param int                             $sizing  The selected size of the page, if any.
  * @return string The user description approval list HTML container.
  *
  * @since 2.0.0
  * @author Alexandros Raikos <alexandros@araikos.gr>
  */
 function user_approvals_list_html(
-	$approvals,
-	$single_url,
-	$total_pages,
-	$total_categories,
-	$active_page = null,
-	$active_category = null,
-	$sorting = null,
-	$sizing = null
+	PolicyMS_Description_Collection $approvals,
+	string $description_url_base,
+	int $active_page = null,
+	string $active_category = null,
+	string $sorting = null,
+	int $sizing = null
 ) {
 	$approvals_list = user_descriptions_list_html(
 		$approvals,
 		false,
 		true,
-		$single_url,
-		$total_pages,
-		$total_categories,
+		$description_url_base,
 		null,
 		$active_page,
 		$active_category,
@@ -1023,7 +1016,11 @@ function user_html(
 		bool $preview,
 		string $account_page_url,
 		string $content_html,
-		string $selected_tab = 'overview'
+		string $selected_tab = 'overview',
+		string $editing_nonce = '',
+		string $verification_nonce = '',
+		string $deletion_nonce = '',
+		string $data_copy_nonce = ''
 		): string {
 
 	// Autocorrects unsupported selected tab value.
@@ -1089,7 +1086,7 @@ function user_html(
 	$organization = $user->information['organization'] ?? '';
 
 	return <<<HTML
-		<div class="policyms-user">
+		<div class="policyms-user" data-user-id="{$user->id}">
 			{$verification_notice}
 			{$preview_notice}
 			<aside class="sidebar">

@@ -390,6 +390,7 @@ class PolicyMS_Public {
 					? '/'
 					: wp_parse_url( get_site_url() )['path'] );
 
+				// NOTE: No need to escape this self-created HTML output.
 				print user_authentication_html(
 					wp_create_nonce( 'policyms_account_user_authentication' ),
 					$home_url,
@@ -409,10 +410,61 @@ class PolicyMS_Public {
 	 */
 	public static function account_user_reset_password_shortcode() {
 		wp_enqueue_script( 'policyms-account-authentication' );
-		user_password_reset_html(
+
+		// NOTE: No need to escape this self-created HTML output.
+		print user_password_reset_html(
 			PolicyMS_Account::is_authenticated(),
 			wp_create_nonce( 'policyms_account_user_password_reset' )
 		);
+	}
+
+	public static function get_user_tab_content(
+		PolicyMS_User $user,
+		string $selected_tab,
+		bool $visitor,
+		string $description_page
+	) {
+		if ( ! array_key_exists( $selected_tab, PolicyMS_User::$default_tabs ) ) {
+			return notice_html(
+				'The requested content is not available.'
+			);
+		}
+		switch ( $selected_tab ) {
+			case 'overview':
+				return user_overview_html(
+					$user->information,
+					$user->statistics
+				);
+			case 'decriptions':
+				// TODO @alexandrosraikos: Parse description list parameters.
+				return user_descriptions_list_html(
+					$user->descriptions,
+					$visitor,
+					$user->is_admin(),
+					$description_page
+				);
+			case 'reviews':
+				// TODO @alexandrosraikos: Parse review list parameters.
+				return user_reviews_list_html(
+					$user->reviews,
+					$visitor,
+					$description_page
+				);
+			case 'approvals':
+				// TODO @alexandrosraikos: Parse review list parameters.
+				return user_approvals_list_html(
+					PolicyMS_Description_Collection::get_pending(),
+					$description_page
+				);
+			case 'profile':
+				return user_profile_details_html(
+					$user,
+					$visitor,
+					$user->is_admin(),
+					$user->picture,
+					new PolicyMS_OAuth_Controller( $user )
+				);
+		}
 	}
 
 	/**
@@ -433,12 +485,15 @@ class PolicyMS_Public {
 		self::exception_handler(
 			function () {
 				if ( PolicyMS_User::is_authenticated() ) {
-					$user_id = ! empty( $_GET['user'] ) ? sanitize_user( wp_unslash( $_GET['user'] ) ) : null;
-					$visitor = ! empty( $user_id );
+					$uid     = ! empty( $_GET['user'] )
+						? sanitize_user( wp_unslash( $_GET['user'] ) )
+						: null;
+					$visitor = ! empty( $uid );
 					$self    = new PolicyMS_User();
+
 					if ( $visitor ) {
 						if ( $self->is_verified() ) {
-							$user = new PolicyMS_User( $user_id );
+							$user = new PolicyMS_User( $uid );
 						} else {
 							throw new PolicyMSUnauthorizedRequestException(
 								'You need to be verify your email address in order to view other user accounts.'
@@ -448,72 +503,47 @@ class PolicyMS_Public {
 						$user = $self;
 					}
 
-					$data = array(
-						'uid'          => $user->uid,
-						'picture'      => $user->picture,
-						'information'  => $user->information,
-						'statistics'   => $user->statistics,
-						'descriptions' => $user->descriptions,
-						'reviews'      => $user->reviews,
-						'approvals'    => ( $self->is_admin() && $self->is_verified() ) ? $user->approvals : null,
-						'metadata'     => $user->metadata,
-						'preferences'  => $user->preferences,
-					);
-
 					// Localize script.
 					wp_enqueue_script( 'policyms-account' );
-					wp_localize_script(
-						'policyms-account',
-						'AccountEditingProperties',
-						array(
-							'nonce'                   => wp_create_nonce( 'policyms_account_user_edit' ),
-							'deletionNonce'           => wp_create_nonce( 'policyms_account_user_deletion' ),
-							'verificationRetryNonce'  => wp_create_nonce( 'policyms_account_user_retry_verification' ),
-							'requestDataCopyNonce'    => wp_create_nonce( 'policyms_account_user_data_request' ),
-							'disconnectGoogleNonce'   => wp_create_nonce( 'policyms_account_disconnect_google' ),
-							'disconnectKeyCloakNonce' => wp_create_nonce( 'policyms_account_disconnect_keycloak' ),
-							'disconnectEGINonce'      => wp_create_nonce( 'policyms_account_disconnect_egi' ),
-							'userID'                  => $user->id,
-							'resetPasswordURL'        => self::get_setting( true, 'password_reset_page' ),
-						)
+
+					$urls = self::get_setting(
+						true,
+						'account_page',
+						'description_page',
+						'archive_page',
+						'upload_page'
 					);
 
-					if ( $self->is_admin() ) {
-						user_html(
-							$user,
-							$visitor,
-							$user === $self,
-							self::get_setting(
-								true,
-								'description_page',
-								'archive_page',
-								'upload_page'
-							)
-						);
-					} else {
-						user_html(
-							array(
-								'uid'          => $user->uid,
-								'picture'      => $user->picture,
-								'information'  => $user->information,
-								'statistics'   => $user->statistics,
-								'descriptions' => $user->descriptions,
-								'reviews'      => $user->reviews,
-								'metadata'     => $user->metadata,
-								'preferences'  => $user->preferences,
-							),
-							$self->is_admin(),
-							$visitor,
-							self::get_setting(
-								true,
-								'description_page',
-								'archive_page',
-								'upload_page'
-							)
-						);
+					// Get selected user tab.
+					$selected_tab = 'overview';
+					if ( ! empty( $_GET['tab'] ) ) {
+						$selected_tab = sanitize_key( wp_unslash( $_GET['tab'] ) );
 					}
+
+					// NOTE: No need to escape this self-created HTML output.
+					print user_html(
+						$user,
+						$visitor,
+						$user === $self,
+						$urls['account_page'],
+						self::get_user_tab_content(
+							$user,
+							$selected_tab,
+							$visitor,
+							$urls['description_page']
+						),
+						$selected_tab,
+						wp_create_nonce( 'policyms_account_user_edit' ),
+						wp_create_nonce( 'policyms_account_user_deletion' ),
+						wp_create_nonce( 'policyms_account_user_retry_verification' ),
+						wp_create_nonce( 'policyms_account_user_data_request' )
+					);
+
 				} else {
-					return notice_html( 'You need to be logged in to view accounts.', 'notice' );
+					print notice_html(
+						'You need to be logged in to view accounts.',
+						'notice'
+					);
 				}
 			}
 		);

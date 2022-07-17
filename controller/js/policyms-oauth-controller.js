@@ -8,7 +8,10 @@ var presetElementQueries = {
     googleButton: '#google-signin',
     keyCloakModalButton: 'button[data-action="show-keycloak-modal"]',
     keyCloakModalFormRegistration: 'form[data-action="policyms-keycloak-registration"]',
-    keyCloakModalFormAuthentication: 'form[data-action="policyms-keycloak-authentication"]'
+    keyCloakModalFormAuthentication: 'form[data-action="policyms-keycloak-authentication"]',
+    googleDisconnectButton: 'button[data-action="policyms-disconnect-google"]',
+    keyCloackDisconnectButton: 'button[data-action="policyms-disconnect-keycloak"]',
+    egiDisconnectButton: 'button[data-action="policyms-disconnect-egi"]',
 };
 
 function googleRegistrationCallback(response) {
@@ -39,6 +42,66 @@ function googleCallback(response) {
     )
 }
 
+
+function disconnectGoogle(e) {
+    e.preventDefault();
+    if ($(presetElementQueries.googleDisconnectButton).attr("password-protected") === undefined) {
+        if (confirm("You need to set a new password before disconnecting your Google account. Head to the \"Reset password\" page and follow the steps provided.")) {
+            window.location.href = $(presetElementQueries.googleDisconnectButton).data('redirect');
+        }
+    } else {
+        makeWPRequest(
+            presetElementQueries.googleDisconnectButton,
+            'policyms_account_disconnect_google',
+            $(presetElementQueries.googleDisconnectButton).data('nonce'),
+            {},
+            (data) => {
+                setAuthorizedToken(data);
+                window.location.reload();
+            }
+        )
+    }
+}
+
+function disconnectKeyCloak(e) {
+    e.preventDefault();
+    if ($(presetElementQueries.keyCloackDisconnectButton).attr("password-protected") === undefined) {
+        if (confirm("You need to set a new password before disconnecting your KeyCloak account. Head to the \"Reset password\" page and follow the steps provided.")) {
+            window.location.href = $(presetElementQueries.googleDisconnectButton).data('redirect');
+        }
+    } else {
+        makeWPRequest(
+            presetElementQueries.keyCloackDisconnectButton,
+            'policyms_account_disconnect_keycloak',
+            $(presetElementQueries.keyCloackDisconnectButton).data('nonce'),
+            {},
+            (data) => {
+                setAuthorizedToken(data);
+                window.location.reload();
+            }
+        )
+    }
+}
+
+function disconnectEGI(e) {
+    e.preventDefault();
+    if ($(presetElementQueries.egiDisconnectButton).attr("password-protected") === undefined) {
+        if (confirm("You need to set a new password before disconnecting your EGI credentials. Head to the \"Reset password\" page and follow the steps provided.")) {
+            window.location.href = $(presetElementQueries.egiDisconnectButton).data('redirect');
+        }
+    } else {
+        makeWPRequest(
+            presetElementQueries.egiDisconnectButton,
+            'policyms_account_disconnect_egi',
+            $(presetElementQueries.egiDisconnectButton).data('nonce'),
+            {},
+            (data) => {
+                setAuthorizedToken(data);
+                window.location.reload();
+            }
+        )
+    }
+}
 
 window.onload = function () {
 

@@ -29,6 +29,8 @@ class PolicyMS_Description_Collection {
 	 */
 	public bool $is_paginated = false;
 
+	public int $total_pages = 1;
+
 	/**
 	 * Initialize a description collection object instance.
 	 *
@@ -39,7 +41,7 @@ class PolicyMS_Description_Collection {
 	 */
 	public function __construct(
 			public array $descriptions,
-			public int $total_pages = 1
+			int $total_pages = 1
 		) {
 		$this->descriptions = $descriptions;
 		// Check if top level values are directly descriptions.
@@ -85,7 +87,11 @@ class PolicyMS_Description_Collection {
 	 *
 	 * @since 2.0.0
 	 */
-	protected static function parse( array $response, bool $specify_pages = true, string $container_key = 'results' ) {
+	protected static function parse(
+		array $response,
+		bool $specify_pages = true,
+		string $container_key = 'results'
+	) {
 		$descriptions = array();
 		if ( isset( $response[ $container_key ] ) ) {
 
@@ -158,7 +164,7 @@ class PolicyMS_Description_Collection {
 			$user->token
 		);
 
-		return self::parse( $response, false );
+		return self::parse( $response, true );
 	}
 
 	/**

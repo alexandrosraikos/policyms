@@ -55,16 +55,16 @@ class PolicyMS_User extends PolicyMS_Account {
 	 *
 	 * @since      1.1.0
 	 */
-	protected ?array $statistics;
+	public ?array $statistics;
 
 	/**
 	 * The user's description collection.
 	 *
-	 * @var array $descriptions The description collection.
+	 * @var ?PolicyMS_Description_Collection $descriptions The description collection.
 	 *
 	 * @since      1.1.0
 	 */
-	protected ?array $descriptions;
+	public ?PolicyMS_Description_Collection $descriptions;
 
 	/**
 	 * The user's review collection.
@@ -73,7 +73,7 @@ class PolicyMS_User extends PolicyMS_Account {
 	 *
 	 * @since      1.1.0
 	 */
-	protected ?array $reviews;
+	public ?array $reviews;
 
 	/**
 	 * The user's picture thumbnail.
@@ -82,7 +82,7 @@ class PolicyMS_User extends PolicyMS_Account {
 	 *
 	 * @since      1.2.0
 	 */
-	protected ?string $picture;
+	public ?string $picture;
 
 
 	/**

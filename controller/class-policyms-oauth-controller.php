@@ -162,6 +162,7 @@ class PolicyMS_OAuth_Controller {
 		bool $password_protected
 		) {
 		$password_protected_attribute = $password_protected ? 'password-protected' : '';
+		$reset_password_url           = PolicyMS_Public::get_setting( true, 'password_reset_page' );
 
 		switch ( $service ) {
 			case 'google':
@@ -171,6 +172,7 @@ class PolicyMS_OAuth_Controller {
 						class="action destructive minimal" 
 						data-action="policyms-disconnect-google"
 						data-nonce="{$nonce}"
+						data-redirect={$reset_password_url}
 						{$password_protected_attribute}>
 						Disconnect
 					</button>
@@ -183,6 +185,7 @@ class PolicyMS_OAuth_Controller {
 						class="action destructive minimal" 
 						data-action="policyms-disconnect-keycloak" 
 						data-nonce="{$nonce}"
+						data-redirect={$reset_password_url}
 						{$password_protected_attribute}>
 						Disconnect
 					</button>
@@ -193,7 +196,9 @@ class PolicyMS_OAuth_Controller {
 				return <<<HTML
 					<button 
 						class="action destructive minimal" 
-						data-action="disconnect-egi" 
+						data-action="policyms-disconnect-egi" 
+						data-nonce="{$nonce}"
+						data-redirect={$reset_password_url}
 						{$password_protected_attribute}>
 						Disconnect
 					</button>

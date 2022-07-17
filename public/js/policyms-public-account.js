@@ -5,6 +5,10 @@
  * @author Alexandros Raikos <alexandros@araikos.gr>
  */
 
+var presetElementQueries = {
+
+};
+
 (function ($) {
   "use strict";
   $(document).ready(function () {
@@ -630,66 +634,6 @@
             }
           }
         );
-      }
-    }
-
-    function disconnectGoogle(e) {
-      e.preventDefault();
-      if ($(e.target).attr("password-protected") === undefined) {
-        if (confirm("You need to set a new password before disconnecting your Google account. Head to the \"Reset password\" page and follow the steps provided.")) {
-          window.location.href = AccountEditingProperties.resetPasswordURL;
-        }
-      } else {
-        makeWPRequest(
-          'button[data-action="disconnect-google"]',
-          'policyms_account_disconnect_google',
-          AccountEditingProperties.disconnectGoogleNonce,
-          {},
-          (data) => {
-            setAuthorizedToken(data);
-            window.location.reload();
-          }
-        )
-      }
-    }
-
-    function disconnectKeyCloak(e) {
-      e.preventDefault();
-      if ($(e.target).attr("password-protected") === undefined) {
-        if (confirm("You need to set a new password before disconnecting your KeyCloak account. Head to the \"Reset password\" page and follow the steps provided.")) {
-          window.location.href = AccountEditingProperties.resetPasswordURL;
-        }
-      } else {
-        makeWPRequest(
-          'button[data-action="disconnect-keycloak"]',
-          'policyms_account_disconnect_keycloak',
-          AccountEditingProperties.disconnectKeyCloakNonce,
-          {},
-          (data) => {
-            setAuthorizedToken(data);
-            window.location.reload();
-          }
-        )
-      }
-    }
-
-    function disconnectEGI(e) {
-      e.preventDefault();
-      if ($(e.target).attr("password-protected") === undefined) {
-        if (confirm("You need to set a new password before disconnecting your EGI credentials. Head to the \"Reset password\" page and follow the steps provided.")) {
-          window.location.href = AccountEditingProperties.resetPasswordURL;
-        }
-      } else {
-        makeWPRequest(
-          'button[data-action="disconnect-keycloak"]',
-          'policyms_account_disconnect_egi',
-          AccountEditingProperties.disconnectEGINonce,
-          {},
-          (data) => {
-            setAuthorizedToken(data);
-            window.location.reload();
-          }
-        )
       }
     }
 
