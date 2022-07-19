@@ -272,6 +272,10 @@ class PolicyMS_Description {
 		);
 	}
 
+	public function reject( string $reason ) {
+		// TODO @alexandrosraikos/@vkoukos: Add the API request.
+	}
+
 	/**
 	 * Set the default cover image for the description.
 	 *

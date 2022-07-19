@@ -5,6 +5,12 @@
  * @author Alexandros Raikos <alexandros@araikos.gr>
  */
 
+var presetElementQueries = {
+  creationForm: 'form[data-action="policyms-edit-description"]',
+  addLinksFieldButton: 'form[data-action="policyms-edit-description"] > fieldset[name="basic-information"] > .links > button[data-action="add-field"]',
+  removeLinksFieldButton: 'form[data-action="policyms-edit-description"] > fieldset[name="basic-information"] > .links button[data-action="remove-field"]'
+};
+
 (function ($) {
   "use strict";
   $(document).ready(function () {
@@ -16,39 +22,6 @@
      *
      */
 
-
-    /**
-     * Add a double input field to the links container.
-     *
-     * @param {Event} e
-     *
-     * @author Alexandros Raikos <alexandros@araikos.gr>
-     */
-    function addLinksField(e) {
-      e.preventDefault();
-      const container = $(this).prev();
-      const newLinksField = $("<div><input type='text' name='links-title[]' placeholder='Example' /><input type='url' name='links-url[]' placeholder='https://www.example.org/' /><button class='remove-field' title='Remove this link.' ><span class='fas fa-times'></span></button></div>");
-      newLinksField.find('input[name*=links]').each(
-        (index, element) => {
-          $(element).val("");
-        }
-      );
-      newLinksField.appendTo(container);
-    }
-    /**
-     *
-     * Remove a double input field from the links container.
-     *
-     * @param {Event} e
-     *
-     * @author Alexandros Raikos <alexandros@araikos.gr>
-     */
-    function removeLinksField(e) {
-      e.preventDefault();
-      const container = $(this).parent().parent();
-      $(this).parent().remove();
-    }
-
     /**
      * Prepare and submit via AJAX the edited information fields.
      *
@@ -56,17 +29,17 @@
      *
      * @author Alexandros Raikos <alexandros@araikos.gr>
      */
-    function createAsset(e) {
+    function createDescription(e) {
       // TODO @alexandrosraikos: Correct required fields prompting. (#129)
       e.preventDefault();
       makeWPRequest(
-        ".policyms.description.editor button[type=submit]",
+        presetElementQueries.creationForm,
         "policyms_description_creation",
-        DescriptionCreationProperties.nonce,
-        new FormData($(".policyms.description.editor form")[0]),
+        $(presetElementQueries.creationForm).data('nonce'),
+        new FormData($(presetElementQueries.creationForm)[0]),
         (data) => {
           window.location.replace(
-            DescriptionCreationProperties.descriptionPage + "/?did=" + data
+            $(presetElementQueries.creationForm).data('redirect') + "/?did=" + data
           );
         }
       );
@@ -79,9 +52,11 @@
      */
 
     // Submit the asset.
-    $(
-      ".policyms.description.editor button[type=submit]"
-    ).click(createAsset);
+    $(document).on(
+      "submit",
+      presetElementQueries.creationForm,
+      createDescription
+    );
 
     // Add another link field.
     $(document).on(

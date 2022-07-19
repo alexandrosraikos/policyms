@@ -528,7 +528,11 @@ function user_profile_details_html(
 	bool $visitor,
 	bool $administrator,
 	string $profile_image_blob,
-	PolicyMS_OAuth_Controller $oauth_controller
+	PolicyMS_OAuth_Controller $oauth_controller,
+	string $editing_nonce = '',
+	string $verification_nonce = '',
+	string $deletion_nonce = '',
+	string $data_copy_nonce = ''
 ): string {
 
 	// The account information editing button.
@@ -736,7 +740,11 @@ function user_profile_details_html(
 		if ( '1' !== $user->metadata['verified'] && ! $visitor ) {
 			$email_verification = <<<HTML
 				<span class="unverified">(Unverified)</span>
-				<button id="policyms-resend-verification-email">Resend verification email</button>
+				<button 
+					data-action="policyms-resend-verification-email"
+					data-nonce="{$verification_nonce}">
+					Resend verification email
+				</button>
 			HTML;
 		} else {
 			if ( ! $visitor || $administrator ) {
@@ -839,7 +847,6 @@ function user_profile_details_html(
 	// SSO connection fields.
 	$sso_information = '';
 	if ( ! $visitor ) {
-		$password_protected_attribute = '1' === $user->metadata['password_protected'] ? 'password-protected' : '';
 
 		// 'Google' fields.
 		$google_action      = $oauth_controller->get_html( 'google' );
@@ -883,7 +890,10 @@ function user_profile_details_html(
 	$request_data_copy_button = '';
 	if ( ! $visitor ) {
 		$request_data_copy_button = <<<HTML
-			<button id="policyms-request-data-copy" class="action">
+			<button 
+				data-action="policyms-user-request-data-copy" 
+				data-nonce="{$data_copy_nonce}"
+				class="action">
 				Request data copy
 			</button>
 		HTML;
@@ -893,7 +903,9 @@ function user_profile_details_html(
 	$delete_account_button = '';
 	if ( ! $visitor || $administrator ) {
 		$delete_account_button = <<<HTML
-			<form id="policyms-delete-account"">
+			<form 
+				data-action="policyms-delete-account"
+				data-nonce="{$deletion_nonce}">
 				<div>
 					<label for=" current-password">Please type your current password to continue.</label>
 				<input name="current-password" type="password" placeholder="Insert your current password here">
@@ -926,7 +938,8 @@ function user_profile_details_html(
 				{$edit_button}
 			</header>
 			<form
-				data-action="policyms-user-editing" 
+				data-action="policyms-user-editing"
+				data-nonce="{$editing_nonce}" 
 				accept-charset="utf8" 
 				action="">
 				<table class="information">
@@ -1017,10 +1030,7 @@ function user_html(
 		string $account_page_url,
 		string $content_html,
 		string $selected_tab = 'overview',
-		string $editing_nonce = '',
-		string $verification_nonce = '',
-		string $deletion_nonce = '',
-		string $data_copy_nonce = ''
+		string $tab_switch_nonce = ''
 		): string {
 
 	// Autocorrects unsupported selected tab value.
@@ -1068,7 +1078,9 @@ function user_html(
 		$navigation_html .= <<<HTML
 			<button 
 				class="tactile" 
-				content-tab="{$identifier}"
+				data-tab-identifier="{$identifier}"
+				data-nonce="{$tab_switch_nonce}"
+				data-action="policyms-switch-user-tab"
 				{$active}>
 					{$label} {$counter}
 			</button>
@@ -1080,13 +1092,17 @@ function user_html(
 		$log_out_button = '<button class="tactile" data-action="policyms-logout">Log out</button>';
 	}
 
-	$full_name    = '';
-	$full_name    = ( ( $user->information['title'] ?? '-' ) === '-' ) ? '' : $user->information['title'];
-	$full_name   .= $user->information['name'] . ' ' . $user->information['surname'];
-	$organization = $user->information['organization'] ?? '';
+	$full_name         = '';
+	$full_name         = ( ( $user->information['title'] ?? '-' ) === '-' ) ? '' : $user->information['title'];
+	$full_name        .= $user->information['name'] . ' ' . $user->information['surname'];
+	$organization      = $user->information['organization'] ?? '';
+	$visitor_attribute = $visitor ? 'visitor' : '';
 
 	return <<<HTML
-		<div class="policyms-user" data-user-id="{$user->id}">
+		<div 
+			class="policyms-user" 
+			data-user-id="{$user->id}"
+			{$visitor_attribute}>
 			{$verification_notice}
 			{$preview_notice}
 			<aside class="sidebar">
@@ -1101,7 +1117,7 @@ function user_html(
 					<h2>{$full_name}</h2>
 					<div>{$organization}</div>
 				</header>
-				<section content="{$selected_tab}">
+				<section data-content="{$selected_tab}">
 					{$content_html}
 				</section>
 			</main>

@@ -418,12 +418,23 @@ class PolicyMS_Public {
 		);
 	}
 
+	/**
+	 * Get the user profile tab content HTML.
+	 *
+	 * @param PolicyMS_User $user The user.
+	 * @param string        $selected_tab The selected tab identifier ID.
+	 * @param bool          $visitor Whether the requester is a visitor.
+	 * @param string        $description_page The description page URL.
+	 * @return string The tab content HTML.
+	 *
+	 * @since 2.0.0
+	 */
 	public static function get_user_tab_content(
 		PolicyMS_User $user,
 		string $selected_tab,
 		bool $visitor,
 		string $description_page
-	) {
+	): string {
 		if ( ! array_key_exists( $selected_tab, PolicyMS_User::$default_tabs ) ) {
 			return notice_html(
 				'The requested content is not available.'
@@ -462,7 +473,11 @@ class PolicyMS_Public {
 					$visitor,
 					$user->is_admin(),
 					$user->picture,
-					new PolicyMS_OAuth_Controller( $user )
+					new PolicyMS_OAuth_Controller( $user ),
+					wp_create_nonce( 'policyms_account_user_edit' ),
+					wp_create_nonce( 'policyms_account_user_deletion' ),
+					wp_create_nonce( 'policyms_account_user_retry_verification' ),
+					wp_create_nonce( 'policyms_account_user_data_request' )
 				);
 		}
 	}
@@ -533,10 +548,7 @@ class PolicyMS_Public {
 							$urls['description_page']
 						),
 						$selected_tab,
-						wp_create_nonce( 'policyms_account_user_edit' ),
-						wp_create_nonce( 'policyms_account_user_deletion' ),
-						wp_create_nonce( 'policyms_account_user_retry_verification' ),
-						wp_create_nonce( 'policyms_account_user_data_request' )
+						wp_create_nonce( 'policyms_account_user_switch_tab' ),
 					);
 
 				} else {
@@ -549,24 +561,16 @@ class PolicyMS_Public {
 		);
 	}
 
+	/**
+	 * Print the EGI redirection handling shortcode.
+	 *
+	 * @since 1.4.0
+	 */
 	public static function account_user_egi_redirection() {
 		self::exception_handler(
 			function () {
-				if ( isset( $_GET['code'] ) ) {
-					$token = PolicyMS_User::authenticate_egi( $_GET['code'] );
-					notice_html( "Please wait while you're being redirected...", 'notice' );
-					wp_enqueue_script( 'policyms-account-authentication' );
-					wp_localize_script(
-						'policyms-account-authentication',
-						'AccountAuthenticationProperties',
-						array(
-							'EGISuccessRedirect' => self::get_setting( true, 'account_page' ),
-							'EGISuccessToken'    => $token,
-						)
-					);
-				} else {
-					notice_html( 'An EGI code was not found.' );
-				}
+				// NOTE: No need to escape this self-created HTML output.
+				print PolicyMS_OAuth_Controller::get_egi_redirection_shortcode();
 			}
 		);
 	}
@@ -582,31 +586,30 @@ class PolicyMS_Public {
 	public function account_user_registration_handler() {
 		$this->ajax_handler(
 			function ( $data ) {
-
 				return PolicyMS_User::register(
 					array(
-						'password'         => stripslashes( $data['password'] ),
-						'password-confirm' => stripslashes( $data['password-confirm'] ),
-						'name'             => filter_var( stripslashes( $data['name'] ), FILTER_SANITIZE_STRING ),
-						'surname'          => filter_var( stripslashes( $data['surname'] ), FILTER_SANITIZE_STRING ),
-						'title'            => filter_var( $data['title'] ?? '', FILTER_SANITIZE_STRING ),
-						'gender'           => filter_var( $data['gender'] ?? '', FILTER_SANITIZE_STRING ),
-						'organization'     => filter_var( stripslashes( $data['organization'] ?? '' ), FILTER_SANITIZE_STRING ),
-						'email'            => filter_var( $data['email'], FILTER_SANITIZE_EMAIL ),
-						'phone'            => filter_var( $data['phone'] ?? '', FILTER_SANITIZE_NUMBER_INT ),
+						'password'         => wp_unslash( $data['password'] ),
+						'password-confirm' => wp_unslash( $data['password-confirm'] ),
+						'name'             => sanitize_text_field( wp_unslash( $data['name'] ) ),
+						'surname'          => sanitize_text_field( wp_unslash( $data['surname'] ) ),
+						'title'            => sanitize_text_field( wp_unslash( $data['title'] ?? '' ) ),
+						'gender'           => sanitize_text_field( wp_unslash( $data['gender'] ?? '' ) ),
+						'organization'     => sanitize_text_field( wp_unslash( $data['organization'] ?? '' ) ),
+						'email'            => sanitize_email( wp_unslash( $data['email'] ) ),
+						'phone'            => sanitize_text_field( $data['phone'] ?? '' ),
 						'socials-title'    => array_map(
 							function ( $title ) {
-								return filter_var( stripslashes( $title ), FILTER_SANITIZE_STRING );
+								return sanitize_text_field( wp_unslash( $title ) );
 							},
 							$data['socials-title'] ?? array()
 						),
 						'socials-url'      => array_map(
 							function ( $url ) {
-								return filter_var( $url, FILTER_SANITIZE_URL );
+								return esc_url_raw( $url );
 							},
 							$data['socials-url'] ?? array()
 						),
-						'about'            => $data['about'] ?? '',
+						'about'            => sanitize_textarea_field( wp_unslash( $data['about'] ?? '' ) ),
 					)
 				);
 			}
@@ -616,43 +619,87 @@ class PolicyMS_Public {
 	/**
 	 * Handle user login AJAX requests.
 	 *
-	 * @uses    PolicyMS_Public::account_authentication)
-	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public function account_user_authentication_handler() {
 		$this->ajax_handler(
 			function ( $data ) {
-
 				return PolicyMS_User::authenticate(
-					$data['email'],
-					$data['password']
+					sanitize_email( $data['email'] ),
+					wp_unslash( $data['password'] )
 				);
 			}
 		);
 	}
 
+	/**
+	 * Handles authentication with Google SSO.
+	 *
+	 * @since   1.2.0
+	 */
 	public function account_user_authentication_google_handler() {
 		$this->ajax_handler(
 			function ( $data ) {
 				return PolicyMS_User::authenticate_google(
-					$data['google_token']
+					sanitize_text_field( $data['google_token'] )
 				);
 			}
 		);
 	}
 
+	/**
+	 * Handles registration with Google SSO.
+	 *
+	 * @since   1.2.0
+	 */
 	public function account_user_registration_google_handler() {
 		$this->ajax_handler(
 			function ( $data ) {
 				return PolicyMS_User::register_google(
-					$data['google_token']
+					sanitize_text_field( $data['google_token'] )
 				);
 			}
 		);
 	}
 
+	/**
+	 * Handles registration with KeyCloak SSO.
+	 *
+	 * @since   1.2.0
+	 */
+	public function account_user_registration_keycloak_handler() {
+		$this->ajax_handler(
+			function ( $data ) {
+				return PolicyMS_User::register_keycloak(
+					sanitize_user( $data['keycloak-username'] ),
+					wp_unslash( $data['keycloak-password'] )
+				);
+			}
+		);
+	}
+
+
+	/**
+	 * Handles authentication with KeyCloak SSO.
+	 *
+	 * @since   1.2.0
+	 */
+	public function account_user_authentication_keycloak_handler() {
+		$this->ajax_handler(
+			function ( $data ) {
+				return PolicyMS_User::authenticate_keycloak(
+					sanitize_user( $data['keycloak-username'] ),
+					wp_unslash( $data['keycloak-password'] )
+				);
+			}
+		);
+	}
+
+	/**
+	 * Handles Google OAuth credential disconnect.
+	 *
+	 * @since   1.2.0
+	 */
 	public function account_disconnect_google_handler() {
 		$this->ajax_handler(
 			function () {
@@ -662,6 +709,11 @@ class PolicyMS_Public {
 		);
 	}
 
+	/**
+	 * Handles KeyCloak OAuth credential disconnect.
+	 *
+	 * @since   1.2.0
+	 */
 	public function account_disconnect_keycloak_handler() {
 		$this->ajax_handler(
 			function () {
@@ -671,6 +723,11 @@ class PolicyMS_Public {
 		);
 	}
 
+	/**
+	 * Handles EGI Check-In OAuth credential disconnect.
+	 *
+	 * @since   1.4.0
+	 */
 	public function account_disconnect_egi_handler() {
 		$this->ajax_handler(
 			function () {
@@ -680,34 +737,36 @@ class PolicyMS_Public {
 		);
 	}
 
-	public function account_user_registration_keycloak_handler() {
+	/**
+	 * Handle new tab content request calls.
+	 *
+	 * @since 2.0.0
+	 */
+	public function account_user_switch_tab_handler() {
 		$this->ajax_handler(
 			function ( $data ) {
-				return PolicyMS_User::register_keycloak(
-					$data['keycloak-username'],
-					$data['keycloak-password']
+				return self::get_user_tab_content(
+					new PolicyMS_User(
+						(bool) $data['is_visitor'] ? sanitize_user( $data['user_id'] ) : null
+					),
+					sanitize_key( $data['tab_identifier'] ),
+					(bool) $data['is_visitor'],
+					self::get_setting( true, 'description_page' )
 				);
 			}
 		);
 	}
 
-	public function account_user_authentication_keycloak_handler() {
-		$this->ajax_handler(
-			function ( $data ) {
-				return PolicyMS_User::authenticate_keycloak(
-					$data['keycloak-username'],
-					$data['keycloak-password']
-				);
-			}
-		);
-	}
-
+	/**
+	 * Handle a password reset request.
+	 *
+	 * @since 1.2.0
+	 */
 	public function account_user_password_reset_handler() {
 		$this->ajax_handler(
 			function ( $data ) {
-
 				PolicyMS_User::reset_password(
-					$data['email']
+					sanitize_email( $data['email'] )
 				);
 			}
 		);
@@ -716,10 +775,7 @@ class PolicyMS_Public {
 	/**
 	 * Handle user account editing AJAX requests.
 	 *
-	 * @uses    PolicyMS_Public::account_registration()
-	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public function account_user_editing_handler() {
 		$this->ajax_handler(
@@ -727,25 +783,40 @@ class PolicyMS_Public {
 				$user = new PolicyMS_User( $data['uid'] ?? null );
 				switch ( $data['subsequent_action'] ) {
 					case 'edit_account_user':
+						$picture = null;
+						if ( ! empty( $_FILES['profile_picture'] ) ) {
+							$picture = array(
+								'error'    => (int) $_FILES['profile_picture']['error'] ?? 4,
+								'size'     => (int) $_FILES['profile_picture']['size'] ?? 0,
+								'tmp_name' => sanitize_text_field( wp_unslash( $_FILES['profile_picture']['tmp_name'] ?? '' ) ),
+								'type'     => sanitize_text_field( wp_unslash( $_FILES['profile_picture']['type'] ?? '' ) ),
+							);
+						}
 						$user->update(
 							array(
-								'password'         => stripslashes( $data['password'] ?? '' ),
-								'password-confirm' => stripslashes( $data['password-confirm'] ?? '' ),
-								'current-password' => stripslashes( $data['current-password'] ?? '' ),
-								'name'             => stripslashes( $data['name'] ),
-								'surname'          => stripslashes( $data['surname'] ),
-								'title'            => $data['title'] ?? '',
-								'gender'           => $data['gender'] ?? '',
-								'organization'     => stripslashes( $data['organization'] ?? '' ),
-								'email'            => $data['email'],
-								'phone'            => $data['phone'] ?? '',
-								'socials-title'    => $data['socials-title'] ?? '',
-								'socials-url'      => $data['socials-url'] ?? '',
-								'about'            => stripslashes( $data['about'] ?? '' ),
-								'public-email'     => $data['public-email'],
-								'public-phone'     => $data['public-phone'],
+								'password'         => wp_unslash( $data['password'] ?? '' ),
+								'password-confirm' => wp_unslash( $data['password-confirm'] ?? '' ),
+								'current-password' => wp_unslash( $data['current-password'] ?? '' ),
+								'name'             => sanitize_text_field( wp_unslash( $data['name'] ) ),
+								'surname'          => sanitize_text_field( wp_unslash( $data['surname'] ) ),
+								'title'            => sanitize_key( $data['title'] ?? '' ),
+								'gender'           => sanitize_key( $data['gender'] ?? '' ),
+								'organization'     => sanitize_text_field( wp_unslash( $data['organization'] ?? '' ) ),
+								'email'            => sanitize_email( $data['email'] ),
+								'phone'            => sanitize_text_field( $data['phone'] ?? '' ),
+								'socials-title'    => array_map(
+									fn( $title) => sanitize_text_field( $title ),
+									$data['socials-title'] ?? ''
+								),
+								'socials-url'      => array_map(
+									fn( $url) => sanitize_text_field( $url ),
+									$data['socials-url'] ?? ''
+								),
+								'about'            => sanitize_textarea_field( wp_unslash( $data['about'] ?? '' ) ),
+								'public-email'     => sanitize_key( $data['public-email'] ),
+								'public-phone'     => sanitize_key( $data['public-phone'] ),
 							),
-							$_FILES['profile_picture']
+							$picture
 						);
 						break;
 					case 'delete_profile_picture':
@@ -755,16 +826,19 @@ class PolicyMS_Public {
 						throw new PolicyMSInvalidDataException(
 							'No subsequent action was defined.'
 						);
-						break;
 				}
 			}
 		);
 	}
 
+	/**
+	 * Handle user verification email resending.
+	 *
+	 * @since   1.2.0
+	 */
 	public function account_user_verification_retry_handler() {
 		$this->ajax_handler(
 			function () {
-
 				$user = new PolicyMS_User();
 				$user->resend_verification_email();
 			}
@@ -775,15 +849,12 @@ class PolicyMS_Public {
 	 * Handle user account editing AJAX requests.
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public function account_user_data_request_handler() {
 		$this->ajax_handler(
-			function ( $data ) {
-
+			function () {
 				$user = new PolicyMS_User();
-				$data = $user->get_data_copy();
-				return $data;
+				return $user->get_data_copy();
 			}
 		);
 	}
@@ -792,13 +863,16 @@ class PolicyMS_Public {
 	 * Handle user account deletion AJAX requests.
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public function account_user_deletion_handler() {
 		$this->ajax_handler(
 			function ( $data ) {
+				$data['current_password'] = wp_unslash( $data['current_password'] );
 				if ( ! empty( $data['user'] ) ) {
-					PolicyMS_User::delete_other( $data['current_password'], $data['user'] );
+					PolicyMS_User::delete_other(
+						$data['current_password'],
+						sanitize_user( $data['user'] )
+					);
 				} else {
 					$user = new PolicyMS_User();
 					$user->delete( $data['current_password'] );
@@ -808,28 +882,14 @@ class PolicyMS_Public {
 	}
 
 	/**
-	 *
-	 * Content
-	 *
-	 * This section refers to functionality and shortcodes relevant to content.
-	 */
-
-	/**
 	 * Register all the shortcodes concerning content handling.
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public function add_description_shortcodes() {
 		add_shortcode( 'policyms-descriptions-featured', 'PolicyMS_Public::descriptions_featured_shortcode' );
-
-		// Read multiple objects sequence.
 		add_shortcode( 'policyms-description-archive', 'PolicyMS_Public::descriptions_archive_shortcode' );
-
-		// Read single object sequence.
 		add_shortcode( 'policyms-description', 'PolicyMS_Public::description_shortcode' );
-
-		// Create object sequence.
 		add_shortcode( 'policyms-description-creation', 'PolicyMS_Public::description_creation_shortcode' );
 	}
 
@@ -837,17 +897,46 @@ class PolicyMS_Public {
 	 * Display multiple Description Objects for visitors and authenticated users.
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public static function descriptions_archive_shortcode() {
 		self::exception_handler(
 			function () {
-				wp_enqueue_script( '.policyms.descriptions.archive' );
+				wp_enqueue_script( 'policyms-descriptions-archive' );
+				if (
+					! wp_verify_nonce(
+						sanitize_text_field( wp_unslash( $_GET['archive-filtering-nonce'] ?? '' ) ),
+						'policyms_description_filtering_nonce'
+					)
+				) {
+					throw new PolicyMSUnauthorizedRequestException(
+						"The filtering request couldn't be validated."
+					);
+				}
 
-				descriptions_archive_html(
-					PolicyMS_Description::get_all(),
-					PolicyMS_Description::get_filters_range(),
-					self::get_setting( true, 'description_page' )
+				$query     = sanitize_text_field( wp_unslash( $_GET['search'] ?? '' ) );
+				$category  = sanitize_key( $_GET['type'] ?? '' );
+				$views_gte = (int) $_GET['views-gte'] ?? 0;
+				$views_lte = (int) $_GET['views-lte'] ?? null;
+				$date_gte  = ! empty( $_GET['update-date-gte'] )
+					? sanitize_text_field( wp_unslash( $_GET['update-date-gte'] ) )
+					: null;
+				$date_lte  = ! empty( $_GET['update-date-lte'] )
+					? sanitize_text_field( wp_unslash( $_GET['update-date-lte'] ) )
+					: null;
+
+				// NOTE: No need to escape this self-created HTML output.
+				print descriptions_archive_html(
+					PolicyMS_Description_Collection::get_all(),
+					PolicyMS_Description_Filters::get_defaults(),
+					new PolicyMS_Description_Filters(
+						$query,
+						$category,
+						$views_gte,
+						$views_lte,
+						$date_gte,
+						$date_lte
+					),
+					wp_create_nonce( 'policyms_description_filtering_nonce' )
 				);
 			}
 		);
@@ -857,15 +946,15 @@ class PolicyMS_Public {
 	 * Display featured descriptions for visitors and authenticated users.
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public static function descriptions_featured_shortcode() {
 		self::exception_handler(
 			function () {
-				$featured = PolicyMS_Description::get_featured();
-				wp_enqueue_script( '.policyms.descriptions.archive' );
-				featured_descriptions_html(
-					$featured
+				wp_enqueue_script( 'policyms-descriptions-archive' );
+
+				// NOTE: No need to escape this self-created HTML output.
+				print featured_descriptions_html(
+					PolicyMS_Description_Collection::get_featured()
 				);
 			}
 		);
@@ -875,23 +964,20 @@ class PolicyMS_Public {
 	 * Display the description creation form for authenticated users.
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public static function description_creation_shortcode() {
 		self::exception_handler(
 			function () {
 				if ( PolicyMS_User::is_authenticated() ) {
 					wp_enqueue_script( 'policyms-description-creation' );
-					wp_localize_script(
-						'policyms-description-creation',
-						'DescriptionCreationProperties',
-						array(
-							'nonce'           => wp_create_nonce( 'policyms_description_creation' ),
-							'descriptionPage' => self::get_setting( true, 'description_page' ),
-						)
-					);
 
-					description_editor_html();
+					// NOTE: No need to escape this self-created HTML output.
+					print description_editor_html(
+						null,
+						self::get_setting( true, 'description_page' ),
+						'',
+						wp_create_nonce( 'policyms_description_creation' ),
+					);
 				} else {
 					notice_html( 'You need to be logged in to create a description.' );
 				}
@@ -903,7 +989,6 @@ class PolicyMS_Public {
 	 * Display a single description object for authenticated users.
 	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public static function description_shortcode() {
 		self::exception_handler(
@@ -913,20 +998,19 @@ class PolicyMS_Public {
 						'Please specify the ID of the description.'
 					);
 				}
-				$description = new PolicyMS_Description( $_GET['did'] );
-				$permissions = array(
-					'authenticated' => PolicyMS_User::is_authenticated(),
-					'provider'      => false,
-					'administrator' => false,
+
+				// Get the description.
+				$description = new PolicyMS_Description(
+					sanitize_key( wp_unslash( $_GET['did'] ) )
 				);
 
-				if ( $permissions['authenticated'] ) {
+				// Initialize the user permissions object.
+				$authenticated = PolicyMS_User::is_authenticated();
+
+				if ( $authenticated ) {
 					$user = new PolicyMS_User();
 
 					if ( $user->is_verified() || $description->is_provider( $user ) ) {
-						$permissions['provider']      = $description->is_provider( $user );
-						$permissions['administrator'] = $user->is_admin();
-
 						$image_blobs = array_map(
 							function ( $image ) {
 								return $image->pull();
@@ -934,62 +1018,71 @@ class PolicyMS_Public {
 							array_filter(
 								$description->assets ?? array(),
 								function ( $category ) {
-									return $category == 'images';
+									return 'images' === $category;
 								},
 								ARRAY_FILTER_USE_KEY
 							)['images'] ?? array()
 						);
 
-						$reviews = $description->get_reviews( filter_var( $_GET['reviews-page'] ?? 1, FILTER_VALIDATE_INT ) );
+						$reviews = $description->get_reviews(
+							intval( $_GET['reviews-page'] ?? 1 )
+						);
 					} else {
-						$permissions['authenticated'] = false;
+						$authenticated = false;
 						notice_html( 'You need to verify your email address to be able to view description details.', 'notice' );
 					}
 				}
 
-				wp_enqueue_script( 'policyms-description-creation' );
 				wp_enqueue_script( 'policyms-description' );
-				wp_localize_script(
-					'policyms-description',
-					'DescriptionEditingProperties',
-					array(
-						'nonce'                   => wp_create_nonce( 'policyms_description_editing' ),
-						'descriptionID'           => $description->id,
-						'assetDownloadNonce'      => $permissions['authenticated'] ? wp_create_nonce( 'policyms_asset_download' ) : null,
-						'assetDeleteNonce'        => $permissions['authenticated'] ? wp_create_nonce( 'policyms_asset_delete' ) : null,
-						'setDefaultImageNonce'    => $permissions['authenticated'] ? wp_create_nonce( 'policyms_set_description_image' ) : null,
-						'removeDefaultImageNonce' => $permissions['authenticated'] ? wp_create_nonce( 'policyms_remove_description_image' ) : null,
-						'reviewsNonce'            => $permissions['authenticated'] ? wp_create_nonce( 'policyms_get_description_reviews' ) : null,
-						'createReviewNonce'       => $permissions['authenticated'] ? wp_create_nonce( 'policyms_create_review' ) : null,
-						'deleteReviewNonce'       => $permissions['authenticated'] ? wp_create_nonce( 'policyms_delete_review' ) : null,
-						'approvalNonce'           => $permissions['administrator'] ? wp_create_nonce( 'policyms_description_approval' ) : null,
-						'deletionNonce'           => ( $permissions['administrator'] || $permissions['provider'] ) ? wp_create_nonce( 'policyms_description_deletion' ) : null,
-						'deleteRedirect'          => $permissions['provider'] ? ( self::get_setting( true, 'account_page' ) . '#descriptions' ) : ( self::get_setting( true, 'account_page' ) . '#approvals' ),
-						'videoURL'                => $permissions['authenticated'] ? self::get_setting( true, 'marketplace_host' ) : '',
-					)
+
+				$urls = self::get_setting(
+					true,
+					'login_page',
+					'account_page',
+					'archive_page',
+					'marketplace_host'
 				);
 
-				add_filter(
-					'wpseo_title',
-					function ( $title ) use ( $description ) {
-						if ( is_singular( 'product' ) ) {
-							$title = $description->information['title'];
-						}
-						return $title;
-					}
-				);
-
-				description_html(
+				// NOTE: No need to escape this self-created HTML output.
+				print description_html(
 					$description,
-					$image_blobs ?? null,
-					self::get_setting(
-						true,
-						'login_page',
-						'account_page',
-						'archive_page'
-					),
-					$reviews ?? null,
-					$permissions
+					$urls['account_page'],
+					$urls['archive_page'],
+					$urls['login_page'],
+					$authenticated,
+					$user->is_admin(),
+					$description->is_provider( $user ),
+					$reviews ?? array(),
+					$image_blobs ?? array(),
+					$authenticated
+						? wp_create_nonce( 'policyms_asset_download' ) : '',
+					$authenticated
+						? wp_create_nonce( 'policyms_get_description_reviews' ) : '',
+					$authenticated
+						? wp_create_nonce( 'policyms_create_review' ) : '',
+					$authenticated
+						? wp_create_nonce( 'policyms_delete_review' ) : '',
+					$user->is_admin()
+						? wp_create_nonce( 'policyms_description_approval' ) : '',
+					$description->is_provider( $user ) || $user->is_admin()
+						? wp_create_nonce( 'policyms_description_editing' )
+						: '',
+					$description->is_provider( $user ) || $user->is_admin()
+						? wp_create_nonce( 'policyms_set_description_image' )
+						: '',
+					$description->is_provider( $user ) || $user->is_admin()
+						? wp_create_nonce( 'policyms_remove_description_image' )
+						: '',
+					$description->is_provider( $user ) || $user->is_admin()
+						? wp_create_nonce( 'policyms_asset_delete' )
+						: '',
+					$description->is_provider( $user ) || $user->is_admin()
+						? wp_create_nonce( 'policyms_description_deletion' )
+						: '',
+					$description->is_provider( $user )
+						? $urls['account_page'] . '#descriptions'
+						: $urls['account_page'] . '#approvals',
+					$urls['marketplace_host']
 				);
 			}
 		);
@@ -998,52 +1091,62 @@ class PolicyMS_Public {
 	/**
 	 * Handle description editing AJAX requests.
 	 *
-	 * @uses    PolicyMS_Public::description_editing()
-	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public function description_editing_handler() {
 		$this->ajax_handler(
 			function ( $data ) {
-				$description = new PolicyMS_Description( $data['description_id'] );
+				$description = new PolicyMS_Description( $data['description-id'] );
 				try {
-
-					// TODO @alexandrosraikos: Remove 'subtype' entirely. (#128)
-					// TODO @alexandrosraikos: Rename 'Fields of Use' to 'Keywords'. (#128)
 					$description->update(
 						array(
-							'title'       => stripslashes( sanitize_text_field( $data['title'] ) ),
-							'type'        => sanitize_text_field( $data['type'] ),
-							'subtype'     => sanitize_text_field( $data['subtype'] ?? '' ),
-							'owner'       => stripslashes( sanitize_text_field( $data['owner'] ?? '' ) ),
-							'description' => stripslashes( sanitize_text_field( $data['description'] ) ),
+							'title'       => sanitize_text_field(
+								wp_unslash( $data['title'] )
+							),
+							'type'        => sanitize_text_field(
+								wp_unslash( $data['type'] )
+							),
+							'owner'       => sanitize_text_field(
+								wp_unslash( $data['owner'] ?? '' )
+							),
+							'description' => sanitize_text_field(
+								wp_unslash( $data['description'] )
+							),
 							'links-title' => array_map(
 								function ( $title ) {
-									return filter_var( stripslashes( $title ), FILTER_SANITIZE_STRING );
+									return sanitize_text_field( wp_unslash( $title ) );
 								},
 								$data['links-title'] ?? array()
 							),
 							'links-url'   => array_map(
 								function ( $url ) {
-									return filter_var( $url, FILTER_SANITIZE_URL );
+									return esc_url_raw( $url );
 								},
 								$data['links-url'] ?? array()
 							),
-							'fieldOfUse'  => explode( ', ', $data['fields-of-use'] ?? '' ),
-							'comments'    => stripslashes( sanitize_text_field( $data['comments'] ?? '' ) ),
+							'keywords'    => explode(
+								', ',
+								sanitize_text_field(
+									wp_unslash( $data['keywords'] ?? '' )
+								)
+							),
+							'comments'    => sanitize_text_field(
+								wp_unslash( $data['comments'] ?? '' )
+							),
 						),
 						array_filter(
 							array_keys( $_FILES ),
 							function ( $key ) {
-								return ( substr( $key, 0, 5 ) === 'image' ||
+								return (
+									substr( $key, 0, 5 ) === 'image' ||
 									substr( $key, 0, 5 ) === 'video' ||
-									substr( $key, 0, 4 ) === 'file' );
+									substr( $key, 0, 4 ) === 'file'
+								);
 							}
 						)
 					);
 				} catch ( PolicyMSAPIError $e ) {
-					if ( $e->http_status === 406 ) {
+					if ( 406 === $e->http_status ) {
 						http_response_code( 200 );
 						die();
 					} else {
@@ -1057,19 +1160,19 @@ class PolicyMS_Public {
 	/**
 	 * Handle description approval AJAX requests.
 	 *
-	 * @uses    PolicyMS_Public::description_approval()
-	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
-	function description_approval_handler() {
+	public function description_approval_handler() {
 		$this->ajax_handler(
 			function ( $data ) {
-
 				$user = new PolicyMS_User();
 				if ( $user->is_admin() ) {
 					$description = new PolicyMS_Description( $data['description_id'] );
-					$description->approve( $data['approval'] );
+					if ( 'approve' === $data['decision'] ) {
+						$description->approve( $data['approval'] );
+					} else {
+						$description->reject( $data['reason'] );
+					}
 				}
 			}
 		);
@@ -1086,38 +1189,34 @@ class PolicyMS_Public {
 	public function description_creation_handler() {
 		$this->ajax_handler(
 			function ( $data ) {
-				// TODO @alexandrosraikos: Handle file upload section after successful creation. (#133)
-				if ( ! empty( $data['subtype'] ) ) {
-					if ( strlen( $data['subtype'] ) > 25 ) {
-						throw new PolicyMSInvalidDataException(
-							'The secondary collection type label exceeds the 25 character limit.'
-						);
-					}
-				}
-
+				// TODO @alexandrosraikos: Handle file upload section after successful creation (#133).
 				return ( PolicyMS_Description::create(
 					array(
-						'title'       => stripslashes( sanitize_text_field( $data['title'] ) ),
-						'type'        => sanitize_text_field( $data['type'] ),
-						'subtype'     => strtolower( sanitize_text_field( $data['subtype'] ?? '' ) ),
-						'owner'       => stripslashes( sanitize_text_field( $data['owner'] ?? '' ) ),
-						'description' => stripslashes( sanitize_text_field( $data['description'] ) ),
+						'title'       => sanitize_text_field( wp_unslash( $data['title'] ) ),
+						'type'        => sanitize_key( wp_unslash( $data['type'] ) ),
+						'owner'       => sanitize_text_field( wp_unslash( $data['owner'] ?? '' ) ),
+						'description' => sanitize_text_field( wp_unslash( $data['description'] ) ),
 						'links'       => PolicyMS_User::implode_urls(
 							array_map(
 								function ( $title ) {
-									return filter_var( stripslashes( $title ), FILTER_SANITIZE_STRING );
+									return sanitize_text_field( wp_unslash( $title ) );
 								},
 								$data['links-title'] ?? array()
 							),
 							array_map(
 								function ( $url ) {
-									return filter_var( $url, FILTER_SANITIZE_URL );
+									return esc_url_raw( $url );
 								},
 								$data['links-url'] ?? array()
 							)
 						),
-						'fieldOfUse'  => explode( ', ', $data['fields-of-use'] ?? array() ),
-						'comments'    => stripslashes( sanitize_text_field( $data['comments'] ?? '' ) ),
+						'keywords'    => explode(
+							', ',
+							$data['keywords'] ?? array()
+						),
+						'comments'    => sanitize_textarea_field(
+							wp_unslash( $data['comments'] ?? '' )
+						),
 					)
 				) );
 			}
@@ -1128,10 +1227,7 @@ class PolicyMS_Public {
 	/**
 	 * Handle description deletion AJAX requests.
 	 *
-	 * @uses    PolicyMS_Public::description_creation()
-	 *
 	 * @since   1.0.0
-	 * @author  Alexandros Raikos <alexandros@araikos.gr>
 	 */
 	public function description_deletion_handler() {
 		$this->ajax_handler(
@@ -1142,28 +1238,46 @@ class PolicyMS_Public {
 		);
 	}
 
+	/**
+	 * Forward a temporary download URL to the client.
+	 *
+	 * @since 1.3.0
+	 */
 	public function asset_download_handler() {
 		$this->ajax_handler(
 			function ( $data ) {
 				$otc = PolicyMS_Asset::get_download_url(
-					$data['category'],
-					$data['file_id']
+					sanitize_key( wp_unslash( $data['category'] ) ),
+					sanitize_text_field( wp_unslash( $data['file_id'] ) )
 				);
 				return array(
-					'url' => self::get_setting( true, 'marketplace_host' ) . '/assets/download/' . $otc . ( ( $data['download'] == 'true' ) ? '' : '?na=not' ),
+					'url' => self::get_setting( true, 'marketplace_host' ) . '/assets/download/' . $otc . ( ( 'true' === $data['download'] ) ? '' : '?na=not' ),
 				);
 			}
 		);
 	}
 
+	/**
+	 * Handle asset deletion AJAX requests.
+	 *
+	 * @since 1.3.0
+	 */
 	public function asset_deletion_handler() {
 		$this->ajax_handler(
 			function ( $data ) {
-				PolicyMS_Asset::delete( $data['asset_category'], $data['asset_id'] );
+				PolicyMS_Asset::delete(
+					sanitize_key( wp_unslash( $data['asset_category'] ) ),
+					sanitize_text_field( wp_unslash( $data['asset_id'] ) )
+				);
 			}
 		);
 	}
 
+	/**
+	 * Handle description reviews retrieval AJAX requests.
+	 *
+	 * @since 1.3.0
+	 */
 	public function get_description_reviews_handler() {
 		$this->ajax_handler(
 			function ( $data ) {
@@ -1178,52 +1292,76 @@ class PolicyMS_Public {
 		);
 	}
 
+	/**
+	 * Handle review creation AJAX requests.
+	 *
+	 * @since 1.3.0
+	 */
 	public function create_review_handler() {
 		$this->ajax_handler(
 			function ( $data ) {
-				if ( $data['update'] == 'on' ) {
+				if ( 'on' === $data['update'] ) {
 					PolicyMS_Review::update(
-						$data['description_id'],
-						$data['rating'],
-						stripslashes( $data['comment'] ),
-						$data['update']
+						sanitize_text_field( wp_unslash( $data['description_id'] ) ),
+						(int) $data['rating'],
+						sanitize_textarea_field( wp_unslash( $data['comment'] ) ),
+						sanitize_key( wp_unslash( $data['update'] ) )
 					);
 				} else {
 					PolicyMS_Review::create(
-						$data['description_id'],
-						$data['rating'],
-						stripslashes( $data['comment'] ),
-						$data['update']
+						sanitize_text_field( wp_unslash( $data['description_id'] ) ),
+						(int) $data['rating'],
+						sanitize_textarea_field( wp_unslash( $data['comment'] ) ),
+						sanitize_key( wp_unslash( $data['update'] ) )
 					);
 				}
 			}
 		);
 	}
 
+	/**
+	 * Handle review deletion AJAX requests.
+	 *
+	 * @since 1.3.0
+	 */
 	public function delete_review_handler() {
 		$this->ajax_handler(
 			function ( $data ) {
-				PolicyMS_Review::delete( $data['description_id'], $data['author_id'] );
-			}
-		);
-	}
-
-	public function set_description_image_handler() {
-		$this->ajax_handler(
-			function ( $data ) {
-				PolicyMS_Description::set_default_image(
-					$data['description_id'],
-					$data['image_id']
+				PolicyMS_Review::delete(
+					sanitize_text_field( wp_unslash( $data['description_id'] ) ),
+					sanitize_text_field( wp_unslash( $data['author_id'] ) )
 				);
 			}
 		);
 	}
 
+	/**
+	 * Handle image cover configuration AJAX requests
+	 *
+	 * @since 1.3.0
+	 */
+	public function set_description_image_handler() {
+		$this->ajax_handler(
+			function ( $data ) {
+				PolicyMS_Description::set_default_image(
+					sanitize_text_field( wp_unslash( $data['description_id'] ) ),
+					sanitize_text_field( wp_unslash( $data['image_id'] ) )
+				);
+			}
+		);
+	}
+
+
+	/**
+	 * Handle image cover removal AJAX requests
+	 *
+	 * @since 1.3.0
+	 */
 	public function remove_description_image_handler() {
 		$this->ajax_handler(
 			function ( $data ) {
 				PolicyMS_Description::remove_default_image(
-					$data['description_id']
+					sanitize_text_field( wp_unslash( $data['description_id'] ) )
 				);
 			}
 		);

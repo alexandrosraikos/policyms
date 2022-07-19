@@ -211,6 +211,8 @@ class PolicyMS {
 		$this->loader->add_action( 'wp_ajax_nopriv_policyms_account_user_registration_google', $plugin_public, 'account_user_registration_google_handler' );
 		$this->loader->add_action( 'wp_ajax_policyms_account_user_registration_keycloak', $plugin_public, 'account_user_registration_keycloak_handler' );
 		$this->loader->add_action( 'wp_ajax_nopriv_policyms_account_user_registration_keycloak', $plugin_public, 'account_user_registration_keycloak_handler' );
+		$this->loader->add_action( 'wp_ajax_policyms_account_user_switch_tab', $plugin_public, 'account_user_switch_tab_handler' );
+		$this->loader->add_action( 'wp_ajax_nopriv_policyms_account_user_switch_tab', $plugin_public, 'account_user_switch_tab_handler' );
 		$this->loader->add_action( 'wp_ajax_policyms_account_disconnect_google', $plugin_public, 'account_disconnect_google_handler' );
 		$this->loader->add_action( 'wp_ajax_nopriv_policyms_account_disconnect_google', $plugin_public, 'account_disconnect_google_handler' );
 		$this->loader->add_action( 'wp_ajax_policyms_account_disconnect_keycloak', $plugin_public, 'account_disconnect_keycloak_handler' );

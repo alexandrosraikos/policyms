@@ -6,7 +6,9 @@
  */
 
 var presetElementQueries = {
-
+  mainContainer: '.policyms-user',
+  tabSwitchButton: '.policyms-user > .sidebar > nav > button[data-action="policyms-switch-user-tab"]',
+  tabContentContainer: '.policyms-user > main > section'
 };
 
 (function ($) {
@@ -27,12 +29,29 @@ var presetElementQueries = {
      */
     function switchTab(e) {
       e.preventDefault();
-      $("#policyms-account section").removeClass("focused");
-      $("section." + $(this).attr("id")).addClass("focused");
-      $("#policyms-account nav button").removeClass("active");
-      $(this).addClass("active");
-      var hashPrepare = $(this).attr("id").split("-");
-      window.location.hash = "#" + hashPrepare[hashPrepare.length - 1];
+      makeWPRequest(
+        presetElementQueries.tabContentContainer,
+        'policyms_account_user_switch_tab',
+        $(e.target).data('nonce'),
+        {
+          tab_identifier: $(e.target).data('tab-identifier'),
+          user_id: $(presetElementQueries.mainContainer).data('user-id'),
+          is_visitor: $(presetElementQueries.mainContainer).prop('visitor') ? true : false
+        },
+        (data) => {
+          // Replace section content.
+          $(presetElementQueries.tabContentContainer).html(data);
+
+          // Make active tab.
+          $(presetElementQueries.tabSwitchButton).prop('active', false);
+          $(e.target).prop('active', true);
+
+          // Update URL parameters.
+          var query = new URLSearchParams(window.location.search);
+          query.set('tab', $(e.target).data('tab-identifier'));
+          history.pushState(null, '', window.location.pathname + "?" + query.toString());
+        }
+      );
     }
 
     /**
@@ -47,24 +66,7 @@ var presetElementQueries = {
     );
 
     // Change account navigation tab.
-    $(
-      "button#policyms-account-overview, button#policyms-account-descriptions, button#policyms-account-reviews, button#policyms-account-approvals, button#policyms-account-profile"
-    ).click(switchTab);
-
-    // Hash determines active tab?
-    if (
-      window.location.hash == "#descriptions" ||
-      window.location.hash == "#reviews" ||
-      window.location.hash == "#approvals" ||
-      window.location.hash == "#profile"
-    ) {
-      $(
-        "button#policyms-account-" +
-        window.location.hash.substr(1)
-      ).trigger("click");
-    } else {
-      $("button#policyms-account-overview").trigger("click");
-    }
+    $(presetElementQueries.tabSwitchButton).click(switchTab);
 
     /**
      * Assets / Reviews / Approvals

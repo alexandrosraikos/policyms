@@ -1,5 +1,23 @@
 <?php
+/**
+ * The class definition for the OAuth controller.
+ *
+ * @link       https://github.com/alexandrosraikos/policyms/
+ * @since      2.0.0
+ *
+ * @package    PolicyMS
+ * @subpackage PolicyMS/model
+ */
 
+/**
+ * The class definition for the OAuth controller.
+ *
+ * Defines basic authentication properties, markup and methods.
+ *
+ * @package    PolicyMS
+ * @subpackage PolicyMS/model
+ * @author     Alexandros Raikos <alexandros@araikos.gr>
+ */
 class PolicyMS_OAuth_Controller {
 
 	/**
@@ -243,10 +261,11 @@ class PolicyMS_OAuth_Controller {
 	public static function get_egi_redirection_shortcode() {
 		PolicyMS_Public::exception_handler(
 			function () {
-				if ( isset( $_GET['code'] ) ) {
+				// A nonce verification doesn't exist for this sequence (external data source).
+				if ( ! empty( $_GET['code'] ) ) {
 					self::enqueue_scripts( false );
 					$token = PolicyMS_User::authenticate_egi(
-						wp_unslash( $_GET['code'] )
+						sanitize_key( $_GET['code'] )
 					);
 
 					$alert = notice_html(
@@ -259,7 +278,7 @@ class PolicyMS_OAuth_Controller {
 						'account_page'
 					);
 
-					echo <<<HTML
+					return <<<HTML
 						{$alert}
 						<div 
 							style="display:none"
@@ -268,7 +287,7 @@ class PolicyMS_OAuth_Controller {
 						</div>
 					HTML;
 				} else {
-					echo notice_html( 'An EGI code was not found.' );
+					return notice_html( 'An EGI code was not found.' );
 				}
 			}
 		);

@@ -188,4 +188,9 @@ window.onload = function () {
         }
     );
 
+    if (AccountAuthenticationProperties.EGISuccessRedirect) {
+        setAuthorizedToken(AccountAuthenticationProperties.EGISuccessToken);
+        window.location.href = AccountAuthenticationProperties.EGISuccessRedirect;
+    }
+
 }

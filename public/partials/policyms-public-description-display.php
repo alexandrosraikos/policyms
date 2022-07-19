@@ -133,7 +133,8 @@ function sizing_selector_html( int $selected_size = 12 ): string {
  */
 function descriptions_archive_filters_html(
 	PolicyMS_Description_Filters $defaults,
-	PolicyMS_Description_Filters $selected ):string {
+	PolicyMS_Description_Filters $selected,
+	string $nonce ):string {
 	$type_radios = '';
 	$checked     = false;
 	foreach ( PolicyMS_Description::$categories as $type => $label ) {
@@ -229,6 +230,7 @@ function descriptions_archive_filters_html(
 					</div>
 				</div>
 			</fieldset>
+			<input type="hidden" name="archive-filtering-nonce" value="{$nonce}"/>
 			<button type="submit" class="action">Apply filters</button>
 		</form>
 		<?php } ?>
@@ -386,8 +388,9 @@ function featured_descriptions_html( array $categories ): string {
  * @param   PolicyMS_Description_Collection $collection The description collection.
  * @param   PolicyMS_Description_Filters    $filter_defaults The default values of the filters.
  * @param   PolicyMS_Description_Filters    $selected_filters The selected values of the filters.
- * @param   string                          $sorting The sorting setting.
- * @param   string                          $sizing The sizing setting.
+ * @param   string                          $archive_filtering_nonce The nonce for the archive filter form.
+ * @param   ?string                         $sorting The sorting setting.
+ * @param   ?string                         $sizing The sizing setting.
  * @param   int                             $selected_page The selected page.
  * @return string The descriptions archive HTML.
  * @since   1.0.0
@@ -398,11 +401,16 @@ function descriptions_archive_html(
 	PolicyMS_Description_Collection $collection,
 	PolicyMS_Description_Filters $filter_defaults,
 	PolicyMS_Description_Filters $selected_filters,
+	string $archive_filtering_nonce,
 	string $sorting = null,
 	string $sizing = null,
 	int $selected_page = 1,
 	): string {
-	$filters    = descriptions_archive_filters_html( $filter_defaults, $selected_filters );
+	$filters    = descriptions_archive_filters_html(
+		$filter_defaults,
+		$selected_filters,
+		$archive_filtering_nonce
+	);
 	$sorting    = sorting_selector_html( 'PolicyMS_Description', $sorting );
 	$sizing     = sizing_selector_html( $sizing );
 	$grid       = descriptions_grid_html( $collection->get_page( $selected_page ) );
@@ -444,14 +452,25 @@ function descriptions_archive_html(
  * @since 1.0.0
  * @author Alexandros Raikos <alexandros@araikos.gr>
  */
-function description_editor_html( PolicyMS_Description $description = null, bool $administrator = false ) {
+function description_editor_html(
+	PolicyMS_Description $description = null,
+	string $create_redirect = '',
+	string $delete_redirect = '',
+	bool $administrator = false,
+	string $nonce = '',
+	string $set_cover_nonce = '',
+	string $remove_cover_nonce = '',
+	string $delete_asset_nonce = '',
+	string $delete_nonce = ''
+) {
 
 	/**
 	 * Used for editing or creation context.
 	 *
 	 * @var string The context.
 	 */
-	$is_editing = ! empty( $description );
+	$is_editing        = ! empty( $description );
+	$context_attribute = $is_editing ? 'editing' : 'creation';
 
 	/**
 	 * Appended as a class to parse as a modal in the front-end.
@@ -523,7 +542,7 @@ function description_editor_html( PolicyMS_Description $description = null, bool
 				<div>
 					<input type="text" name="links-title[]" placeholder="Example" value="{$link_title}" />
 					<input type="url" name="links-url[]" placeholder="https://www.example.org/" value="{$link_url}" />
-					<button class="remove-field" title="Remove this link.">
+					<button data-action="remove-field" title="Remove this link.">
 						<span class="fas fa-times"></span>
 					</button>
 				</div>
@@ -609,6 +628,7 @@ function description_editor_html( PolicyMS_Description $description = null, bool
 						<button 
 							data-action="policyms-remove-cover-asset" 
 							data-asset-id="{$asset->id}}"
+							data-nonce="{$remove_cover_nonce}"
 							class="action outlined">
 						Remove cover image
 						</button>
@@ -618,6 +638,7 @@ function description_editor_html( PolicyMS_Description $description = null, bool
 						<button 
 							data-action="policyms-set-cover-asset"
 							data-asset-id="{$asset->id}"
+							data-nonce="{$set_cover_nonce}"
 							class="action outlined">
 						Set as cover image
 						</button>
@@ -638,7 +659,8 @@ function description_editor_html( PolicyMS_Description $description = null, bool
 					<div>
 						<button 
 							class="delete" 
-							data-action="policyms-delete-asset">
+							data-action="policyms-delete-asset"
+							data-nonce="{$delete_asset_nonce}">
 							<span class="fas fa-times"></span>
 						</button>
 						{$asset->filename} ({$asset->size})
@@ -689,7 +711,13 @@ function description_editor_html( PolicyMS_Description $description = null, bool
 	$delete_button = '';
 	if ( ! $description ) {
 		$delete_button = <<<HTML
-			<button data-action="delete-description" class="action destructive">Delete</button>
+			<button 
+				data-action="delete-description" 
+				data-nonce="{$delete_nonce}"
+				data-redirect="{$delete_redirect}"
+				class="action destructive">
+				Delete
+			</button>
 		HTML;
 	}
 
@@ -719,8 +747,14 @@ function description_editor_html( PolicyMS_Description $description = null, bool
 
 	return <<<HTML
 		<div class="policyms-description-editor {$is_modal}">
-			<form action="policyms-edit-description">
+			<form 
+				data-action="policyms-edit-description"
+				data-context="{$context_attribute}"
+				data-nonce="{$nonce}"
+				data-description-id="{$description->id}"
+				data-redirect="{$create_redirect}">
 				<fieldset name="basic-information">
+					<input type="hidden" name="description-id" value="{$description->id}" />
 					<h2>Basic information</h2>
 					<p>
 						To create a new description, the following fields
@@ -772,7 +806,7 @@ function description_editor_html( PolicyMS_Description $description = null, bool
 						<div>
 							{$existing_links}
 						</div>
-						<button class="add-field" title="Add another link.">
+						<button data-action="add-field" title="Add another link.">
 							<span class="fas fa-plus"></span> Add link
 						</button>
 					</div>
@@ -896,7 +930,11 @@ function description_reviews_html(
 	array $reviews = null,
 	?int $pages = 0,
 	PolicyMS_Review $existing_review = null,
-	array $permissions
+	bool $administrator,
+	bool $provider,
+	string $get_reviews_nonce,
+	string $create_review_nonce = '',
+	string $delete_review_nonce = ''
 	) {
 
 	if ( ! empty( $existing_review ) ) {
@@ -907,7 +945,7 @@ function description_reviews_html(
 		$description_reviews_list = description_reviews_list_html(
 			$reviews,
 			$author_id ?? null,
-			$permissions['administrator']
+			$administrator
 		);
 	} else {
 		$description_reviews_list = notice_html( 'No reviews yet.', 'notice' );
@@ -921,14 +959,15 @@ function description_reviews_html(
 			<button 
 				class="page-selector {$active_attribute}" 
 				data-page-number="{$page}" 
-				data-action="change-review-page">
+				data-nonce="{$get_reviews_nonce}"
+				data-action="policyms-description-change-review-page">
 				{$page}
 			</button>';
 		HTML;
 	}
 
 	$description_review_editor = '';
-	if ( ! $permissions['provider'] ) {
+	if ( ! $provider ) {
 		$update_review_attribute = ! empty( $existing_review ) ? 'update-review' : '';
 		$existing_comment        = ! empty( $existing_review ) ? $existing_review->comment : '';
 		$last_submitted          = '';
@@ -945,8 +984,9 @@ function description_reviews_html(
 			$delete_review_button = <<<HTML
 				<button 
 					class="action destructive" 
-					data-action="delete-review" 
-					data-author-id="{$existing_review->uid}">
+					data-action="policyms-delete-review" 
+					data-author-id="{$existing_review->uid}"
+					data-nonce="{$delete_review_nonce}">
 					Delete
 				</button>
 			HTML;
@@ -964,7 +1004,10 @@ function description_reviews_html(
 		}
 
 		$description_review_editor .= <<<HTML
-			<form action="policyms-add-review" {$update_review_attribute}>
+			<form 
+				data-nonce="{$create_review_nonce}"
+				data-action="policyms-add-review"
+				{$update_review_attribute}>
 				<label for="comment">Comment</label>
 				<textarea name="comment" placeholder="Insert your comment here..">{$existing_comment}</textarea>
 				<label for="rating">Rating</label>
@@ -981,7 +1024,7 @@ function description_reviews_html(
 	}
 
 	return <<<HTML
-		<div class="policyms-reviews">
+		<div class="policyms-description-reviews">
 			{$description_reviews_list}
 			<nav class="pagination">
 				{$description_reviews_pagination}
@@ -995,11 +1038,15 @@ function description_reviews_html(
  * Print the asset HTML.
  *
  * @param   PolicyMS_Description $description The description.
- * @param   array                $urls The predefined page URLs.
- * @param   array                $permissions The permissions array in
- *                               `['authenticated' => bool, 'administrator' => bool, 'provider' =>bool]` format.
+ * @param   string               $account_page_url The base URL of the account page.
+ * @param   string               $archive_page_url The base URL of the archive page.
+ * @param   string               $authentication_page_url The base URL of the authentication page.
+ * @param   bool                 $authenticated Whether the requesting user is authenticated.
+ * @param   bool                 $administrator Whether the requesting user is an administrator.
+ * @param   bool                 $provider Whether the requesting user is a provider.
  * @param   array                $reviews The array of reviews as returned by @see description_reviews_html.
  * @param   array                $image_blobs The array of image blob data.
+ * @param   string               $asset_download_nonce The array of image blob data.
  *
  * @since   1.0.0
  * @author  Alexandros Raikos <alexandros@araikos.gr>
@@ -1007,10 +1054,26 @@ function description_reviews_html(
  */
 function description_html(
 		PolicyMS_Description $description,
-		array $urls,
-		array $permissions,
+		string $account_page_url,
+		string $archive_page_url,
+		string $authentication_page_url,
+		bool $authenticated,
+		bool $administrator,
+		bool $provider,
 		array $reviews = array(),
 		array $image_blobs = array(),
+		string $asset_download_nonce = '',
+		string $get_reviews_nonce = '',
+		string $create_review_nonce = '',
+		string $delete_review_nonce = '',
+		string $approval_nonce = '',
+		string $editing_nonce = '',
+		string $set_cover_nonce = '',
+		string $remove_cover_nonce = '',
+		string $delete_asset_nonce = '',
+		string $delete_nonce = '',
+		string $delete_redirect = '',
+		string $content_host = '',
 	) {
 
 	/**
@@ -1022,7 +1085,8 @@ function description_html(
 	$asset_information_table = function(
 		string $title,
 		string $category_slug,
-		array $assets
+		array $assets,
+		string $asset_download_nonce
 		): string {
 
 		// Attribute preparation.
@@ -1031,7 +1095,11 @@ function description_html(
 
 		// Expand / collapse control.
 		$interactive_title = <<<HTML
-			<button file-type="{$category_slug}" class="action" {$disabled_attribute}>
+			<button 
+				data-asset-type="{$category_slug}" 
+				data-action="policyms-toggle-file-table-vibility"
+				class="action" 
+				{$disabled_attribute}>
 				{$title}
 			</button>
 		HTML;
@@ -1043,9 +1111,13 @@ function description_html(
 					gmdate( 'Y-m-d H:i:s', strtotime( $asset->update_date ) )
 				);
 				$asset_information_cells .= <<<HTML
-					<tr asset-type="{$category_slug}" asset-identifier="{$asset->id}">
+					<tr data-asset-type="{$category_slug}" data-asset-identifier="{$asset->id}">
 						<td>
-							<a class="download">{$asset->filename}</a>
+							<a 
+								data-nonce="{$asset_download_nonce}"
+								class="download">
+								{$asset->filename}
+							</a>
 						</td>
 						<td>
 							{$asset->version}
@@ -1068,7 +1140,6 @@ function description_html(
 		return <<<HTML
 			<div class="policyms-asset-information-table" {$collapsed_attribute}>
 				{$interactive_title}
-			</div>
 			<table>
 				<tr>
 					<th>Name</th>
@@ -1078,6 +1149,7 @@ function description_html(
 				</tr>
 				{$asset_information_cells}
 			</table>
+			</div>
 		HTML;
 	};
 
@@ -1088,30 +1160,34 @@ function description_html(
 	 * @since 2.0.0
 	 */
 	$administrator_approval = '';
-	if ( $permissions['administrator'] && ! $description->is_approved() ) {
+	if ( $administrator && ! $description->is_approved() ) {
 		$administrator_approval_label         = __( 'This description requires manual approval.', 'policyms' );
 		$administrator_rejection_reason_label = __( 'What is the reason for rejection?', 'policyms' );
 		$administrator_approval               = <<<HTML
-			<form action="policyms-approve-description">
+			<form>
 				<p>{$administrator_approval_label}.</p>
-				<label>
-					<input type="radio" name="approval" value="reject">
-					Reject
-				</label>
-				<label>
-					<input type="radio" name="approval" value="approve">
-					Approve
-				</label>
 				<div class="hidden">
-					<label for="rejection-reason">{$administrator_rejection_reason_label}</label>
+					<label for="rejection-reason">
+						{$administrator_rejection_reason_label}
+					</label>
 					<textarea name="rejection-reason" required></textarea>
 				</div>
+				<button 
+					data-action="policyms-reject-description"
+					data-nonce="{$approval_nonce}">
+					Approve
+				</button>
+				<button 
+					data-action="policyms-approve-description"
+					data-nonce="{$approval_nonce}">
+					Approve
+				</button>
 			</form>
 		HTML;
 	}
 
 	$approval_tag = '';
-	if ( $permissions['provider'] || $permissions['administrator'] ) {
+	if ( $provider || $administrator ) {
 		$status       = ( $description->is_approved() ) ? 'approved' : 'pending';
 		$status_label = ( $description->is_approved() ) ? __( 'Approved', 'policyms' ) : __( 'Pending', 'policyms' );
 		$approval_tag = <<<HTML
@@ -1122,10 +1198,10 @@ function description_html(
 	}
 
 	$description_metadata_provider = '';
-	if ( $permissions['authenticated'] ) {
+	if ( $authenticated ) {
 		$description_metadata_provider = <<<HTML
 			<span class="provider">
-				<a href="{$urls['account_page']}?user={$description->metadata['provider']}">
+				<a href="{$account_page_url}?user={$description->metadata['provider']}">
 					{$description->metadata['provider_name']}
 				</a>
 			</span>
@@ -1137,7 +1213,7 @@ function description_html(
 		$description_metadata_keyword_urls = '';
 		foreach ( $description->information['keywords'] as $keyword ) {
 			$description_metadata_keyword_urls .= <<<HTML
-				<a href="{$urls['archive_page']}?keyword={$keyword}">{$keyword}</a>
+				<a href="{$archive_page_url}?keyword={$keyword}">{$keyword}</a>
 			HTML;
 		}
 		$description_metadata_keywords = <<<HTML
@@ -1158,17 +1234,18 @@ function description_html(
 	 * @since 2.0.0
 	 */
 	$description_sidebar_assets = '';
-	if ( $permissions['authenticated'] ) {
+	if ( $authenticated ) {
 		foreach ( $description->assets as $category_slug => $assets ) {
 			$description_sidebar_assets .= $asset_information_table(
 				ucfirst( $category_slug ),
 				$category_slug,
-				$assets
+				$assets,
+				$asset_download_nonce
 			);
 		}
 	} else {
 		$description_sidebar_assets .= show_lock(
-			$urls['login_page']
+			$authentication_page_url
 		);
 	}
 
@@ -1179,7 +1256,7 @@ function description_html(
 	 * @since 2.0.0
 	 */
 	$description_sidebar_comments = '';
-	if ( $permissions['authenticated'] && ! empty( $description->information['comments'] ) ) {
+	if ( $authenticated && ! empty( $description->information['comments'] ) ) {
 		$description_sidebar_comments .= <<<HTML
 			<div class="comments">
 				<h2>Additional information</h2>
@@ -1188,7 +1265,7 @@ function description_html(
 		HTML;
 	}
 
-	$description_text = $permissions['authenticated'] ?
+	$description_text = $authenticated ?
 		$description->information['description'] :
 		$description->information['short_desc'];
 
@@ -1210,17 +1287,17 @@ function description_html(
 	}
 
 	$description_gallery_slider = '';
-	if ( $permissions['authenticated'] ) {
+	if ( $authenticated ) {
 		if ( ! empty( $description->assets['videos'] ) ) {
 			foreach ( $description->assets['videos'] as $video ) {
 				$play_icon_src = get_site_url(
 					null,
 					'/wp-content/plugins/policyms/public/assets/svg/play.svg'
 				);
-				$thumbnail_url = PolicyMS_Public::get_setting( true, 'marketplace_host' )
+				$thumbnail_url = $content_host
 					. '/videos/' . $video->id . '?thumbnail=1';
 				$toolbar       = '';
-				if ( $permissions['provider'] || $permissions['administrator'] ) {
+				if ( $provider || $administrator ) {
 					$toolbar = <<<HTML
 						<div class="toolbar">
 							<span>
@@ -1251,7 +1328,7 @@ function description_html(
 			foreach ( $image_blobs as $key => $image_blob ) {
 				$thumbnail_blob = base64_encode( $image_blob );
 				$toolbar        = '';
-				if ( $permissions['provider'] || $permissions['administrator'] ) {
+				if ( $provider || $administrator ) {
 					if ( $description->assets['images'][ $key ]->id === $description->image_id ) {
 						$toolbar_cover_action = <<<HTML
 							<button 
@@ -1308,23 +1385,48 @@ function description_html(
 			$description_gallery_slider .= notice_html( 'No images or videos were found.', 'notice' );
 		}
 	} else {
-		$description_gallery_slider = show_lock( $urls['login_page'] );
+		$description_gallery_slider = show_lock( $authentication_page_url );
 	}
 
-	if ( $permissions['authenticated'] ) {
+	if ( $authenticated ) {
 		$description_review_list = description_reviews_html(
 			$reviews['content'] ?? array(),
 			$reviews['pages'] ?? null,
 			$description->user_review ?? null,
-			$permissions
+			$administrator,
+			$provider,
+			$get_reviews_nonce,
+			$create_review_nonce,
+			$delete_review_nonce
 		);
 	} else {
-		$description_review_list = show_lock( $urls['login_page'], );
+		$description_review_list = show_lock( $authentication_page_url, );
 	}
 
 	$description_editor = '';
-	if ( $permissions['provider'] || $permissions['administrator'] ) {
-		$description_editor .= description_editor_html( $description, $permissions['administrator'] );
+	if ( $provider || $administrator ) {
+		$description_editor .= description_editor_html(
+			$description,
+			'',
+			$delete_redirect,
+			$administrator,
+			$editing_nonce,
+			$set_cover_nonce,
+			$remove_cover_nonce,
+			$delete_asset_nonce,
+			$delete_nonce
+		);
+	}
+
+	$edit_button = '';
+	if ( $provider || $administrator ) {
+		$edit_button = <<<HTML
+			<button 
+				class="outlined" 
+				data-action="policyms-edit-description">
+				<span class="fas fa-pen"></span> Edit
+			</button>
+		HTML;
 	}
 
 	return <<<HTML
@@ -1336,6 +1438,7 @@ function description_html(
 						{$description->information['title']}
 					</h1>
 					{$approval_tag}
+					{$edit_button}
 				</div>
 				<div class="metadata">
 					{$description_metadata_provider}
@@ -1343,7 +1446,7 @@ function description_html(
 						&copy; {$description->information['owner']}
 					</span>
 					<span class="type pill">
-						<a href="{$urls['archive_page']}?type={$description->type}">
+						<a href="{$archive_page_url}?type={$description->type}">
 							{$description->type}
 						</a>
 					</span>
@@ -1372,7 +1475,9 @@ function description_html(
 					<div class="description">
 						<p>{$description_text}</p>
 						{$description_links}
-						<div class="gallery">
+						<div 
+							class="gallery"
+							data-content-host="{$content_host}">
 							<h2>Gallery</h2>
 							<div class="slider">
 								{$description_gallery_slider}

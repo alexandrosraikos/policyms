@@ -49,12 +49,12 @@ class PolicyMS_Description_Filters {
 	/**
 	 * Initialize a description filter collection.
 	 *
-	 * @param string $query A search term, if any.
-	 * @param string $type A description collection type, if any.
-	 * @param int    $views_gte A minimum number of views, if any.
-	 * @param ?int   $views_lte A maximum number of views, if any.
-	 * @param string $date_gte A minimum description update date, if any.
-	 * @param string $date_lte A maximum description update date, if any.
+	 * @param string  $query A search term, if any.
+	 * @param string  $type A description collection type, if any.
+	 * @param int     $views_gte A minimum number of views, if any.
+	 * @param ?int    $views_lte A maximum number of views, if any.
+	 * @param ?string $date_gte A minimum description update date, if any.
+	 * @param ?string $date_lte A maximum description update date, if any.
 	 */
 	public function __construct(
 		public string $query = '',

@@ -330,6 +330,52 @@ function toggleFileList(e) {
     .toggleClass("collapsed");
 }
 
+
+
+/**
+ * Add a double input field to the links container.
+ *
+ * @param {Event} e
+ *
+ * @author Alexandros Raikos <alexandros@araikos.gr>
+ */
+function addLinksField(e) {
+  e.preventDefault();
+  const container = $(this).prev();
+  const newLinksField = $(`
+    <div>
+      <input 
+        type='text' 
+        name='links-title[]' 
+        placeholder='Example' />
+      <input 
+        type='url' 
+        name='links-url[]' 
+        placeholder='https://www.example.org/' />
+      <button class='remove-field' title='Remove this link.' >
+        <span class='fas fa-times'></span>
+      </button>
+    </div>`);
+  newLinksField.find('input[name*=links]').each(
+    (_, element) => {
+      $(element).val("");
+    }
+  );
+  newLinksField.appendTo(container);
+}
+/**
+ *
+ * Remove a double input field from the links container.
+ *
+ * @param {Event} e
+ *
+ * @author Alexandros Raikos <alexandros@araikos.gr>
+ */
+function removeLinksField(e) {
+  e.preventDefault();
+  $(this).parent().remove();
+}
+
 /**
  * Make a WP request.
  *

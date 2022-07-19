@@ -71,10 +71,5 @@ var presetElementQueries = {
     $(presetElementQueries.authenticationForm).submit(authenticateUser);
     $(presetElementQueries.passwordResetForm).submit(resetPasswordRequest);
 
-    if (AccountAuthenticationProperties.EGISuccessRedirect) {
-      setAuthorizedToken(AccountAuthenticationProperties.EGISuccessToken);
-      window.location.href = AccountAuthenticationProperties.EGISuccessRedirect;
-    }
-
   });
 })(jQuery);
