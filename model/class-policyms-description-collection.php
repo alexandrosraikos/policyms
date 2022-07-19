@@ -29,6 +29,13 @@ class PolicyMS_Description_Collection {
 	 */
 	public bool $is_paginated = false;
 
+	/**
+	 * The total number of pages in the collection, if it's paginated.
+	 *
+	 * @var int
+	 *
+	 * @since 2.0.0
+	 */
 	public int $total_pages = 1;
 
 	/**

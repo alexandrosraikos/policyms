@@ -12,10 +12,12 @@
 /**
  * Print the account registration form.
  *
+ * @param   bool                      $authenticated Whether the user is authenticated.
+ * @param   string                    $nonce The account registration nonce.
  * @param   string                    $authentication_url The url that redirects to the log in page.
+ * @param   string                    $account_page_url The url that redirects to the account page.
  * @param   string                    $tos_url The url that redirects to the terms of service page.
  * @param   PolicyMS_OAuth_Controller $oauth_controller The OAuth controller instance.
- * @param   bool                      $authenticated Whether the user is authenticated.
  *
  * @since   1.0.0
  * @author  Alexandros Raikos <alexandros@araikos.gr>
@@ -120,6 +122,8 @@ function user_registration_html(
 /**
  * Get the user authentication container HTML.
  *
+ * @param string                    $nonce The user authentication nonce.
+ * @param string                    $home_url The URL of the home page.
  * @param string                    $registration_url The URL of the registration page.
  * @param string                    $reset_password_page_url  The URL of the password reset page.
  * @param PolicyMS_OAuth_Controller $oauth_controller The OAuth controller instance.
@@ -309,14 +313,12 @@ function user_overview_html( array $information, array $statistics ): string {
  * @param PolicyMS_Description_Collection $descriptions The list of the user's PolicyMS_Description instances.
  * @param bool                            $visitor Whether the requester is a visitor.
  * @param bool                            $administrator Whether the requester is aan administrator.
- * @param string                          $single_url The base url for the single description page.
- * @param int                             $total_pages The available number of pages.
- * @param array                           $total_categories The available categories for the content type in `[slug => label]` format.
- * @param string                          $creation_url The URL of the creation page of a given type.
+ * @param string                          $description_url_base The base url for the single description page.
+ * @param ?string                         $creation_url The URL of the creation page of a given type.
  * @param int                             $active_page The currently selected page, if any.
- * @param string                          $active_category  The selected category, if any.
- * @param string                          $sorting  The selected item sorting, if any.
- * @param int                             $sizing  The selected size of the page, if any.
+ * @param ?string                         $active_category  The selected category, if any.
+ * @param ?string                         $sorting  The selected item sorting, if any.
+ * @param ?int                            $sizing  The selected size of the page, if any.
  * @return string The user description list HTML container.
  *
  * @since 2.0.0
@@ -399,13 +401,12 @@ function user_descriptions_list_html(
 /**
  * Get the user review list HTML container.
  *
- * @param array  $reviews The list of the user's PolicyMS_Reviews instances.
- * @param bool   $visitor Whether the requester is a visitor.
- * @param string $single_url The base url for the single description page.
- * @param int    $total_pages The available number of pages.
- * @param int    $active_page The currently selected page, if any.
- * @param string $sorting  The selected item sorting, if any.
- * @param int    $sizing  The selected size of the page, if any.
+ * @param array   $reviews The list of the user's PolicyMS_Reviews instances.
+ * @param bool    $visitor Whether the requester is a visitor.
+ * @param string  $single_url The base url for the single description page.
+ * @param int     $active_page The currently selected page, if any.
+ * @param ?string $sorting  The selected item sorting, if any.
+ * @param ?int    $sizing  The selected size of the page, if any.
  * @return string The user review list HTML container.
  *
  * @since 2.0.0
@@ -472,13 +473,11 @@ function user_reviews_list_html(
  * Get the user description approval list HTML container.
  *
  * @param PolicyMS_Description_Collection $approvals The list of the user's PolicyMS_Description instances to be approved.
- * @param string                          $single_url The base url for the single description page.
- * @param int                             $total_pages The available number of pages.
- * @param array                           $total_categories The available categories for the content type in `[slug => label]` format.
+ * @param string                          $description_url_base The base url for the single description page.
  * @param int                             $active_page The currently selected page, if any.
- * @param string                          $active_category  The selected category, if any.
- * @param string                          $sorting  The selected item sorting, if any.
- * @param int                             $sizing  The selected size of the page, if any.
+ * @param ?string                         $active_category  The selected category, if any.
+ * @param ?string                         $sorting  The selected item sorting, if any.
+ * @param ?int                            $sizing  The selected size of the page, if any.
  * @return string The user description approval list HTML container.
  *
  * @since 2.0.0
@@ -487,7 +486,7 @@ function user_reviews_list_html(
 function user_approvals_list_html(
 	PolicyMS_Description_Collection $approvals,
 	string $description_url_base,
-	int $active_page = null,
+	int $active_page = 1,
 	string $active_category = null,
 	string $sorting = null,
 	int $sizing = null
@@ -519,6 +518,10 @@ function user_approvals_list_html(
  * @param bool                      $administrator Whether the requester is an administrator.
  * @param string                    $profile_image_blob The base64 encoded profile image blob.
  * @param PolicyMS_OAuth_Controller $oauth_controller The OAuth controller instance.
+ * @param string                    $editing_nonce The verification nonce for user profile editing.
+ * @param string                    $verification_nonce The verification nonce for user profile verification.
+ * @param string                    $deletion_nonce The verification nonce for user profile deletion.
+ * @param string                    $data_copy_nonce The verification nonce for user profile data copy retrieval.
  * @return string The user profile details and editor HTML.
  *
  * @since 2.0.0
@@ -1018,6 +1021,7 @@ function user_profile_details_html(
  * @param string        $account_page_url The generic account page's URL.
  * @param string        $content_html The generated HTML for the main content container.
  * @param string        $selected_tab The identifier of the selected tab.
+ * @param string        $tab_switch_nonce The verification nonce for switching profile tabs.
  * @return string The account page HTML.
  *
  * @since   1.0.0

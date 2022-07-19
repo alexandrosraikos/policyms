@@ -126,6 +126,7 @@ function sizing_selector_html( int $selected_size = 12 ): string {
  *
  * @param PolicyMS_Description_Filters $defaults The default filter values.
  * @param PolicyMS_Description_Filters $selected The selected filter values.
+ * @param string                       $nonce The verification nonce for archive filtering.
  * @return string
  *
  * @since 1.0.0
@@ -446,7 +447,14 @@ function descriptions_archive_html(
  * If a description object is not passed, this function acts as a description creation form.
  *
  * @param PolicyMS_Description $description An existing description to edit, if any.
+ * @param string               $create_redirect The URL to redirect when creating the description.
+ * @param string               $delete_redirect The URL to redirect when deleting the description.
  * @param bool                 $administrator Whether the requester is an administrator.
+ * @param string               $nonce The verification nonce for description editing.
+ * @param string               $set_cover_nonce The verification nonce for description cover setting.
+ * @param string               $remove_cover_nonce The verification nonce for description cover removal.
+ * @param string               $delete_asset_nonce The verification nonce for description asset deletion.
+ * @param string               $delete_nonce The verification nonce for description deletion.
  * @return string The contained form HTML.
  *
  * @since 1.0.0
@@ -916,11 +924,14 @@ function description_reviews_list_html(
 /**
  * The reviews container for each description.
  *
- * @param   array           $reviews The array of reviews.
- * @param   int             $pages The number of total pages.
- * @param   PolicyMS_Review $existing_review The existing review.
- * @param   array           $permissions The permissions array in
- *                          `['authenticated' => bool, 'administrator' => bool, 'provider' =>bool]` format.
+ * @param   array            $reviews The array of reviews.
+ * @param   ?int             $pages The number of total pages.
+ * @param   ?PolicyMS_Review $existing_review The existing review.
+ * @param bool             $administrator Whether the requesting user is an administrator.
+ * @param bool             $provider Whether the requesting user is the description's provider.
+ * @param string           $get_reviews_nonce The verification nonce for retrieving more reviews.
+ * @param string           $create_review_nonce The verification nonce for creating a review.
+ * @param string           $delete_review_nonce The verification nonce for deleting a review.
  *
  * @since   1.0.0
  * @author  Alexandros Raikos <alexandros@araikos.gr>
@@ -1047,6 +1058,17 @@ function description_reviews_html(
  * @param   array                $reviews The array of reviews as returned by @see description_reviews_html.
  * @param   array                $image_blobs The array of image blob data.
  * @param   string               $asset_download_nonce The array of image blob data.
+ * @param   string               $get_reviews_nonce The verification nonce for retrieving more reviews.
+ * @param   string               $create_review_nonce The verification nonce for creating a review.
+ * @param   string               $delete_review_nonce The verification nonce for deleting a review.
+ * @param   string               $approval_nonce The verification nonce for approving the description.
+ * @param   string               $editing_nonce The verification nonce for editing the description.
+ * @param   string               $set_cover_nonce The verification nonce for setting a description cover.
+ * @param   string               $remove_cover_nonce The verification nonce for removing a description cover.
+ * @param   string               $delete_asset_nonce The verification nonce for deleting an asset.
+ * @param   string               $delete_nonce The verification nonce for deleting the description.
+ * @param   string               $delete_redirect The redirecting URL after deleting the description.
+ * @param   string               $content_host The host URL for downloading content.
  *
  * @since   1.0.0
  * @author  Alexandros Raikos <alexandros@araikos.gr>
