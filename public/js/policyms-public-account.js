@@ -424,31 +424,6 @@ var presetElementQueries = {
     }
 
     /**
-     * Add another sibling field for weblinks.
-     *
-     * @param {Event} e
-     *
-     * @author Alexandros Raikos <alexandros@araikos.gr>
-     */
-    function addWeblinkField(e) {
-      e.preventDefault();
-      $(
-        "<div><input type='text' name='socials-title[]' placeholder='Example' /><input type='url' name='socials-url[]' placeholder='https://www.example.org/' /><button class='remove-field' title='Remove this link.' ><span class='fas fa-times'></span></button></div>"
-      ).appendTo("#policyms-account-edit .socials > div");
-    }
-
-    /**
-     * Remove the weblink field.
-     * @param {Event} e
-     *
-     * @author Alexandros Raikos <alexandros@araikos.gr>
-     */
-    function removeWeblinkField(e) {
-      e.preventDefault();
-      $(this).parent().remove();
-    }
-
-    /**
      * Display a current password requirement in the form.
      *
      * @param {Boolean} active Set to `true` if you want to display the prompt.
@@ -652,18 +627,6 @@ var presetElementQueries = {
     $(
       '.policyms #policyms-account-edit button[data-action="delete-picture"]'
     ).click(deleteProfilePicture);
-
-    // Add a weblink field.
-    $("#policyms-account-edit .socials button.add-field").click(
-      addWeblinkField
-    );
-
-    // Remove a weblink field.
-    $(document).on(
-      "click",
-      "#policyms-account-edit .socials button.remove-field",
-      removeWeblinkField
-    );
 
     // Verify a weblink field.
     $(document).on("change");

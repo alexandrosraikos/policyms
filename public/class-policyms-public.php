@@ -284,7 +284,7 @@ class PolicyMS_Public {
 			}
 		}
 
-		return 1 === count( $settings ) ? $settings[ $id[0] ] : $settings;
+		return 1 === count( $settings ) ? $settings[ $id ] : $settings;
 	}
 
 	/**
@@ -610,17 +610,17 @@ class PolicyMS_Public {
 						'organization'     => sanitize_text_field( wp_unslash( $data['organization'] ?? '' ) ),
 						'email'            => sanitize_email( wp_unslash( $data['email'] ) ),
 						'phone'            => sanitize_text_field( $data['phone'] ?? '' ),
-						'socials-title'    => array_map(
+						'links-title'      => array_map(
 							function ( $title ) {
 								return sanitize_text_field( wp_unslash( $title ) );
 							},
-							$data['socials-title'] ?? array()
+							$data['links-title'] ?? array()
 						),
-						'socials-url'      => array_map(
+						'links-url'        => array_map(
 							function ( $url ) {
 								return esc_url_raw( $url );
 							},
-							$data['socials-url'] ?? array()
+							$data['links-url'] ?? array()
 						),
 						'about'            => sanitize_textarea_field( wp_unslash( $data['about'] ?? '' ) ),
 					)
@@ -817,13 +817,13 @@ class PolicyMS_Public {
 								'organization'     => sanitize_text_field( wp_unslash( $data['organization'] ?? '' ) ),
 								'email'            => sanitize_email( $data['email'] ),
 								'phone'            => sanitize_text_field( $data['phone'] ?? '' ),
-								'socials-title'    => array_map(
+								'links-title'      => array_map(
 									fn( $title) => sanitize_text_field( $title ),
-									$data['socials-title'] ?? ''
+									$data['links-title'] ?? ''
 								),
-								'socials-url'      => array_map(
+								'links-url'        => array_map(
 									fn( $url) => sanitize_text_field( $url ),
-									$data['socials-url'] ?? ''
+									$data['links-url'] ?? ''
 								),
 								'about'            => sanitize_textarea_field( wp_unslash( $data['about'] ?? '' ) ),
 								'public-email'     => sanitize_key( $data['public-email'] ),
@@ -915,21 +915,10 @@ class PolicyMS_Public {
 		self::exception_handler(
 			function () {
 				wp_enqueue_script( 'policyms-descriptions-archive' );
-				if (
-					! wp_verify_nonce(
-						sanitize_text_field( wp_unslash( $_GET['archive-filtering-nonce'] ?? '' ) ),
-						'policyms_description_filtering_nonce'
-					)
-				) {
-					throw new PolicyMSUnauthorizedRequestException(
-						"The filtering request couldn't be validated."
-					);
-				}
-
 				$query     = sanitize_text_field( wp_unslash( $_GET['search'] ?? '' ) );
 				$category  = sanitize_key( $_GET['type'] ?? '' );
-				$views_gte = (int) $_GET['views-gte'] ?? 0;
-				$views_lte = (int) $_GET['views-lte'] ?? null;
+				$views_gte = !empty($_GET['views-gte']) ? (int)$_GET['views-gte'] : null;
+				$views_lte = !empty($_GET['views-lte']) ? (int)$_GET['views-lte'] : null;
 				$date_gte  = ! empty( $_GET['update-date-gte'] )
 					? sanitize_text_field( wp_unslash( $_GET['update-date-gte'] ) )
 					: null;
@@ -939,7 +928,6 @@ class PolicyMS_Public {
 
 				// NOTE: No need to escape this self-created HTML output.
 				print descriptions_archive_html(
-					PolicyMS_Description_Collection::get_all(),
 					PolicyMS_Description_Filters::get_defaults(),
 					new PolicyMS_Description_Filters(
 						$query,
@@ -949,7 +937,8 @@ class PolicyMS_Public {
 						$date_gte,
 						$date_lte
 					),
-					wp_create_nonce( 'policyms_description_filtering_nonce' )
+					wp_create_nonce( 'policyms_description_filtering_nonce' ),
+					PolicyMS_Description_Collection::get_all()
 				);
 			}
 		);
@@ -992,7 +981,7 @@ class PolicyMS_Public {
 						wp_create_nonce( 'policyms_description_creation' ),
 					);
 				} else {
-					notice_html( 'You need to be logged in to create a description.' );
+					print notice_html( 'You need to be logged in to create a description.' );
 				}
 			}
 		);

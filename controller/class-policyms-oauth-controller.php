@@ -63,7 +63,7 @@ class PolicyMS_OAuth_Controller {
 		}
 		wp_enqueue_script(
 			'policyms-oauth-controller',
-			plugin_dir_url( __FILE__ ) . 'controller/js/policyms-oauth-controller.js',
+			plugin_dir_url( __FILE__ ) . 'js/policyms-oauth-controller.js',
 			array(
 				'policyms',
 				$remote ? 'policyms-google-oauth' : '',
@@ -134,7 +134,7 @@ class PolicyMS_OAuth_Controller {
 				return <<<HTML
 					<button 
 						id="keycloak" 
-						class="action keycloak" 
+						class="keycloak" 
 						data-context="{$context}"
 						data-action="show-keycloak-modal"
 						data-nonce="{$nonce}"
@@ -159,7 +159,7 @@ class PolicyMS_OAuth_Controller {
 					<button 
 						id="egi" 
 						data-action="policyms-redirect-egi"
-						class="action egi" 
+						class="egi" 
 						onClick="window.location.href = 'https://aai-demo.egi.eu/auth/realms/egi/protocol/openid-connect/auth?client_id= {$egi_settings['egi_client_id']}&scope=profile%20openid%20email&redirect_uri={$egi_redirection_url}&response_type=code&code_challenge={$egi_settings['egi_code_challenge']}&code_challenge_method=S256'">
 						{$egi_button_label}
 					</button>
@@ -282,6 +282,7 @@ class PolicyMS_OAuth_Controller {
 					return <<<HTML
 						{$alert}
 						<div 
+							data-action="policyms-handle-egi-redirect"
 							style="display:none"
 							data-egi-redirect="{$account_page_url}"
 							data-egi-token="{$token}">
@@ -301,8 +302,8 @@ class PolicyMS_OAuth_Controller {
 	 */
 	public function get_all_html(): string {
 		$sso_buttons = '';
-		foreach ( self::$supported_services as $sso_service ) {
-			$sso_buttons .= $this->get_html( $sso_service );
+		foreach ( self::$supported_services as $sso_id => $sso_service ) {
+			$sso_buttons .= $this->get_html( $sso_id );
 		}
 
 		return <<<HTML

@@ -90,7 +90,7 @@ class PolicyMS_Description_Collection {
 	 * @param string $container_key The API response container array key for
 	 * the description content.
 	 *
-	 * @return self The parased description collection object.
+	 * @return ?self The parsed description collection object.
 	 *
 	 * @since 2.0.0
 	 */
@@ -98,28 +98,33 @@ class PolicyMS_Description_Collection {
 		array $response,
 		bool $specify_pages = true,
 		string $container_key = 'results'
-	) {
+	): ?self {
 		$descriptions = array();
 		if ( isset( $response[ $container_key ] ) ) {
-
-			foreach ( $response[ $container_key ] as $number => $page ) {
-				$descriptions[ $number ] = array();
-				foreach ( $page as $description ) {
-					$descriptions[ $number ][] = new self( $description['id'], $description );
-				}
-			}
 			if ( $specify_pages ) {
+				foreach ( $response[ $container_key ] as $number => $page ) {
+					$descriptions[ $number ] = array();
+					foreach ( $page as $description ) {
+						$descriptions[ $number ][] = new PolicyMS_Description( $description['id'], $description );
+					}
+				}
 				return new PolicyMS_Description_Collection(
 					$descriptions,
 					$response['pages']
 				);
 			} else {
+				foreach ( $response[ $container_key ] as $number => $page ) {
+					$descriptions = array();
+					foreach ( $page as $description ) {
+						$descriptions[] = new PolicyMS_Description( $description['id'], $description );
+					}
+				}
 				return new PolicyMS_Description_Collection(
 					$descriptions
 				);
 			}
 		} else {
-			return array();
+			return null;
 		}
 	}
 
@@ -202,11 +207,11 @@ class PolicyMS_Description_Collection {
 	 * Get all the descriptions, with any existing filter queries.
 	 *
 	 * @param string $category The description category, if any.
-	 * @return self The description collection.
+	 * @return ?self The description collection.
 	 *
 	 * @since 2.0.0
 	 */
-	public static function get_all( string $category = '' ): self {
+	public static function get_all( string $category = '' ): ?self {
 		$filters = PolicyMS_Description_Filters::build_query();
 
 		if ( $category ) {

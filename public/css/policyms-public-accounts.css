@@ -18,14 +18,11 @@
   padding: 20px;
   border: 1px solid var(--policyms-border-color-light);
   margin-bottom: 20px;
-}
-
-.policyms-oauth-buttons .actions {
   display: flex;
   align-items: center;
 }
 
-.policyms-oauth-buttons .action {
+.policyms-oauth-buttons button {
   width: auto;
   margin-right: 8px;
 }
@@ -96,74 +93,15 @@ button[data-action="policyms-redirect-egi"]::before {
 *
 */
 
-.policyms-user-registration .tos-agree {
+.policyms-user-registration > form > .tos-agree {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.policyms-user-registration .tos-agree label {
+.policyms-user-registration > form > .tos-agree label {
   padding-left: 6px;
   margin: 0;
-}
-
-.policyms-user-registration .socials div div {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-}
-.policyms-user-registration .socials div div input[name="socials-title[]"] {
-  max-width: 200px;
-}
-.policyms-user-registration .socials div div input[name="socials-url[]"] {
-  min-width: 225px;
-}
-
-.policyms-user-registration .socials div div * {
-  display: block;
-  height: auto;
-  max-height: unset;
-  margin: 0 8px 0 0;
-}
-
-.policyms-user-registration .socials div button.remove-field,
-.policyms-user-registration .socials div button.remove-field * {
-  box-sizing: border-box;
-  padding: 0;
-  border: none;
-  margin: 0 0 0 3px;
-  background: none !important;
-  color: var(--policyms-text-color) !important;
-  transition: opacity 0.2s ease-in-out;
-}
-
-.policyms-user-registration .socials div button.remove-field:hover {
-  opacity: 0.8;
-  transition: opacity 0.2s ease-in-out;
-}
-
-.policyms-user-registration .socials div button.remove-field:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  transition: opacity 0.2s ease-in-out;
-}
-
-.policyms-user-registration .socials > button.add-field {
-  display: block;
-  height: auto;
-  padding: 3px 5px;
-  padding: 0;
-  border: none;
-  margin: 10px 0;
-  background: none !important;
-  color: var(--policyms-text-color);
-  font-size: 75%;
-  line-height: normal;
-}
-
-.policyms-user-registration .socials > button.add-field:hover {
-  cursor: pointer;
-  opacity: 0.8;
 }
 
 /*

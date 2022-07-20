@@ -104,7 +104,6 @@ function disconnectEGI(e) {
 }
 
 window.onload = function () {
-
     google.accounts.id.initialize({
         client_id: "129650564826-9bf7dhacn26c1hf1k0h0qcn48iv8mv8s.apps.googleusercontent.com",
         callback: window[$(presetElementQueries.googleButton).data('context')]
@@ -119,7 +118,6 @@ window.onload = function () {
     }
     );
     google.accounts.id.prompt();
-
 
     $('button[data-action="show-keycloak-modal"]').click((e) => {
         e.preventDefault();
@@ -188,9 +186,14 @@ window.onload = function () {
         }
     );
 
-    if (AccountAuthenticationProperties.EGISuccessRedirect) {
-        setAuthorizedToken(AccountAuthenticationProperties.EGISuccessToken);
-        window.location.href = AccountAuthenticationProperties.EGISuccessRedirect;
+    const EGIProperties = {
+        redirect: $('div[data-action="policyms-handle-egi-redirect"]').data('egi-redirect'),
+        token: $('div[data-action="policyms-handle-egi-redirect"]').data('egi-token')
+    }
+
+    if (EGIProperties.redirect && EGIProperties.token) {
+        setAuthorizedToken(EGIProperties.token);
+        window.location.href = EGIProperties.redirect;
     }
 
 }

@@ -40,14 +40,14 @@ function sorting_selector_html( string $content_type, string $selected_option = 
 	}
 
 	// Check for valid data.
-	if ( ! in_array( $selected_option, $sorting_options, true ) ) {
+	if ( ! array_key_exists( $selected_option, $sorting_options ) ) {
 		throw new PolicyMSInvalidDataException(
 			'The sorting option can only be one of the following: ' . print_r( $sorting_options )
 		);
 	}
 
 	// Create the HTML form options.
-	$html_options = array();
+	$html_options = '';
 	foreach ( $sorting_options as $option => $option_label ) {
 		$selected_label = ( ! empty( $selected_option ) ) ?
 			( ( $selected_option === $option ) ? 'selected' : '' ) :
@@ -83,7 +83,7 @@ function sorting_selector_html( string $content_type, string $selected_option = 
  * @since 2.0.0
  * @author Alexandros Raikos <alexandros@araikos.gr>
  */
-function sizing_selector_html( int $selected_size = 12 ): string {
+function sizing_selector_html( ?int $selected_size = 12 ): string {
 
 	// Populate the available sizing options.
 	$size_options = array( 12, 30, 60, 90 );
@@ -96,7 +96,7 @@ function sizing_selector_html( int $selected_size = 12 ): string {
 	}
 
 	// Create the HTML form options.
-	$html_options = array();
+	$html_options = '';
 	foreach ( $size_options as $option ) {
 		$selected_label = ( ! empty( $selected_option ) ) ?
 			( ( $selected_option === $option ) ? 'selected' : '' ) :
@@ -198,10 +198,10 @@ function descriptions_archive_filters_html(
 						<input 
 							type="number" 
 							name="views-lte" 
-							placeholder="{$defaults->views_gte}" 
+							placeholder="{$defaults->views_lte}" 
 							value="{$selected->views_lte}" 
 							min="0" 
-							max="{$defaults->views_gte}" />
+							max="{$defaults->views_lte}" />
 					</div>
 				</div>
 			</fieldset>
@@ -386,36 +386,44 @@ function featured_descriptions_html( array $categories ): string {
 /**
  * The descriptions archive HTML.
  *
- * @param   PolicyMS_Description_Collection $collection The description collection.
- * @param   PolicyMS_Description_Filters    $filter_defaults The default values of the filters.
- * @param   PolicyMS_Description_Filters    $selected_filters The selected values of the filters.
- * @param   string                          $archive_filtering_nonce The nonce for the archive filter form.
- * @param   ?string                         $sorting The sorting setting.
- * @param   ?string                         $sizing The sizing setting.
- * @param   int                             $selected_page The selected page.
+ * @param   PolicyMS_Description_Filters     $filter_defaults The default values of the filters.
+ * @param   PolicyMS_Description_Filters     $selected_filters The selected values of the filters.
+ * @param   string                           $archive_filtering_nonce The nonce for the archive filter form.
+ * @param   ?PolicyMS_Description_Collection $collection The description collection.
+ * @param   ?string                          $sorting The sorting setting.
+ * @param   ?string                          $sizing The sizing setting.
+ * @param   int                              $selected_page The selected page.
  * @return string The descriptions archive HTML.
  * @since   1.0.0
  * @author  Alexandros Raikos <alexandros@araikos.gr>
  * @author  Eleftheria Kouremenou <elkour@unipi.gr>
  */
 function descriptions_archive_html(
-	PolicyMS_Description_Collection $collection,
 	PolicyMS_Description_Filters $filter_defaults,
 	PolicyMS_Description_Filters $selected_filters,
 	string $archive_filtering_nonce,
+	PolicyMS_Description_Collection $collection = null,
 	string $sorting = null,
 	string $sizing = null,
 	int $selected_page = 1,
 	): string {
-	$filters    = descriptions_archive_filters_html(
+	$filters = descriptions_archive_filters_html(
 		$filter_defaults,
 		$selected_filters,
 		$archive_filtering_nonce
 	);
-	$sorting    = sorting_selector_html( 'PolicyMS_Description', $sorting );
-	$sizing     = sizing_selector_html( $sizing );
-	$grid       = descriptions_grid_html( $collection->get_page( $selected_page ) );
-	$pagination = ( $collection->is_paginated )
+	$sorting = $sorting
+		? sorting_selector_html( 'PolicyMS_Description', $sorting )
+		: sorting_selector_html( 'PolicyMS_Description' );
+	$sizing  = $sizing
+		? sizing_selector_html( $sizing )
+		: sizing_selector_html();
+	if ( $collection ) {
+		$grid = descriptions_grid_html( $collection->get_page( $selected_page ) );
+	} else {
+		$grid = notice_html( 'There are no descriptions.', 'notice' );
+	}
+	$pagination = ( ! empty( $collection->is_paginated ) )
 		? show_pagination_html( $collection->total_pages, $selected_page )
 		: '';
 
@@ -472,33 +480,10 @@ function description_editor_html(
 	string $delete_nonce = ''
 ) {
 
-	/**
-	 * Used for editing or creation context.
-	 *
-	 * @var string The context.
-	 */
-	$is_editing        = ! empty( $description );
-	$context_attribute = $is_editing ? 'editing' : 'creation';
-
-	/**
-	 * Appended as a class to parse as a modal in the front-end.
-	 *
-	 * @var string The modal class indicator.
-	 */
-	$is_modal = $is_editing ? 'modalize' : '';
-
-	/**
-	 * Appended for existing title value.
-	 *
-	 * @var string The description.
-	 */
-	$existing_title = $description->information['title'] ?? '';
-
-	/**
-	 * Appended for selecting type.
-	 *
-	 * @var string The select options.
-	 */
+	$is_editing            = ! empty( $description );
+	$context_attribute     = $is_editing ? 'editing' : 'creation';
+	$is_modal              = $is_editing ? 'modalize' : '';
+	$existing_title        = $description->information['title'] ?? '';
 	$existing_type_options = '';
 	$allowed_type_editing  = $is_editing ? 'disabled' : 'required';
 	foreach ( PolicyMS_Description::$categories as $type => $label ) {
@@ -508,127 +493,30 @@ function description_editor_html(
 			<option value="{$type}" {$is_selected}>{$label}</option>
 		HTML;
 	}
-
-	/**
-	 * Appended for existing owner value.
-	 *
-	 * @var string The owner.
-	 */
-	$existing_owner = empty( $description->information['owner'] )
+	$existing_owner       = empty( $description->information['owner'] )
 		? ''
 		: $description->information['owner'];
-
-	/**
-	 * Appended for existing description value.
-	 *
-	 * @var string The description.
-	 */
 	$existing_description = empty( $description->information['description'] )
 		? ''
 		: $description->information['description'];
-
-	/**
-	 * Appended for existing keyword values.
-	 *
-	 * @var string The comma-separated keywords.
-	 */
-	$existing_keywords = empty( $description->information['keywords'] )
+	$existing_keywords    = empty( $description->information['keywords'] )
 		? ''
 		: implode( ', ', $description->information['keywords'] );
-
-	/**
-	 * Appended for creating and managing existing hyperlinks.
-	 *
-	 * @var string Existing form inputs.
-	 */
-	$existing_links = '';
-	if ( ! empty( $description->links ) ) {
-		foreach ( $description->links as $link ) {
-			$link_title      = explode( ':', $link, 2 )[0];
-			$link_url        = explode( ':', $link, 2 )[1];
-			$existing_links .= <<<HTML
-				<div>
-					<input type="text" name="links-title[]" placeholder="Example" value="{$link_title}" />
-					<input type="url" name="links-url[]" placeholder="https://www.example.org/" value="{$link_url}" />
-					<button data-action="remove-field" title="Remove this link.">
-						<span class="fas fa-times"></span>
-					</button>
-				</div>
-			HTML;
-		}
-	} else {
-		$existing_links .= <<<HTML
-			<div>
-				<input type="text" name="links-title[]" placeholder="Example" />
-				<input type="url" name="links-url[]" placeholder="https://www.example.org/" />
-				<button class="remove-field" title="Remove this link."><span class="fas fa-times"></span></button>
-			</div>
-		HTML;
-	}
-
-	/**
-	 * Appended for existing comment values.
-	 *
-	 * @var string The comment.
-	 */
-	$existing_comment = empty( $description->information['comments'] ) ? '' : $description->information['comments'];
-
-	/**
-	 * Appended to allow the upload of assets.
-	 *
-	 * @var string The additional asset-related form elements.
-	 */
-	$asset_editor = '';
-
-	/**
-	 * Appended to notify of allowed sizes.
-	 *
-	 * @var string The size limit.
-	 */
-	$upload_limit_label = ( $administrator ?? false ) ? '1GB' : '100MB';
-
+	$links                = link_input_fields_html( $description->links );
+	$existing_comment     = empty( $description->information['comments'] ) ? '' : $description->information['comments'];
+	$asset_editor         = '';
+	$upload_limit_label   = ( $administrator ?? false ) ? '1GB' : '100MB';
 	foreach ( PolicyMS_Asset_Type::get_supported_types() as $asset_type ) {
-
-		/**
-		 * Appended to notify for media which will be part of the gallery.
-		 *
-		 * @var string The appended gallery string.
-		 */
-		$type_title = $asset_type->label_plural . ( $asset_type->in_gallery() ? ' (Gallery)' : '' );
-
-		/**
-		 * Appended to notify of special media handling.
-		 *
-		 * @var string The HTML paragraph.
-		 */
+		$type_title        = $asset_type->label_plural . ( $asset_type->in_gallery() ? ' (Gallery)' : '' );
 		$asset_type_notice = $asset_type->notice ? "<p>{$asset_type->notice}</p> " : '';
-
-		/**
-		 * Appended to notify the user of the
-		 * supported asset extensions.
-		 *
-		 * @var string The supported extensions string.
-		 */
-		$extensions = $asset_type->get_extensions();
+		$extensions        = $asset_type->get_extensions();
 		if ( $extensions ) {
 			$extensions = ' (' . implode( ', ', $asset_type->get_extensions() ) . ')';
 		} else {
 			$extensions = '';
 		}
-
-		/**
-		 * Appended to manage existing assets.
-		 *
-		 * @var string The asset management fields.
-		 */
 		$existing_assets = '';
 		foreach ( ( $description->assets[ $asset_type->id ] ?? array() ) as $asset ) {
-
-			/**
-			 * Appended to allow cover setting on image assets.
-			 *
-			 * @var string The button.
-			 */
 			$cover_button = '';
 			if ( 'image' === $asset_type->id ) {
 				if ( $asset->id === $description->image_id ) {
@@ -653,12 +541,6 @@ function description_editor_html(
 					HTML;
 				}
 			}
-
-			/**
-			 * Appended to manage existing assets.
-			 *
-			 * @var string The existing asset controls.
-			 */
 			$existing_assets .= <<<HTML
 				<div 
 					class="policyms-asset-editor" 
@@ -685,12 +567,6 @@ function description_editor_html(
 				</div>
 			HTML;
 		}
-
-		/**
-		 * Appended to allow new assets to be uploaded.
-		 *
-		 * @var string The new asset upload field.
-		 */
 		$new_assets = <<<HTML
 			Upload {$extensions}:
 			<div class="chooser">
@@ -702,7 +578,6 @@ function description_editor_html(
 			</div>
 		HTML;
 
-		// Append editor sections.
 		$asset_editor .= <<<HTML
 			<h3>{$type_title}</h3>
 			{$asset_type_notice}
@@ -711,11 +586,6 @@ function description_editor_html(
 		HTML;
 	}
 
-	/**
-	 * Appended to allow deletion of an existing description.
-	 *
-	 * @var string The new asset upload field.
-	 */
 	$delete_button = '';
 	if ( ! $description ) {
 		$delete_button = <<<HTML
@@ -729,11 +599,6 @@ function description_editor_html(
 		HTML;
 	}
 
-	/**
-	 * Appended to notify of (re)approval.
-	 *
-	 * @var string The paragraph.
-	 */
 	$approval_notice = '';
 	if ( $is_editing ) {
 		$approval_notice = '<p>Please note that after submitting your changes, the description will need to be reapproved by an administrator.</p>';
@@ -741,11 +606,6 @@ function description_editor_html(
 		$approval_notice = '<p>Please note that after submitting, an administrator needs to approve of the content before other users can view it.</p>';
 	}
 
-	/**
-	 * Appended to allow closing the modal when modalized.
-	 *
-	 * @var string The button.
-	 */
 	$cancel_button = $is_editing ? <<<HTML
 		<button
 			action="policyms-close-modal">
@@ -809,15 +669,8 @@ function description_editor_html(
 						placeholder="Separate multiple keywords using a comma (lorem, ipsum, etc.)">
 						{$existing_keywords}
 					</textarea>
-					<label for="links">Related links</label>
-					<div class="links">
-						<div>
-							{$existing_links}
-						</div>
-						<button data-action="add-field" title="Add another link.">
-							<span class="fas fa-plus"></span> Add link
-						</button>
-					</div>
+					<label>Related links</label>
+					{$links}
 				</fieldset>
 				<fieldset name="internal-information">
 					<h2>Additional information</h2>

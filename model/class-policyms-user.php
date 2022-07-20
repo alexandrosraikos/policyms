@@ -310,8 +310,8 @@ class PolicyMS_User extends PolicyMS_Account {
 					'email'        => $data['email'],
 					'phone'        => $data['phone'],
 					'social'       => $this->implode_urls(
-						$data['socials-title'],
-						$data['socials-url']
+						$data['links-title'],
+						$data['links-url']
 					),
 					'about'        => $data['about'],
 				),
@@ -845,8 +845,8 @@ class PolicyMS_User extends PolicyMS_Account {
 					'email'        => $information['email'],
 					'about'        => stripslashes( $information['about'] ),
 					'social'       => self::implode_urls(
-						$information['socials-title'],
-						$information['socials-url']
+						$information['links-title'],
+						$information['links-url']
 					),
 				),
 			)

@@ -162,6 +162,60 @@ function show_modal( $inner_html, $controls = false ) {
     HTML;
 }
 
+/**
+ *
+ * @param array $existing_links The existing links in `title:url` line format.
+ *
+ * @since 2.0.0
+ */
+function link_input_fields_html( array $existing_links = array() ) {
+	$existing_links_html = '';
+	foreach ( $existing_links as $link ) {
+		$title                = explode( ':', $link, 2 )[0];
+		$url                  = explode( ':', $link, 2 )[1];
+		$existing_links_html .= <<<HTML
+			<div class="grouping">
+				<input 
+					type="text" 
+					name="links-title[]" 
+					value="{$title}" 
+					placeholder="Example" />
+				<input 
+					type="url" 
+					name="links-url[]" 
+					value="{$url}" 
+					placeholder="https://www.example.org/" />
+				<button class="remove" data-action="remove-field" title="Remove this link."><span class="fas fa-times"></span></button>
+			</div>
+		HTML;
+	}
+
+	$disabled_attribute = ( $existing_links ) ? 'disabled' : '';
+
+	return <<<HTML
+		<div class="policyms policyms-input-fields-grouping">
+			{$existing_links_html}
+			<div class="grouping">
+				<input 
+					type="text" 
+					name="links-title[]" 
+					placeholder="Example" />
+				<input 
+					type="url" 
+					name="links-url[]" 
+					placeholder="https://www.example.org/" />
+				<button 
+					class="remove"
+					data-action="remove-field" 
+					title="Remove this link."
+					{$disabled_attribute}>
+					<span class="fas fa-times"></span>
+				</button>
+			</div>
+			<button class="add" data-action="add-field" title="Add another link."><span class="fas fa-plus"></span> Add link</button>
+		</div>
+	HTML;
+}
 
 /**
  *

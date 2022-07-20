@@ -35,6 +35,7 @@ function user_registration_html(
 		return notice_html( "You're already logged in.", 'notice' );
 	} else {
 		$sso_buttons = $oauth_controller->get_all_html();
+		$links       = link_input_fields_html();
 		return <<<HTML
 			<div class="policyms policyms-user-registration">
 				{$sso_buttons}
@@ -75,17 +76,8 @@ function user_registration_html(
 						</select>
 						<label for="about">Summary</label>
 						<textarea name="about" placeholder="Tell us about yourself" style="resize:vertical"></textarea>
-						<label for="socials">Related links</label>
-						<div class="socials">
-							<div>
-								<div>
-									<input type="text" name="socials-title[]" placeholder="Example" />
-									<input type="url" name="socials-url[]" placeholder="https://www.example.org/" />
-									<button data-action="remove-field" title="Remove this link."><span class="fas fa-times"></span></button>
-								</div>
-							</div>
-							<button data-action="add-field" title="Add another link."><span class="fas fa-plus"></span> Add link</button>
-						</div>
+						<label>Related links</label>
+						{$links}
 					</fieldset>
 					<fieldset name="account-contact">
 						<h2>Account contact details</h2>

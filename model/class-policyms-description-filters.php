@@ -59,17 +59,17 @@ class PolicyMS_Description_Filters {
 	public function __construct(
 		public string $query = '',
 		public string $type = '',
-		public int $views_gte = 0,
+		public ?int $views_gte = null,
 		public ?int $views_lte = null,
 		public ?string $date_gte = null,
 		public ?string $date_lte = null
 		) {
 			$this->query     = $query;
 			$this->type      = $type;
-			$this->views_gte = $views_gte;
-			$this->views_lte = $views_lte ?? '1000+';
-			$this->date_gte  = $date_gte ?? gmdate( 'Y-m-d' );
-			$this->date_lte  = $date_lte ?? gmdate( 'Y-m-d', 0 );
+			$this->views_gte = $views_gte ?? null;
+			$this->views_lte = $views_lte ?? null;
+			$this->date_gte  = $date_gte ?? null;
+			$this->date_lte  = $date_lte ?? null;
 	}
 
 	/**
@@ -122,7 +122,7 @@ class PolicyMS_Description_Filters {
 		}
 
 		// Verify sorting setting, if any.
-		$sizing = null;
+		$sizing = 12;
 		if ( ! empty( $_GET['items-per-page'] ) ) {
 			$sizing = (int) $_GET['items-per-page'];
 			if ( ! in_array( $sizing, self::$sizing_options, true ) ) {
@@ -140,9 +140,7 @@ class PolicyMS_Description_Filters {
 
 		// Provider parameter.
 		$provider = null;
-		if ( empty( $_GET['provider'][0] ) ) {
-			$provider = '';
-		} else {
+		if ( !empty( $_GET['provider'][0] ) ) {
 			// NOTE: Each provider value is sanitized appropriately.
 			$provider = implode(
 				',',
@@ -167,9 +165,7 @@ class PolicyMS_Description_Filters {
 
 		// Provider parameter.
 		$keywords = null;
-		if ( empty( $_GET['keywords'][0] ) ) {
-			$keywords = '';
-		} else {
+		if ( !empty( $_GET['keywords'][0] ) ) {
 			// NOTE: Each keyword value is sanitized appropriately.
 			$keywords = implode(
 				',',

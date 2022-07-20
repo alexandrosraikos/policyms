@@ -391,7 +391,7 @@
 /**
  * The menu search button.
  */
-.policyms.policyms-menu-search button[data-action="description-search"] {
+.policyms.policyms-menu-search > button[data-action="description-search"] {
   padding: 3px 6px;
   color: inherit;
 }
@@ -406,8 +406,8 @@
 /**
  * The menu search modal form.
  */
-.policyms-modal.policyms-menu-search > form {
-  display: flex;
+.policyms-modal .policyms-menu-search > form {
+  display: flex !important;
   justify-content: center;
   align-items: center;
 }
@@ -415,7 +415,7 @@
 /**
  * The menu search modal text field.
  */
-.policyms-modal.policyms-menu-search > form input {
+.policyms-modal .policyms-menu-search > form input {
   margin: 10px !important;
   min-width: 50vw;
   background-color: transparent !important;
@@ -425,7 +425,7 @@
 /**
  * The menu search modal form button.
  */
-.policyms-modal.policyms-menu-search > form > button[type="submit"] {
+.policyms-modal .policyms-menu-search > form > button[type="submit"] {
   width: 36px;
   height: 36px;
   padding: 0 !important;
@@ -516,17 +516,17 @@
 .policyms-modal > .container > .previous,
 .policyms-modal > .container > .next {
   /* Positioning */
-  z-index: 600;
-  position: absolute;
+  z-index: 600 !important;
+  position: absolute !important;
 
   /* Display & Box Model */
-  width: 40px;
-  height: 40px;
-  padding: 0;
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
 
   /* Other */
-  text-align: center;
-  vertical-align: middle;
+  text-align: center !important;
+  vertical-align: middle !important;
   color: white !important;
 }
 
@@ -535,6 +535,7 @@
 */
 .policyms-modal > .close {
   /* Positioning */
+  position: relative;
   top: 20px;
   right: 20px;
 }
@@ -730,4 +731,70 @@
     padding: 0;
     margin: 0;
   }
+}
+
+/**
+* Links input fields
+* -----------
+* An link title:url grouping.
+*/
+
+.policyms-input-fields-grouping > button.add {
+  display: block;
+  height: auto;
+  padding: 3px 5px;
+  padding: 0;
+  border: none;
+  margin: 10px 0;
+  background: none !important;
+  color: var(--policyms-text-color);
+  font-size: 75%;
+  line-height: normal;
+}
+
+.policyms-input-fields-grouping > button.add:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.policyms-input-fields-grouping > .grouping {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.policyms-input-fields-grouping > .grouping > * {
+  display: block;
+  height: auto;
+  max-height: unset;
+  margin: 0 10px 0 0 !important;
+}
+
+.policyms-input-fields-grouping > .grouping > input[name="links-title[]"] {
+  max-width: 200px;
+}
+
+.policyms-input-fields-grouping > .grouping > input[name="links-url[]"] {
+  min-width: 225px;
+}
+
+.policyms-input-fields-grouping > .grouping > button.remove {
+  box-sizing: border-box;
+  padding: 0;
+  border: none;
+  margin: 0 0 0 3px;
+  background: none !important;
+  color: var(--policyms-text-color) !important;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.policyms-input-fields-grouping > .grouping > button.remove:hover {
+  opacity: 0.8;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.policyms-input-fields-grouping > .grouping > button.remove:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transition: opacity 0.2s ease-in-out;
 }

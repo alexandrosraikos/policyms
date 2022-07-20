@@ -84,9 +84,10 @@ class Modal {
      * ----------
      */
 
-    // Iterate through content on button click.
-    if (this.iterable) {
-      $(document).ready(() => {
+    $(document).ready(() => {
+
+      // Iterate through content on button click.
+      if (this.iterable) {
         // Set next on click.
         this.controls.next().on("click", () => {
           this.next();
@@ -104,27 +105,28 @@ class Modal {
         $(document).on("keydown", (e) => {
           if (e.key === "ArrowLeft") this.previous();
         });
-      });
-    }
+      }
 
-    // Dismiss modal on button click.
-    $(".policyms-modal button[data-action=\"close\"]").on("click", (e) => {
-      e.preventDefault();
-      this.hide();
-    });
-
-    $(".policyms-modal .backdrop").on(
-      "click",
-      (e) => {
+      // Dismiss modal on button click.
+      $(".policyms-modal > .close").on("click", (e) => {
         e.preventDefault();
         this.hide();
-      }
-    )
+      });
 
-    // Dismiss modal on 'Escape' key press.
-    $(document).on("keydown", (e) => {
-      if (e.key === "Escape") this.hide();
-    });
+      $(".policyms-modal > .backdrop").on(
+        "click",
+        (e) => {
+          e.preventDefault();
+          this.hide();
+        }
+      )
+
+      // Dismiss modal on 'Escape' key press.
+      $(document).on("keydown", (e) => {
+        if (e.key === "Escape") this.hide();
+      });
+
+    })
   }
 
   /**
@@ -329,47 +331,35 @@ function toggleFileList(e) {
 }
 
 
-
 /**
- * Add a double input field to the links container.
+ * Add another sibling field for weblinks.
  *
  * @param {Event} e
  *
  * @author Alexandros Raikos <alexandros@araikos.gr>
  */
-function addLinksField(e) {
+function addGroupedLinkField(e) {
   e.preventDefault();
-  const container = $(this).prev();
-  const newLinksField = $(`
-    <div>
-      <input 
-        type='text' 
-        name='links-title[]' 
-        placeholder='Example' />
-      <input 
-        type='url' 
-        name='links-url[]' 
-        placeholder='https://www.example.org/' />
-      <button class='remove-field' title='Remove this link.' >
+  $(
+    `
+    <div class="grouping">
+      <input type='text' name='links-title[]' placeholder='Example' />
+      <input type='url' name='links-url[]' placeholder='https://www.example.org/' />
+      <button class="remove" data-action="remove-field" title="Remove this link.">
         <span class='fas fa-times'></span>
       </button>
-    </div>`);
-  newLinksField.find('input[name*=links]').each(
-    (_, element) => {
-      $(element).val("");
-    }
-  );
-  newLinksField.appendTo(container);
+    </div>
+    `
+  ).insertBefore($('.policyms-input-fields-grouping > button[data-action="add-field"]'));
 }
+
 /**
- *
- * Remove a double input field from the links container.
- *
+ * Remove the weblink field.
  * @param {Event} e
  *
  * @author Alexandros Raikos <alexandros@araikos.gr>
  */
-function removeLinksField(e) {
+function removeGroupedLinkField(e) {
   e.preventDefault();
   $(this).parent().remove();
 }
@@ -483,8 +473,14 @@ $(document).ready(() => {
         <form 
           method="get\" 
           action="`+ $(searchButtonQuery).data('redirect') + `">
-          <input type="text\" name="search" placeholder="Search descriptions..." />
-          <button class="tactile" type="submit" title="Search">
+          <input 
+            type="text\" 
+            name="search" 
+            placeholder="Search descriptions..." />
+          <button 
+            class="tactile" 
+            type="submit" 
+            title="Search">
               <span class="fas fa-search"></span>
           </button>
         </form>
@@ -502,4 +498,16 @@ $(document).ready(() => {
   if ($('.policyms-error[logout]').length) {
     removeAuthorization(true);
   }
+
+  // Add a grouped link field.
+  $('.policyms-input-fields-grouping > button[data-action="add-field"]').click(
+    addGroupedLinkField
+  );
+
+  // Remove a grouped link field.
+  $(document).on(
+    "click",
+    '.policyms-input-fields-grouping > .grouping > button[data-action="remove-field"]',
+    removeGroupedLinkField
+  );
 });
