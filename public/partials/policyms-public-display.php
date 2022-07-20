@@ -52,36 +52,41 @@ function menu_items_html(
 	bool $authenticated,
 	string $authentication_url,
 	string $registration_url,
-	string $account_url
+	string $account_url,
+	string $archive_page_base_url
 	): string {
 
 	$wrapper = function ( $element ) {
 		$random_id = wp_rand( 1000, 10000 );
 		return <<<HTML
-			<li 
-				id="menu-item-{$random_id}" 
-				class="menu-item menu-item-type-post_type menu-item-object-page menu-item-{$random_id}">
-				{$element}
-			</li>
-		HTML;
+            <li 
+                id="menu-item-{$random_id}" 
+                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-{$random_id}">
+                {$element}
+            </li>
+        HTML;
 	};
 
 	$links = '';
 	if ( $authenticated ) {
 		$links .= $wrapper( '<a href="' . $account_url . '">My Account</a>' );
-		$links .= $wrapper( '<a class="policyms-logout">Log out</a>' );
+		$links .= $wrapper( '<a data-action="policyms-user-logout">Log out</a>' );
 	} else {
 		$links .= $wrapper( '<a href="' . $authentication_url . '">Log In</a>' );
 		$links .= $wrapper( '<a href="' . $registration_url . '">Register</a>' );
 	}
+
 	$links .= $wrapper(
 		<<<HTML
-			<div class="policyms menu-search">
-				<button class="tactile" data-action="description-search">
-					<span class="fas fa-search"></span>
-				</button>
-			</div>
-		HTML
+            <div class="policyms policyms-menu-search">
+                <button 
+                    class="tactile" 
+                    data-action="description-search"
+                    data-redirect="{$archive_page_base_url}">
+                    <span class="fas fa-search"></span>
+                </button>
+            </div>
+        HTML
 	);
 	return $links;
 }
@@ -97,7 +102,13 @@ function menu_items_html(
  */
 function show_lock( $login_page ) {
 	$lock_img_src = get_site_url( '', '/wp-content/plugins/policyms/public/assets/img/lock.svg' );
-	$message      = sprintf( __( 'You need to be <a href="%s">logged in</a> in order to view this content.', 'policyms' ), $login_page );
+	$message      = sprintf(
+		__(
+			'You need to be <a href="%s">logged in</a> in order to view this content.',
+			'policyms'
+		),
+		$login_page
+	);
 
 	return <<<HTML
         <div class="policyms-locked-content">
@@ -280,7 +291,7 @@ function content_list_html(
 		$content_list_filter_header_label = __( 'Filter', 'policyms' );
 		$content_list_filters             = <<<HTML
         <form action="policyms-filter-content-list">
-            <span>{$content_list_filter_header_label}:</span>
+            <div>{$content_list_filter_header_label}:</div>
             {$content_list_filter_categories}
         </form>
         HTML;
@@ -319,7 +330,7 @@ function content_list_html(
 
 	// Return the content list HTML.
 	return <<<HTML
-    <div class="policyms-content-list" content-type="{$content_type}">
+    <div class="policyms policyms-content-list" content-type="{$content_type}">
         {$content_list_header}
         {$content_list_filters}
         <ul>

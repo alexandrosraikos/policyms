@@ -19,8 +19,6 @@ FontAwesomeConfig = { autoA11y: true }
 /**
  * The Modal class, which refers to the given modal in the DOM.
  *
- * For the referring structure:
- * @see policyms-public-display.php::show_modal()
  * @since 1.0.0
  */
 class Modal {
@@ -41,10 +39,10 @@ class Modal {
      * The modal HTML.
      */
     this.HTML = `
-    <div class="policyms modal ${this.type
+    <div class="policyms policyms-modal ${this.type
       }" hidden>
         <div class="backdrop"></div>
-        <button class="close tactile" data-action="close">
+        <button class="close tactile">
           <span class="fas fa-times"></span>
         </button>
         <div class="container">
@@ -79,7 +77,7 @@ class Modal {
     this.set(this.iterable ? this.data[index] : this.data);
 
     // Show modal.
-    $(".policyms.modal." + this.type).removeClass("hidden");
+    $(".policyms-modal." + this.type).removeClass("hidden");
 
     /**
      * Listeners
@@ -110,12 +108,12 @@ class Modal {
     }
 
     // Dismiss modal on button click.
-    $(".policyms.modal button[data-action=\"close\"]").on("click", (e) => {
+    $(".policyms-modal button[data-action=\"close\"]").on("click", (e) => {
       e.preventDefault();
       this.hide();
     });
 
-    $(".policyms.modal .backdrop").on(
+    $(".policyms-modal .backdrop").on(
       "click",
       (e) => {
         e.preventDefault();
@@ -139,7 +137,7 @@ class Modal {
    */
   content = () => {
     return $(
-      ".policyms.modal." + this.type + " > .container > .content"
+      ".policyms-modal." + this.type + " > .container > .content"
     );
   };
 
@@ -149,14 +147,14 @@ class Modal {
   controls = {
     previous: () => {
       return $(
-        ".policyms.modal." +
+        ".policyms-modal." +
         this.type +
         " > .container > .previous"
       );
     },
     next: () => {
       return $(
-        ".policyms.modal." + this.type + " > .container > .next"
+        ".policyms-modal." + this.type + " > .container > .next"
       );
     },
   };
@@ -171,7 +169,7 @@ class Modal {
    * @param {Event} e The event.
    */
   hide() {
-    $(".policyms.modal." + this.type).remove();
+    $(".policyms-modal." + this.type).remove();
     $("html, body").css({ overflow: "auto" });
   }
 
@@ -180,7 +178,7 @@ class Modal {
    * @param {string} id The identifier of the modal
    */
   static kill(id) {
-    $(".policyms.modal." + id).remove();
+    $(".policyms-modal." + id).remove();
     $("html, body").css({ overflow: "auto" });
   }
 
@@ -472,31 +470,19 @@ function makeWPRequest(actionDOMSelector, action, nonce, data, completion) {
  */
 
 $(document).ready(() => {
-  // Dismiss error dialogues and notices.
-  $(
-    ".policyms-error.dismissable, .policyms-notice.dismissable"
-  ).prepend(
-    '<button class="policyms-alert-close">Dismiss</button>'
-  );
-  $(".policyms-alert-close").click(function (e) {
-    $(this.parentNode).addClass("seen");
-  });
-
-  if ($('.policyms-error[logout]').length) {
-    removeAuthorization(true);
-  }
-
   // Search button listener.
-  $(".policyms button[data-action=\"description-search\"]").click((e) => {
+  const searchButtonQuery = '.policyms-menu-search > button[data-action="description-search"]';
+
+  $(searchButtonQuery).click((e) => {
     e.preventDefault();
     new Modal(
       "description-search",
       `
       <div
-        class="policyms menu-search">
+        class="policyms policyms-menu-search">
         <form 
           method="get\" 
-          action="`+ GlobalProperties.archivePage + `">
+          action="`+ $(searchButtonQuery).data('redirect') + `">
           <input type="text\" name="search" placeholder="Search descriptions..." />
           <button class="tactile" type="submit" title="Search">
               <span class="fas fa-search"></span>
@@ -508,7 +494,12 @@ $(document).ready(() => {
   });
 
   // User log out.
-  $("a.policyms-logout, button.policyms-logout").click(
+  $('a[data-action="policyms-user-logout"], button[data-action="policyms-user-logout"]').click(
     removeAuthorization
   );
+
+  // Automated user log out.
+  if ($('.policyms-error[logout]').length) {
+    removeAuthorization(true);
+  }
 });

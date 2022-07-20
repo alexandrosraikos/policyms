@@ -14,20 +14,20 @@
 *
 */
 
-.policyms .sso {
+.policyms-oauth-buttons {
   padding: 20px;
-  margin-bottom: 20px;
   border: 1px solid var(--policyms-border-color-light);
+  margin-bottom: 20px;
 }
 
-.policyms .sso .actions {
+.policyms-oauth-buttons .actions {
   display: flex;
   align-items: center;
 }
 
-.policyms .sso .action {
-  margin-right: 8px;
+.policyms-oauth-buttons .action {
   width: auto;
+  margin-right: 8px;
 }
 
 #google-signin,
@@ -40,54 +40,50 @@
   margin: 0 !important;
 }
 
-button#keycloak-registration,
-button#keycloak-signin {
+button[data-action="show-keycloak-modal"] {
+  display: inline-block;
+  padding: 6.5px 10px !important;
+  border: none !important;
   background-color: rgb(35, 36, 39) !important;
   font-weight: bold;
-  display: inline-block;
-  border: none !important;
-  padding: 6.5px 10px !important;
   border-radius: 4px !important;
 }
 
-button#keycloak-registration::before,
-button#keycloak-signin::before {
+button[data-action="show-keycloak-modal"]::before {
   content: " ";
   display: inline-block;
-  height: 14px;
   width: 28px;
+  height: 14px;
   margin-right: 6px;
   background-image: url(../assets/img/policycloud.png);
+  background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
-  background-position: center;
 }
 
-button#egi-signin,
-a#egi-signin {
-  background-color: rgb(35, 36, 39) !important;
-  font-weight: bold;
+button[data-action="policyms-redirect-egi"] {
   display: inline-block;
-  border: 1px solid !important;
+  display: inline-block;
   padding: 6.5px 10px !important;
-  border-radius: 4px !important;
-  display: inline-block;
+  border: 1px solid !important;
+  background-color: rgb(35, 36, 39) !important;
   color: white;
   font-size: var(--btnFs, var(--bodyFontSize));
+  font-weight: bold;
+  border-radius: 4px !important;
 }
 
-button#egi-signin::before,
-a#egi-signin::before {
+button[data-action="policyms-redirect-egi"]::before {
   content: " ";
   display: inline-block;
-  height: 18px;
   width: 32px;
+  height: 18px;
   margin-right: 6px;
   margin-bottom: -3px;
   background-image: url(../assets/img/egi.png);
+  background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
-  background-position: center;
 }
 
 /*
@@ -100,72 +96,72 @@ a#egi-signin::before {
 *
 */
 
-#policyms-registration .tos-agree {
+.policyms-user-registration .tos-agree {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 
-#policyms-registration .tos-agree label {
+.policyms-user-registration .tos-agree label {
   padding-left: 6px;
   margin: 0;
 }
 
-#policyms-registration .socials div div {
+.policyms-user-registration .socials div div {
   display: flex;
   align-items: center;
   margin-bottom: 10px;
 }
-#policyms-registration .socials div div input[name="socials-title[]"] {
+.policyms-user-registration .socials div div input[name="socials-title[]"] {
   max-width: 200px;
 }
-#policyms-registration .socials div div input[name="socials-url[]"] {
+.policyms-user-registration .socials div div input[name="socials-url[]"] {
   min-width: 225px;
 }
 
-#policyms-registration .socials div div * {
+.policyms-user-registration .socials div div * {
   display: block;
   height: auto;
   max-height: unset;
   margin: 0 8px 0 0;
 }
 
-#policyms-registration .socials div button.remove-field,
-#policyms-registration .socials div button.remove-field * {
-  padding: 0;
-  margin: 0 0 0 3px;
-  border: none;
+.policyms-user-registration .socials div button.remove-field,
+.policyms-user-registration .socials div button.remove-field * {
   box-sizing: border-box;
+  padding: 0;
+  border: none;
+  margin: 0 0 0 3px;
   background: none !important;
   color: var(--policyms-text-color) !important;
   transition: opacity 0.2s ease-in-out;
 }
 
-#policyms-registration .socials div button.remove-field:hover {
+.policyms-user-registration .socials div button.remove-field:hover {
   opacity: 0.8;
   transition: opacity 0.2s ease-in-out;
 }
 
-#policyms-registration .socials div button.remove-field:disabled {
+.policyms-user-registration .socials div button.remove-field:disabled {
   opacity: 0.4;
   cursor: not-allowed;
   transition: opacity 0.2s ease-in-out;
 }
 
-#policyms-registration .socials > button.add-field {
-  padding: 3px 5px;
+.policyms-user-registration .socials > button.add-field {
   display: block;
   height: auto;
-  line-height: normal;
+  padding: 3px 5px;
+  padding: 0;
+  border: none;
+  margin: 10px 0;
   background: none !important;
   color: var(--policyms-text-color);
   font-size: 75%;
-  margin: 10px 0;
-  padding: 0;
-  border: none;
+  line-height: normal;
 }
 
-#policyms-registration .socials > button.add-field:hover {
+.policyms-user-registration .socials > button.add-field:hover {
   cursor: pointer;
   opacity: 0.8;
 }
@@ -182,33 +178,33 @@ a#egi-signin::before {
 
 /* Generic layout */
 
-#policyms-account {
+.policyms-user {
   display: flex;
-  width: 100%;
   justify-content: center;
-  padding: 0;
+  width: 100%;
   height: auto;
+  padding: 0;
 }
 
-#policyms-account-sidebar {
+.policyms-user > aside.sidebar {
   flex: 0 0 30%;
   padding: 20px;
   border-right: 1px solid rgba(0, 0, 0, 0.15);
 }
 
-#policyms-account-sidebar > .policyms-account-title {
+.policyms-user > aside.sidebar > .policyms-user > main > header {
   display: none;
 }
 
-#policyms-account-sidebar > img {
+.policyms-user > aside.sidebar > img {
   display: block;
   width: 90%;
-  object-fit: cover;
-  max-width: 256px;
-  max-height: 256px;
   min-width: 256px;
+  max-width: 256px;
   min-height: 256px;
+  max-height: 256px;
   margin: 10px auto;
+  object-fit: cover;
   border-radius: 1000px;
   -moz-user-select: -moz-none;
   -khtml-user-select: none;
@@ -217,114 +213,107 @@ a#egi-signin::before {
   user-select: none;
 }
 
-#policyms-account-sidebar > nav {
+.policyms-user > aside.sidebar > nav {
   margin-top: 30px;
 }
 
-#policyms-account-sidebar > nav button {
+.policyms-user > aside.sidebar > nav button {
   display: block;
   text-align: left;
 }
 
-#policyms-account-sidebar > nav button.active {
+.policyms-user > aside.sidebar > nav button.active {
   background-color: rgba(0, 0, 0, 0.05);
   transition: all 0.1s ease-in-out;
 }
 
-#policyms-account-sidebar > nav button .pill {
+.policyms-user > aside.sidebar > nav button .pill {
   display: inline-block;
+  margin-left: 4px;
   font-size: 75%;
   font-weight: bold;
-  margin-left: 4px;
 }
 
-#policyms-account-sidebar > nav > hr {
+.policyms-user > aside.sidebar > nav > hr {
   display: block;
-  border-collapse: collapse;
-  border: 0.5px solid var(--policyms-border-color-light);
   height: 0px;
+  border: 0.5px solid var(--policyms-border-color-light);
   margin: 15px 0;
+  border-collapse: collapse;
 }
 
-#policyms-account-sidebar > nav button.policyms-logout {
+.policyms-user > aside.sidebar > nav button.policyms-logout {
   color: rgba(185, 16, 16, 0.842) !important;
 }
 
-#policyms-account-content {
+.policyms-user > main {
   flex: 1;
   margin: 20px;
 }
 
-#policyms-account-content .policyms-account-title {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+.policyms-user > main .policyms-user > main > header {
   padding-bottom: 15px;
-  margin-left: -20px;
   padding-left: 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+  margin-left: -20px;
 }
 
-.policyms-account-title h2 {
+.policyms-user > main > header > h2 {
   font-weight: bold;
 }
 
-.policyms-account-title div {
+.policyms-user > main > header > div {
   font-size: 80%;
   opacity: 0.8;
 }
 
-#policyms-account-content section {
-  display: none;
-  max-height: 0px;
-  margin: 0;
-  padding: 0;
-}
-
-#policyms-account-content section.focused {
+.policyms-user > main > section {
   display: block;
   max-height: 1000vh;
-  opacity: 0;
-  margin: 20px 0;
   padding: 0;
+  margin: 20px 0;
+  opacity: 0;
   transform: translateY(-10px);
   animation: sweep-in 0.3s ease-in-out forwards;
 }
 
-#policyms-account-content section header {
+.policyms-user > main > section header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   margin: 0 0 20px 0;
 }
 
-#policyms-account-content section header h3,
-#policyms-account-content section h3 {
-  font-weight: bold;
-  font-size: 110% !important;
+.policyms-user > main > section header h3,
+.policyms-user > main > section h3 {
   margin-bottom: 0;
-}
-
-#policyms-account-content section header .actions {
-  align-self: flex-end;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-#policyms-account-content section header a,
-#policyms-account-content section header button {
+  font-size: 110% !important;
   font-weight: bold;
-  background-color: #000000;
-  color: white;
-  border-radius: 10px;
+}
+
+.policyms-user > main > section header .actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-self: flex-end;
+}
+
+.policyms-user > main > section header a,
+.policyms-user > main > section header button {
   padding: 5px 10px;
-  text-decoration: none;
-  font-size: 80% !important;
   border: none;
   margin-left: 10px;
+  background-color: #000000;
+  color: white;
+  font-size: 80% !important;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 10px;
   transition: all 0.2s ease-in-out;
 }
 
-#policyms-account-content section header a:hover,
-#policyms-account-content section header button:hover {
+.policyms-user > main > section header a:hover,
+.policyms-user > main > section header button:hover {
   transform: scale(0.98);
   cursor: pointer;
   text-decoration: none;
@@ -332,8 +321,8 @@ a#egi-signin::before {
   transition: all 0.2s ease-in-out;
 }
 
-#policyms-account-content section header a:active,
-#policyms-account-content section header button:active {
+.policyms-user > main > section header a:active,
+.policyms-user > main > section header button:active {
   transform: scale(0.97);
   cursor: pointer;
   text-decoration: none;
@@ -341,480 +330,289 @@ a#egi-signin::before {
   transition: all 0.1s ease-in-out;
 }
 
-#policyms-account-content section header a {
+.policyms-user > main > section header a {
   white-space: nowrap;
 }
 
-#policyms-account-content section header a img,
-#policyms-account-content section header button img {
+.policyms-user > main > section header a img,
+.policyms-user > main > section header button img {
+  display: inline-block;
   max-width: 15px;
   margin: -3px 5px 0 0;
-  display: inline-block;
 }
 
 /* Overview tab */
 
-#policyms-account section.policyms-account-overview p {
-  font-size: 90%;
+.policyms-user section.policyms-user-overview p {
   color: var(--policyms-text-color-secondary);
+  font-size: 90%;
 }
 
-#policyms-account section.policyms-account-overview ul {
+.policyms-user section.policyms-user-overview ul {
   padding: 0;
   margin: 10px 0;
   font-size: 80%;
   list-style-type: none;
 }
 
-#policyms-account section.policyms-account-overview ul li {
-  margin-right: 7px;
+.policyms-user section.policyms-user-overview ul li {
   display: inline-block;
+  margin-right: 7px;
 }
 
-#policyms-account section.policyms-account-overview h4 {
-  font-size: 18px;
+.policyms-user section.policyms-user-overview h4 {
   margin: 20px 0;
+  font-size: 18px;
 }
 
-#policyms-account section.policyms-account-overview table,
-#policyms-account section.policyms-account-overview tr,
-#policyms-account section.policyms-account-overview td,
-#policyms-account section.policyms-account-profile table,
-#policyms-account section.policyms-account-profile tr,
-#policyms-account section.policyms-account-profile td {
+.policyms-user section.policyms-user-overview table,
+.policyms-user section.policyms-user-overview tr,
+.policyms-user section.policyms-user-overview td,
+.policyms-user section.policyms-user-profile table,
+.policyms-user section.policyms-user-profile tr,
+.policyms-user section.policyms-user-profile td {
   border: none;
 }
 
-#policyms-account section.policyms-account-overview table.statistics {
+.policyms-user section.policyms-user-overview table.statistics {
   margin-bottom: 20px;
 }
 
-#policyms-account section.policyms-account-overview table .large-figure {
+.policyms-user section.policyms-user-overview table .large-figure {
   font-size: 150%;
   font-weight: bold;
 }
 
 @media screen and (max-width: 900px) {
-  #policyms-account-content section header {
+  .policyms-user > main > section header {
     align-items: flex-start;
   }
 
-  #policyms-account-content section header .actions {
-    align-self: flex-end;
+  .policyms-user > main > section header .actions {
     flex-direction: column-reverse;
     justify-content: flex-end;
     align-items: flex-end;
+    align-self: flex-end;
   }
 
-  #policyms-account-content section header a,
-  #policyms-account-content section header button {
+  .policyms-user > main > section header a,
+  .policyms-user > main > section header button {
     margin-bottom: 8px;
   }
 }
 
-/* Assets tab */
+/* Content list items. */
 
-#policyms-account-content section header form.selector {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
-#policyms-account-content section header form.selector * {
-  height: 100%;
-  width: auto;
-  margin: 0 5px;
-  padding: 0;
-  white-space: nowrap;
-}
-
-#policyms-account-content section header form.selector select {
-  padding: 0 10px 0 6px;
-}
-
-#policyms-account-content section .collection-filters {
-  margin-bottom: 20px;
-  border-top: 1px solid var(--policyms-border-color-light);
-  border-bottom: 1px solid var(--policyms-border-color-light);
-  padding: 15px 0;
-  font-size: 75%;
-  font-weight: bold;
-}
-
-#policyms-account-content section .collection-filters div {
-  margin-bottom: 5px;
-}
-
-#policyms-account-content section .collection-filters button {
-  margin: 0 5px 5px 0;
-}
-
-#policyms-account-content section .paginated-list .hidden {
-  display: none;
-}
-
-#policyms-account-content section .paginated-list .page {
-  display: none;
-  padding: 0 10px 0 0;
-  margin: 0;
-}
-
-#policyms-account-content section .paginated-list .page.visible {
-  display: block;
-}
-
-#policyms-account-content section .paginated-list .page li {
-  display: none;
-  max-height: 0;
+li.policyms-user-description {
   overflow: hidden;
-}
-
-#policyms-account-content section .paginated-list .page li.visible {
   display: block;
-  max-height: 1000vh;
-  margin: 5px 0;
   padding: 15px 10px;
   border-top: 1px solid var(--policyms-border-color-light);
+  margin: 5px 0;
   animation: sweep-in 0.3s ease-in-out forwards;
 }
 
-#policyms-account-content section .paginated-list .page li h4 {
-  margin-bottom: 10px;
-}
-
-#policyms-account-content section .paginated-list .page li > div > a {
+li.policyms-user-description > .container > a {
+  display: block !important;
   text-decoration: none;
   border-radius: 10px;
-  display: block !important;
   transition: all 0.2s ease-in-out;
 }
 
-#policyms-account-content section .paginated-list .page li > div > p {
+li.policyms-user-description > .container > a > h4 {
+  margin-bottom: 10px;
+}
+
+li.policyms-user-description > .container > p {
   color: var(--policyms-text-color-secondary);
   font-size: 80%;
 }
 
-#policyms-account-content section .paginated-list .page li .metadata {
-  font-size: 70%;
+li.policyms-user-description > .container > .metadata {
   margin-top: 10px;
   color: var(--policyms-text-color-secondary);
+  font-size: 70%;
 }
 
-#policyms-account-content
-  section
-  .paginated-list
-  .page
-  li
-  .metadata
-  a:last-of-type,
-#policyms-account-content section .paginated-list .page li .metadata span {
+li.policyms-user-description > .container > .metadata a:last-of-type,
+li.policyms-user-description > .container > .metadata span {
   display: inline-block;
   margin-right: 8px;
 }
 
 /* Reviews tab */
 
-#policyms-account
-  section.policyms-account-reviews
-  #policyms-account-reviews-list
-  .rating {
+li.policyms-user-review-listed > .container > .rating {
   display: flex;
   justify-content: flex-start;
   align-items: center;
 }
 
-#policyms-account
-  section.policyms-account-reviews
-  .paginated-list
-  .rating
-  span:first-of-type {
+li.policyms-user-review-listed > .container > .rating span:first-of-type {
   font-size: 32px;
   font-weight: bold;
 }
 
-#policyms-account
-  section.policyms-account-reviews
-  .paginated-list
-  .rating
-  span:last-of-type {
-  font-size: 16px;
+li.policyms-user-review-listed > .container > .rating span:last-of-type {
   margin-left: 10px;
   color: var(--policyms-text-color-secondary);
+  font-size: 16px;
 }
-
-#policyms-account section.policyms-account-reviews .paginated-list .review p {
-  color: var(--policyms-text-color);
+li.policyms-user-review-listed > .container > p {
   margin: 15px 0;
+  color: var(--policyms-text-color);
 }
 
-#policyms-account section.policyms-account-reviews .paginated-list .review a {
+li.policyms-user-review-listed > .container > a {
   text-decoration: none;
 }
 
-#policyms-account
-  section.policyms-account-reviews
-  .paginated-list
-  .review
-  .metadata {
-  font-size: 14px;
+li.policyms-user-review-listed > .container > .metadata {
   margin-top: 10px;
+  font-size: 14px;
 }
 
 /* Information tab */
 
-#policyms-account section.policyms-account-profile table.information {
+.policyms-user-profile > form.container > table.information {
   margin-top: 20px;
   font-size: 80%;
 }
 
-#policyms-account
-  section.policyms-account-profile
-  table.information
-  tr
+.policyms-user-profile
+  > form.container
+  > table.information
+  > tr
   > td:first-of-type {
   max-width: 80px;
   font-weight: bold;
 }
 
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  .folding,
-#policyms-description-create .folding {
+.policyms-user-profile > form .folding {
   display: none;
 }
 
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  .critical-action {
+.policyms-user-profile > form .critical-action {
   display: none;
 }
 
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  .critical-action.visible {
+.policyms-user-profile > form .critical-action.visible {
   display: block;
   animation: sweep-in 0.3s ease-in-out;
 }
 
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  .folding.visible,
-#policyms-description-create .folding.visible {
+.policyms-user-profile > form .folding.visible {
   display: table-cell;
   animation: sweep-in 0.3s ease-in-out;
 }
 
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  td:first-of-type {
+.policyms-user-profile > form td:first-of-type {
   min-width: 100px;
 }
 
-#policyms-account section.policyms-account-profile #policyms-account-edit input,
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  select {
-  padding: 5px 10px;
+.policyms-user-profile > form input,
+.policyms-user-profile > form select {
+  box-sizing: border-box;
   min-width: 100%;
+  padding: 5px 10px;
+  border: 1px solid rgba(140, 140, 140, 0.2);
   margin-bottom: 5px;
   border-radius: 5px;
-  border: 1px solid rgba(140, 140, 140, 0.2);
-  box-sizing: border-box;
 }
 
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  label {
+.policyms-user-profile > form label {
   font-size: 80%;
   opacity: 0.8;
 }
 
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  .socials
-  input {
+.policyms-user-profile > form .socials input {
   min-width: unset;
   margin-right: 8px;
 }
 
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  .socials
-  div
-  div {
+.policyms-user-profile > form .socials div div {
   display: flex;
 }
 
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  .socials
-  button:disabled {
+.policyms-user-profile > form .socials button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  .socials
-  input {
+.policyms-user-profile > form .socials input {
   line-height: normal;
 }
 
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  div.error,
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  div.notice {
-  margin: 10px;
+.policyms-user-profile > form div.error,
+.policyms-user-profile > form div.notice {
+  display: none;
   width: 100%;
   padding: 10px 15px;
+  margin: 10px;
   font-size: 80% !important;
   font-weight: bold !important;
   border-radius: 8px;
-  display: none;
 }
 
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  div.error {
+.policyms-user-profile > form div.error {
   background-color: var(--policyms-background-failure);
 }
 
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  div.notice {
+.policyms-user-profile > form div.notice {
   background-color: var(--policyms-background-notice);
 }
 
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  div.error.visible,
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  div.notice.visible {
+.policyms-user-profile > form div.error.visible,
+.policyms-user-profile > form div.notice.visible {
   display: block;
 }
 
-#policyms-account section.policyms-account-profile #policyms-account-edit img {
+.policyms-user-profile > form img {
   max-width: 200px;
   border-radius: 8px;
 }
 
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  input[type="file"] {
+.policyms-user-profile > form input[type="file"] {
   font-size: 125%;
 }
 
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  button {
-  font-weight: bold;
-  background-color: #000000;
-  color: white;
-  border-radius: 10px;
-  padding: 5px 10px;
-  text-decoration: none;
-  text-align: left;
-  border: none;
-  margin: 15px 0;
-  transition: all 0.2s ease-in-out;
-}
-
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  button:hover {
-  transform: scale(0.98);
-  cursor: pointer;
-  text-decoration: none;
-  opacity: 0.9;
-  transition: all 0.2s ease-in-out;
-}
-
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  button:active {
-  transform: scale(0.97);
-  cursor: pointer;
-  text-decoration: none;
-  opacity: 0.8;
-  transition: all 0.1s ease-in-out;
-}
-
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  .unverified {
-  font-weight: bold;
+.policyms-user-profile > form .unverified {
   color: darkred;
+  font-weight: bold;
 }
 
-#policyms-account
-  section.policyms-account-profile
-  #policyms-account-edit
-  button#policyms-resend-verification-email {
-  color: inherit;
-  background: none;
+.policyms-user-profile > form button#policyms-resend-verification-email {
   padding: 0;
   margin: 0 5px;
+  background: none;
+  color: inherit;
   font-size: 100%;
   text-decoration: underline;
 }
 
-#policyms-account section.policyms-account-profile button.action {
-  display: block;
-  margin: 15px 0;
-}
-
-#policyms-account
-  section.policyms-account-profile
-  #policyms-delete-account
-  div {
+.policyms-user-profile
+  > form[data-action="policyms-delete-account"]
+  > button[type="submit"] {
   display: none;
 }
 
-#policyms-account
-  section.policyms-account-profile
-  #policyms-delete-account
-  div.policyms-error {
+.policyms-user-profile
+  > form[data-action="policyms-delete-account"]
+  > div.policyms-error {
   display: block;
 }
 
-#policyms-account
-  section.policyms-account-profile
-  #policyms-delete-account
-  div.visible {
+.policyms-user-profile
+  > form[data-action="policyms-delete-account"]
+  > div.visible {
   display: block;
 }
 
-button#policyms-resend-verification-email.disabled,
-a#policyms-resend-verification-email.disabled {
+button[data-action="policyms-resend-verification-email"].disabled {
   opacity: 0.8;
 }
 
-button#policyms-resend-verification-email.disabled:hover,
-a#policyms-resend-verification-email.disabled:hover {
+button[data-action="policyms-resend-verification-email"].disabled:hover {
   opacity: 0.8;
   cursor: not-allowed;
   text-decoration: none;
@@ -833,78 +631,55 @@ a#policyms-resend-verification-email.disabled:hover {
 }
 
 @media screen and (max-width: 650px) {
-  #policyms-account-content > .policyms-account-title {
+  .policyms-user > main > .policyms-user > main > header {
     display: none;
   }
 
-  #policyms-account {
+  .policyms-user {
     flex-direction: column;
   }
 
-  #policyms-account-sidebar {
+  .policyms-user > aside.sidebar {
+    padding: 0 10px 10px 10px;
     border: none;
     border-bottom: 1px solid rgba(0, 0, 0, 0.15);
-    padding: 0 10px 10px 10px;
   }
 
-  #policyms-account-sidebar > img {
+  .policyms-user > aside.sidebar > img {
     max-width: 128px;
   }
 
-  #policyms-account-sidebar > .policyms-account-title {
+  .policyms-user > aside.sidebar > .policyms-user > main > header {
     display: block;
     text-align: center;
   }
 
-  #policyms-account-content {
+  .policyms-user > main {
     padding: 0 10px;
     margin: 0;
   }
 
-  #policyms-account-content section #policyms-account-descriptions-list {
-    padding: 0;
-    margin: 0;
-    max-height: unset;
-    overflow-y: visible;
+  li.policyms-user-description {
+    margin: 10px 0;
   }
 
-  #policyms-account-content section #policyms-account-descriptions-list li a {
+  li.policyms-user-description a {
     flex-direction: column;
   }
 
-  #policyms-account-content
-    section
-    #policyms-account-descriptions-list
-    li
-    .thumbnail {
+  li.policyms-user-description .thumbnail {
     flex: unset;
     height: 200px;
     margin-bottom: 25px;
   }
 
-  #policyms-account
-    section.policyms-account-reviews
-    #policyms-account-reviews-list
-    li {
-    margin: 10px 0;
-  }
-
-  #policyms-account
-    section.policyms-account-profile
-    #policyms-account-edit
-    input,
-  #policyms-account
-    section.policyms-account-profile
-    #policyms-account-edit
-    select {
+  .policyms-user-profile > form input,
+  .policyms-user-profile > form select {
     max-width: 50vw;
     max-width: 50vw;
   }
 
-  #policyms-account
-    section.policyms-account-profile
-    #policyms-account-edit
-    td:first-of-type {
+  .policyms-user-profile > form td:first-of-type {
     min-width: 110px;
   }
 }

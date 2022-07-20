@@ -158,6 +158,7 @@ class PolicyMS_OAuth_Controller {
 				return <<<HTML
 					<button 
 						id="egi" 
+						data-action="policyms-redirect-egi"
 						class="action egi" 
 						onClick="window.location.href = 'https://aai-demo.egi.eu/auth/realms/egi/protocol/openid-connect/auth?client_id= {$egi_settings['egi_client_id']}&scope=profile%20openid%20email&redirect_uri={$egi_redirection_url}&response_type=code&code_challenge={$egi_settings['egi_code_challenge']}&code_challenge_method=S256'">
 						{$egi_button_label}

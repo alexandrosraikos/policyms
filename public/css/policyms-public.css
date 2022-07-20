@@ -380,34 +380,52 @@
 * Style the inline menu bar search box.
 */
 
-.policyms.menu-search {
+/**
+ * The menu search button container.
+ */
+.policyms.policyms-menu-search {
   margin: 0;
   margin-top: -6px;
 }
 
-.policyms.menu-search button[data-action="description-search"] {
+/**
+ * The menu search button.
+ */
+.policyms.policyms-menu-search button[data-action="description-search"] {
   padding: 3px 6px;
   color: inherit;
 }
 
-.policyms.modal .menu-search {
+/**
+ * The menu search modal container.
+ */
+.policyms-modal .policyms-menu-search {
   margin: 10px;
 }
 
-.policyms.menu-search form {
+/**
+ * The menu search modal form.
+ */
+.policyms-modal.policyms-menu-search > form {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.policyms.menu-search form input {
+/**
+ * The menu search modal text field.
+ */
+.policyms-modal.policyms-menu-search > form input {
   margin: 10px !important;
   min-width: 50vw;
   background-color: transparent !important;
   color: inherit !important;
 }
 
-.policyms.menu-search form button[type="submit"] {
+/**
+ * The menu search modal form button.
+ */
+.policyms-modal.policyms-menu-search > form > button[type="submit"] {
   width: 36px;
   height: 36px;
   padding: 0 !important;
@@ -426,7 +444,7 @@
 *
 * Hint: Use HTML class `modalize` on PHP echo.
 */
-.policyms.modalize {
+.policyms .modalize {
   /* Display & Box Model */
   display: none;
 }
@@ -434,37 +452,17 @@
 /**
 * Display content when added to modal.
 */
-.policyms.modal .modalize,
-.policyms.modal .content > * {
+.policyms .modalize,
+.policyms-modal .content > * {
   /* Display & Box Model */
   display: block;
-}
-
-/**
-* The modal's dark backdrop.
-*/
-.policyms.modal .backdrop {
-  /* Positioning */
-  position: absolute;
-  z-index: 550;
-  top: 0;
-  left: 0;
-
-  /* Display & Box Model */
-  width: 100vw;
-  height: 100vh;
-
-  /* Other */
-  background-color: rgba(0, 0, 0, 0.5);
-  content: " ";
-  cursor: pointer;
 }
 
 /**
 * The modal's root positioning
 * which covers the page.
 */
-.policyms.modal {
+.policyms-modal {
   /* Positioning */
   position: fixed;
   z-index: 500;
@@ -492,11 +490,31 @@
 }
 
 /**
+* The modal's dark backdrop.
+*/
+.policyms-modal > .backdrop {
+  /* Positioning */
+  position: absolute;
+  z-index: 550;
+  top: 0;
+  left: 0;
+
+  /* Display & Box Model */
+  width: 100vw;
+  height: 100vh;
+
+  /* Other */
+  background-color: rgba(0, 0, 0, 0.5);
+  content: " ";
+  cursor: pointer;
+}
+
+/**
 * The common modal control attributes.
 */
-.policyms.modal > .close,
-.policyms.modal > .container > .previous,
-.policyms.modal > .container > .next {
+.policyms-modal > .close,
+.policyms-modal > .container > .previous,
+.policyms-modal > .container > .next {
   /* Positioning */
   z-index: 600;
   position: absolute;
@@ -515,7 +533,7 @@
 /**
 * The modal's "close" button position.
 */
-.policyms.modal > .close {
+.policyms-modal > .close {
   /* Positioning */
   top: 20px;
   right: 20px;
@@ -524,7 +542,7 @@
 /**
 * The modal's centered content container.
 */
-.policyms.modal > .container {
+.policyms-modal > .container {
   /* Positioning */
   position: fixed;
   top: 50%;
@@ -544,20 +562,20 @@
 /**
 * The modal's iterable controls positions.
 */
-.policyms.modal > .container > .previous,
-.policyms.modal > .container > .next {
+.policyms-modal > .container > .previous,
+.policyms-modal > .container > .next {
   /* Positioning */
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
 }
 
-.policyms.modal > .container > .previous {
+.policyms-modal > .container > .previous {
   /* Positioning */
   left: -50px;
 }
 
-.policyms.modal > .container > .next {
+.policyms-modal > .container > .next {
   /* Positioning */
   right: -50px;
 }
@@ -565,8 +583,8 @@
 /**
 * The modal's iterable controls on start or end.
 */
-.policyms.modal > .container > .previous:disabled,
-.policyms.modal > .container > .next:disabled {
+.policyms-modal > .container > .previous:disabled,
+.policyms-modal > .container > .next:disabled {
   /* Other */
   cursor: not-allowed;
   opacity: 0.6;
@@ -575,7 +593,7 @@
 /**
 * The modal's content box.
 */
-.policyms.modal > .container > .content {
+.policyms-modal > .container > .content {
   /* Display & Box Model */
   max-height: 90.2vh;
   overflow-x: hidden;
@@ -658,26 +676,58 @@
   margin: 5px;
 }
 
-.policyms-alert-close {
-  border: none;
-  background: red !important;
-  position: absolute;
-  border-radius: 10px;
-  display: inline-block;
-  height: 32px;
-  font-size: 60%;
-  font-weight: bold;
-  padding: 0 8px;
-  top: -15px;
-  color: white !important;
-  right: -20px;
+/**
+* Content List
+* -----------
+* A list with dynamic content.
+*/
+
+.policyms-content-list > header > .policyms-sort-content,
+.policyms-content-list > header > .policyms-change-page-size {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.policyms-content-list > header > .policyms-sort-content *,
+.policyms-content-list > header > .policyms-change-page-size * {
+  width: auto;
+  height: 100%;
+  padding: 0;
+  margin: 0 5px;
+  white-space: nowrap;
 }
 
-.policyms-alert-close div {
-  position: relative;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background-color: black;
-  height: 5px;
+.policyms-content-list > header > .policyms-sort-content select,
+.policyms-content-list > header > .policyms-change-page-size select {
+  padding: 0 10px 0 6px;
+}
+
+.policyms-content-list > .policyms-filter-content-list {
+  padding: 15px 0;
+  border-top: 1px solid var(--policyms-border-color-light);
+  border-bottom: 1px solid var(--policyms-border-color-light);
+  margin-bottom: 20px;
+  font-size: 75%;
+  font-weight: bold;
+}
+
+.policyms-content-list > .policyms-filter-content-list span {
+  margin-bottom: 5px;
+}
+
+.policyms-content-list > .policyms-filter-content-list button {
+  margin: 0 5px 5px 0;
+}
+
+.policyms-content-list > ul {
+  padding: 0 10px 0 0;
+}
+
+@media screen and (max-width: 650px) {
+  .policyms-content-list {
+    overflow-y: visible;
+    max-height: unset;
+    padding: 0;
+    margin: 0;
+  }
 }

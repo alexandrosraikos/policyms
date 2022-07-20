@@ -36,7 +36,7 @@ function user_registration_html(
 	} else {
 		$sso_buttons = $oauth_controller->get_all_html();
 		return <<<HTML
-			<div class="policyms-user-registration">
+			<div class="policyms policyms-user-registration">
 				{$sso_buttons}
 				<form 
 					data-action="policyms-user-registration"
@@ -146,7 +146,7 @@ function user_authentication_html(
 	} else {
 		$sso_buttons = $oauth_controller->get_all_html();
 		return <<<HTML
-			<div class="policyms-user-authentication">
+			<div class="policyms policyms-user-authentication">
 				{$sso_buttons}
 				<form 
 					data-action="policyms-user-authentication"
@@ -186,7 +186,7 @@ function user_password_reset_html( $authenticated, $nonce ) {
 		return show_lock( 'You are already logged in.', 'notice' );
 	} else {
 		return <<<HTML
-			<div class="policyms-password-resset">
+			<div class="policyms policyms-password-resset">
 				<form 
 					data-action="policyms-user-password-reset"
 					data-nonce="{$nonce}"
@@ -293,7 +293,7 @@ function user_overview_html( array $information, array $statistics ): string {
 	}
 
 	return <<<HTML
-		<section class="policyms-user-overview">
+		<section class="policyms policyms-user-overview">
 			<header>
 				<h3>Overview</h3>
 			</header>
@@ -357,12 +357,13 @@ function user_descriptions_list_html(
 			// TODO @alexandrosraikos: Add 'Keywords' (#128).
 			return <<<HTML
 			<li 
+				class="policyms-user-description"
 				data-type-filter="{$description->type}" 
 				data-date-updated="{$updated_date_unix}" 
 				data-rating="{$description->metadata['reviews']['average_rating']}" 
 				data-total-views="{$description->metadata['views']}" 
 				class="visible">
-				<div class="description">
+				<div class="container">
 					<a href="{$description_url_base}?did={$description->id}">
 						<h4>{$description->information['title']}</h4>
 					</a>
@@ -392,7 +393,7 @@ function user_descriptions_list_html(
 	);
 
 	return <<<HTML
-		<section class="policyms-user-descriptions">
+		<section class="policyms policyms-user-descriptions">
 			{$description_list}
 		</section>
 	HTML;
@@ -431,10 +432,11 @@ function user_reviews_list_html(
 			);
 			return <<<HTML
 				<li 
+					class="policyms-user-review-listed"
 					data-type-filter="{$review->description_collection}" 
 					data-date-updated="{$updated_date_unix}" 
 					data-rating="{$review->rating}" class="visible">
-					<div class="review">
+					<div class="container">
 						<div class="rating">
 							<span>
 								<span class="fas fa-star"></span> {$review->rating}
@@ -462,7 +464,7 @@ function user_reviews_list_html(
 	);
 
 	return <<<HTML
-		<section class="policyms-user-reviews">
+		<section class="policyms policyms-user-reviews">
 			{$review_list}
 		</section>
 	HTML;
@@ -504,7 +506,7 @@ function user_approvals_list_html(
 	);
 
 	return <<<HTML
-		<section class="policyms-user-approvals">
+		<section class="policyms policyms-user-approvals">
 			{$approvals_list}
 		</section>
 	HTML;
@@ -912,10 +914,10 @@ function user_profile_details_html(
 				<div>
 					<label for=" current-password">Please type your current password to continue.</label>
 				<input name="current-password" type="password" placeholder="Insert your current password here">
-			</div>
-			<button type="submit" class="action destructive" user="{$user->username}">
-				Delete account
-			</button>
+				</div>
+				<button type="submit" class="action destructive" user="{$user->username}">
+					Delete account
+				</button>
 			</form>
 		HTML;
 	}
@@ -935,12 +937,13 @@ function user_profile_details_html(
 	}
 
 	return <<<HTML
-		<section class="policyms-user-profile">
+		<section class="policyms policyms-user-profile">
 			<header>
 				<h3>Information</h3>
 				{$edit_button}
 			</header>
 			<form
+				class="container"
 				data-action="policyms-user-editing"
 				data-nonce="{$editing_nonce}" 
 				accept-charset="utf8" 
@@ -1104,7 +1107,7 @@ function user_html(
 
 	return <<<HTML
 		<div 
-			class="policyms-user" 
+			class="policyms policyms-user" 
 			data-user-id="{$user->id}"
 			{$visitor_attribute}>
 			{$verification_notice}

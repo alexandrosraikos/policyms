@@ -110,6 +110,17 @@ class PolicyMS_Public {
 			$this->version,
 			false
 		);
+		wp_localize_script(
+			'policyms',
+			'GlobalProperties',
+			array(
+				'rootURLPath' => ( empty( wp_parse_url( get_site_url() )['path'] )
+					? '/'
+					: wp_parse_url( get_site_url() )['path'] ),
+				'loginPage'   => self::get_setting( true, 'login_page' ),
+				'ajaxURL'     => admin_url( 'admin-ajax.php' ),
+			)
+		);
 
 		wp_enqueue_script(
 			'fontawesome',
@@ -333,6 +344,7 @@ class PolicyMS_Public {
 				'login_page',
 				'account_page',
 				'registration_page',
+				'archive_page'
 			);
 		} catch ( \Exception $e ) {
 			return $items;
@@ -344,7 +356,8 @@ class PolicyMS_Public {
 				PolicyMS_User::is_authenticated(),
 				$options['login_page'],
 				$options['registration_page'],
-				$options['account_page']
+				$options['account_page'],
+				$options['archive_page']
 			);
 		} else {
 			return $items;

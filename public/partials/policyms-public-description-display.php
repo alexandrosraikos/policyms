@@ -62,7 +62,7 @@ function sorting_selector_html( string $content_type, string $selected_option = 
 
 	// Return the entire sorting selector form HTML.
 	return <<<HTML
-			<form action="policyms-sort-content" content-type="{$content_type}">
+			<form action="policyms policyms-sort-content" content-type="{$content_type}">
 				<label for="sorting">{$sorting_label}</label>
 				<select name="sorting">
 					{$html_options}
@@ -111,7 +111,7 @@ function sizing_selector_html( int $selected_size = 12 ): string {
 
 	// Return the entire sorting selector form HTML.
 	return <<<HTML
-		<form action="policyms-change-page-size">
+		<form action="policyms policyms-change-page-size">
 			<label for="sizing">{$size_label}</label>
 			<select name="sizing">
 				{$html_options}
@@ -303,7 +303,7 @@ function descriptions_grid_html( array $descriptions, bool $empty_notice = true 
 			HTML;
 		}
 		return <<<HTML
-			<div class="policyms-descriptions-grid">
+			<div class="policyms policyms-descriptions-grid">
 				<ul>
 					{$description_cards}
 				</ul>
@@ -336,7 +336,7 @@ function featured_descriptions_html( array $categories ): string {
 	$suggested_grid   = descriptions_grid_html( $categories['suggestions']->descriptions );
 
 	return <<<HTML
-		<div class="policyms featured-descriptions">
+		<div class="policyms policyms-featured-descriptions">
 			<div class="white-container">
 				<div class="row statistics">
 					<div class="column">
@@ -420,7 +420,7 @@ function descriptions_archive_html(
 		: '';
 
 	return <<<HTML
-		<div class="policyms-descriptions-archive inspect">
+		<div class="policyms policyms-descriptions-archive inspect">
 			{$filters}
 			<div class="content">
 				<header>
@@ -661,7 +661,7 @@ function description_editor_html(
 			 */
 			$existing_assets .= <<<HTML
 				<div 
-					class="asset-editor" 
+					class="policyms-asset-editor" 
 					data-asset-type="{$asset_type->id}" 
 					data-asset-id="{$asset->id}">
 					<div>
@@ -754,7 +754,7 @@ function description_editor_html(
 	HTML : '';
 
 	return <<<HTML
-		<div class="policyms-description-editor {$is_modal}">
+		<div class="policyms policyms-description-editor {$is_modal}">
 			<form 
 				data-action="policyms-edit-description"
 				data-context="{$context_attribute}"
@@ -1452,7 +1452,7 @@ function description_html(
 	}
 
 	return <<<HTML
-		<div class="policyms-description-single">
+		<div class="policyms policyms-description-single">
 			{$administrator_approval}
 			<header>
 				<div class="title">
