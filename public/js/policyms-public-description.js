@@ -10,39 +10,37 @@ var presetElementQueries = {
 
   descriptionContainer: '.policyms-description-single',
 
-  descriptionContainer: '.policyms-description-single',
+  descriptionRejectionButton: '.policyms-description-single > form > button[data-action="policyms-reject-description"]',
 
-  descriptionRejectionButton: descriptionContainer + ' > form > button[data-action="policyms-reject-description"]',
+  descriptionApprovalButton: '.policyms-description-single > form > button[data-action="policyms-approve-description"]',
 
-  descriptionApprovalButton: descriptionContainer + ' > form > button[data-action="policyms-approve-description"]',
+  descriptionAssetTableToggle: '.policyms-description-single > .content > aside > .policyms-asset-information-table > button[data-action="policyms-toggle-file-table-vibility"]',
 
-  descriptionAssetTableToggle: presetElementQueries.descriptionContainer + ' > .content > aside > .policyms-asset-information-table > button[data-action="policyms-toggle-file-table-vibility"]',
+  descriptionGalleryItem: '.policyms-description-single .content > .information > .description > .gallery > .slider > .item',
 
-  descriptionGalleryItem: presetElementQueries.descriptionContainer + '.content > .information > .description > .gallery > .slider > .item',
+  assetDownloadButton: '.policyms-description-single > .content > aside > .policyms-asset-information-table > tr > td > a.download',
 
-  assetDownloadButton: descriptionContainer + ' > .content > aside > .policyms-asset-information-table > tr > td > a.download',
+  descriptionReviewPageButton: '.policyms-description-single > .reviews > .policyms-description-reviews > nav.pagination > button[data-action="policyms-description-change-review-page"]',
 
-  descriptionReviewPageButton: descriptionContainer + ' > .reviews > .policyms-description-reviews > nav.pagination > button[data-action="policyms-description-change-review-page"]',
+  descriptionReviewStarButton: '.policyms-description-single > .reviews > .policyms-description-reviews > form[data-action="policyms-add-review"] > .stars > input[type="radio"]',
 
-  descriptionReviewStarButton: presetElementQueries.descriptionReviewForm + ' > .stars > input[type="radio"]',
+  descriptionReviewForm: '.policyms-description-single > .reviews > .policyms-description-reviews > form[data-action="policyms-add-review"]',
 
-  descriptionReviewForm: presetElementQueries.descriptionContainer + ' > .reviews > .policyms-description-reviews > form[data-action="policyms-add-review"]',
-
-  descriptionReviewDeleteButton: presetElementQueries.descriptionReviewForm + ' > .actions > button[data-action="policyms-delete-review"]',
+  descriptionReviewDeleteButton: '.policyms-description-single > .reviews > .policyms-description-reviews > form[data-action="policyms-add-review"] > .actions > button[data-action="policyms-delete-review"]',
 
   descriptionEditingFormContainer: '.policyms-description-editor',
 
-  descriptionEditingForm: descriptionEditingFormContainer + 'form[data-action="policyms-edit-description"]',
+  descriptionEditingForm: '.policyms-description-editor form[data-action="policyms-edit-description"]',
 
-  descriptionEditButton: descriptionContainer + '> header > .title > button[data-action="policyms-edit-description"]',
+  descriptionEditButton: '.policyms-description-single > header > .title > button[data-action="policyms-edit-description"]',
 
-  descriptionSetCoverButton: presetElementQueries.descriptionEditingForm + ' > fieldset[name="assets"] > .asset-editor > button[data-action="policyms-set-cover-asset"]',
+  descriptionSetCoverButton: '.policyms-description-editor form[data-action="policyms-edit-description"] > fieldset[name="assets"] > .asset-editor > button[data-action="policyms-set-cover-asset"]',
 
-  descriptionRemoveCoverButton: presetElementQueries.descriptionEditingForm + ' > fieldset[name="assets"] > .asset-editor > button[data-action="policyms-remove-cover-asset"]',
+  descriptionRemoveCoverButton: '.policyms-description-editor form[data-action="policyms-edit-description"] > fieldset[name="assets"] > .asset-editor > button[data-action="policyms-remove-cover-asset"]',
 
-  descriptionDeleteAssetButton: presetElementQueries.descriptionEditingForm + ' > fieldset[name="assets"] > .asset-editor > div > button[data-action="policyms-delete-asset"]',
+  descriptionDeleteAssetButton: '.policyms-description-editor form[data-action="policyms-edit-description"] > fieldset[name="assets"] > .asset-editor > div > button[data-action="policyms-delete-asset"]',
 
-  descriptionDeletionButton: descriptionEditingForm + '> .actions > button[data-action="delete-description"]',
+  descriptionDeletionButton: '.policyms-description-editor form[data-action="policyms-edit-description"]> .actions > button[data-action="delete-description"]',
 
 };
 /**

@@ -4,7 +4,7 @@
  * @author Alexandros Raikos <alexandros@araikos.gr>
  */
 
-var presetElementQueries = {
+var authenticationElements = {
   authenticationForm: 'form[data-action="policyms-user-authentication"]',
   passwordResetForm: 'form[data-action="policyms-user-password-reset"]',
 };
@@ -28,13 +28,13 @@ var presetElementQueries = {
       e.preventDefault();
 
       makeWPRequest(
-        presetElementQueries.authenticationForm,
+        authenticationElements.authenticationForm,
         "policyms_account_user_authentication",
-        $(presetElementQueries.authenticationForm).data('nonce'),
-        new FormData($(presetElementQueries.authenticationForm,)[0]),
+        $(authenticationElements.authenticationForm).data('nonce'),
+        new FormData($(authenticationElements.authenticationForm,)[0]),
         (data) => {
           setAuthorizedToken(data);
-          window.location.href = $(presetElementQueries.authenticationForm).data('redirect');
+          window.location.href = $(authenticationElements.authenticationForm).data('redirect');
         }
       );
     }
@@ -47,13 +47,13 @@ var presetElementQueries = {
       e.preventDefault();
 
       makeWPRequest(
-        presetElementQueries.passwordResetForm,
+        authenticationElements.passwordResetForm,
         "policyms_account_user_password_reset",
-        $(presetElementQueries.passwordResetForm).data('nonce'),
-        new FormData($(presetElementQueries.passwordResetForm)[0]),
+        $(authenticationElements.passwordResetForm).data('nonce'),
+        new FormData($(authenticationElements.passwordResetForm)[0]),
         () => {
           showAlert(
-            presetElementQueries.passwordResetForm,
+            authenticationElements.passwordResetForm,
             "An email has been sent with instructions to reset your password.",
             "notice"
           );
@@ -68,8 +68,8 @@ var presetElementQueries = {
      */
 
 
-    $(presetElementQueries.authenticationForm).submit(authenticateUser);
-    $(presetElementQueries.passwordResetForm).submit(resetPasswordRequest);
+    $(authenticationElements.authenticationForm).submit(authenticateUser);
+    $(authenticationElements.passwordResetForm).submit(resetPasswordRequest);
 
   });
 })(jQuery);

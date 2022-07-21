@@ -619,7 +619,20 @@
   margin-right: 10px;
 }
 
-.policyms-description-single > .content > .information > .gallery > .slider {
+.policyms-description-single
+  > .content
+  > .information
+  > .description
+  > .gallery {
+  display: block !important;
+}
+
+.policyms-description-single
+  > .content
+  > .information
+  > .description
+  > .gallery
+  > .slider {
   /* Display & Box Model */
   display: flex;
   flex-wrap: wrap;
@@ -630,6 +643,7 @@
 .policyms-description-single
   > .content
   > .information
+  > .description
   > .gallery
   > .slider
   > .item {
@@ -639,6 +653,7 @@
 .policyms-description-single
   > .content
   > .information
+  > .description
   > .gallery
   > .slider
   > .item {
@@ -651,6 +666,7 @@
 .policyms.description
   > .content
   > .information
+  > .description
   > .gallery
   > .slider
   > .item:hover {
@@ -663,6 +679,7 @@
 .policyms.description
   > .content
   > .information
+  > .description
   > .gallery
   > .slider
   > .item
@@ -670,6 +687,7 @@
 .policyms.description
   > .content
   > .information
+  > .description
   > .gallery
   > .slider
   > .item
@@ -684,6 +702,7 @@
 .policyms.description
   > .content
   > .information
+  > .description
   > .gallery
   > .slider
   > .item
@@ -700,6 +719,7 @@
 .policyms.description
   > .content
   > .information
+  > .description
   > .gallery
   > .slider
   > .item
@@ -710,6 +730,7 @@
 .policyms.description
   > .content
   > .information
+  > .description
   > .gallery
   > .slider
   > .item

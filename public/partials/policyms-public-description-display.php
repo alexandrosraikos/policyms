@@ -1327,7 +1327,7 @@ function description_html(
 					</span>
 					{$description_metadata_keywords}
 					<a href="#reviews" class="reviews">
-						<span class="fas fa-star"></span> {$description->metadata['reviews']['average_rating']} ({$description->metadata['reviews']['no_reviews']} reviews)'; ?>
+						<span class="fas fa-star"></span> {$description->metadata['reviews']['average_rating']} ({$description->metadata['reviews']['no_reviews']} reviews)
 					</a>
 					&nbsp;
 					<span class="views">

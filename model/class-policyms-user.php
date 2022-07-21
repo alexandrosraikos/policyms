@@ -911,7 +911,7 @@ class PolicyMS_User extends PolicyMS_Account {
 	protected static function get_account_data( string $id = null ): array {
 		$response = PolicyMS_Communication_Controller::api_request(
 			'GET',
-			'/accounts/users/information' . ( isset( $id ) ? '/' . $id : '' ),
+			'/accounts/users/information' . ( isset( $id ) ? '/' . $id : '' ) . '?resources=1',
 			array(),
 			PolicyMS_Account::retrieve_token()
 		);

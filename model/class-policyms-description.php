@@ -144,7 +144,7 @@ class PolicyMS_Description {
 				PolicyMS_User::is_authenticated() ?
 				PolicyMS_Account::retrieve_token() :
 				null
-			)[0][0]
+			)['results'][0][0]
 		);
 	}
 

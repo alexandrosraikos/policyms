@@ -404,6 +404,7 @@ class PolicyMS_Public {
 					: wp_parse_url( get_site_url() )['path'] );
 
 				// NOTE: No need to escape this self-created HTML output.
+				wp_enqueue_script('policyms-account-authentication');
 				print user_authentication_html(
 					wp_create_nonce( 'policyms_account_user_authentication' ),
 					$home_url,
@@ -1003,7 +1004,7 @@ class PolicyMS_Public {
 
 				// Get the description.
 				$description = new PolicyMS_Description(
-					sanitize_key( wp_unslash( $_GET['did'] ) )
+					sanitize_text_field( wp_unslash( $_GET['did'] ) )
 				);
 
 				// Initialize the user permissions object.
@@ -1045,6 +1046,9 @@ class PolicyMS_Public {
 					'marketplace_host'
 				);
 
+				$administrator = (isset($user)) ? $user->is_admin(): false;
+				$provider = (isset($user)) ? $description->is_provider( $user ) :false;
+
 				// NOTE: No need to escape this self-created HTML output.
 				print description_html(
 					$description,
@@ -1052,8 +1056,8 @@ class PolicyMS_Public {
 					$urls['archive_page'],
 					$urls['login_page'],
 					$authenticated,
-					$user->is_admin(),
-					$description->is_provider( $user ),
+					$administrator,
+					$provider,
 					$reviews ?? array(),
 					$image_blobs ?? array(),
 					$authenticated
@@ -1064,24 +1068,24 @@ class PolicyMS_Public {
 						? wp_create_nonce( 'policyms_create_review' ) : '',
 					$authenticated
 						? wp_create_nonce( 'policyms_delete_review' ) : '',
-					$user->is_admin()
+						$administrator
 						? wp_create_nonce( 'policyms_description_approval' ) : '',
-					$description->is_provider( $user ) || $user->is_admin()
+					$provider || $administrator
 						? wp_create_nonce( 'policyms_description_editing' )
 						: '',
-					$description->is_provider( $user ) || $user->is_admin()
+					$provider || $administrator
 						? wp_create_nonce( 'policyms_set_description_image' )
 						: '',
-					$description->is_provider( $user ) || $user->is_admin()
+					$provider || $administrator
 						? wp_create_nonce( 'policyms_remove_description_image' )
 						: '',
-					$description->is_provider( $user ) || $user->is_admin()
+					$provider || $administrator
 						? wp_create_nonce( 'policyms_asset_delete' )
 						: '',
-					$description->is_provider( $user ) || $user->is_admin()
+					$provider || $administrator
 						? wp_create_nonce( 'policyms_description_deletion' )
 						: '',
-					$description->is_provider( $user )
+					$provider
 						? $urls['account_page'] . '#descriptions'
 						: $urls['account_page'] . '#approvals',
 					$urls['marketplace_host']

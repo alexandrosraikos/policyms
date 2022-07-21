@@ -1067,7 +1067,7 @@ function user_html(
 		}
 
 		// Prepare counter.
-		// TODO @vkoukos: Implement [no_<resource>] counters on user->account.
+		// TODO @vkoukos: Implement [no_<resources>] counters on user->account.
 		$counter = '';
 		if ( $user->metadata[ "no_{$identifier}" ] ) {
 			$counter = '(' . $user->metadata[ "no_{$identifier}" ] . ')';

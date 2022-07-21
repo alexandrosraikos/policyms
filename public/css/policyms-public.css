@@ -352,7 +352,7 @@
 }
 
 /* Locked content */
-.policyms .lock {
+.policyms-locked-content {
   min-height: 300px;
   display: flex;
   width: 100%;
@@ -363,12 +363,12 @@
   border-radius: 12px;
 }
 
-.policyms .lock > img {
+.policyms-locked-content > img {
   margin-bottom: 10px;
   width: 60px;
 }
 
-.policyms .lock > p {
+.policyms-locked-content > p {
   margin-top: 10px;
   text-align: center;
   width: 80%;
