@@ -96,14 +96,12 @@ class PolicyMS_Communication_Controller {
 			);
 
 			if (
-				200 !== $http_code
+				( 200 !== $http_code
 				&& 201 !== $http_code
-				&& 403 !== $http_code
+				&& 403 !== $http_code )
+				|| 'unsuccessful' === ( $data['_status'] ?? '' )
 				) {
-				throw new PolicyMSAPIError(
-					'PolicyMS error when contacting ' . $uri . ': ' . $data['message'],
-					$http_code
-				);
+				throw new PolicyMSAPIError( $data['message'] ?? 'Unknown error.', $http_code );
 			} else {
 				return $data;
 			}

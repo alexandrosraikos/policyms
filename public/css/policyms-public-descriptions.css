@@ -550,12 +550,22 @@
 }
 
 /**
-* Asset content
+* Description content
 */
 
 .policyms-description-single > .content {
   /* Display & Box Model */
   display: flex;
+}
+
+.policyms-description-single > .content > aside {
+  /* Display & Box Model */
+  max-width: 33%;
+  border-right: 1px solid var(--policyms-border-color-light);
+}
+
+.policyms-description-single > .content > aside > .comments {
+  margin-top: 25px;
 }
 
 @media screen and (max-width: 800px) {
@@ -817,6 +827,7 @@
 
 .policyms-description-single > .reviews {
   padding: 20px;
+  border-top: 1px solid var(--policyms-border-color-light);
 }
 
 .policyms-description-single .reviews ul {
@@ -834,63 +845,87 @@
   font-weight: bold;
 }
 
-.policyms-description-single .review .rating .stars * {
-  fill: var(--policyms-background-warning-outline);
-}
-
-.policyms-description-single .reviews form label {
+.policyms-description-reviews form label {
   float: none;
 }
 
-.policyms-description-single .reviews form .stars {
+.policyms-description-reviews form .stars {
   display: flex;
   margin: -10px 0px 0 0px;
 }
 
-.policyms-description-single .reviews form .stars input[type="radio"] {
+.policyms-description-reviews form .stars input[type="radio"] {
   position: absolute;
   opacity: 0;
 }
 
-.policyms-description-single .reviews form .stars input[type="radio"] + svg {
+.policyms-description-reviews form .stars input[type="radio"] + svg {
   cursor: pointer;
 }
 
-.policyms-description-single
-  .reviews
+.policyms-description-reviews
   form
   .stars
-  input[type="radio"]:checked
+  label
+  input[type="radio"]
   + svg
-  *,
-.policyms-description-single
-  .reviews
+  > path {
+  fill: var(--policyms-star-color);
+}
+
+.policyms-description-reviews
   form
   .stars
-  input[type="radio"].checked
+  label[checked]
+  ~ label
+  input[type="radio"]
   + svg
-  *,
-.policyms-description-single
-  .reviews
+  > path {
+  fill: var(--policyms-text-color);
+}
+
+.policyms-description-reviews
+  form
+  .stars:hover
+  label
+  input[type="radio"]
+  + svg
+  > path {
+  fill: var(--policyms-star-color) !important;
+}
+
+.policyms-description-reviews
   form
   .stars
-  input[type="radio"]:hover
+  label[checked]:hover
+  ~ label
+  input[type="radio"]
   + svg
-  * {
-  fill: var(--policyms-background-warning-outline);
+  > path,
+.policyms-description-reviews
+  form
+  .stars
+  label:hover
+  ~ label
+  input[type="radio"]
+  + svg
+  > path {
+  fill: var(--policyms-text-color) !important;
 }
 
 /**
 * Asset editing form
 */
 
-.policyms-description-editor.modalize {
+.policyms-description-editor.modalized {
+  display: none;
   padding: 20px;
   margin: 20px 0;
+  background-color: var(--policyms-background-color);
 }
 
-.policyms-description-editor.modalize {
-  background-color: var(--policyms-background-color);
+.policyms-modal .policyms-description-editor.modalized {
+  display: block;
 }
 
 .policyms-description-editor form fieldset {
@@ -1045,7 +1080,7 @@
   border-collapse: collapse;
 }
 
-.policyms-asset-information-table.collapsed > table {
+.policyms-asset-information-table[collapsed] > table {
   display: none;
 }
 

@@ -52,12 +52,16 @@ class PolicyMS_Asset_Type {
 	 * @since 2.0.0
 	 */
 	public function get_extensions(): array {
-		return array_map(
-			function ( $mimetypes ) {
-				return explode( '/', $mimetypes )[1];
-			},
-			explode( ',', $this->mimetypes )
-		);
+		if ( $this->mimetypes ) {
+			return array_map(
+				function ( $mimetypes ) {
+					return explode( '/', $mimetypes )[1];
+				},
+				explode( ',', $this->mimetypes )
+			);
+		} else {
+			return array();
+		}
 	}
 
 	/**

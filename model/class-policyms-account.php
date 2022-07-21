@@ -121,7 +121,7 @@ abstract class PolicyMS_Account {
 	public static function retrieve_token() {
 		// Retrieve saved token.
 		if ( ! empty( $_COOKIE['pcmapi-token'] ) ) {
-			return self::decrypt_token( sanitize_key( $_COOKIE['pcmapi-token'] ) );
+			return self::decrypt_token( sanitize_text_field( $_COOKIE['pcmapi-token'] ) );
 		} else {
 			throw new PolicyMSUnauthorizedRequestException( 'The token could not be found.' );
 		};

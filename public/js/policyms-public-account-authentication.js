@@ -31,7 +31,7 @@ var authenticationElements = {
         authenticationElements.authenticationForm,
         "policyms_account_user_authentication",
         $(authenticationElements.authenticationForm).data('nonce'),
-        new FormData($(authenticationElements.authenticationForm,)[0]),
+        new FormData($(authenticationElements.authenticationForm)[0]),
         (data) => {
           setAuthorizedToken(data);
           window.location.href = $(authenticationElements.authenticationForm).data('redirect');

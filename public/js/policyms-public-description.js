@@ -22,11 +22,11 @@ var presetElementQueries = {
 
   descriptionReviewPageButton: '.policyms-description-single > .reviews > .policyms-description-reviews > nav.pagination > button[data-action="policyms-description-change-review-page"]',
 
-  descriptionReviewStarButton: '.policyms-description-single > .reviews > .policyms-description-reviews > form[data-action="policyms-add-review"] > .stars > input[type="radio"]',
+  descriptionReviewStarButton: '.policyms-description-single > .reviews > .policyms-description-reviews > form[data-action="policyms-add-review"] > .rating > .stars > label > input[type="radio"]',
 
   descriptionReviewForm: '.policyms-description-single > .reviews > .policyms-description-reviews > form[data-action="policyms-add-review"]',
 
-  descriptionReviewDeleteButton: '.policyms-description-single > .reviews > .policyms-description-reviews > form[data-action="policyms-add-review"] > .actions > button[data-action="policyms-delete-review"]',
+  descriptionReviewDeleteButton: '.policyms-description-single > .reviews > .policyms-description-reviews button[data-action="policyms-delete-review"]',
 
   descriptionEditingFormContainer: '.policyms-description-editor',
 
@@ -40,8 +40,7 @@ var presetElementQueries = {
 
   descriptionDeleteAssetButton: '.policyms-description-editor form[data-action="policyms-edit-description"] > fieldset[name="assets"] > .asset-editor > div > button[data-action="policyms-delete-asset"]',
 
-  descriptionDeletionButton: '.policyms-description-editor form[data-action="policyms-edit-description"]> .actions > button[data-action="delete-description"]',
-
+  descriptionDeletionButton: '.policyms-description-editor form[data-action="policyms-edit-description"]> .actions > button[data-action="delete-description"]'
 };
 /**
  * Asset editing
@@ -220,14 +219,15 @@ function rejectDescription(e) {
 }
 
 function highlightRatingStars(e) {
-  const eventStar = $(e.target);
-  eventStar.attr('checked', true);
   $(presetElementQueries.descriptionReviewStarButton).each((index, element) => {
-    $(element).prop('checked', false);
-    if ($(element).val() <= eventStar.val()) {
-      $(element).prop('checked', true);
-    }
+    $(element).attr('checked', false);
+    const parentLabel = $(element).parents('label')[0];
+    $(parentLabel).attr('checked', false);
   });
+  const label = $(e.target).parents('label')[0];
+  const input = $(label).children('input')[0];
+  $(label).attr('checked', true);
+  $(input).attr('checked', true);
 }
 
 function changeReviewPage(e) {
@@ -259,6 +259,10 @@ function createReview(e) {
     "description_id",
     $(presetElementQueries.descriptionEditingForm).data('description-id')
   );
+  formData.append(
+    'update',
+    $(presetElementQueries.descriptionReviewForm + '[update-review]').length > 0
+  )
 
   makeWPRequest(
     presetElementQueries.descriptionReviewForm,

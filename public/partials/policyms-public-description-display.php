@@ -482,7 +482,7 @@ function description_editor_html(
 
 	$is_editing            = ! empty( $description );
 	$context_attribute     = $is_editing ? 'editing' : 'creation';
-	$is_modal              = $is_editing ? 'modalize' : '';
+	$is_modal              = $is_editing ? 'modalized' : '';
 	$existing_title        = $description->information['title'] ?? '';
 	$existing_type_options = '';
 	$allowed_type_editing  = $is_editing ? 'disabled' : 'required';
@@ -511,7 +511,7 @@ function description_editor_html(
 		$asset_type_notice = $asset_type->notice ? "<p>{$asset_type->notice}</p> " : '';
 		$extensions        = $asset_type->get_extensions();
 		if ( $extensions ) {
-			$extensions = ' (' . implode( ', ', $asset_type->get_extensions() ) . ')';
+			$extensions = ' (' . implode( ', ', $extensions ) . ')';
 		} else {
 			$extensions = '';
 		}
@@ -703,6 +703,7 @@ function description_editor_html(
  * The reviews list.
  *
  * @param   array  $reviews The array of reviews in the given page.
+ * @param   string $delete_review_nonce The verification nonce for deleting reviews.
  * @param   string $author_id The author ID.
  * @param   bool   $administrator Whether the requester is an administrator.
  *
@@ -712,6 +713,7 @@ function description_editor_html(
  */
 function description_reviews_list_html(
 	array $reviews,
+	string $delete_review_nonce,
 	string $author_id = null,
 	bool $administrator = false ) {
 	$reviews_list = '';
@@ -729,12 +731,13 @@ function description_reviews_list_html(
 			. '?user=' . $review->uid;
 		$delete_button    = '';
 		if ( ! empty( $author_id ) || $administrator ) {
-			if ( $review->uid === $author_id || $administrator ) {
+			if ( ( $review->uid === $author_id ) || $administrator ) {
 				$delete_button .= <<<HTML
 				| 
 					<button 
 						class="action destructive minimal" 
-						data-action="delete-review" 
+						data-action="policyms-delete-review" 
+						data-nonce="{$delete_review_nonce}"
 						data-author-id="{$review->uid}">
 						Delete
 					</button>
@@ -808,6 +811,7 @@ function description_reviews_html(
 	if ( ! empty( $reviews ) ) {
 		$description_reviews_list = description_reviews_list_html(
 			$reviews,
+			$delete_review_nonce,
 			$author_id ?? null,
 			$administrator
 		);
@@ -841,47 +845,50 @@ function description_reviews_html(
 				gmdate( 'Y-m-d H:i:s', strtotime( $existing_review->update_date ) )
 			);
 			$last_submitted       = <<<HTML
-				<p>
+				<p class="discreet">
 					Last submitted {$existing_review_date}
 				</p>
 			HTML;
 			$delete_review_button = <<<HTML
 				<button 
-					class="action destructive" 
+					class="tactile destructive" 
 					data-action="policyms-delete-review" 
 					data-author-id="{$existing_review->uid}"
 					data-nonce="{$delete_review_nonce}">
-					Delete
+					Delete review
 				</button>
 			HTML;
 		}
 		$review_stars = '';
 		for ( $i = 0; $i < 5; $i++ ) {
 			$rating            = $i + 1;
-			$checked_attribute = ( $rating <= ( $existing_review->rating ?? 0 ) ) ? 'checked' : '';
+			$checked_attribute = ( ( $existing_review->rating ?? 0 ) === $rating ) ? 'checked' : '';
 			$review_stars     .= <<<HTML
-			<label>
+			<label {$checked_attribute}>
 				<input type="radio" name="rating" value="{$rating}" {$checked_attribute} required />
 				<span class="fas fa-star"></span>
 			</label>
 			HTML;
 		}
+		$submit_review_label = ! empty( $existing_review ) ? 'Update review' : 'Submit review';
 
 		$description_review_editor .= <<<HTML
 			<form 
 				data-nonce="{$create_review_nonce}"
 				data-action="policyms-add-review"
 				{$update_review_attribute}>
+				<div class="rating">
+					<label for="rating">Rating</label>
+					<div class="stars">
+						{$review_stars}
+					</div>
+				</div>
 				<label for="comment">Comment</label>
 				<textarea name="comment" placeholder="Insert your comment here..">{$existing_comment}</textarea>
-				<label for="rating">Rating</label>
-				<div class="stars">
-					{$review_stars}
-				</div>
-				{$last_submitted}
-				<div class="actions">
+				<div class="actions align-end">
+					{$last_submitted}
 					{$delete_review_button}
-					<button class="action" type="submit">Submit</button>
+					<button class="action" type="submit">{$submit_review_label}</button>
 				</div>
 			</form>
 		HTML;
@@ -1066,7 +1073,7 @@ function description_html(
 		$status       = ( $description->is_approved() ) ? 'approved' : 'pending';
 		$status_label = ( $description->is_approved() ) ? __( 'Approved', 'policyms' ) : __( 'Pending', 'policyms' );
 		$approval_tag = <<<HTML
-			<span class="policyms-status-label" status="{$status}">
+			<span class="pill policyms-status-label" status="{$status}">
 				{$status_label}
 			</span>
 		HTML;
@@ -1152,7 +1159,7 @@ function description_html(
 			$label              = explode( ':', $link, 2 )[0];
 			$description_links .= <<<HTML
 				<li>
-					<a class="button outlined" href="{$url}" target="blank">
+					<a class="button action" href="{$url}" target="blank">
 						{$label}
 					</a>
 				</li>
@@ -1312,8 +1319,6 @@ function description_html(
 					<h1>
 						{$description->information['title']}
 					</h1>
-					{$approval_tag}
-					{$edit_button}
 				</div>
 				<div class="metadata">
 					{$description_metadata_provider}
@@ -1336,6 +1341,12 @@ function description_html(
 					</span>
 					<span class="last-updated">
 						Last updated {$formatted_updated_time}
+					</span>
+					<span>
+						{$approval_tag}
+					</span>
+					<span>
+						{$edit_button}
 					</span>
 				</div>
 			</header>

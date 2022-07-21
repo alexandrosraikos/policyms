@@ -219,7 +219,7 @@ class PolicyMS_Public {
 
 			// Prepare the data and send.
 			http_response_code( 200 );
-			die( ! empty( $data ) ? esc_js( wp_json_encode( $data ) ) : null );
+			die( ! empty( $data ) ? wp_json_encode( $data ) : null );
 		} catch ( PolicyMSUnauthorizedRequestException $e ) {
 			http_response_code( 401 );
 			die( esc_html( $e->getMessage() ) );
@@ -229,9 +229,9 @@ class PolicyMS_Public {
 		} catch ( PolicyMSMissingOptionsException $e ) {
 			http_response_code( 404 );
 			die( esc_html( $e->getMessage() ) );
-		} catch ( \Exception $e ) {
+		} catch ( PolicyMSAPIError $e ) {
 			http_response_code( 500 );
-			die( 'There was an internal error.' );
+			die( $e->getMessage() );
 		}
 	}
 
@@ -1306,7 +1306,7 @@ class PolicyMS_Public {
 	public function create_review_handler() {
 		$this->ajax_handler(
 			function ( $data ) {
-				if ( 'on' === $data['update'] ) {
+				if ( 'true' === $data['update'] ) {
 					PolicyMS_Review::update(
 						sanitize_text_field( wp_unslash( $data['description_id'] ) ),
 						(int) $data['rating'],
