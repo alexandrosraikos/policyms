@@ -131,8 +131,8 @@ window.onload = function () {
             style="padding:30px 20px 0 20px;">
             <form data-action="policyms-keycloak-${registration ? "registration" : "authentication"}">
               <fieldset name="keycloak-account-credentials">
-              <h2>${registration ? "Sign up" : "Sign in"} with PolicyMS</h2>
-              <p>You can ${registration ? "register" : "connect to"} your account using your PolicyMS KeyCloak credentials.</p>
+              <h2>${registration ? "Sign up" : "Sign in"} with PolicyCLOUD</h2>
+              <p>You can ${registration ? "register" : "connect to"} your account using your PolicyCLOUD KeyCloak credentials.</p>
                 <label for="keycloak-username">KeyCloak Username *</label>
                 <input required name="keycloak-username" placeholder="e.g. johndoe" type="text" />
                 <label for="keycloak-password">KeyCloak Password *</label>

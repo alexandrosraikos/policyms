@@ -34,7 +34,7 @@ function user_registration_html(
 	if ( $authenticated ) {
 		return notice_html( "You're already logged in.", 'notice' );
 	} else {
-		$sso_buttons = $oauth_controller->get_all_html();
+		$sso_buttons = $oauth_controller->get_all_html( true );
 		return <<<HTML
 			<div class="policyms policyms-user-registration">
 					<h2>Welcome</h2>
@@ -102,7 +102,7 @@ function user_authentication_html(
 	if ( $authenticated ) {
 		return notice_html( "You're already logged in.", 'notice' );
 	} else {
-		$sso_buttons = $oauth_controller->get_all_html();
+		$sso_buttons = $oauth_controller->get_all_html( false );
 		return <<<HTML
 			<div class="policyms policyms-user-authentication">
 				<form 

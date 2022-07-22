@@ -300,10 +300,10 @@ class PolicyMS_OAuth_Controller {
 	 *
 	 * @since 2.0.0
 	 */
-	public function get_all_html(): string {
+	public function get_all_html( bool $exclusive ): string {
 		$sso_buttons = '';
 		foreach ( self::$supported_services as $sso_id => $sso_service ) {
-			$sso_buttons .= $this->get_html( $sso_id );
+			$sso_buttons .= $this->get_html( $sso_id, $exclusive );
 		}
 
 		return <<<HTML
