@@ -439,6 +439,8 @@ class PolicyMS_Public {
 	 * @param string        $selected_tab The selected tab identifier ID.
 	 * @param bool          $visitor Whether the requester is a visitor.
 	 * @param string        $description_page The description page URL.
+	 * @param string        $description_archive_page The description page archive URL.
+	 * @param string        $description_creation_url The description creation URL.
 	 * @return string The tab content HTML.
 	 *
 	 * @since 2.0.0
@@ -448,6 +450,7 @@ class PolicyMS_Public {
 		string $selected_tab,
 		bool $visitor,
 		string $description_page,
+		string $description_archive_page,
 		string $description_creation_url
 	): string {
 		if ( ! array_key_exists( $selected_tab, PolicyMS_User::$default_tabs ) ) {
@@ -468,6 +471,7 @@ class PolicyMS_Public {
 					$visitor,
 					$user->is_admin(),
 					$description_page,
+					$description_archive_page,
 					$description_creation_url
 				);
 			case 'reviews':
@@ -481,7 +485,8 @@ class PolicyMS_Public {
 				// TODO @alexandrosraikos: Parse review list parameters.
 				return user_approvals_list_html(
 					PolicyMS_Description_Collection::get_pending(),
-					$description_page
+					$description_page,
+					$description_archive_page
 				);
 			case 'profile':
 				return user_profile_details_html(
@@ -562,6 +567,7 @@ class PolicyMS_Public {
 							$selected_tab,
 							$visitor,
 							$urls['description_page'],
+							$urls['archive_page'],
 							$selected_tab === 'descriptions' ? $urls['upload_page'] : ''
 						),
 						$selected_tab,
@@ -769,6 +775,7 @@ class PolicyMS_Public {
 					sanitize_key( $data['tab_identifier'] ),
 					('true' === $data['is_visitor']),
 					self::get_setting( true, 'description_page' ),
+					self::get_setting( true, 'archive_page' ),
 					self::get_setting( true, 'upload_page' )
 				);
 			}

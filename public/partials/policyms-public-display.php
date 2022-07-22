@@ -164,6 +164,8 @@ function show_modal( $inner_html, $controls = false ) {
 
 /**
  *
+ * Get the grouped links fields HTML.
+ *
  * @param array $existing_links The existing links in `title:url` line format.
  *
  * @since 2.0.0
@@ -408,14 +410,17 @@ function show_pagination_html( int $total_pages, $active_page = 1 ):string {
 	if ( $active_page > $total_pages || $active_page < 1 ) {
 		throw new PolicyMSInvalidDataException( 'The page number was invalid.' );
 	}
+	if ( 1 === $total_pages ) {
+		return '';
+	}
 
 	$content_list_pagination_buttons = '';
 	for ( $page = 1; $page <= $total_pages; $page++ ) {
-		$selected                         = ( $page === $active_page ) ? 'selected' : '';
+		$active                           = ( $page === $active_page ) ? 'active' : '';
 		$content_list_pagination_buttons .= <<<HTML
             <button 
                 content-page="{$page}" 
-                class="{$selected} tactile">
+                class="{$active} tactile">
                 {$page}
             </button>
         HTML;

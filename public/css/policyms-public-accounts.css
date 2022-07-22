@@ -356,68 +356,78 @@
 li.policyms-user-description {
   overflow: hidden;
   display: block;
-  padding: 15px 10px;
-  border-top: 1px solid var(--policyms-border-color-light);
-  margin: 5px 0;
+  padding: 0 0 20px 0;
+  border-bottom: 1px solid var(--policyms-border-color-light);
+  margin: 10px 0;
   animation: sweep-in 0.3s ease-in-out forwards;
 }
 
-li.policyms-user-description > .container > a {
+li.policyms-user-description > div > a {
   display: block !important;
   text-decoration: none;
   border-radius: 10px;
+  padding: 0 !important;
+  margin: 0 !important;
   transition: all 0.2s ease-in-out;
 }
 
-li.policyms-user-description > .container > a > h4 {
+li.policyms-user-description > div > a > h4 {
   margin-bottom: 10px;
+  font-weight: bold;
 }
 
-li.policyms-user-description > .container > p {
+li.policyms-user-description > div > p {
   color: var(--policyms-text-color-secondary);
   font-size: 80%;
 }
 
-li.policyms-user-description > .container > .metadata {
+li.policyms-user-description > div > .metadata {
   margin-top: 10px;
   color: var(--policyms-text-color-secondary);
-  font-size: 70%;
+  font-size: 11pt;
 }
 
-li.policyms-user-description > .container > .metadata a:last-of-type,
-li.policyms-user-description > .container > .metadata span {
+li.policyms-user-description > div > .metadata > *:not([class])::after {
+  content: "|";
+  display: inline-block;
+  margin-left: 8px;
+  opacity: 0.7;
+}
+
+li.policyms-user-description > div > .metadata a:last-of-type,
+li.policyms-user-description > div > .metadata span {
   display: inline-block;
   margin-right: 8px;
 }
 
 /* Reviews tab */
 
-li.policyms-user-review-listed > .container > .rating {
+li.policyms-user-review-listed > div > .rating {
   display: flex;
   justify-content: flex-start;
   align-items: center;
 }
 
-li.policyms-user-review-listed > .container > .rating span:first-of-type {
+li.policyms-user-review-listed > div > .rating span:first-of-type {
   font-size: 32px;
   font-weight: bold;
 }
 
-li.policyms-user-review-listed > .container > .rating span:last-of-type {
+li.policyms-user-review-listed > div > .rating span:last-of-type {
   margin-left: 10px;
   color: var(--policyms-text-color-secondary);
   font-size: 16px;
 }
-li.policyms-user-review-listed > .container > p {
+li.policyms-user-review-listed > div > p {
   margin: 15px 0;
   color: var(--policyms-text-color);
 }
 
-li.policyms-user-review-listed > .container > a {
+li.policyms-user-review-listed > div > a {
   text-decoration: none;
 }
 
-li.policyms-user-review-listed > .container > .metadata {
+li.policyms-user-review-listed > div > .metadata {
   margin-top: 10px;
   font-size: 14px;
 }
