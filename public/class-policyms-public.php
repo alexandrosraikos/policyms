@@ -195,7 +195,7 @@ class PolicyMS_Public {
 	private function ajax_handler( $completion ) {
 		if ( ! isset( $_POST['action'] ) || ! isset( $_POST['nonce'] ) ) {
 			http_response_code( 400 );
-			die( 'The required WordPress fields were not specified.' );
+			die( 'The required fields were not specified.' );
 		}
 
 		// Verify the action related nonce.

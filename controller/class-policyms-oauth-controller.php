@@ -188,7 +188,7 @@ class PolicyMS_OAuth_Controller {
 				$nonce = wp_create_nonce( 'policyms_account_disconnect_google' );
 				return <<<HTML
 					<button 
-						class="action destructive minimal" 
+						class="action destructive" 
 						data-action="policyms-disconnect-google"
 						data-nonce="{$nonce}"
 						data-redirect={$reset_password_url}
@@ -201,7 +201,7 @@ class PolicyMS_OAuth_Controller {
 				$nonce = wp_create_nonce( 'policyms_account_disconnect_keycloak' );
 				return <<<HTML
 					<button 
-						class="action destructive minimal" 
+						class="action destructive" 
 						data-action="policyms-disconnect-keycloak" 
 						data-nonce="{$nonce}"
 						data-redirect={$reset_password_url}
@@ -214,7 +214,7 @@ class PolicyMS_OAuth_Controller {
 				$nonce = wp_create_nonce( 'policyms_account_disconnect_egi' );
 				return <<<HTML
 					<button 
-						class="action destructive minimal" 
+						class="action destructive" 
 						data-action="policyms-disconnect-egi" 
 						data-nonce="{$nonce}"
 						data-redirect={$reset_password_url}

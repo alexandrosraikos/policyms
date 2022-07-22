@@ -222,10 +222,7 @@
 }
 
 .policyms-user > aside.sidebar > nav button .pill {
-  display: inline-block;
   margin-left: 4px;
-  font-size: 75%;
-  font-weight: bold;
 }
 
 .policyms-user > aside.sidebar > nav > hr {
@@ -402,6 +399,13 @@ li.policyms-user-description > div > .metadata span {
 
 /* Reviews tab */
 
+li.policyms-user-review-listed {
+  list-style-type: none;
+  border-bottom: 1px solid var(--policyms-border-color-light);
+  padding: 0 0 20px 0;
+  margin: 0 0 10px 0 !important;
+}
+
 li.policyms-user-review-listed > div > .rating {
   display: flex;
   justify-content: flex-start;
@@ -425,31 +429,54 @@ li.policyms-user-review-listed > div > p {
 
 li.policyms-user-review-listed > div > a {
   text-decoration: none;
+  font-weight: bold;
 }
 
 li.policyms-user-review-listed > div > .metadata {
-  margin-top: 10px;
-  font-size: 14px;
+  margin-top: 15px;
 }
 
 /* Information tab */
 
-.policyms-user-profile > form.container > table.information {
+.policyms-user-profile > header {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.policyms-user-profile > header > h2 {
+  margin: 0;
+}
+
+.policyms-user-profile > form > table.information {
   margin-top: 20px;
-  font-size: 80%;
 }
 
 .policyms-user-profile
-  > form.container
+  > form
   > table.information
+  > tbody
   > tr
   > td:first-of-type {
-  max-width: 80px;
+  width: 240px;
   font-weight: bold;
+  font-size: 12pt !important;
+  padding-right: 20px;
+}
+
+.policyms-user-profile > form > table.information > tbody > tr > td {
+  padding: 10px;
+  border-bottom: 1px solid var(--policyms-border-color-light);
 }
 
 .policyms-user-profile > form .folding {
-  display: none;
+  display: none !important;
+}
+
+.policyms-user-profile > form .folding.visible {
+  display: table-cell !important;
 }
 
 .policyms-user-profile > form .critical-action {
@@ -461,9 +488,12 @@ li.policyms-user-review-listed > div > .metadata {
   animation: sweep-in 0.3s ease-in-out;
 }
 
-.policyms-user-profile > form .folding.visible {
-  display: table-cell;
-  animation: sweep-in 0.3s ease-in-out;
+.policyms-user-profile > form > .actions {
+  justify-content: flex-end;
+}
+
+.policyms-user-profile > form > .actions > * {
+  margin-right: 0 !important;
 }
 
 .policyms-user-profile > form td:first-of-type {
@@ -480,9 +510,8 @@ li.policyms-user-review-listed > div > .metadata {
   border-radius: 5px;
 }
 
-.policyms-user-profile > form label {
-  font-size: 80%;
-  opacity: 0.8;
+.policyms-user-profile > form .pill {
+  margin-left: 6px;
 }
 
 .policyms-user-profile > form .socials input {
@@ -550,9 +579,7 @@ li.policyms-user-review-listed > div > .metadata {
   text-decoration: underline;
 }
 
-.policyms-user-profile
-  > form[data-action="policyms-delete-account"]
-  > button[type="submit"] {
+.policyms-user-profile > form[data-action="policyms-delete-account"] > div {
   display: none;
 }
 

@@ -24,7 +24,7 @@
   --policyms-background-notice: var(--policyms-highlight-color-mid);
   --policyms-background-notice-outline: var(--policyms-highlight-color-mid);
   --policyms-background-failure: #e73d3d;
-  --policyms-background-failure-outline: #e73d3d;
+  --policyms-background-failure-outline: #bc1414;
   --policyms-background-warning: #fffce8;
   --policyms-background-warning-outline: #dfaf2b;
   --policyms-star-color: #dfaf2b;
@@ -124,9 +124,12 @@
 }
 
 .policyms button.action.destructive {
-  background-color: var(--policyms-background-failure) !important;
-  border-color: var(--policyms-background-failure-outline);
-  color: var(--policyms-text-color-invert) !important;
+  background: var(--policyms-background-failure-outline) !important;
+  background: linear-gradient(
+    307deg,
+    var(--policyms-background-failure) 0%,
+    var(--policyms-background-failure-outline) 99%
+  ) !important;
 }
 .policyms button.action.minimal.destructive {
   background-color: transparent !important;
@@ -262,7 +265,7 @@
 }
 
 .policyms .pill.small {
-  font-weight: 10pt;
+  font-size: 10pt;
   padding: 1px 10px;
 }
 
@@ -859,6 +862,8 @@
   align-items: flex-end;
   justify-content: flex-end;
   width: 100%;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--policyms-border-color-light);
 }
 
 .policyms-content-list > header > form {
@@ -887,9 +892,8 @@
 
 .policyms-content-list > .policyms-filter-content-list {
   padding: 15px 0;
-  border-top: 1px solid var(--policyms-border-color-light);
   border-bottom: 1px solid var(--policyms-border-color-light);
-  margin: 20px 0;
+  margin: 0;
   font-size: 75%;
   font-weight: bold;
 }

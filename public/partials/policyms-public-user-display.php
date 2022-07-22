@@ -23,19 +23,19 @@
  * @author  Alexandros Raikos <alexandros@araikos.gr>
  */
 function user_registration_html(
-    bool $authenticated,
-    string $nonce,
-    string $authentication_url,
-    string $account_page_url,
-    string $tos_url,
-    PolicyMS_OAuth_Controller $oauth_controller
+	bool $authenticated,
+	string $nonce,
+	string $authentication_url,
+	string $account_page_url,
+	string $tos_url,
+	PolicyMS_OAuth_Controller $oauth_controller
 
 ) {
-    if ( $authenticated ) {
-        return notice_html( "You're already logged in.", 'notice' );
-    } else {
-        $sso_buttons = $oauth_controller->get_all_html( true );
-        return <<<HTML
+	if ( $authenticated ) {
+		return notice_html( "You're already logged in.", 'notice' );
+	} else {
+		$sso_buttons = $oauth_controller->get_all_html( true );
+		return <<<HTML
             <div class="policyms policyms-user-registration">
                     <h2>Welcome</h2>
                     <p>Create an account and start working with policy materials today.</p>
@@ -74,7 +74,7 @@ function user_registration_html(
                 <p>Already have an account? Please <a class="underline" href="{$authentication_url}">sign in</a>.</p>
             </div>
         HTML;
-    }
+	}
 }
 
 /**
@@ -92,18 +92,18 @@ function user_registration_html(
  * @author Alexandros Raikos <alexandros@araikos.gr>
  */
 function user_authentication_html(
-    string $nonce,
-    string $home_url,
-    string $registration_url,
-    string $reset_password_page_url,
-    PolicyMS_OAuth_Controller $oauth_controller,
-    bool $authenticated
-    ) {
-    if ( $authenticated ) {
-        return notice_html( "You're already logged in.", 'notice' );
-    } else {
-        $sso_buttons = $oauth_controller->get_all_html( false );
-        return <<<HTML
+	string $nonce,
+	string $home_url,
+	string $registration_url,
+	string $reset_password_page_url,
+	PolicyMS_OAuth_Controller $oauth_controller,
+	bool $authenticated
+	) {
+	if ( $authenticated ) {
+		return notice_html( "You're already logged in.", 'notice' );
+	} else {
+		$sso_buttons = $oauth_controller->get_all_html( false );
+		return <<<HTML
             <div class="policyms policyms-user-authentication">
                 <form 
                     data-action="policyms-user-authentication"
@@ -129,7 +129,7 @@ function user_authentication_html(
                     <p>Don't have an account yet? You can <a class="underline" href="{$registration_url}">register</a> for free now. If you have forgotten your credentials, you can <a class="underline" href="{$reset_password_page_url}">reset your password.</a></p>
             </div>
         HTML;
-    }
+	}
 }
 
 /**
@@ -143,10 +143,10 @@ function user_authentication_html(
  * @author Alexandros Raikos <alexandros@araikos.gr>
  */
 function user_password_reset_html( $authenticated, $nonce ) {
-    if ( $authenticated ) {
-        return show_lock( 'You are already logged in.', 'notice' );
-    } else {
-        return <<<HTML
+	if ( $authenticated ) {
+		return show_lock( 'You are already logged in.', 'notice' );
+	} else {
+		return <<<HTML
             <div class="policyms policyms-password-reset">
                         <h2>Reset your password</h2>
                         <p>Insert your e-mail address below and we will contact you with instructions to reset your password.</p>
@@ -166,7 +166,7 @@ function user_password_reset_html( $authenticated, $nonce ) {
                 </form>
             </div>
         HTML;
-    }
+	}
 }
 
 /**
@@ -180,27 +180,27 @@ function user_password_reset_html( $authenticated, $nonce ) {
  * @author Alexandros Raikos <alexandros@araikos.gr>
  */
 function user_overview_html( array $information, array $statistics ): string {
-    $about = $information['about'] ?? '';
-    $links = '';
-    if ( !empty($information['social'][0]) ) {
-        $links = '<ul>';
-        foreach ( $information['social'] as $link ) {
-            $link_title = explode( ':', $link, 2 )[0];
-            $link_url   = explode( ':', $link, 2 )[1];
-            $links     .= <<<HTML
+	$about = $information['about'] ?? '';
+	$links = '';
+	if ( ! empty( $information['social'][0] ) ) {
+		$links = '<ul>';
+		foreach ( $information['social'] as $link ) {
+			$link_title = explode( ':', $link, 2 )[0];
+			$link_url   = explode( ':', $link, 2 )[1];
+			$links     .= <<<HTML
              <li>
                 <a href="{$link_url}" target="blank">
                     {$link_title}
                 </a>
             </li>';
             HTML;
-        }
-        $links = '</ul>';
-    }
+		}
+		$links = '</ul>';
+	}
 
-    $statistics_html = '';
-    if ( !empty($statistics) ) {
-        $statistics_html .= <<<HTML
+	$statistics_html = '';
+	if ( ! empty( $statistics ) ) {
+		$statistics_html .= <<<HTML
         <div class="section-title">
             <h3>Statistics</h3>
             <hr/>
@@ -248,22 +248,22 @@ function user_overview_html( array $information, array $statistics ): string {
             </tr>
         </table>
         HTML;
-    } else {
-        $statistics_html = notice_html( 'Statistics for this user are currently unavailable.', 'notice' );
-    }
+	} else {
+		$statistics_html = notice_html( 'Statistics for this user are currently unavailable.', 'notice' );
+	}
 
-    $about_html = '';
-    if (!empty($about)) {
-        $about_html = <<<HTML
+	$about_html = '';
+	if ( ! empty( $about ) ) {
+		$about_html = <<<HTML
             <div class="section-title">
                 <h3>About</h3>
                 <hr/>
             </div>
             <p>{$about}</p>
         HTML;
-    }
+	}
 
-    return <<<HTML
+	return <<<HTML
         <section class="policyms policyms-user-overview">
             <header>
                 <h2>Overview</h2>
@@ -284,7 +284,7 @@ function user_overview_html( array $information, array $statistics ): string {
  * @param bool                            $visitor Whether the requester is a visitor.
  * @param bool                            $administrator Whether the requester is aan administrator.
  * @param string                          $description_url_base The base url for the single description page.
- * @param string $description_archive_url The base url for the description archive
+ * @param string                          $description_archive_url The base url for the description archive.
  * @param ?string                         $creation_url The URL of the creation page of a given type.
  * @param int                             $active_page The currently selected page, if any.
  * @param ?string                         $active_category  The selected category, if any.
@@ -296,38 +296,39 @@ function user_overview_html( array $information, array $statistics ): string {
  * @author Alexandros Raikos <alexandros@araikos.gr>
  */
 function user_descriptions_list_html(
-    PolicyMS_Description_Collection $descriptions,
-    bool $visitor,
-    bool $administrator,
-    string $description_url_base,
-    string $description_archive_url,
-    ?string $creation_url = null,
-    int $active_page = 1,
-    ?string $active_category = null,
-    string $sorting = 'newest',
-    int $sizing = 12
+	PolicyMS_Description_Collection $descriptions,
+	bool $visitor,
+	bool $administrator,
+	string $description_url_base,
+	string $description_archive_url,
+	?string $creation_url = null,
+	int $active_page = 1,
+	?string $active_category = null,
+	string $sorting = 'newest',
+	int $sizing = 12
 ): string {
-    $description_list = content_list_html(
-        $visitor,
-        'PolicyMS_Description',
-        $descriptions->get_page( $active_page ),
-        function ( $description ) use ( $description_url_base, $description_archive_url, $visitor, $administrator ) {
-            $updated_date_unix      = strtotime( $description->metadata['uploadDate'] );
-            $updated_date_formatted = time_elapsed_string(
-                gmdate( 'Y-m-d H:i:s', strtotime( $description->metadata['updateDate'] ) )
-            );
-            $status_label           = '';
-            if ( ! $visitor || $administrator ) {
-                $status_label_class = ( 1 === $description->metadata['approved'] ) ? 'success' : 'notice';
-                $status_label_text  = ( 1 === $description->metadata['approved'] ) ? 'Approved' : 'Pending';
-                $status_label       = <<<HTML
+	$description_list = content_list_html(
+		$visitor,
+		'PolicyMS_Description',
+		$descriptions->get_page( $active_page ),
+		function ( $description ) use ( $description_url_base, $description_archive_url, $visitor, $administrator ) {
+			$updated_date_unix      = strtotime( $description->metadata['uploadDate'] );
+			$updated_date_formatted = time_elapsed_string(
+				gmdate( 'Y-m-d H:i:s', strtotime( $description->metadata['updateDate'] ) )
+			);
+			$status_label           = '';
+			if ( ! $visitor || $administrator ) {
+				$status_label_class = ( 1 === $description->metadata['approved'] ) ? 'success' : 'notice';
+				$status_label_text  = ( 1 === $description->metadata['approved'] ) ? 'Approved' : 'Pending';
+				$status_label       = <<<HTML
                 <span class="label {$status_label_class}">
                     {$status_label_text}
                 </span>
                 HTML;
-            }
-            // TODO @alexandrosraikos: Add 'Keywords' (#128).
-            return <<<HTML
+			}
+			$category_label = PolicyMS_Description::$categories[ $description->type ];
+			// TODO @alexandrosraikos: Add 'Keywords' (#128).
+			return <<<HTML
             <li 
                 class="policyms-user-description"
                 data-type-filter="{$description->type}" 
@@ -341,7 +342,7 @@ function user_descriptions_list_html(
                     </a>
                     <p>{$description->information['short_desc']}</p>
                     <div class="metadata">
-                        <a href="{$description_archive_url}?type={$description->type}"  class="pill">{$description->type}</a>
+                        <a href="{$description_archive_url}?type={$description->type}"  class="pill">{$category_label}</a>
                         <span>
                             <span class="fas fa-star"></span> {$description->metadata['reviews']['average_rating']} ({$description->metadata['reviews']['no_reviews']} reviews)
                         </span>
@@ -354,17 +355,17 @@ function user_descriptions_list_html(
                 </div>
             </li>
             HTML;
-        },
-        $descriptions->total_pages,
-        PolicyMS_Description::$categories,
-        $active_page,
-        $active_category,
-        $sorting,
-        $sizing,
-        $creation_url
-    );
+		},
+		$descriptions->total_pages,
+		PolicyMS_Description::$categories,
+		$active_page,
+		$active_category,
+		$sorting,
+		$sizing,
+		$creation_url
+	);
 
-    return <<<HTML
+	return <<<HTML
         <section class="policyms policyms-user-descriptions">
             <h2>Descriptions</h2>
             {$description_list}
@@ -387,23 +388,23 @@ function user_descriptions_list_html(
  * @author Alexandros Raikos <alexandros@araikos.gr>
  */
 function user_reviews_list_html(
-    array $reviews,
-    bool $visitor,
-    string $single_url,
-    int $active_page = 1,
-    string $sorting = 'newest',
-    int $sizing = 12
+	array $reviews,
+	bool $visitor,
+	string $single_url,
+	int $active_page = 1,
+	string $sorting = 'newest',
+	int $sizing = 12
 ): string {
-    $review_list = content_list_html(
-        $visitor,
-        'PolicyMS_Review',
-        $reviews['content'] ?? array(),
-        function ( $review ) use ( $single_url ) {
-            $updated_date_unix      = strtotime( $review->update_date );
-            $updated_date_formatted = time_elapsed_string(
-                gmdate( 'Y-m-d H:i:s', strtotime( $review->update_date ) )
-            );
-            return <<<HTML
+	$review_list = content_list_html(
+		$visitor,
+		'PolicyMS_Review',
+		$reviews['content'][0] ?? array(),
+		function ( $type, $review ) use ( $single_url ) {
+			$updated_date_unix      = strtotime( $review->update_date );
+			$updated_date_formatted = time_elapsed_string(
+				gmdate( 'Y-m-d H:i:s', strtotime( $review->update_date ) )
+			);
+			return <<<HTML
                 <li 
                     class="policyms-user-review-listed"
                     data-type-filter="{$review->description_collection}" 
@@ -417,26 +418,26 @@ function user_reviews_list_html(
                             <span>
                                 Posted {$updated_date_formatted}</span>
                         </div>
-                        <p>"{$review->comment}"</p>
+                        <p><em>"{$review->comment}"</em></p>
                         <a href="{$single_url}?did={$review->description_id}#reviews">
-                            <h4>{$review->description_title}</h4>
+                             {$review->description_title}
                         </a>
                         <div class="metadata">
-                            <a class="pill">{$review->description_collection}</a>
+                            <a class="pill small">{$review->description_collection}</a>
                         </div>
                     </div>
                 </li>
             HTML;
-        },
-        $reviews['pages'] ?? 1,
-        null,
-        $active_page,
-        'newest',
-        $sorting,
-        $sizing
-    );
+		},
+		$reviews['pages'] ?? 1,
+		null,
+		$active_page,
+		'newest',
+		$sorting,
+		$sizing
+	);
 
-    return <<<HTML
+	return <<<HTML
         <section class="policyms policyms-user-reviews">
             <h2>Reviews</h2>
             {$review_list}
@@ -450,7 +451,7 @@ function user_reviews_list_html(
  *
  * @param PolicyMS_Description_Collection $approvals The list of the user's PolicyMS_Description instances to be approved.
  * @param string                          $description_url_base The base url for the single description page.
- * @param string $description_archive_url The base url for the description archive
+ * @param string                          $description_archive_url The base url for the description archive.
  * @param int                             $active_page The currently selected page, if any.
  * @param ?string                         $active_category  The selected category, if any.
  * @param ?string                         $sorting  The selected item sorting, if any.
@@ -461,25 +462,26 @@ function user_reviews_list_html(
  * @author Alexandros Raikos <alexandros@araikos.gr>
  */
 function user_approvals_list_html(
-    PolicyMS_Description_Collection $approvals,
-    string $description_url_base,
-    string $description_archive_url,
-    int $active_page = 1,
-    string $active_category = null,
-    string $sorting = 'newest',
-    int $sizing = 12
+	PolicyMS_Description_Collection $approvals,
+	string $description_url_base,
+	string $description_archive_url,
+	int $active_page = 1,
+	string $active_category = null,
+	string $sorting = 'newest',
+	int $sizing = 12
 ) {
-    $description_list = content_list_html(
-        false,
-        'PolicyMS_Description',
-        $approvals->get_page( $active_page ),
-        function ( $type, $description ) use ( $description_url_base, $description_archive_url ) {
-            $updated_date_unix      = strtotime( $description->metadata['uploadDate'] );
-            $updated_date_formatted = time_elapsed_string(
-                gmdate( 'Y-m-d H:i:s', strtotime( $description->metadata['updateDate'] ) )
-            );
-            // TODO @alexandrosraikos: Add 'Keywords' (#128).
-            return <<<HTML
+	$description_list = content_list_html(
+		false,
+		'PolicyMS_Description',
+		$approvals->get_page( $active_page ),
+		function ( $type, $description ) use ( $description_url_base, $description_archive_url ) {
+			$updated_date_unix      = strtotime( $description->metadata['uploadDate'] );
+			$updated_date_formatted = time_elapsed_string(
+				gmdate( 'Y-m-d H:i:s', strtotime( $description->metadata['updateDate'] ) )
+			);
+			// TODO @alexandrosraikos: Add 'Keywords' (#128).
+			$category_label = PolicyMS_Description::$categories[ $description->type ];
+			return <<<HTML
             <li 
                 class="policyms-user-description"
                 data-type-filter="{$description->type}" 
@@ -494,7 +496,7 @@ function user_approvals_list_html(
                     <p>{$description->information['short_desc']}</p>
                     <div class="metadata">
                         <a href="{$description_archive_url}?type={$description->type}" class="pill">
-                            {$description->type}
+                            {$category_label}
                         </a>
                         <span>
                             <span class="fas fa-star"></span> {$description->metadata['reviews']['average_rating']} ({$description->metadata['reviews']['no_reviews']} reviews)
@@ -510,16 +512,16 @@ function user_approvals_list_html(
                 </div>
             </li>
             HTML;
-        },
-        $approvals->total_pages,
-        PolicyMS_Description::$categories,
-        $active_page,
-        $active_category,
-        $sorting,
-        $sizing
-    );
+		},
+		$approvals->total_pages,
+		PolicyMS_Description::$categories,
+		$active_page,
+		$active_category,
+		$sorting,
+		$sizing
+	);
 
-    return <<<HTML
+	return <<<HTML
         <section class="policyms policyms-user-approvals">
             <h2>Approvals</h2>
             {$description_list}
@@ -544,35 +546,35 @@ function user_approvals_list_html(
  * @since 2.0.0
  */
 function user_profile_details_html(
-    PolicyMS_User $user,
-    bool $visitor,
-    bool $administrator,
-    string $profile_image_blob,
-    PolicyMS_OAuth_Controller $oauth_controller,
-    string $editing_nonce = '',
-    string $verification_nonce = '',
-    string $deletion_nonce = '',
-    string $data_copy_nonce = ''
+	PolicyMS_User $user,
+	bool $visitor,
+	bool $administrator,
+	string $profile_image_blob,
+	PolicyMS_OAuth_Controller $oauth_controller,
+	string $editing_nonce = '',
+	string $verification_nonce = '',
+	string $deletion_nonce = '',
+	string $data_copy_nonce = ''
 ): string {
 
-    // The account information editing button.
-    $edit_button = '';
-    if ( ! $visitor || $administrator ) {
-        $edit_button = <<<HTML
-            <button data-action="policyms-account-edit-toggle">
+	// The account information editing button.
+	$edit_button = '';
+	if ( ! $visitor || $administrator ) {
+		$edit_button = <<<HTML
+            <button class="action small" data-action="policyms-account-edit-toggle">
                 <span class="fas fa-pen"></span> Edit
             </button>
         HTML;
-    }
+	}
 
-    // The profile picture selector.
-    $picture_editor = '';
-    if ( $administrator || ! $visitor ) {
-        $existing_picture = '';
-        if ( $user->picture ) {
-            $delete_picture = '';
-            if ( 'default_image_users' !== $user->preferences['profile_image'] ) {
-                $delete_picture = <<<HTML
+	// The profile picture selector.
+	$picture_editor = '';
+	if ( $administrator || ! $visitor ) {
+		$existing_picture = '';
+		if ( $user->picture ) {
+			$delete_picture = '';
+			if ( 'default_image_users' !== $user->preferences['profile_image'] ) {
+				$delete_picture = <<<HTML
                     <button 
                         type="button" 
                         data-action="delete-picture" 
@@ -580,15 +582,15 @@ function user_profile_details_html(
                         Remove
                     </button>
                 HTML;
-            }
-            $existing_picture = <<<HTML
+			}
+			$existing_picture = <<<HTML
             <div class="file-editor" data-name="profile-picture">
                 <img class="file" src="{$profile_image_blob}" draggable="false" />
                 {$delete_picture}
             </div>
             HTML;
-        }
-        $picture_editor = <<<HTML
+		}
+		$picture_editor = <<<HTML
             <tr>
                 <td class="folding">
                     <span>Profile picture</span>
@@ -604,13 +606,13 @@ function user_profile_details_html(
                 </td>
             </tr>
         HTML;
-    }
+	}
 
-    // 'About' field editor.
-    $about_field = '';
-    if ( ! $visitor || $administrator ) {
-        $about       = $user->information['about'] ?? '';
-        $about_field = <<<HTML
+	// 'About' field editor.
+	$about_field = '';
+	if ( ! $visitor || $administrator ) {
+		$about       = $user->information['about'] ?? '';
+		$about_field = <<<HTML
             <textarea 
                 name="about" 
                 class="folding" 
@@ -619,56 +621,55 @@ function user_profile_details_html(
                 {$about}
             </textarea>
         HTML;
-    }
+	}
 
-    // 'Links' fields and editor.
-    $links = '';
-    if ( !empty($user->information['social'][0] )) {
-        foreach ( $user->information['social'] as $link ) {
-            $link_title = explode( ':', $link, 2 )[0];
-            $link_url   = explode( ':', $link, 2 )[1];
-            $links     .= <<<HTML
+	// 'Links' fields and editor.
+	$links = '';
+	if ( ! empty( $user->information['social'][0] ) ) {
+		foreach ( $user->information['social'] as $link ) {
+			$link_title = explode( ':', $link, 2 )[0];
+			$link_url   = explode( ':', $link, 2 )[1];
+			$links     .= <<<HTML
                 <a href="{$link_url}" target="blank">{$link_title}</a><br/>
             HTML;
-        }
-    }
-    $links_editor = '';
-    if ( ! $visitor || $administrator ) {
-        $links_editor .= <<<HTML
+		}
+	}
+	$links_editor = '';
+	if ( ! $visitor || $administrator ) {
+		$links_editor .= <<<HTML
             <div class="socials folding">
                 <div>
         HTML;
-        if (!empty($user->information['social'][0] )) {
-            foreach ( $user->information['social'] as $link ) {
-                $link_title    = explode( ':', $link, 2 )[0];
-                $link_url      = explode( ':', $link, 2 )[1];
-                $links_editor .= <<<HTML
+		if ( ! empty( $user->information['social'][0] ) ) {
+			foreach ( $user->information['social'] as $link ) {
+				$link_title    = explode( ':', $link, 2 )[0];
+				$link_url      = explode( ':', $link, 2 )[1];
+				$links_editor .= <<<HTML
                 <div>
                     <input type="text" name="socials-title[]" placeholder="Example" value="{$link_title}" />
                     <input type="url" name="socials-url[]" placeholder="https://www.example.org/" value="{$link_url}" />
                     <button class="remove-field" title="Remove this link."><span class="fas fa-times"></span></button>
                 </div>
                 HTML;
-            }
-        }
-        $links_editor .= <<<HTML
+			}
+		}
+		$links_editor .= <<<HTML
                 </div>
                 <button class="add-field" title="Add another link."><span class="fas fa-plus"></span> Add link</button>
             </div>
         HTML;
-    }
+	}
 
-    // 'Password' editor.
-    $password_editor = '';
-    if ( ! $visitor ) {
-        $password_value = '';
-        if ('0' === $user->metadata['password_protected']) {
-            $password_value = '<span class="folding visible"><em>(Not yet set)</em></span>';
-        }
-        else {
-            $password_value = '<span class="folding visible">*****************</span>';
-        }
-        $password_editor = <<<HTML
+	// 'Password' editor.
+	$password_editor = '';
+	if ( ! $visitor ) {
+		$password_value = '';
+		if ( '0' === $user->metadata['password_protected'] ) {
+			$password_value = '<span class="folding visible"><em>(Not yet set)</em></span>';
+		} else {
+			$password_value = '<span class="folding visible">*****************</span>';
+		}
+		$password_editor = <<<HTML
         <tr>
             <td>
                 Password
@@ -680,24 +681,24 @@ function user_profile_details_html(
             </td>
         </tr>
         HTML;
-    }
+	}
 
-    // 'Role' field.
-    $role = ( 'admin' === $user->metadata['role'] ) ? 'Administrator' : 'User';
+	// 'Role' field.
+	$role = ( 'admin' === $user->metadata['role'] ) ? 'Administrator' : 'User';
 
-    // 'Full name' fields.
-    $full_name        = ( ( ( $user->information['title'] ?? '-' ) === '-' ) ? '' : $user->information['title'] ) . ' ';
-    $full_name       .= ( $user->information['name'] ) . ' ' . ( $user->information['surname'] );
-    $full_name_editor = '';
-    if ( ! $visitor || $administrator ) {
-        $full_name_title_options = '';
-        foreach ( PolicyMS_User::$titles as $id => $title ) {
-            $selected                 = $id === $user->information['title'] ? 'selected' : '';
-            $full_name_title_options .= <<<HTML
+	// 'Full name' fields.
+	$full_name        = ( ( ( $user->information['title'] ?? '-' ) === '-' ) ? '' : $user->information['title'] ) . ' ';
+	$full_name       .= ( $user->information['name'] ) . ' ' . ( $user->information['surname'] );
+	$full_name_editor = '';
+	if ( ! $visitor || $administrator ) {
+		$full_name_title_options = '';
+		foreach ( PolicyMS_User::$titles as $id => $title ) {
+			$selected                 = $id === $user->information['title'] ? 'selected' : '';
+			$full_name_title_options .= <<<HTML
                 <option value="{$id}" {$selected}>{$title}</option>"
             HTML;
-        }
-        $full_name_editor .= <<<HTML
+		}
+		$full_name_editor .= <<<HTML
             <select class="folding" name="title">
                 {$full_name_title_options}
             </select>
@@ -716,31 +717,31 @@ function user_profile_details_html(
                 value="{$user->information['surname']}" 
                 required />
         HTML;
-    }
+	}
 
-    // 'Gender' fields.
-    $gender_title  = PolicyMS_User::$genders[ $user->information['gender'] ];
-    $gender_editor = '';
-    if ( ! $visitor || $administrator ) {
-        $gender_editor_options = '';
-        foreach ( PolicyMS_User::$genders as $id => $gender ) {
-            $selected               = $id === $user->information['gender'] ? 'selected' : '';
-            $gender_editor_options .= <<<HTML
+	// 'Gender' fields.
+	$gender_title  = PolicyMS_User::$genders[ $user->information['gender'] ];
+	$gender_editor = '';
+	if ( ! $visitor || $administrator ) {
+		$gender_editor_options = '';
+		foreach ( PolicyMS_User::$genders as $id => $gender ) {
+			$selected               = $id === $user->information['gender'] ? 'selected' : '';
+			$gender_editor_options .= <<<HTML
                 <option value="{$id}" {$selected}>$gender</option>
             HTML;
-        }
-        $gender_editor = <<<HTML
+		}
+		$gender_editor = <<<HTML
             <select name="gender" class="folding">
                 {$gender_editor_options}
             </select>
         HTML;
-    }
+	}
 
-    // 'Organization' fields.
-    $organization        = $user->information['organization'] ?? '-';
-    $organization_editor = '';
-    if ( ! $visitor || $administrator ) {
-        $organization_editor = <<<HTML
+	// 'Organization' fields.
+	$organization        = $user->information['organization'] ?? '-';
+	$organization_editor = '';
+	if ( ! $visitor || $administrator ) {
+		$organization_editor = <<<HTML
             <input 
                 class="folding" 
                 type="text" 
@@ -748,14 +749,14 @@ function user_profile_details_html(
                 value="{$organization}" 
                 placeholder="Insert your organization here" />
         HTML;
-    }
+	}
 
-    // 'Email' fields.
-    $email_information = '';
-    if ( $user->information['email'] || ! $visitor ) {
-        $email_verification = '';
-        if ( '1' !== $user->metadata['verified'] && ! $visitor ) {
-            $email_verification = <<<HTML
+	// 'Email' fields.
+	$email_information = '';
+	if ( $user->information['email'] || ! $visitor ) {
+		$email_verification = '';
+		if ( '1' !== $user->metadata['verified'] && ! $visitor ) {
+			$email_verification = <<<HTML
                 <span class="unverified">(Unverified)</span>
                 <button 
                     data-action="policyms-resend-verification-email"
@@ -763,26 +764,25 @@ function user_profile_details_html(
                     Resend verification email
                 </button>
             HTML;
-        } else {
-            if ( ! $visitor || $administrator ) {
-                $email_verification_status_class = 0 === $user->preferences['public_email'] ? 'notice' : 'success';
-                $email_verification_status       = PolicyMS_Account::$privacy_switches[ $user->preferences['public_email'] ];
-                $email_verification              = <<<HTML
-                    <span class="label {$email_verification_status_class}">{$email_verification_status}</span>
+		} else {
+			if ( ! $visitor || $administrator ) {
+				$email_verification_status       = PolicyMS_Account::$privacy_switches[ $user->preferences['public_email'] ];
+				$email_verification              = <<<HTML
+                    <span class="pill">{$email_verification_status}</span>
                 HTML;
-            }
-        }
+			}
+		}
 
-        $email_editor = '';
-        if ( ! $visitor || $administrator ) {
-            $email_privacy_options = '';
-            foreach ( PolicyMS_Account::$privacy_switches as $id => $label ) {
-                $selected               = $id === $user->preferences['public_email'] ? 'selected' : '';
-                $email_privacy_options .= <<<HTML
+		$email_editor = '';
+		if ( ! $visitor || $administrator ) {
+			$email_privacy_options = '';
+			foreach ( PolicyMS_Account::$privacy_switches as $id => $label ) {
+				$selected               = $id === $user->preferences['public_email'] ? 'selected' : '';
+				$email_privacy_options .= <<<HTML
                     <option value="{$id}" {$selected}>{$title}</option>
                 HTML;
-            }
-            $email_editor = <<<HTML
+			}
+			$email_editor = <<<HTML
                 <label for="email" class="folding">
                     Changing this setting will require a verification of the new e-mail address.
                 </label>
@@ -796,9 +796,9 @@ function user_profile_details_html(
                     {$email_privacy_options}
                 </select>
             HTML;
-        }
+		}
 
-        $email_information = <<<HTML
+		$email_information = <<<HTML
             <tr>
                 <td>E-mail</td>
                 <td>
@@ -810,32 +810,32 @@ function user_profile_details_html(
                 </td>
             </tr>
         HTML;
-    }
+	}
 
-    // 'Phone' fields.
-    $phone_information = '';
-    if ( $user->information['phone'] || ! $visitor ) {
-        $phone_privacy_label = '';
-        if ( ! $visitor || $administrator ) {
-            $phone_privacy_label_class = 0 === $user->preferences['public_phone'] ? 'notice' : 'success';
-            $phone_privacy_label       = PolicyMS_Account::$privacy_switches[ $user->preferences['public_phone'] ];
-            $phone_privacy             = <<<HTML
-                <span class="label {$phone_privacy_label_class}">
+	// 'Phone' fields.
+	$phone_information = '';
+	if ( $user->information['phone'] || ! $visitor ) {
+		$phone_privacy_label = '';
+        $phone_privacy = '';
+		if ( (! $visitor || $administrator)  && !empty($user->information['phone']) ) {
+			$phone_privacy_label       = PolicyMS_Account::$privacy_switches[ $user->preferences['public_phone'] ];
+			$phone_privacy             = <<<HTML
+                <span class="pill">
                     {$phone_privacy_label}
                 </span>
             HTML;
-        }
+		}
 
-        $phone_editor = '';
-        if ( ! $visitor || $administrator ) {
-            $phone_privacy_options = '';
-            foreach ( PolicyMS_Account::$privacy_switches as $id => $label ) {
-                $selected               = $id === $user->preferences['public_phone'] ? 'selected' : '';
-                $phone_privacy_options .= <<<HTML
+		$phone_editor = '';
+		if ( ! $visitor || $administrator ) {
+			$phone_privacy_options = '';
+			foreach ( PolicyMS_Account::$privacy_switches as $id => $label ) {
+				$selected               = $id === $user->preferences['public_phone'] ? 'selected' : '';
+				$phone_privacy_options .= <<<HTML
                     <option value="{$id}" {$selected}>{$title}</option>
                 HTML;
-            }
-            $phone_editor = <<<HTML
+			}
+			$phone_editor = <<<HTML
                 <input 
                     class="folding" 
                     type="text" 
@@ -846,67 +846,71 @@ function user_profile_details_html(
                     {$phone_privacy_options}
                 </select>
             HTML;
-        }
+		}
 
-        $phone_information = <<<HTML
+        $phone_value = (!empty($user->information['phone'])) 
+            ? $user->information['phone']
+            : '<em>Not provided</em>';
+
+		$phone_information = <<<HTML
         <tr>
             <td>Phone number</td>
             <td>
                 <span class="folding visible">
-                    {$user->information['phone']} {$phone_privacy}
+                    {$phone_value} {$phone_privacy}
                 </span>
                 {$phone_editor}
             </td>
         </tr>
         HTML;
-    }
+	}
 
-    // SSO connection fields.
-    $sso_information = '';
-    if ( ! $visitor ) {
+	// SSO connection fields.
+	$sso_information = '';
+	if ( ! $visitor ) {
 
-        // 'Google' fields.
-        $google_action      = $oauth_controller->get_html( 'google' );
-        $google_information = <<<HTML
+		// 'Google' fields.
+		$google_action      = $oauth_controller->get_html( 'google' );
+		$google_information = <<<HTML
             <tr>
                 <td>Google account</td>
                 <td>{$google_action}</td>
             </tr>
         HTML;
 
-        // 'KeyCloak' fields.
-        $keycloak_action      = $oauth_controller->get_html( 'keycloak' );
-        $keycloak_information = <<<HTML
+		// 'KeyCloak' fields.
+		$keycloak_action      = $oauth_controller->get_html( 'keycloak' );
+		$keycloak_information = <<<HTML
             <tr>
                 <td>PolicyCLOUD account</td>
                 <td>{$keycloak_action}</td>
             </tr>
         HTML;
 
-        // 'EGI' fields.
-        $egi_action = $oauth_controller->get_html( 'egi' );
+		// 'EGI' fields.
+		$egi_action = $oauth_controller->get_html( 'egi' );
 
-        $egi_information = <<<HTML
+		$egi_information = <<<HTML
             <tr>
                 <td>EGI credentials</td>
                 <td>{$egi_action}</td>
             </tr>
         HTML;
 
-        $sso_information = <<<HTML
+		$sso_information = <<<HTML
             {$google_information}
             {$keycloak_information}
             {$egi_information}
         HTML;
-    }
+	}
 
-    // 'Member since' field.
-    $registration_date_formatted = gmdate( 'd/m/y', strtotime( $user->metadata['registration_datetime'] ) );
+	// 'Member since' field.
+	$registration_date_formatted = gmdate( 'd/m/y', strtotime( $user->metadata['registration_datetime'] ) );
 
-    // Request data copy button.
-    $request_data_copy_button = '';
-    if ( ! $visitor ) {
-        $request_data_copy_button = <<<HTML
+	// Request data copy button.
+	$request_data_copy_button = '';
+	if ( ! $visitor ) {
+		$request_data_copy_button = <<<HTML
             <button 
                 data-action="policyms-user-request-data-copy" 
                 data-nonce="{$data_copy_nonce}"
@@ -914,48 +918,40 @@ function user_profile_details_html(
                 Request data copy
             </button>
         HTML;
-    }
+	}
 
-    // Delete account button.
-    $delete_account_button = '';
-    if ( ! $visitor || $administrator ) {
-        $delete_account_button = <<<HTML
-            <form 
-                data-action="policyms-delete-account"
-                data-nonce="{$deletion_nonce}">
-                <div>
-                    <label for=" current-password">Please type your current password to continue.</label>
-                <input name="current-password" type="password" placeholder="Insert your current password here">
-                </div>
-                <button type="submit" class="action destructive" user="{$user->uid}">
-                    Delete account
-                </button>
-            </form>
+	// Delete account button.
+	$delete_account_button = '';
+	if ( ! $visitor || $administrator ) {
+		$delete_account_button = <<<HTML
+            <button 
+                data-action="policyms-delete-user" 
+                data-nonce="{$deletion_nonce}" 
+                class="action destructive" 
+                user="{$user->uid}">
+                Delete account
+            </button>
         HTML;
-    }
+	}
 
-    // Notices.
-    $notice_containers = '';
-    if ( ! $visitor || $administrator ) {
-        $notice_containers = <<<HTML
-            <div class="folding error"></div>
-            <div class="folding notice"></div>
+	// Notices.
+	$notice_containers = '';
+	if ( ! $visitor || $administrator ) {
+		$notice_containers = <<<HTML
             <div class="critical-action">
                 <label for="current-password">Please type your current password to continue.</label>
                 <input name="current-password" type="password" placeholder="Insert your current password here">
             </div>
-            <button type="submit" class="folding">Submit</button>
         HTML;
-    }
+	}
 
-    return <<<HTML
+	return <<<HTML
         <section class="policyms policyms-user-profile">
             <header>
                 <h2>Information</h2>
                 {$edit_button}
             </header>
             <form
-                class="container"
                 data-action="policyms-user-editing"
                 data-nonce="{$editing_nonce}" 
                 accept-charset="utf8" 
@@ -1018,10 +1014,15 @@ function user_profile_details_html(
                         <td>{$registration_date_formatted}</td>
                     </tr>
                     </table>
+                    <div class="actions">
+                        {$delete_account_button}
+                        {$request_data_copy_button}
+                        <button class="folding action" data-action="policyms-edit-user">
+                            Save changes
+                        </button>
+                    </div>
                     {$notice_containers}
                 </form>
-                {$request_data_copy_button}
-                {$delete_account_button}
                 </section>
 
     HTML;
@@ -1043,57 +1044,57 @@ function user_profile_details_html(
  * @author  Alexandros Raikos <alexandros@araikos.gr>
  */
 function user_html(
-        PolicyMS_User $user,
-        bool $visitor,
-        bool $preview,
-        string $account_page_url,
-        string $content_html,
-        string $selected_tab = 'overview',
-        string $tab_switch_nonce = ''
-        ): string {
+		PolicyMS_User $user,
+		bool $visitor,
+		bool $preview,
+		string $account_page_url,
+		string $content_html,
+		string $selected_tab = 'overview',
+		string $tab_switch_nonce = ''
+		): string {
 
-    // Autocorrects unsupported selected tab value.
-    if ( ! PolicyMS_User::$default_tabs[ $selected_tab ] ) {
-        $selected_tab = 'overview';
-    }
+	// Autocorrects unsupported selected tab value.
+	if ( ! PolicyMS_User::$default_tabs[ $selected_tab ] ) {
+		$selected_tab = 'overview';
+	}
 
-    $preview_notice = '';
-    if ( $preview ) {
-        $preview_notice = notice_html(
-            "You're currently viewing your profile as it is viewed by other registered users.
+	$preview_notice = '';
+	if ( $preview ) {
+		$preview_notice = notice_html(
+			"You're currently viewing your profile as it is viewed by other registered users.
             <a href=\"{$account_page_url}\">Return to your account page.</a>",
-            'notice'
-        );
-    }
+			'notice'
+		);
+	}
 
-    // Show account verification notice.
-    $verification_notice = '';
-    if ( isset( $user->metadata['verified'] ) ) {
-        if ( '1' !== $user->metadata['verified'] ) {
-            $verification_notice = notice_html( 'Your account is still unverified, please check your email inbox or spam folder for a verification email. You can resend it in your profile settings if you can\'t find it.', 'notice' );
-        }
-    } else {
-        return notice_html( "Your account verification status couldn't be accessed." );
-    }
+	// Show account verification notice.
+	$verification_notice = '';
+	if ( isset( $user->metadata['verified'] ) ) {
+		if ( '1' !== $user->metadata['verified'] ) {
+			$verification_notice = notice_html( 'Your account is still unverified, please check your email inbox or spam folder for a verification email. You can resend it in your profile settings if you can\'t find it.', 'notice' );
+		}
+	} else {
+		return notice_html( "Your account verification status couldn't be accessed." );
+	}
 
-    $navigation_html = '';
-    foreach ( PolicyMS_User::$default_tabs as $identifier => $label ) {
+	$navigation_html = '';
+	foreach ( PolicyMS_User::$default_tabs as $identifier => $label ) {
 
-        // Administration-only tabs check.
-        if ( 'approvals' === $identifier &&
-        ( ! $user->is_admin() || $visitor )
-        ) {
-            continue;
-        }
+		// Administration-only tabs check.
+		if ( 'approvals' === $identifier &&
+		( ! $user->is_admin() || $visitor )
+		) {
+			continue;
+		}
 
-        // Prepare counter.
-        $counter = '';
-        if ( !empty($user->resources[ $identifier ]) ) {
-            $counter = '<span class="pill small">' . $user->resources[ $identifier ] . '</span>';
-        }
+		// Prepare counter.
+		$counter = '';
+		if ( ! empty( $user->resources[ $identifier ] ) ) {
+			$counter = '<span class="pill small">' . $user->resources[ $identifier ] . '</span>';
+		}
 
-        $active           = ( $identifier === $selected_tab ) ? 'active' : '';
-        $navigation_html .= <<<HTML
+		$active           = ( $identifier === $selected_tab ) ? 'active' : '';
+		$navigation_html .= <<<HTML
             <button 
                 class="tactile {$active}"
                 data-tab-identifier="{$identifier}"
@@ -1102,24 +1103,24 @@ function user_html(
                     {$label} {$counter}
             </button>
         HTML;
-    }
+	}
 
-    $log_out_button = '';
-    if ( ! $visitor ) {
-        $log_out_button = '<button class="tactile" data-action="policyms-user-logout">Sign out</button>';
-    }
+	$log_out_button = '';
+	if ( ! $visitor ) {
+		$log_out_button = '<button class="tactile" data-action="policyms-user-logout">Sign out</button>';
+	}
 
-    $full_name         = '';
-    $full_name         = ( ( $user->information['title'] ?? '-' ) === '-' ) ? '' : $user->information['title'].' ';
-    $full_name        .= $user->information['name'] . ' ' . $user->information['surname'];
-    $organization      = '';
-    if (!empty($user->information['organization'])){
-        $organization = '<span class="fas fa-id-badge"></span> '.$user->information['organization'];
-    }
-    $visitor_attribute = $visitor ? 'visitor' : '';
-    $picture_encoded = $user->__get('picture');
+	$full_name    = '';
+	$full_name    = ( ( $user->information['title'] ?? '-' ) === '-' ) ? '' : $user->information['title'] . ' ';
+	$full_name   .= $user->information['name'] . ' ' . $user->information['surname'];
+	$organization = '';
+	if ( ! empty( $user->information['organization'] ) ) {
+		$organization = '<span class="fas fa-id-badge"></span> ' . $user->information['organization'];
+	}
+	$visitor_attribute = $visitor ? 'visitor' : '';
+	$picture_encoded   = $user->__get( 'picture' );
 
-    return <<<HTML
+	return <<<HTML
         {$verification_notice}
         {$preview_notice}
         <div 

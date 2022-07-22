@@ -329,12 +329,13 @@ function content_list_html(
 	 * Preparing the list category filters.
 	 * --------
 	 */
-
-	$content_list_filter_categories = '';
+	$content_list_filters = '';
 	if ( ! empty( $total_categories ) ) {
 		if ( ! empty( $category ) && ! array_key_exists( ( $active_category ?? $total_categories[0] ), $total_categories, true ) ) {
 			throw new PolicyMSInvalidDataException( sprintf( 'The category %s does not exist.', $active_category ) );
 		}
+
+		$content_list_filter_categories = '';
 		foreach ( $total_categories as $category_slug => $category_label ) {
 			$is_active                       = ( ( $active_category ?? '' ) === $category_slug ) ? 'active' : '';
 			$content_list_filter_categories .= <<<HTML
