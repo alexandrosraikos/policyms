@@ -299,7 +299,7 @@ function user_descriptions_list_html(
 	bool $visitor,
 	bool $administrator,
 	string $description_url_base,
-	string $creation_url,
+	?string $creation_url = null,
 	int $active_page = 1,
 	?string $active_category = null,
 	string $sorting = 'newest',
@@ -1042,10 +1042,9 @@ function user_html(
 		}
 
 		// Prepare counter.
-		// TODO @vkoukos: Implement [no_<resources>] counters on user->account.
 		$counter = '';
-		if ( !empty($user->metadata[ "no_{$identifier}" ]) ) {
-			$counter = '(' . $user->metadata[ "no_{$identifier}" ] . ')';
+		if ( !empty($user->resources[ $identifier ]) ) {
+			$counter = '<span class="pill small">' . $user->resources[ $identifier ] . '</span>';
 		}
 
 		$active           = ( $identifier === $selected_tab ) ? 'active' : '';
@@ -1062,13 +1061,16 @@ function user_html(
 
 	$log_out_button = '';
 	if ( ! $visitor ) {
-		$log_out_button = '<button class="tactile" data-action="policyms-logout">Sign out</button>';
+		$log_out_button = '<button class="tactile" data-action="policyms-user-logout">Sign out</button>';
 	}
 
 	$full_name         = '';
 	$full_name         = ( ( $user->information['title'] ?? '-' ) === '-' ) ? '' : $user->information['title'].' ';
 	$full_name        .= $user->information['name'] . ' ' . $user->information['surname'];
-	$organization      = $user->information['organization'] ?? '';
+	$organization      = '';
+	if (!empty($user->information['organization'])){
+		$organization = '<span class="fas fa-id-badge"></span> '.$user->information['organization'];
+	}
 	$visitor_attribute = $visitor ? 'visitor' : '';
 	$picture_encoded = $user->__get('picture');
 

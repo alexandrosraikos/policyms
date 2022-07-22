@@ -174,47 +174,47 @@ function link_input_fields_html( array $existing_links = array() ) {
 		$title                = explode( ':', $link, 2 )[0];
 		$url                  = explode( ':', $link, 2 )[1];
 		$existing_links_html .= <<<HTML
-			<div class="grouping">
-				<input 
-					type="text" 
-					name="links-title[]" 
-					value="{$title}" 
-					placeholder="Example" />
-				<input 
-					type="url" 
-					name="links-url[]" 
-					value="{$url}" 
-					placeholder="https://www.example.org/" />
-				<button class="remove" data-action="remove-field" title="Remove this link."><span class="fas fa-times"></span></button>
-			</div>
-		HTML;
+            <div class="grouping">
+                <input 
+                    type="text" 
+                    name="links-title[]" 
+                    value="{$title}" 
+                    placeholder="Example" />
+                <input 
+                    type="url" 
+                    name="links-url[]" 
+                    value="{$url}" 
+                    placeholder="https://www.example.org/" />
+                <button class="remove" data-action="remove-field" title="Remove this link."><span class="fas fa-times"></span></button>
+            </div>
+        HTML;
 	}
 
 	$disabled_attribute = ( $existing_links ) ? 'disabled' : '';
 
 	return <<<HTML
-		<div class="policyms policyms-input-fields-grouping">
-			{$existing_links_html}
-			<div class="grouping">
-				<input 
-					type="text" 
-					name="links-title[]" 
-					placeholder="Example" />
-				<input 
-					type="url" 
-					name="links-url[]" 
-					placeholder="https://www.example.org/" />
-				<button 
-					class="remove"
-					data-action="remove-field" 
-					title="Remove this link."
-					{$disabled_attribute}>
-					<span class="fas fa-times"></span>
-				</button>
-			</div>
-			<button class="add" data-action="add-field" title="Add another link."><span class="fas fa-plus"></span> Add link</button>
-		</div>
-	HTML;
+        <div class="policyms policyms-input-fields-grouping">
+            {$existing_links_html}
+            <div class="grouping">
+                <input 
+                    type="text" 
+                    name="links-title[]" 
+                    placeholder="Example" />
+                <input 
+                    type="url" 
+                    name="links-url[]" 
+                    placeholder="https://www.example.org/" />
+                <button 
+                    class="remove"
+                    data-action="remove-field" 
+                    title="Remove this link."
+                    {$disabled_attribute}>
+                    <span class="fas fa-times"></span>
+                </button>
+            </div>
+            <button class="add" data-action="add-field" title="Add another link."><span class="fas fa-plus"></span> Add link</button>
+        </div>
+    HTML;
 }
 
 /**
@@ -304,7 +304,7 @@ function content_list_html(
 		$create_button_label = __( 'Create new', 'policyms' );
 		$create_button_html  = <<<HTML
             <a 
-                id="policyms-upload" 
+                class="action small"
                 href="{$creation_url}" 
                 title="Create new">
                     <span class="fas fa-plus"></span> {$create_button_label}
@@ -334,20 +334,22 @@ function content_list_html(
 			throw new PolicyMSInvalidDataException( sprintf( 'The category %s does not exist.', $active_category ) );
 		}
 		foreach ( $total_categories as $category_slug => $category_label ) {
-			$is_checked                      = ( ( $active_category ?? '' ) === $category_slug ) ? 'checked' : '';
+			$is_active                       = ( ( $active_category ?? '' ) === $category_slug ) ? 'active' : '';
 			$content_list_filter_categories .= <<<HTML
-            <label>
-                <input type="checkbox" name="category" value="{$category_slug}" {$is_checked}>
+            <button 
+                class="pill {$is_active}"
+                data-action="policyms-filter-content-list" 
+                data-category="{$category_slug}">
                 {$category_label}
-            </label>
+            </button>
             HTML;
 		}
 		$content_list_filter_header_label = __( 'Filter', 'policyms' );
 		$content_list_filters             = <<<HTML
-        <form action="policyms-filter-content-list">
+        <div class="policyms-filter-content-list">
             <div>{$content_list_filter_header_label}:</div>
             {$content_list_filter_categories}
-        </form>
+        </div>
         HTML;
 	}
 
@@ -368,19 +370,13 @@ function content_list_html(
 	 * Preparing pagination indicators.
 	 * --------
 	 */
-
-	$content_list_pagination_buttons = '';
-	for ( $page = 1; $page <= $total_pages; $page++ ) {
-		$selected                         = ( $page === $active_page ) ? 'selected' : '';
-		$content_list_pagination_buttons .= <<<HTML
-            <button content-page="{$page}" class="{$selected}">{$page}</button>
-        HTML;
+	$content_list_pagination = '';
+	if ( ! empty( $content ) ) {
+		$content_list_pagination = show_pagination_html(
+			$total_pages,
+			$active_page
+		);
 	}
-	$content_list_pagination = <<<HTML
-        <nav>
-            {$content_list_pagination_buttons}
-        </nav>
-    HTML;
 
 	// Return the content list HTML.
 	return <<<HTML
@@ -419,14 +415,14 @@ function show_pagination_html( int $total_pages, $active_page = 1 ):string {
 		$content_list_pagination_buttons .= <<<HTML
             <button 
                 content-page="{$page}" 
-                class="{$selected}">
+                class="{$selected} tactile">
                 {$page}
             </button>
         HTML;
 	}
 
 	return <<<HTML
-        <nav>
+        <nav class="policyms policyms-pagination">
             {$content_list_pagination_buttons}
         </nav>
     HTML;

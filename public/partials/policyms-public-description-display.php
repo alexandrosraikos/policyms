@@ -62,7 +62,10 @@ function sorting_selector_html( string $content_type, string $selected_option = 
 
 	// Return the entire sorting selector form HTML.
 	return <<<HTML
-			<form action="policyms policyms-sort-content" content-type="{$content_type}">
+			<form 
+				class="policyms policyms-sort-content" 
+				data-action="policyms-sort-content" 
+				content-type="{$content_type}">
 				<label for="sorting">{$sorting_label}</label>
 				<select name="sorting">
 					{$html_options}
@@ -111,7 +114,9 @@ function sizing_selector_html( ?int $selected_size = 12 ): string {
 
 	// Return the entire sorting selector form HTML.
 	return <<<HTML
-		<form action="policyms policyms-change-page-size">
+		<form 
+			class="policyms policyms-change-page-size" 
+			data-action="policyms-change-page-size">
 			<label for="sizing">{$size_label}</label>
 			<select name="sizing">
 				{$html_options}

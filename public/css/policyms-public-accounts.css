@@ -175,6 +175,7 @@
   width: 100%;
   height: auto;
   padding: 0;
+  margin-bottom: 20px;
 }
 
 .policyms-user > aside.sidebar {
@@ -273,70 +274,6 @@
 .policyms-user > main > section.loading {
   cursor: wait;
   opacity: 0.4 !important;
-}
-
-.policyms-user > main > section header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 0 0 20px 0;
-}
-
-.policyms-user > main > section header h3,
-.policyms-user > main > section h3 {
-  margin-bottom: 0;
-  font-size: 110% !important;
-  font-weight: bold;
-}
-
-.policyms-user > main > section header .actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  align-self: flex-end;
-}
-
-.policyms-user > main > section header a,
-.policyms-user > main > section header button {
-  padding: 5px 10px;
-  border: none;
-  margin-left: 10px;
-  background-color: #000000;
-  color: white;
-  font-size: 80% !important;
-  font-weight: bold;
-  text-decoration: none;
-  border-radius: 10px;
-  transition: all 0.2s ease-in-out;
-}
-
-.policyms-user > main > section header a:hover,
-.policyms-user > main > section header button:hover {
-  transform: scale(0.98);
-  cursor: pointer;
-  text-decoration: none;
-  opacity: 0.9;
-  transition: all 0.2s ease-in-out;
-}
-
-.policyms-user > main > section header a:active,
-.policyms-user > main > section header button:active {
-  transform: scale(0.97);
-  cursor: pointer;
-  text-decoration: none;
-  opacity: 0.8;
-  transition: all 0.1s ease-in-out;
-}
-
-.policyms-user > main > section header a {
-  white-space: nowrap;
-}
-
-.policyms-user > main > section header a img,
-.policyms-user > main > section header button img {
-  display: inline-block;
-  max-width: 15px;
-  margin: -3px 5px 0 0;
 }
 
 /* Overview tab */

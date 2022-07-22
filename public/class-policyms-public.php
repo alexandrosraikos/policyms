@@ -764,10 +764,10 @@ class PolicyMS_Public {
 			function ( $data ) {
 				return self::get_user_tab_content(
 					new PolicyMS_User(
-						(bool) $data['is_visitor'] ? sanitize_user( $data['user_id'] ) : null
+						('true' === $data['is_visitor']) ? sanitize_user( $data['user_id'] ) : null
 					),
 					sanitize_key( $data['tab_identifier'] ),
-					(bool) $data['is_visitor'],
+					('true' === $data['is_visitor']),
 					self::get_setting( true, 'description_page' ),
 					self::get_setting( true, 'upload_page' )
 				);

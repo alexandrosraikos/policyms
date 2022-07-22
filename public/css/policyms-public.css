@@ -47,7 +47,7 @@
 
 .policyms a {
   display: inline !important;
-  margin: 0 auto;
+  margin: 0;
   text-decoration: none !important;
   font-size: inherit;
   font-weight: bold;
@@ -72,7 +72,8 @@
 }
 
 .policyms button.action,
-.policyms a.action {
+.policyms a.action,
+.policyms button.pill.active {
   padding: 2px 16px;
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
   border-radius: 6px;
@@ -88,6 +89,29 @@
   font-size: 12pt;
 }
 
+.policyms a.action.small,
+.policyms button.action.small {
+  /* TODO: Make description edit button `prominent` as well. */
+  padding: 5px 10px;
+  border: none;
+  color: white;
+  font-size: 80% !important;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 10px;
+  transition: all 0.2s ease-in-out;
+}
+
+.policyms a.action.small {
+  white-space: nowrap;
+}
+
+.policyms a.action.small img,
+.policyms button.action.small img {
+  display: inline-block;
+  max-width: 15px;
+  margin: -3px 5px 0 0;
+}
 .policyms button.action.minimal {
   padding: 0;
   border: none;
@@ -116,14 +140,18 @@
   color: var(--policyms-text-color-invert) !important;
 }
 
-.policyms button.action:hover {
+.policyms button.action:hover,
+.policyms a.action:hover {
+  opacity: 1;
   cursor: pointer;
   transform: scale(0.99);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   transition: all 0.2s ease-in-out;
 }
 
-.policyms button.action:active {
+.policyms button.action:active,
+.policyms a.action:active {
+  opacity: 1;
   transform: scale(0.97);
   box-shadow: 0 1px 0px rgba(0, 0, 0, 0.3);
   transition: all 0.1s ease-in-out;
@@ -208,13 +236,33 @@
   transition: all 0.1s ease-in-out;
 }
 
-.policyms *.pill {
+.policyms .pill {
   display: inline-block !important;
-  font-size: 90%;
-  font-weight: 500;
-  padding: 0 10px;
-  background-color: var(--policyms-border-color-light);
-  border-radius: 100px;
+  font-weight: bold;
+  color: var(--policyms-text-color);
+  padding: 4px 14px;
+  background: var(--policyms-border-color-light);
+  background: linear-gradient(
+    25deg,
+    var(--policyms-border-color-light) 0%,
+    rgba(255, 255, 255, 0) 99%
+  );
+  border-radius: 100px !important;
+}
+
+.policyms button.pill:hover {
+  transform: scale(0.98);
+  transition: all 0.2s;
+}
+
+.policyms button.pill:active {
+  transform: scale(0.96);
+  transition: all 0.2s;
+}
+
+.policyms .pill.small {
+  font-weight: 10pt;
+  padding: 1px 10px;
 }
 
 .policyms h1 {
@@ -414,11 +462,12 @@
 .policyms form textarea,
 .policyms form select {
   display: block;
-  padding: 10px 14px;
+  padding: 10px 21px 10px 14px;
   margin: 0 0 10px 0;
   background-color: #ffffff;
   border: 1px solid var(--policyms-border-color-light) !important;
   border-radius: 10px;
+  min-width: 70px;
 }
 
 .policyms form select {
@@ -784,19 +833,41 @@
 }
 
 /**
+* Sorting Selectors
+* -----------
+*/
+
+.policyms-sort-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.policyms-sort-content > * {
+  margin-right: 10px;
+}
+
+/**
 * Content List
 * -----------
 * A list with dynamic content.
 */
 
-.policyms-content-list > header > .policyms-sort-content,
-.policyms-content-list > header > .policyms-change-page-size {
+.policyms-content-list > header {
   display: flex;
-  justify-content: flex-start;
-  align-items: center;
+  align-items: flex-end;
+  justify-content: flex-end;
+  width: 100%;
 }
-.policyms-content-list > header > .policyms-sort-content *,
-.policyms-content-list > header > .policyms-change-page-size * {
+
+.policyms-content-list > header > form {
+  margin: 0 10px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.policyms-content-list > header > form * {
   width: auto;
   height: 100%;
   padding: 0;
@@ -804,22 +875,26 @@
   white-space: nowrap;
 }
 
-.policyms-content-list > header > .policyms-sort-content select,
-.policyms-content-list > header > .policyms-change-page-size select {
-  padding: 0 10px 0 6px;
+.policyms-content-list > header > form select {
+  padding: 0 20px 0 12px;
+  width: auto;
+}
+
+.policyms-content-list > header > a {
+  margin: 0 0 2px 0;
 }
 
 .policyms-content-list > .policyms-filter-content-list {
   padding: 15px 0;
   border-top: 1px solid var(--policyms-border-color-light);
   border-bottom: 1px solid var(--policyms-border-color-light);
-  margin-bottom: 20px;
+  margin: 20px 0;
   font-size: 75%;
   font-weight: bold;
 }
 
-.policyms-content-list > .policyms-filter-content-list span {
-  margin-bottom: 5px;
+.policyms-content-list > .policyms-filter-content-list > div {
+  margin-bottom: 7px;
 }
 
 .policyms-content-list > .policyms-filter-content-list button {
@@ -837,6 +912,18 @@
     padding: 0;
     margin: 0;
   }
+}
+
+/**
+* Pagination
+* -----------
+*/
+
+.policyms-pagination {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-content: center;
 }
 
 /**

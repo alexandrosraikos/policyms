@@ -58,6 +58,15 @@ class PolicyMS_User extends PolicyMS_Account {
 	public ?array $statistics;
 
 	/**
+	 * The user's resource statistics.
+	 * 
+	 * @var array $resources The numbers.
+	 * 
+	 * @since 2.0.0
+	 */
+	public ?array $resources;
+
+	/**
 	 * The user's description collection.
 	 *
 	 * @var ?PolicyMS_Description_Collection $descriptions The description collection.
@@ -157,6 +166,7 @@ class PolicyMS_User extends PolicyMS_Account {
 		$this->information = $data['info'];
 		$this->metadata    = $data['account'];
 		$this->preferences = $data['profile_parameters'];
+		$this->resources = $data['resources'];
 	}
 
 	/**
