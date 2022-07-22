@@ -70,7 +70,8 @@ function user_registration_html(
 						<button type="submit" class="action ">Create account</button>
 					</div>
 				</form>
-					<p>Already have an account? Please <a class="underline" href="{$authentication_url}">Log in</a>.</p>
+				<hr />
+				<p>Already have an account? Please <a class="underline" href="{$authentication_url}">sign in</a>.</p>
 			</div>
 		HTML;
 	}

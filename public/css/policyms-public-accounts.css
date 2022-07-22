@@ -141,6 +141,10 @@
 .policyms-user-registration {
   max-width: 600px;
 }
+.policyms-user-registration > p:last-of-type {
+  margin-top: 20px;
+  text-align: center;
+}
 
 .policyms-user-registration > form > .tos-agree {
   display: flex;
