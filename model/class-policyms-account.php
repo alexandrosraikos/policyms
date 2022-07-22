@@ -37,7 +37,7 @@ abstract class PolicyMS_Account {
 	 *
 	 * @since 1.1.0
 	 */
-	protected string $token;
+	public string $token;
 
 	/**
 	 * A universal definition for privacy settings.

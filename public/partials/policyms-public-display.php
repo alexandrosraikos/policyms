@@ -25,7 +25,7 @@
  */
 function notice_html( string $message, string $type = 'error', int $http_status = null ) {
 	$logout_attribute = ( ( 403 === ( $http_status ?? 0 ) ) ? 'logout' : '' );
-	$message          = esc_html( $message );
+	$message          = $message;
 	$type             = esc_attr( $type );
 
 	return <<<HTML
@@ -70,9 +70,9 @@ function menu_items_html(
 	$links = '';
 	if ( $authenticated ) {
 		$links .= $wrapper( '<a href="' . $account_url . '">My Account</a>' );
-		$links .= $wrapper( '<a data-action="policyms-user-logout">Log out</a>' );
+		$links .= $wrapper( '<a data-action="policyms-user-logout">Sign Out</a>' );
 	} else {
-		$links .= $wrapper( '<a href="' . $authentication_url . '">Log In</a>' );
+		$links .= $wrapper( '<a href="' . $authentication_url . '">Sign In</a>' );
 		$links .= $wrapper( '<a href="' . $registration_url . '">Register</a>' );
 	}
 
@@ -285,7 +285,7 @@ function content_list_html(
 	array $total_categories = null,
 	int $active_page = 1,
 	string $active_category = null,
-	string $sorting = null,
+	string $sorting = 'newest',
 	int $sizing = null,
 	?string $creation_url = null,
 ): string {
@@ -330,7 +330,7 @@ function content_list_html(
 
 	$content_list_filter_categories = '';
 	if ( ! empty( $total_categories ) ) {
-		if ( ! in_array( ( $active_category ?? $total_categories[0] ), $total_categories, true ) ) {
+		if ( ! empty( $category ) && ! array_key_exists( ( $active_category ?? $total_categories[0] ), $total_categories, true ) ) {
 			throw new PolicyMSInvalidDataException( sprintf( 'The category %s does not exist.', $active_category ) );
 		}
 		foreach ( $total_categories as $category_slug => $category_label ) {
@@ -358,7 +358,7 @@ function content_list_html(
 
 	$content_list_items = '';
 	if ( empty( $content ) ) {
-		return notice_html( 'Nothing to display yet.', 'notice' );
+		$content_list_items = notice_html( 'Nothing to display yet.', 'notice' );
 	}
 	foreach ( $content as $item ) {
 		$content_list_items .= $inner_html( $content_type, $item );

@@ -110,7 +110,7 @@ class PolicyMS_Description_Collection {
 				}
 				return new PolicyMS_Description_Collection(
 					$descriptions,
-					$response['pages']
+					$response['pages'] ?? 1
 				);
 			} else {
 				foreach ( $response[ $container_key ] as $number => $page ) {

@@ -8,7 +8,8 @@
 var presetElementQueries = {
   mainContainer: '.policyms-user',
   tabSwitchButton: '.policyms-user > .sidebar > nav > button[data-action="policyms-switch-user-tab"]',
-  tabContentContainer: '.policyms-user > main > section'
+  tabContentContainer: '.policyms-user > main > section',
+  editToggleButton: '.policyms-user button[data-action="policyms-account-edit-toggle"]'
 };
 
 (function ($) {
@@ -43,8 +44,8 @@ var presetElementQueries = {
           $(presetElementQueries.tabContentContainer).html(data);
 
           // Make active tab.
-          $(presetElementQueries.tabSwitchButton).prop('active', false);
-          $(e.target).prop('active', true);
+          $(presetElementQueries.tabSwitchButton).removeClass('active');
+          $(e.target).addClass('active');
 
           // Update URL parameters.
           var query = new URLSearchParams(window.location.search);

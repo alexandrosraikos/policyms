@@ -211,10 +211,12 @@
 .policyms-user > aside.sidebar > nav button {
   display: block;
   text-align: left;
+  width: 100%;
+  font-weight: 500;
 }
 
 .policyms-user > aside.sidebar > nav button.active {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(0, 0, 0, 0.05) !important;
   transition: all 0.1s ease-in-out;
 }
 
@@ -249,13 +251,16 @@
   margin-left: -20px;
 }
 
-.policyms-user > main > header > h2 {
+.policyms-user > main > header > .title {
   font-weight: bold;
+  margin: 0;
+  font-size: 24pt;
 }
 
-.policyms-user > main > header > div {
-  font-size: 80%;
-  opacity: 0.8;
+.policyms-user > main > header > .organization {
+  font-size: 11pt;
+  color: var(--policyms-text-color-secondary);
+  font-weight: bold;
 }
 
 .policyms-user > main > section {
@@ -263,9 +268,11 @@
   max-height: 1000vh;
   padding: 0;
   margin: 20px 0;
-  opacity: 0;
-  transform: translateY(-10px);
-  animation: sweep-in 0.3s ease-in-out forwards;
+}
+
+.policyms-user > main > section.loading {
+  cursor: wait;
+  opacity: 0.4 !important;
 }
 
 .policyms-user > main > section header {
@@ -334,42 +341,57 @@
 
 /* Overview tab */
 
-.policyms-user section.policyms-user-overview p {
+.policyms-user-overview .section-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.policyms-user-overview .section-title > h3 {
+  margin-right: 10px;
+  margin-bottom: 4px;
+}
+
+.policyms-user-overview h2 {
+  margin-bottom: 10px;
+}
+
+.policyms-user-overview p {
   color: var(--policyms-text-color-secondary);
   font-size: 90%;
 }
 
-.policyms-user section.policyms-user-overview ul {
+.policyms-user-overview ul {
   padding: 0;
   margin: 10px 0;
   font-size: 80%;
   list-style-type: none;
 }
 
-.policyms-user section.policyms-user-overview ul li {
+.policyms-user-overview ul li {
   display: inline-block;
   margin-right: 7px;
 }
 
-.policyms-user section.policyms-user-overview h4 {
+.policyms-user-overview h4 {
   margin: 20px 0;
   font-size: 18px;
 }
 
-.policyms-user section.policyms-user-overview table,
-.policyms-user section.policyms-user-overview tr,
-.policyms-user section.policyms-user-overview td,
+.policyms-user-overview table,
+.policyms-user-overview tr,
+.policyms-user-overview td,
 .policyms-user section.policyms-user-profile table,
 .policyms-user section.policyms-user-profile tr,
 .policyms-user section.policyms-user-profile td {
   border: none;
 }
 
-.policyms-user section.policyms-user-overview table.statistics {
+.policyms-user-overview table.statistics {
   margin-bottom: 20px;
 }
 
-.policyms-user section.policyms-user-overview table .large-figure {
+.policyms-user-overview table .large-figure {
   font-size: 150%;
   font-weight: bold;
 }

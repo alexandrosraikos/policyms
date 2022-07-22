@@ -447,7 +447,8 @@ class PolicyMS_Public {
 		PolicyMS_User $user,
 		string $selected_tab,
 		bool $visitor,
-		string $description_page
+		string $description_page,
+		string $description_creation_url
 	): string {
 		if ( ! array_key_exists( $selected_tab, PolicyMS_User::$default_tabs ) ) {
 			return notice_html(
@@ -458,20 +459,21 @@ class PolicyMS_Public {
 			case 'overview':
 				return user_overview_html(
 					$user->information,
-					$user->statistics
+					$user->__get('statistics')
 				);
-			case 'decriptions':
+			case 'descriptions':
 				// TODO @alexandrosraikos: Parse description list parameters.
 				return user_descriptions_list_html(
-					$user->descriptions,
+					$user->__get('descriptions'),
 					$visitor,
 					$user->is_admin(),
-					$description_page
+					$description_page,
+					$description_creation_url
 				);
 			case 'reviews':
 				// TODO @alexandrosraikos: Parse review list parameters.
 				return user_reviews_list_html(
-					$user->reviews,
+					$user->__get('reviews'),
 					$visitor,
 					$description_page
 				);
@@ -486,7 +488,7 @@ class PolicyMS_Public {
 					$user,
 					$visitor,
 					$user->is_admin(),
-					$user->picture,
+					$user->__get('picture'),
 					new PolicyMS_OAuth_Controller( $user ),
 					wp_create_nonce( 'policyms_account_user_edit' ),
 					wp_create_nonce( 'policyms_account_user_deletion' ),
@@ -553,13 +555,14 @@ class PolicyMS_Public {
 					print user_html(
 						$user,
 						$visitor,
-						$user === $self,
+						$user === $self && $visitor,
 						$urls['account_page'],
 						self::get_user_tab_content(
 							$user,
 							$selected_tab,
 							$visitor,
-							$urls['description_page']
+							$urls['description_page'],
+							$selected_tab === 'descriptions' ? $urls['upload_page'] : ''
 						),
 						$selected_tab,
 						wp_create_nonce( 'policyms_account_user_switch_tab' ),
@@ -765,7 +768,8 @@ class PolicyMS_Public {
 					),
 					sanitize_key( $data['tab_identifier'] ),
 					(bool) $data['is_visitor'],
-					self::get_setting( true, 'description_page' )
+					self::get_setting( true, 'description_page' ),
+					self::get_setting( true, 'upload_page' )
 				);
 			}
 		);

@@ -128,11 +128,11 @@ class PolicyMS_User extends PolicyMS_Account {
 	 * @since 2.0.0
 	 */
 	public static array $default_tabs = array(
-		'overview'    => 'Overview',
-		'decriptions' => 'Descriptions',
-		'reviews'     => 'Reviews',
-		'approvals'   => 'Approvals',
-		'profile'     => 'Profile',
+		'overview'     => 'Overview',
+		'descriptions' => 'Descriptions',
+		'reviews'      => 'Reviews',
+		'approvals'    => 'Approvals',
+		'profile'      => 'Profile',
 	);
 
 	/**
@@ -176,7 +176,7 @@ class PolicyMS_User extends PolicyMS_Account {
 			case 'metadata':
 			case 'uid':
 			case 'preferences':
-				return $this->${$name};
+				return $this->${$variable_name};
 			case 'statistics':
 				return $this->statistics ?? $this->get_statistics();
 			case 'descriptions':
@@ -188,13 +188,7 @@ class PolicyMS_User extends PolicyMS_Account {
 			case 'picture':
 				return $this->picture ?? $this->get_picture();
 			default:
-				throw new PolicyMSInvalidDataException(
-					'The property "' .
-						$name .
-						'" does not exist in ' .
-						get_class( $this ) .
-						'.'
-				);
+				return $this->${$variable_name};
 		}
 	}
 

@@ -182,7 +182,7 @@ function user_password_reset_html( $authenticated, $nonce ) {
 function user_overview_html( array $information, array $statistics ): string {
 	$about = $information['about'] ?? '';
 	$links = '';
-	if ( $information['social'][0] ) {
+	if ( !empty($information['social'][0]) ) {
 		$links = '<ul>';
 		foreach ( $information['social'] as $link ) {
 			$link_title = explode( ':', $link, 2 )[0];
@@ -198,10 +198,13 @@ function user_overview_html( array $information, array $statistics ): string {
 		$links = '</ul>';
 	}
 
-	$statistics = '';
-	if ( $statistics ) {
-		$statistics .= <<<HTML
-		<h4>Statistics</h4>
+	$statistics_html = '';
+	if ( !empty($statistics) ) {
+		$statistics_html .= <<<HTML
+		<div class="section-title">
+			<h3>Statistics</h3>
+			<hr/>
+		</div>
 		<table class="statistics">
 			<tr>
 				<td>
@@ -246,20 +249,30 @@ function user_overview_html( array $information, array $statistics ): string {
 		</table>
 		HTML;
 	} else {
-		$statistics = notice_html( 'Statistics for this user are currently unavailable.', 'notice' );
+		$statistics_html = notice_html( 'Statistics for this user are currently unavailable.', 'notice' );
+	}
+
+	$about_html = '';
+	if (!empty($about)) {
+		$about_html = <<<HTML
+			<div class="section-title">
+				<h3>About</h3>
+				<hr/>
+			</div>
+			<p>{$about}</p>
+		HTML;
 	}
 
 	return <<<HTML
 		<section class="policyms policyms-user-overview">
 			<header>
-				<h3>Overview</h3>
+				<h2>Overview</h2>
 			</header>
 			<div>
-				<h4>About</h4>
-				<p>{$about}</p>
+				{$about_html}
 				{$links}
 			</div>
-			{$statistics}
+			{$statistics_html}
 		</section>
 	HTML;
 }
@@ -286,11 +299,11 @@ function user_descriptions_list_html(
 	bool $visitor,
 	bool $administrator,
 	string $description_url_base,
-	string $creation_url = null,
+	string $creation_url,
 	int $active_page = 1,
-	string $active_category = null,
-	string $sorting = null,
-	int $sizing = null
+	?string $active_category = null,
+	string $sorting = 'newest',
+	int $sizing = 12
 ): string {
 	$description_list = content_list_html(
 		$visitor,
@@ -375,13 +388,13 @@ function user_reviews_list_html(
 	bool $visitor,
 	string $single_url,
 	int $active_page = 1,
-	string $sorting = null,
-	int $sizing = null
+	string $sorting = 'newest',
+	int $sizing = 12
 ): string {
 	$review_list = content_list_html(
 		$visitor,
 		'PolicyMS_Review',
-		$reviews['content'],
+		$reviews['content'] ?? array(),
 		function ( $review ) use ( $single_url ) {
 			$updated_date_unix      = strtotime( $review->update_date );
 			$updated_date_formatted = time_elapsed_string(
@@ -412,10 +425,10 @@ function user_reviews_list_html(
 				</li>
 			HTML;
 		},
-		$reviews['pages'],
+		$reviews['pages'] ?? 1,
 		null,
 		$active_page,
-		null,
+		'newest',
 		$sorting,
 		$sizing
 	);
@@ -447,8 +460,8 @@ function user_approvals_list_html(
 	string $description_url_base,
 	int $active_page = 1,
 	string $active_category = null,
-	string $sorting = null,
-	int $sizing = null
+	string $sorting = 'newest',
+	int $sizing = 12
 ) {
 	$approvals_list = user_descriptions_list_html(
 		$approvals,
@@ -501,7 +514,7 @@ function user_profile_details_html(
 	$edit_button = '';
 	if ( ! $visitor || $administrator ) {
 		$edit_button = <<<HTML
-			<button id="policyms-account-edit-toggle">
+			<button data-action="policyms-account-edit-toggle">
 				<span class="fas fa-pen"></span> Edit
 			</button>
 		HTML;
@@ -565,7 +578,7 @@ function user_profile_details_html(
 
 	// 'Links' fields and editor.
 	$links = '';
-	if ( $user->information['social'][0] ) {
+	if ( !empty($user->information['social'][0] )) {
 		foreach ( $user->information['social'] as $link ) {
 			$link_title = explode( ':', $link, 2 )[0];
 			$link_url   = explode( ':', $link, 2 )[1];
@@ -580,7 +593,7 @@ function user_profile_details_html(
 			<div class="socials folding">
 				<div>
 		HTML;
-		if ( $user->information['social'][0] ) {
+		if (!empty($user->information['social'][0] )) {
 			foreach ( $user->information['social'] as $link ) {
 				$link_title    = explode( ':', $link, 2 )[0];
 				$link_url      = explode( ':', $link, 2 )[1];
@@ -603,23 +616,20 @@ function user_profile_details_html(
 	// 'Password' editor.
 	$password_editor = '';
 	if ( ! $visitor ) {
+		$password_value = '';
+		if ('0' === $user->metadata['password_protected']) {
+			$password_value = '<span class="folding visible"><em>(Not yet set)</em></span>';
+		}
+		else {
+			$password_value = '<span class="folding visible">*****************</span>';
+		}
 		$password_editor = <<<HTML
 		<tr>
 			<td>
 				Password
 			</td>
 			<td>
-				<?php
-				if ( $user->metadata['password_protected'] == '0' ) {
-					?>
-					<span class="folding visible"><em>(Not yet set)</em></span>
-					<?php
-				} else {
-					?>
-					<span class="folding visible">*****************</span>
-					<?php
-				}
-				?>
+				{$password_value}
 				<input class="folding" type="password" name="password" placeholder="Enter your new password here" />
 				<input class="folding" type="password" name="password-confirm" placeholder="Confirm new password here" />
 			</td>
@@ -872,7 +882,7 @@ function user_profile_details_html(
 					<label for=" current-password">Please type your current password to continue.</label>
 				<input name="current-password" type="password" placeholder="Insert your current password here">
 				</div>
-				<button type="submit" class="action destructive" user="{$user->username}">
+				<button type="submit" class="action destructive" user="{$user->uid}">
 					Delete account
 				</button>
 			</form>
@@ -896,7 +906,7 @@ function user_profile_details_html(
 	return <<<HTML
 		<section class="policyms policyms-user-profile">
 			<header>
-				<h3>Information</h3>
+				<h2>Information</h2>
 				{$edit_button}
 			</header>
 			<form
@@ -1022,7 +1032,7 @@ function user_html(
 	}
 
 	$navigation_html = '';
-	foreach ( PolicyMS_User::$default_tabs[ $selected_tab ] as $identifier => $label ) {
+	foreach ( PolicyMS_User::$default_tabs as $identifier => $label ) {
 
 		// Administration-only tabs check.
 		if ( 'approvals' === $identifier &&
@@ -1034,18 +1044,17 @@ function user_html(
 		// Prepare counter.
 		// TODO @vkoukos: Implement [no_<resources>] counters on user->account.
 		$counter = '';
-		if ( $user->metadata[ "no_{$identifier}" ] ) {
+		if ( !empty($user->metadata[ "no_{$identifier}" ]) ) {
 			$counter = '(' . $user->metadata[ "no_{$identifier}" ] . ')';
 		}
 
 		$active           = ( $identifier === $selected_tab ) ? 'active' : '';
 		$navigation_html .= <<<HTML
 			<button 
-				class="tactile" 
+				class="tactile {$active}"
 				data-tab-identifier="{$identifier}"
 				data-nonce="{$tab_switch_nonce}"
-				data-action="policyms-switch-user-tab"
-				{$active}>
+				data-action="policyms-switch-user-tab">
 					{$label} {$counter}
 			</button>
 		HTML;
@@ -1053,24 +1062,25 @@ function user_html(
 
 	$log_out_button = '';
 	if ( ! $visitor ) {
-		$log_out_button = '<button class="tactile" data-action="policyms-logout">Log out</button>';
+		$log_out_button = '<button class="tactile" data-action="policyms-logout">Sign out</button>';
 	}
 
 	$full_name         = '';
-	$full_name         = ( ( $user->information['title'] ?? '-' ) === '-' ) ? '' : $user->information['title'];
+	$full_name         = ( ( $user->information['title'] ?? '-' ) === '-' ) ? '' : $user->information['title'].' ';
 	$full_name        .= $user->information['name'] . ' ' . $user->information['surname'];
 	$organization      = $user->information['organization'] ?? '';
 	$visitor_attribute = $visitor ? 'visitor' : '';
+	$picture_encoded = $user->__get('picture');
 
 	return <<<HTML
+		{$verification_notice}
+		{$preview_notice}
 		<div 
 			class="policyms policyms-user" 
 			data-user-id="{$user->id}"
 			{$visitor_attribute}>
-			{$verification_notice}
-			{$preview_notice}
 			<aside class="sidebar">
-				<img src="{$user->picture}"  alt="" draggable="false" />
+				<img src="{$picture_encoded}"  alt="" draggable="false" />
 				<nav>
 					{$navigation_html}
 					{$log_out_button}
@@ -1078,8 +1088,8 @@ function user_html(
 			</aside>
 			<main>
 				<header>
-					<h2>{$full_name}</h2>
-					<div>{$organization}</div>
+					<div class="title">{$full_name}</div>
+					<div class="organization">{$organization}</div>
 				</header>
 				<section data-content="{$selected_tab}">
 					{$content_html}
