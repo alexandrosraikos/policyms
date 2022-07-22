@@ -66,7 +66,7 @@ function user_registration_html(
                             I have read and I agree to the <a class="underline" href="{$tos_url}">Terms of Service</a>.
                         </label>
                     </div>
-                    <div class="actions">
+                    <div class="actions center">
                         <button type="submit" class="action ">Create account</button>
                     </div>
                 </form>
@@ -116,17 +116,17 @@ function user_authentication_html(
                     <input required name="email" placeholder="e.g. name@example.com" type="email" />
                     <label for="password">Password *</label>
                     <input required name="password" placeholder="*************" type="password" />
-                    <div class="actions">
+                    <div class="actions center">
                         <button type="submit" class="action">Sign in</button>
                     </div>
                 </form>
-                    <div class="sso-divider">
-                        <hr/>
-                        <span>or</span>
-                        <hr/>
-                    </div>
-                    {$sso_buttons}
-                    <p>Don't have an account yet? You can <a class="underline" href="{$registration_url}">register</a> for free now. If you have forgotten your credentials, you can <a class="underline" href="{$reset_password_page_url}">reset your password.</a></p>
+                <div class="sso-divider">
+                    <hr/>
+                    <span>or</span>
+                    <hr/>
+                </div>
+                {$sso_buttons}
+                <p>Don't have an account yet? You can <a class="underline" href="{$registration_url}">register</a> for free now. If you have forgotten your credentials, you can <a class="underline" href="{$reset_password_page_url}">reset your password.</a></p>
             </div>
         HTML;
 	}
@@ -188,14 +188,14 @@ function user_overview_html( array $information, array $statistics ): string {
 			$link_title = explode( ':', $link, 2 )[0];
 			$link_url   = explode( ':', $link, 2 )[1];
 			$links     .= <<<HTML
-             <li>
-                <a href="{$link_url}" target="blank">
+            <li>
+                <a href="{$link_url}" class="action pill" target="blank">
                     {$link_title}
                 </a>
-            </li>';
+            </li>
             HTML;
 		}
-		$links = '</ul>';
+		$links .= '</ul>';
 	}
 
 	$statistics_html = '';
@@ -594,14 +594,14 @@ function user_profile_details_html(
             <tr>
                 <td class="folding">
                     <span>Profile picture</span>
+                    <p class="discreet">
+                        Please select an image of up to 1MB and over 256x256 for optimal results. Supported file types: jpeg, png.
+                    </p>
                 </td>
                 <td class="folding">
                     {$existing_picture}
                     <span class="folding">
                         <input type="file" name="profile_picture" accept="image/png, image/jpeg" />
-                        <label for="picture">
-                            Please select an image of up to 1MB and over 256x256 for optimal results. Supported file types: jpg, png.
-                        </label>
                     </span>
                 </td>
             </tr>
@@ -617,9 +617,7 @@ function user_profile_details_html(
                 name="about" 
                 class="folding" 
                 placeholder="Tell us about yourself" 
-                style="resize:vertical">
-                {$about}
-            </textarea>
+                style="resize:vertical">{$about}</textarea>
         HTML;
 	}
 
@@ -635,30 +633,9 @@ function user_profile_details_html(
 		}
 	}
 	$links_editor = '';
-	if ( ! $visitor || $administrator ) {
-		$links_editor .= <<<HTML
-            <div class="socials folding">
-                <div>
-        HTML;
-		if ( ! empty( $user->information['social'][0] ) ) {
-			foreach ( $user->information['social'] as $link ) {
-				$link_title    = explode( ':', $link, 2 )[0];
-				$link_url      = explode( ':', $link, 2 )[1];
-				$links_editor .= <<<HTML
-                <div>
-                    <input type="text" name="socials-title[]" placeholder="Example" value="{$link_title}" />
-                    <input type="url" name="socials-url[]" placeholder="https://www.example.org/" value="{$link_url}" />
-                    <button class="remove-field" title="Remove this link."><span class="fas fa-times"></span></button>
-                </div>
-                HTML;
-			}
-		}
-		$links_editor .= <<<HTML
-                </div>
-                <button class="add-field" title="Add another link."><span class="fas fa-plus"></span> Add link</button>
-            </div>
-        HTML;
-	}
+	if ( (! $visitor || $administrator) ) {
+        $links_editor = '<div class="folding">'.link_input_fields_html($user->information['social']).'</div>';
+    }
 
 	// 'Password' editor.
 	$password_editor = '';
@@ -676,8 +653,8 @@ function user_profile_details_html(
             </td>
             <td>
                 {$password_value}
-                <input class="folding" type="password" name="password" placeholder="Enter your new password here" />
-                <input class="folding" type="password" name="password-confirm" placeholder="Confirm new password here" />
+                <input class="folding" type="password" name="password" placeholder="Enter your new password " />
+                <input class="folding" type="password" name="password-confirm" placeholder="Confirm your new password" />
             </td>
         </tr>
         HTML;
@@ -766,8 +743,8 @@ function user_profile_details_html(
             HTML;
 		} else {
 			if ( ! $visitor || $administrator ) {
-				$email_verification_status       = PolicyMS_Account::$privacy_switches[ $user->preferences['public_email'] ];
-				$email_verification              = <<<HTML
+				$email_verification_status = PolicyMS_Account::$privacy_switches[ $user->preferences['public_email'] ];
+				$email_verification        = <<<HTML
                     <span class="pill">{$email_verification_status}</span>
                 HTML;
 			}
@@ -779,13 +756,10 @@ function user_profile_details_html(
 			foreach ( PolicyMS_Account::$privacy_switches as $id => $label ) {
 				$selected               = $id === $user->preferences['public_email'] ? 'selected' : '';
 				$email_privacy_options .= <<<HTML
-                    <option value="{$id}" {$selected}>{$title}</option>
+                    <option value="{$id}" {$selected}>{$label}</option>
                 HTML;
 			}
 			$email_editor = <<<HTML
-                <label for="email" class="folding">
-                    Changing this setting will require a verification of the new e-mail address.
-                </label>
                 <input 
                     class="folding" 
                     type="email" 
@@ -800,10 +774,15 @@ function user_profile_details_html(
 
 		$email_information = <<<HTML
             <tr>
-                <td>E-mail</td>
+                <td>
+                    E-mail
+                    <p class="folding discreet">Changing this setting will require e-mail verification.</p>
+                </td>
                 <td>
                     <span class="folding visible">
-                        {$user->information['email']}
+                        <a href="mailto:{$user->information['email']}">
+                            {$user->information['email']}
+                        </a>
                         {$email_verification}
                     </span>
                     {$email_editor}
@@ -816,10 +795,10 @@ function user_profile_details_html(
 	$phone_information = '';
 	if ( $user->information['phone'] || ! $visitor ) {
 		$phone_privacy_label = '';
-        $phone_privacy = '';
-		if ( (! $visitor || $administrator)  && !empty($user->information['phone']) ) {
-			$phone_privacy_label       = PolicyMS_Account::$privacy_switches[ $user->preferences['public_phone'] ];
-			$phone_privacy             = <<<HTML
+		$phone_privacy       = '';
+		if ( ( ! $visitor || $administrator ) && ! empty( $user->information['phone'] ) ) {
+			$phone_privacy_label = PolicyMS_Account::$privacy_switches[ $user->preferences['public_phone'] ];
+			$phone_privacy       = <<<HTML
                 <span class="pill">
                     {$phone_privacy_label}
                 </span>
@@ -832,13 +811,13 @@ function user_profile_details_html(
 			foreach ( PolicyMS_Account::$privacy_switches as $id => $label ) {
 				$selected               = $id === $user->preferences['public_phone'] ? 'selected' : '';
 				$phone_privacy_options .= <<<HTML
-                    <option value="{$id}" {$selected}>{$title}</option>
+                    <option value="{$id}" {$selected}>{$label}</option>
                 HTML;
 			}
 			$phone_editor = <<<HTML
                 <input 
                     class="folding" 
-                    type="text" 
+                    type="tel" 
                     name="phone" 
                     value="{$user->information['phone']}" 
                     placeholder="Insert your phone number here" />
@@ -848,9 +827,12 @@ function user_profile_details_html(
             HTML;
 		}
 
-        $phone_value = (!empty($user->information['phone'])) 
-            ? $user->information['phone']
-            : '<em>Not provided</em>';
+		$phone_value = ( ! empty( $user->information['phone'] ) )
+			? $user->information['phone']
+			: '<em>Not provided</em>';
+        $phone_value = <<<HTML
+            <a href="tel:{$phone_value}">{$phone_value}</a>
+        HTML;
 
 		$phone_information = <<<HTML
         <tr>
@@ -873,7 +855,7 @@ function user_profile_details_html(
 		$google_action      = $oauth_controller->get_html( 'google' );
 		$google_information = <<<HTML
             <tr>
-                <td>Google account</td>
+                <td>Google</td>
                 <td>{$google_action}</td>
             </tr>
         HTML;
@@ -882,17 +864,17 @@ function user_profile_details_html(
 		$keycloak_action      = $oauth_controller->get_html( 'keycloak' );
 		$keycloak_information = <<<HTML
             <tr>
-                <td>PolicyCLOUD account</td>
+                <td>PolicyCLOUD</td>
                 <td>{$keycloak_action}</td>
             </tr>
         HTML;
 
 		// 'EGI' fields.
-		$egi_action = $oauth_controller->get_html( 'egi' );
+		$egi_action = $oauth_controller->get_html( 'egi-check-in' );
 
 		$egi_information = <<<HTML
             <tr>
-                <td>EGI credentials</td>
+                <td>EGI Check-In</td>
                 <td>{$egi_action}</td>
             </tr>
         HTML;
@@ -927,8 +909,8 @@ function user_profile_details_html(
             <button 
                 data-action="policyms-delete-user" 
                 data-nonce="{$deletion_nonce}" 
-                class="action destructive" 
-                user="{$user->uid}">
+                data-user="{$user->uid}"
+                class="action destructive" >
                 Delete account
             </button>
         HTML;
@@ -1013,18 +995,17 @@ function user_profile_details_html(
                         <td>Member since</td>
                         <td>{$registration_date_formatted}</td>
                     </tr>
-                    </table>
-                    <div class="actions">
-                        {$delete_account_button}
-                        {$request_data_copy_button}
-                        <button class="folding action" data-action="policyms-edit-user">
-                            Save changes
-                        </button>
-                    </div>
-                    {$notice_containers}
-                </form>
-                </section>
-
+                </table>
+                {$notice_containers}
+                <div class="actions">
+                    {$delete_account_button}
+                    {$request_data_copy_button}
+                    <button class="folding action" data-action="policyms-edit-user">
+                        Save changes
+                    </button>
+                </div>
+            </form>
+        </section>
     HTML;
 }
 

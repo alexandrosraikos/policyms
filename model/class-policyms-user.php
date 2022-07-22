@@ -59,9 +59,9 @@ class PolicyMS_User extends PolicyMS_Account {
 
 	/**
 	 * The user's resource statistics.
-	 * 
+	 *
 	 * @var array $resources The numbers.
-	 * 
+	 *
 	 * @since 2.0.0
 	 */
 	public ?array $resources;
@@ -166,7 +166,7 @@ class PolicyMS_User extends PolicyMS_Account {
 		$this->information = $data['info'];
 		$this->metadata    = $data['account'];
 		$this->preferences = $data['profile_parameters'];
-		$this->resources = $data['resources'];
+		$this->resources   = $data['resources'];
 	}
 
 	/**
@@ -280,11 +280,12 @@ class PolicyMS_User extends PolicyMS_Account {
 		self::inspect( $data );
 
 		// Upload new profile picture.
-		if ( isset( $picture ) ) {
+		if ( ! empty( $picture ) ) {
 			$token = $this->update_picture( $picture );
 		}
 
 		// Contact the PolicyMS API for password change.
+		// TODO @vkoukos: Return new token on password update.
 		if ( ! empty( $data['password'] ) ) {
 			$response = PolicyMS_Communication_Controller::api_request(
 				'POST',
@@ -294,7 +295,7 @@ class PolicyMS_User extends PolicyMS_Account {
 					'new_password'         => $data['password'],
 					'confirm_new_password' => $data['password-confirm'],
 				),
-				$this->token
+				$token ?? $this->token
 			);
 			if ( ! empty( $response['token'] ) ) {
 				$token = $response['token'];
@@ -324,7 +325,7 @@ class PolicyMS_User extends PolicyMS_Account {
 					'public_phone' => intval( $data['public-phone'] ),
 				),
 			),
-			$this->token
+			$token ?? $this->token
 		);
 
 		if ( ! empty( $response['token'] ) ) {

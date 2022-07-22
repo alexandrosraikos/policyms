@@ -9,10 +9,14 @@ var accountElementQueries = {
   mainContainer: '.policyms-user',
   tabSwitchButton: '.policyms-user > .sidebar > nav > button[data-action="policyms-switch-user-tab"]',
   tabContentContainer: '.policyms-user > main > section',
-  editToggleButton: '.policyms-user-profile > header > button[data-action="policyms-account-edit-toggle"]'
+  editToggleButton: '.policyms-user-profile > header > button[data-action="policyms-account-edit-toggle"]',
+  deleteAccountButton: '.policyms-user-profile > form > .actions > button[data-action="policyms-delete-user"]',
+  userEditingForm: '.policyms-user-profile > form',
+  requestDataCopyButton: '.policyms-user-profile > form > .actions > button[data-action="policyms-user-request-data-copy"]',
+  confirmDeletePasswordField: 'form[data-action="policyms-user-deletion-validation"] > input[name="current-password"]',
+  confirmDeleteAccountButton: 'form[data-action="policyms-user-deletion-validation"] > .actions > button[type="submit"]',
+  updateUserButton: '.policyms-user-profile > form > .actions > button[data-action="policyms-edit-user"]'
 };
-
-
 
 /**
  * Switch visible interface tab.
@@ -21,6 +25,9 @@ var accountElementQueries = {
  */
 function switchTab(e) {
   e.preventDefault();
+  if ($(e.target).hasClass('active')) {
+    return;
+  }
   makeWPRequest(
     accountElementQueries.tabContentContainer,
     'policyms_account_user_switch_tab',
@@ -408,13 +415,11 @@ function toggleFormFields(e) {
   $(".folding").toggleClass("visible");
   if ($(this).html().includes("Edit")) {
     $(this).addClass("destructive");
-    $(this).html('<span class="fas fa-times"></span> Cancel');
+    $(this).html('Cancel');
   } else {
     $(this).removeClass("destructive");
     $(this).html('<span class="fas fa-pen"></span> Edit');
   }
-  $("#policyms-account-edit .error").removeClass("visible");
-  $("#policyms-account-edit .notice").removeClass("visible");
 }
 
 /**
@@ -426,18 +431,18 @@ function toggleFormFields(e) {
  */
 function setCurrentPasswordRequirement(enabled = false) {
   if (enabled) {
-    $("#policyms-account-edit .critical-action").addClass(
+    $(accountElementQueries.userEditingForm + " .critical-action").addClass(
       "visible"
     );
     $(
-      "#policyms-account-edit input[name=current-password]"
+      accountElementQueries.userEditingForm + "  input[name=current-password]"
     ).prop("required", true);
   } else {
-    $("#policyms-account-edit .critical-action").removeClass(
+    $(accountElementQueries.userEditingForm + "  .critical-action").removeClass(
       "visible"
     );
     $(
-      "#policyms-account-edit input[name=current-password]"
+      accountElementQueries.userEditingForm + "  input[name=current-password]"
     ).prop("required", false);
   }
 }
@@ -451,23 +456,29 @@ function setCurrentPasswordRequirement(enabled = false) {
  */
 function updateInformation(e) {
   e.preventDefault();
+  if ($(accountElementQueries.userEditingForm)[0].checkValidity()) {
+    // Prepare form data.
+    var formData = new FormData(
+      $(accountElementQueries.userEditingForm)[0]
+    );
+    formData.append("uid", $(accountElementQueries.mainContainer).data('user-id'));
+    formData.append("subsequent_action", "edit_account_user");
 
-  // Prepare form data.
-  var formData = new FormData(
-    $("#policyms-account-edit")[0]
-  );
-  formData.append("uid", AccountEditingProperties.userID);
-  formData.append("subsequent_action", "edit_account_user");
-
-  makeWPRequest(
-    "#policyms-account-edit button[type=submit]",
-    "policyms_account_user_edit",
-    AccountEditingProperties.nonce,
-    formData,
-    () => {
-      window.location.reload();
-    }
-  );
+    makeWPRequest(
+      accountElementQueries.userEditingForm,
+      "policyms_account_user_edit",
+      $(accountElementQueries.userEditingForm).data('nonce'),
+      formData,
+      (data) => {
+        if (data) {
+          setAuthorizedToken(data);
+        }
+        window.location.reload();
+      }
+    );
+  } else {
+    $(accountElementQueries.userEditingForm)[0].reportValidity();
+  }
 }
 
 /**
@@ -488,7 +499,7 @@ function deleteProfilePicture(e) {
 
   // Prepare deletion form.
   var formData = new FormData();
-  formData.append("uid", AccountEditingProperties.userID ?? "");
+  formData.append("uid", $(accountElementQueries.mainContainer).data('user-id') ?? "");
   formData.append("subsequent_action", "delete_profile_picture");
 
   makeWPRequest(
@@ -516,7 +527,7 @@ function retryVerification(e) {
     "policyms_account_user_retry_verification",
     AccountEditingProperties.verificationRetryNonce,
     {
-      uid: AccountEditingProperties.userID,
+      uid: $(accountElementQueries.mainContainer).data('user-id'),
     },
     () => {
       showAlert(
@@ -542,9 +553,9 @@ function retryVerification(e) {
 function requestDataCopy(e) {
   e.preventDefault();
   makeWPRequest(
-    "button#policyms-request-data-copy",
+    accountElementQueries.requestDataCopyButton,
     "policyms_account_user_data_request",
-    AccountEditingProperties.requestDataCopyNonce,
+    $(accountElementQueries.requestDataCopyButton).data('nonce'),
     {},
     (data) => {
       const blobData = JSON.stringify(data, null, 2);
@@ -552,12 +563,12 @@ function requestDataCopy(e) {
         type: "text/plain",
       });
       var a = document.createElement("a");
-      a.download = AccountEditingProperties.userID + "_account_data.txt";
+      a.download = $(accountElementQueries.mainContainer).data('user-id') + "_account_data.txt";
       a.href = URL.createObjectURL(blob);
       a.dataset.downloadurl = ["text/plain", a.download, a.href].join(":");
       a.style.display = "none";
       a.setAttribute("id", "policyms-download-data-copy");
-      $("section.policyms-account-profile").append(a);
+      $(accountElementQueries.requestDataCopyButton).append(a);
       $("#policyms-download-data-copy").get(0).click();
     }
   );
@@ -574,11 +585,27 @@ function requestDataCopy(e) {
 function validateDeletionRequest(e) {
   e.preventDefault();
 
-  // Show password prompt.
-  $("#policyms-delete-account > div").addClass("visible");
-  $(
-    "#policyms-delete-account input[name=current-password]"
-  ).attr("required", true);
+  // Show password prompt modal.
+  new Modal(
+    'policyms-user-deletion-validation-form',
+    `
+    <div style="padding:30px 20px 0 20px;">
+      <form data-action="policyms-user-deletion-validation">
+        <h2>Are you sure?</h2>
+        <p>Type your current password below to confirm your request to delete your user account.</p>
+        <label for="current-password">Current password *</label>
+        <input required name="current-password" placeholder="Enter your current password" type="password" />
+        <div class="actions">
+          <button 
+              type="submit" 
+              class="action destructive">
+              Confirm
+          </button>
+        </div>
+      </form>
+      </div>
+    `
+  );
 
   // Perform the AJAX request for a present password value.
   if (
@@ -586,26 +613,28 @@ function validateDeletionRequest(e) {
       "#policyms-delete-account input[name=current-password]"
     ).val() !== ""
   ) {
-    makeWPRequest(
-      "#policyms-delete-account button[type=submit]",
-      "policyms_account_user_deletion",
-      AccountEditingProperties.deletionNonce,
-      {
-        current_password: $(
-          "#policyms-delete-account input[name=current-password]"
-        ).val(),
-        user: $('#policyms-delete-account button[type=submit]').attr('user') ?? ''
-      },
-      () => {
-        if ($('#policyms-delete-account button[type=submit]').attr('user').length == 0) {
-          removeAuthorization();
-          window.location.href(GlobalProperties.rootURLPath);
-        } else {
-          window.location.reload();
-        }
-      }
-    );
   }
+}
+
+function deleteUser(e) {
+  e.preventDefault();
+  makeWPRequest(
+    accountElementQueries.confirmDeleteAccountButton,
+    "policyms_account_user_deletion",
+    $(accountElementQueries.deleteAccountButton).data('nonce'),
+    {
+      current_password: $(accountElementQueries.confirmDeletePasswordField).val(),
+      user: $(accountElementQueries.deleteAccountButton).data('user') ?? ''
+    },
+    () => {
+      if ($(accountElementQueries.deleteAccountButton).data('user').length == 0) {
+        removeAuthorization();
+        window.location.href(GlobalProperties.rootURLPath);
+      } else {
+        window.location.reload();
+      }
+    }
+  );
 }
 
 (function ($) {
@@ -642,9 +671,9 @@ function validateDeletionRequest(e) {
 
     // Show current password field on email editing.
     const initialEmailAddress = $(
-      "#policyms-account-edit input[name=email]"
+      accountElementQueries.userEditingForm + " input[name=email]"
     ).val();
-    $("#policyms-account-edit input[name=email]").on(
+    $(accountElementQueries.userEditingForm + " input[name=email]").on(
       "change paste keyup",
       function () {
         setCurrentPasswordRequirement($(this).val() !== initialEmailAddress);
@@ -652,7 +681,7 @@ function validateDeletionRequest(e) {
     );
 
     // Show current password field on password editing.
-    $("#policyms-account-edit input[name=password]").on(
+    $(accountElementQueries.userEditingForm + " input[name=password]").on(
       "change paste keyup",
       function () {
         setCurrentPasswordRequirement($(this).val() !== "");
@@ -665,16 +694,29 @@ function validateDeletionRequest(e) {
     );
 
     // Submit the updated information.
-    $("#policyms-account-edit").submit(updateInformation);
+    $(document).on(
+      'click',
+      accountElementQueries.updateUserButton,
+      updateInformation
+    );
 
     // Request a copy of the account's data.
-    $("button#policyms-request-data-copy").click(
+    $(document).on(
+      'click',
+      accountElementQueries.requestDataCopyButton,
       requestDataCopy
     );
 
-    // Show current password field on deletion request.
-    $("#policyms-delete-account").submit(
+    // Confirm and delete account.
+    $(document).on(
+      'click',
+      accountElementQueries.deleteAccountButton,
       validateDeletionRequest
+    );
+    $(document).on(
+      'click',
+      accountElementQueries.confirmDeleteAccountButton,
+      deleteUser
     );
 
     $("button[data-action=\"disconnect-google\"]").click(

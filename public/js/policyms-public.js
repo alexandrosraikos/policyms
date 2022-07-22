@@ -42,7 +42,7 @@ class Modal {
     <div class="policyms policyms-modal ${this.type
       }" hidden>
         <div class="backdrop"></div>
-        <button class="close tactile">
+        <button class="close action destructive">
           <span class="fas fa-times"></span>
         </button>
         <div class="container">
@@ -288,29 +288,29 @@ function showAlert(
   placeBefore = false,
   disappearing = true
 ) {
-  if (placeBefore) {
-    $(selector).before(
-      '<div class="policyms-' +
-      type +
-      ' animated"><span>' +
-      message +
-      "</span></div>"
-    );
-  } else {
-    $(selector).after(
-      '<div class="policyms-' +
-      type +
-      ' animated"><span>' +
-      message +
-      "</span></div>"
-    );
-  }
+  const iconIdentifier = (type === 'notice')
+    ? 'fa-circle-exclamation'
+    : 'fa-triangle-exclamation';
+
+  const notice = `
+  <div class="policyms-notice policyms-${type} animated absolute">
+    <span class="icon fas ${iconIdentifier}"></span>
+    <span>${message}</span>
+  </div>
+  `;
+
+  $('.policyms:first-of-type').append(notice);
+  // if (placeBefore) {
+  //   $(selector).before(notice);
+  // } else {
+  //   $(selector).after(notice);
+  // }
   if (disappearing) {
     setTimeout(() => {
-      $(selector).next().addClass("seen");
+      $('.policyms-notice.absolute').addClass("seen");
     }, 3500);
     setTimeout(() => {
-      $(selector).next().addClass("dismissed");
+      $('.policyms-notice.absolute').addClass("dismissed");
     }, 3700);
   }
 }
@@ -500,7 +500,9 @@ $(document).ready(() => {
   }
 
   // Add a grouped link field.
-  $('.policyms-input-fields-grouping > button[data-action="add-field"]').click(
+  $(document).on(
+    'click',
+    '.policyms-input-fields-grouping > button[data-action="add-field"]',
     addGroupedLinkField
   );
 

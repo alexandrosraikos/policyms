@@ -242,7 +242,7 @@
   margin: 20px;
 }
 
-.policyms-user > main .policyms-user > main > header {
+.policyms-user > main > header {
   padding-bottom: 15px;
   padding-left: 20px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.15);
@@ -250,7 +250,7 @@
 }
 
 .policyms-user > main > header > .title {
-  font-weight: bold;
+  font-weight: 700;
   margin: 0;
   font-size: 24pt;
 }
@@ -288,11 +288,6 @@
 
 .policyms-user-overview h2 {
   margin-bottom: 10px;
-}
-
-.policyms-user-overview p {
-  color: var(--policyms-text-color-secondary);
-  font-size: 90%;
 }
 
 .policyms-user-overview ul {

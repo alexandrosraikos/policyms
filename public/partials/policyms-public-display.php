@@ -27,9 +27,21 @@ function notice_html( string $message, string $type = 'error', int $http_status 
 	$logout_attribute = ( ( 403 === ( $http_status ?? 0 ) ) ? 'logout' : '' );
 	$message          = $message;
 	$type             = esc_attr( $type );
+	$icon_identifier  = '';
+	switch ( $type ) {
+		case 'notice':
+			$icon_identifier = 'fa-circle-exclamation';
+			break;
+		case 'error':
+			$icon_identifier = 'fa-triangle-exclamation';
+			break;
+		default:
+			break;
+	}
 
 	return <<<HTML
-        <div class="policyms-{$type}" {$logout_attribute}>
+        <div class="policyms-notice policyms-{$type}" {$logout_attribute}>
+            <span class="icon fas {$icon_identifier}"></span>&nbsp;
             <span>{$message}</span>
         </div>
     HTML;
@@ -192,11 +204,11 @@ function link_input_fields_html( array $existing_links = array() ) {
         HTML;
 	}
 
-	$disabled_attribute = ( $existing_links ) ? 'disabled' : '';
+	$disabled_attribute = ( empty( $existing_links ) ) ? 'disabled' : '';
 
-	return <<<HTML
-        <div class="policyms policyms-input-fields-grouping">
-            {$existing_links_html}
+	$blank_link_html = '';
+	if ( empty( $existing_links ) ) {
+		$blank_link_html = <<<HTML
             <div class="grouping">
                 <input 
                     type="text" 
@@ -214,6 +226,13 @@ function link_input_fields_html( array $existing_links = array() ) {
                     <span class="fas fa-times"></span>
                 </button>
             </div>
+        HTML;
+	}
+
+	return <<<HTML
+        <div class="policyms policyms-input-fields-grouping">
+            {$existing_links_html}
+            {$blank_link_html}
             <button class="add" data-action="add-field" title="Add another link."><span class="fas fa-plus"></span> Add link</button>
         </div>
     HTML;

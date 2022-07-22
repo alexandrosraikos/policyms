@@ -27,9 +27,9 @@ class PolicyMS_OAuth_Controller {
 	 *  The supported SSO service identifiers and titles.
 	 */
 	public static array $supported_services = array(
-		'keycloak' => 'PolicyCLOUD',
-		'egi'      => 'EGI Check-in',
-		'google'   => 'Google',
+		'keycloak'     => 'PolicyCLOUD',
+		'egi-check-in' => 'EGI Check-In',
+		'google'       => 'Google',
 	);
 
 	/**
@@ -143,7 +143,7 @@ class PolicyMS_OAuth_Controller {
 					</button>
 				HTML;
 
-			case 'egi':
+			case 'egi-check-in':
 				$egi_button_label = $register
 					? 'Sign up with EGI Check-in'
 					: 'Sign in with EGI Check-in';
@@ -240,11 +240,16 @@ class PolicyMS_OAuth_Controller {
 		bool $exclusive = true
 		) {
 		if ( self::exists( $service ) ) {
-			if ( $this->user ) {
-				return $this->get_disconnect_html(
-					$service,
-					$this->user->is_password_protected()
-				);
+			if ( ! empty( $this->user ) ) {
+				if ( ! empty( $this->user->metadata['connections'][ $service ] ) ) {
+					return $this->get_disconnect_html(
+						$service,
+						$this->user->is_password_protected()
+					);
+				} else {
+					$service_label = self::$supported_services[ $service ];
+					return notice_html( "This account is not connected via {$service_label}.", 'notice' );
+				}
 			} else {
 				return $this->get_connect_html(
 					$service,
@@ -308,7 +313,6 @@ class PolicyMS_OAuth_Controller {
 
 		return <<<HTML
 			<div class="policyms-oauth-buttons">
-				
 				{$sso_buttons}
 			</div>
 		HTML;

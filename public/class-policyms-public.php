@@ -124,7 +124,7 @@ class PolicyMS_Public {
 
 		wp_enqueue_script(
 			'fontawesome',
-			'https://use.fontawesome.com/releases/v5.15.4/js/all.js',
+			'https://use.fontawesome.com/releases/v6.1.1/js/all.js',
 			array( 'policyms' ),
 			$this->version,
 			false
@@ -200,7 +200,7 @@ class PolicyMS_Public {
 
 		// Verify the action related nonce.
 		$action = sanitize_key( $_POST['action'] );
-		if ( ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), $action ) ) {
+		if ( ! wp_verify_nonce( sanitize_text_field( $_POST['nonce'] ), $action ) ) {
 			http_response_code( 403 );
 			die( 'Unverified request for action: ' . esc_attr( $action ) );
 		}
@@ -496,8 +496,8 @@ class PolicyMS_Public {
 					$user->__get('picture'),
 					new PolicyMS_OAuth_Controller( $user ),
 					wp_create_nonce( 'policyms_account_user_edit' ),
-					wp_create_nonce( 'policyms_account_user_deletion' ),
 					wp_create_nonce( 'policyms_account_user_retry_verification' ),
+					wp_create_nonce( 'policyms_account_user_deletion' ),
 					wp_create_nonce( 'policyms_account_user_data_request' )
 				);
 		}
@@ -824,18 +824,18 @@ class PolicyMS_Public {
 								'current-password' => wp_unslash( $data['current-password'] ?? '' ),
 								'name'             => sanitize_text_field( wp_unslash( $data['name'] ) ),
 								'surname'          => sanitize_text_field( wp_unslash( $data['surname'] ) ),
-								'title'            => sanitize_key( $data['title'] ?? '' ),
+								'title'            => sanitize_text_field( $data['title'] ?? '' ),
 								'gender'           => sanitize_key( $data['gender'] ?? '' ),
 								'organization'     => sanitize_text_field( wp_unslash( $data['organization'] ?? '' ) ),
 								'email'            => sanitize_email( $data['email'] ),
 								'phone'            => sanitize_text_field( $data['phone'] ?? '' ),
 								'links-title'      => array_map(
-									fn( $title) => sanitize_text_field( $title ),
-									$data['links-title'] ?? ''
+									fn( $title) => str_replace(':', '',sanitize_text_field( $title )),
+									$data['links-title'] ?? array()
 								),
 								'links-url'        => array_map(
 									fn( $url) => sanitize_text_field( $url ),
-									$data['links-url'] ?? ''
+									$data['links-url'] ?? array()
 								),
 								'about'            => sanitize_textarea_field( wp_unslash( $data['about'] ?? '' ) ),
 								'public-email'     => sanitize_key( $data['public-email'] ),
