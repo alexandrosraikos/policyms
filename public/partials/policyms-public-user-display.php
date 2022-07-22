@@ -35,77 +35,42 @@ function user_registration_html(
 		return notice_html( "You're already logged in.", 'notice' );
 	} else {
 		$sso_buttons = $oauth_controller->get_all_html();
-		$links       = link_input_fields_html();
 		return <<<HTML
 			<div class="policyms policyms-user-registration">
-				{$sso_buttons}
+					<h2>Welcome</h2>
+					<p>Create an account and start working with policy materials today.</p>
+					{$sso_buttons}
+					<div class="sso-divider">
+						<hr/>
+						<span>or</span>
+						<hr/>
+					</div>
 				<form 
 					data-action="policyms-user-registration"
 					data-redirect="{$account_page_url}"
 					data-nonce="{$nonce}"
 					action="">
-					<fieldset name="account-details">
-						<h2>Account details</h2>
-						<p>Fill in the following fields with your personal details. This information will be used to personalize your experience within the marketplace platform and showcase your profile to other registered users. Fields marked with (*) are required for registration.</p>
-						<label for="title">Title</label>
-						<select name="title">
-							<option value="Mr.">Mr.</option>
-							<option value="Ms.">Ms.</option>
-							<option value="Mrs.">Mrs.</option>
-							<option value="Dr.">Dr.</option>
-							<option value="Prof.">Prof.</option>
-							<option value="Sir">Sir</option>
-							<option value="Miss">Miss</option>
-							<option value="Mx.">Mx.</option>
-							<option value="-" selected>None</option>
-						</select>
-						<label for="name">First name *</label>
-						<input required name="name" placeholder="Insert your first name" type="text" />
-						<label for="surname">Last name *</label>
-						<input required name="surname" placeholder="Insert your last name" type="text" />
-						<label for="organization">Organization</label>
-						<input name="organization" placeholder="Insert your organization" type="text" />
-						<label for="gender">Gender</label>
-						<select name="gender">
-							<option value="male">Male</option>
-							<option value="female">Female</option>
-							<option value="transgender">Transgender</option>
-							<option value="genderqueer">Genderqueer</option>
-							<option value="questioning">Questioning</option>
-							<option value="-" selected>Prefer not to say</option>
-						</select>
-						<label for="about">Summary</label>
-						<textarea name="about" placeholder="Tell us about yourself" style="resize:vertical"></textarea>
-						<label>Related links</label>
-						{$links}
-					</fieldset>
-					<fieldset name="account-contact">
-						<h2>Account contact details</h2>
-						<p>Fill in your contact information here. This information will be used to validate your new account, as well as optionally make them visible to other logged in Marketplace visitors. Fields marked with (*) are required for registration. These details remain private by default. </p>
-						<label for="email">E-mail address *</label>
-						<input type="email" name="email" placeholder="e.g. johndoe@example.org" required />
-						<label for="phone">Phone number</label>
-						<input type="tel" name="phone" placeholder="e.g. +30 6999123456" />
-					</fieldset>
-					<fieldset name="account-credentials">
-						<h2>Account credentials</h2>
-						<p>The following information is required for authorization purposes.</p>
-						<label for="password">Password *</label>
-						<input required name="password" placeholder="Insert your password" type="password" />
-						<label for="password-confirm">Confirm password *</label>
-						<input required name="password-confirm" placeholder="Insert your password again" type="password" />
-					</fieldset>
+					<label for="name">First name *</label>
+					<input required name="name" placeholder="Enter your first name" type="text" />
+					<label for="surname">Last name *</label>
+					<input required name="surname" placeholder="Enter your last name" type="text" />
+					<label for="email">E-mail address *</label>
+					<input type="email" name="email" placeholder="e.g. name@example.com" required />
+					<label for="password">Password *</label>
+					<input required name="password" placeholder="Must have at least 8 characters" type="password" />
+					<label for="password-confirm">Confirm password *</label>
+					<input required name="password-confirm" placeholder="Enter your password again" type="password" />
 					<div class="tos-agree">
 						<input type="checkbox" id="tos-agree" name="tos-agree" required />
 						<label for="tos-agreee">
-							By submitting this registration form, you agree to our <a class="underline" href="{$tos_url}">Terms of Service</a>.
+							I have read and I agree to the <a class="underline" href="{$tos_url}">Terms of Service</a>.
 						</label>
 					</div>
 					<div class="actions">
 						<button type="submit" class="action ">Create account</button>
 					</div>
-					<p>Already have an account? Please <a class="underline" href="{$authentication_url}">Log in</a>.</p>
 				</form>
+					<p>Already have an account? Please <a class="underline" href="{$authentication_url}">Log in</a>.</p>
 			</div>
 		HTML;
 	}
@@ -139,25 +104,28 @@ function user_authentication_html(
 		$sso_buttons = $oauth_controller->get_all_html();
 		return <<<HTML
 			<div class="policyms policyms-user-authentication">
-				{$sso_buttons}
 				<form 
 					data-action="policyms-user-authentication"
 					data-redirect="{$home_url}"
 					data-nonce="{$nonce}"
 					action="">
-					<fieldset name=" account-credentials">
-						<h2>Insert your credentials</h2>
-						<p>The following information is required to log you in.</p>
-						<label for="email">E-mail address *</label>
-						<input required name="email" placeholder="e.g. johndoe@example.org" type="email" />
-						<label for="password">Password *</label>
-						<input required name="password" placeholder="Insert your password" type="password" />
-					</fieldset>
+					<h2>Welcome back</h2>
+					<p>Please enter your details or sign in using one of the services below.</p>
+					<label for="email">E-mail address *</label>
+					<input required name="email" placeholder="e.g. name@example.com" type="email" />
+					<label for="password">Password *</label>
+					<input required name="password" placeholder="*************" type="password" />
 					<div class="actions">
-						<button type="submit" class="action">Log in</button>
+						<button type="submit" class="action">Sign in</button>
 					</div>
-					<p>Don't have an account yet? You can <a class="underline" href="{$registration_url}">register</a> now to obtain full access to the Marketplace. If you have forgotten your credentials, you can <a class="underline" href="{$reset_password_page_url}">reset your password.</a></p>
 				</form>
+					<div class="sso-divider">
+						<hr/>
+						<span>or</span>
+						<hr/>
+					</div>
+					{$sso_buttons}
+					<p>Don't have an account yet? You can <a class="underline" href="{$registration_url}">register</a> for free now. If you have forgotten your credentials, you can <a class="underline" href="{$reset_password_page_url}">reset your password.</a></p>
 			</div>
 		HTML;
 	}
@@ -178,26 +146,22 @@ function user_password_reset_html( $authenticated, $nonce ) {
 		return show_lock( 'You are already logged in.', 'notice' );
 	} else {
 		return <<<HTML
-			<div class="policyms policyms-password-resset">
+			<div class="policyms policyms-password-reset">
+						<h2>Reset your password</h2>
+						<p>Insert your e-mail address below and we will contact you with instructions to reset your password.</p>
 				<form 
 					data-action="policyms-user-password-reset"
 					data-nonce="{$nonce}"
 					>
-					<fieldset>
-						<h2>Reset your password</h2>
-						<p>Insert your e-mail address below and we will contact you with instructions to reset your password.</p>
 						<label for="email">E-mail address *</label>
 						<input 
 							name="email" 
-							placeholder="e.g. johndoe@example.org" 
+							placeholder="e.g. name@example.com" 
 							type="email" 
 							required />
-						<div class="actions">
-							<button type="submit" class="action">
-								Reset password
-							</button>
-						</div>
-					</fieldset>
+						<button type="submit" class="action">
+							Reset password
+						</button>
 				</form>
 			</div>
 		HTML;
@@ -858,7 +822,7 @@ function user_profile_details_html(
 		$keycloak_action      = $oauth_controller->get_html( 'keycloak' );
 		$keycloak_information = <<<HTML
 			<tr>
-				<td>PolicyMS account (Internal)</td>
+				<td>PolicyCLOUD account</td>
 				<td>{$keycloak_action}</td>
 			</tr>
 		HTML;

@@ -27,9 +27,9 @@ class PolicyMS_OAuth_Controller {
 	 *  The supported SSO service identifiers and titles.
 	 */
 	public static array $supported_services = array(
-		'google'   => 'Google',
-		'keycloak' => 'PolicyCLOUD (Internal)',
+		'keycloak' => 'PolicyCLOUD',
 		'egi'      => 'EGI Check-in',
+		'google'   => 'Google',
 	);
 
 	/**
@@ -125,7 +125,7 @@ class PolicyMS_OAuth_Controller {
 				HTML;
 
 			case 'keycloak':
-				$keycloak_button_label = $register ? 'Sign up with PolicyCLOUD (Internal)' : 'Sign in with PolicyCLOUD (Internal)';
+				$keycloak_button_label = $register ? 'Sign up with PolicyCLOUD' : 'Sign in with PolicyCLOUD';
 
 				$nonce = $register
 					? wp_create_nonce( 'policyms_account_user_registration_keycloak' )
@@ -308,6 +308,7 @@ class PolicyMS_OAuth_Controller {
 
 		return <<<HTML
 			<div class="policyms-oauth-buttons">
+				
 				{$sso_buttons}
 			</div>
 		HTML;

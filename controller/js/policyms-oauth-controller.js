@@ -114,7 +114,8 @@ window.onload = function () {
         shape: 'rectangular',
         theme: "filled_black",
         size: "large",
-        locale: "en-GB"
+        locale: "en-GB",
+        width: "420px"
     }
     );
     google.accounts.id.prompt();

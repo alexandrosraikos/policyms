@@ -17,7 +17,7 @@
   --policyms-text-color-invert: #f0f0f0;
   --policyms-text-color-invert-secondary: #c2c2c2;
   --policyms-highlight-color-dark: #03204a;
-  --policyms-highlight-color-mid: #3b82fd;
+  --policyms-highlight-color-mid: #3570d6;
   --policyms-highlight-color-light: #00bdf5;
   --policyms-border-color-light: rgba(0, 0, 0, 0.1);
   --policyms-background-color: rgba(253, 253, 253);
@@ -36,6 +36,13 @@
 
 .policyms {
   margin: 0 auto;
+}
+
+.policyms hr {
+  margin: 0;
+  border: none;
+  height: 1px;
+  background-color: var(--policyms-border-color-light);
 }
 
 .policyms a {
@@ -66,13 +73,19 @@
 
 .policyms button.action,
 .policyms a.action {
-  padding: 7px 15px;
-  border: 1px solid var(--policyms-background-notice-outline);
-  border-radius: 8px;
-  background: var(--policyms-background-notice) !important;
+  padding: 2px 16px;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  background: rgb(99, 156, 255) !important;
+  background: linear-gradient(
+    307deg,
+    rgba(99, 156, 255, 1) 0%,
+    rgba(53, 112, 214, 1) 99%
+  ) !important;
   color: var(--policyms-text-color-invert) !important;
   transition: all 0.2s ease-in-out;
-  font-weight: 500;
+  font-weight: bold;
+  font-size: 12pt;
 }
 
 .policyms button.action.minimal {
@@ -104,13 +117,14 @@
 
 .policyms button.action:hover {
   cursor: pointer;
-  transform: scale(0.98);
+  transform: scale(0.99);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   transition: all 0.2s ease-in-out;
 }
 
 .policyms button.action:active {
-  opacity: 0.7;
-  transform: scale(0.95);
+  transform: scale(0.97);
+  box-shadow: 0 1px 0px rgba(0, 0, 0, 0.3);
   transition: all 0.1s ease-in-out;
 }
 
@@ -224,7 +238,8 @@
 }
 
 .policyms p {
-  line-height: 1.3em;
+  line-height: 1.5;
+  margin-bottom: 20px;
 }
 
 .policyms p.discreet {
@@ -296,14 +311,14 @@
 */
 
 .policyms form {
-  margin: 0 auto;
+  margin: 0 auto 20px auto;
   padding: 0;
 }
 
 .policyms form fieldset {
   border: none;
   padding: 10px 0;
-  margin: 0 auto;
+  margin: 0 auto 20px 0;
 }
 
 .policyms form fieldset > * {
@@ -313,6 +328,7 @@
 .policyms form input[type="text"],
 .policyms form input[type="number"],
 .policyms form input[type="email"],
+.policyms form input[type="password"],
 .policyms form input[type="tel"],
 .policyms form textarea {
   display: block;
@@ -321,16 +337,69 @@
   box-sizing: border-box;
 }
 
-.policyms form fieldset:not(.policyms form fieldset:last-of-type) {
-  border-bottom: 1px solid var(--policyms-border-color-light);
-  padding-bottom: 20px;
+.policyms form input[type="checkbox"] {
+  position: relative;
+  -moz-appearance: none;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  width: 50px;
+  height: 30px;
+  margin: 10px 7px 10px 0;
+  background-color: #ffffff;
+  border: var(--border-thin);
+  border-radius: 50px;
+  -webkit-box-shadow: inset -20px 0 0 0 var(--policyms-background-color);
+  box-shadow: inset -20px 0 0 0 var(--policyms-background-color);
+  -webkit-transition-duration: 200ms;
+  -o-transition-duration: 200ms;
+  transition-duration: 200ms;
+}
+
+.policyms form input[type="checkbox"]:hover {
+  cursor: pointer;
+}
+
+.policyms form input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30px;
+  height: 30px;
+  background-color: transparent;
+  border-radius: 50%;
+  -webkit-box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  -webkit-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+
+.policyms form input[type="checkbox"]:checked {
+  border-color: var(--policyms-highlight-color-mid);
+  -webkit-box-shadow: inset 20px 0 0 0 var(--policyms-highlight-color-mid);
+  box-shadow: inset 20px 0 0 0 var(--policyms-highlight-color-mid);
+  -webkit-transition-duration: 200ms;
+  -o-transition-duration: 200ms;
+  transition-duration: 200ms;
+}
+
+.policyms form input[type="checkbox"]:checked::after {
+  left: 20px;
+  -webkit-box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  -webkit-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
 .policyms form label {
   display: block;
-  font-weight: 500;
+  color: var(--policyms-text-color-secondary);
   margin: 10px 0 5px 0;
   padding: 0;
+  font-size: 11pt;
 }
 
 .policyms
@@ -339,16 +408,23 @@
 .policyms form textarea,
 .policyms form select {
   display: block;
-  font-size: 16px;
-  padding: 10px;
+  padding: 10px 14px;
   margin: 0 0 10px 0;
   background-color: #ffffff;
-  border: 1px double #222222 !important;
+  border: 1px solid var(--policyms-border-color-light) !important;
   border-radius: 10px;
 }
 
-.policyms form > p {
-  text-align: center;
+.policyms form select {
+  padding: 10px;
+  padding-right: 30px;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat, repeat;
+  background-position: right 1em top 50%, 0 0;
+  background-size: 0.65em auto, 100%;
 }
 
 .policyms form select:hover {
@@ -357,15 +433,14 @@
 }
 
 .policyms form button[type="submit"] {
-  display: block;
-  margin: 0 auto;
+  margin: 10px 0;
 }
 
 .policyms form .actions {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 20px;
+  margin: 10px;
 }
 
 .policyms form .actions.align-end {
